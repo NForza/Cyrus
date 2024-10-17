@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using Microsoft.CodeAnalysis;
 
 #pragma warning disable RS1035 // Do not use banned APIs for analyzers
@@ -16,7 +15,7 @@ public class CqrsGenerator : ISourceGenerator
 {
     public void Execute(GeneratorExecutionContext context)
     {
-#if DEBUG
+#if DEBUG1 //remove the 1 to enable debugging when compiling source code
         //This will launch the debugger when the generator is running
         //You might have to do a Rebuild to get the generator to run
         if (!Debugger.IsAttached)
@@ -25,27 +24,27 @@ public class CqrsGenerator : ISourceGenerator
         }
 #endif
         var additionalFile = context.AdditionalFiles
-            .FirstOrDefault(file => Path.GetFileName(file.Path) == "cqrsConfig.json");
+            .FirstOrDefault(file => Path.GetFileName(file.Path) == "cqrsConfig.txt");
+        string configContent = additionalFile.GetText(context.CancellationToken)?.ToString() ?? string.Empty;
 
-        string jsonConfigContent = additionalFile.GetText(context.CancellationToken)?.ToString() ?? string.Empty;
-        var configuration = JsonSerializer.Deserialize<Configuration>(jsonConfigContent);
-        var contractSuffix = configuration.Contracts.ProjectSuffix;
-        var commandSuffix = configuration.Commands.CommandSuffix;
-        var methodHandlerName = configuration.Commands.HandlerMethodName;
+        var configuration = ParseConfigFile(configContent);
+        IEnumerable<string> contractSuffix = configuration["contracts_projects"]?.Split(',').Select(s => s.Trim()) ?? ["Contracts"];
+        var commandSuffix = configuration["command_suffix"] ?? "Command";
+        var methodHandlerName = configuration["command_handler_name"] ?? "Execute";
 
-        var commands = GetAllCommandsFromContractsAssembly(context.Compilation, contractSuffix, commandSuffix).ToList();
+        var commands = GetAllCommandsFromContractsAssemblies(context.Compilation, contractSuffix, commandSuffix).ToList();
         var handlers = context.Compilation
             .GetSymbolsWithName(s => s == methodHandlerName, SymbolFilter.Member)
             .OfType<IMethodSymbol>()
             .Where(m => m.Parameters.Length == 1 && commands.Contains(m.Parameters[0].Type, SymbolEqualityComparer.Default))
             .ToList();
 
-        foreach (var command in commands.OfType<ITypeSymbol>())
+        foreach (var command in commands)
         {
             Debug.WriteLine($"Found command: {command.Name}");
         }
 
-        foreach (var handlerType in handlers.OfType<IMethodSymbol>().Select(m => m.ContainingType))
+        foreach (var handlerType in handlers.Select(m => m.ContainingType))
         {
             Debug.WriteLine($"Found handler: {handlerType.Name}");
         }
@@ -57,25 +56,56 @@ public class CqrsGenerator : ISourceGenerator
         GenerateServiceCollectionExtensions(context, handlers);
     }
 
-    private IEnumerable<INamedTypeSymbol> GetAllCommandsFromContractsAssembly(Compilation compilation, string contractProjectSuffix, string commandSuffix)
+    private IEnumerable<INamedTypeSymbol> GetAllCommandsFromContractsAssemblies(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string commandSuffix)
     {
+        var commandsInDomain = compilation.GetSymbolsWithName(s => s.EndsWith(commandSuffix), SymbolFilter.Type)
+            .OfType<INamedTypeSymbol>()
+            .Where(t => t.IsRecord)
+            .ToList();
+
+        foreach (var command in commandsInDomain)
+        {
+            yield return command;
+        }
+
         foreach (var reference in compilation.References)
         {
             var assemblySymbol = compilation.GetAssemblyOrModuleSymbol(reference) as IAssemblySymbol;
-            if (assemblySymbol == null || !assemblySymbol.Name.EndsWith(contractProjectSuffix)) continue;
+            if (assemblySymbol == null
+                ||
+                assemblySymbol.Name.StartsWith("System")
+                ||
+                assemblySymbol.Name.StartsWith("Microsoft")
+                ||
+                !contractProjectSuffixes.Any(assemblySymbol.Name.EndsWith))
+                continue;
 
             // Recursively find all types in the assembly
             var allTypes = GetAllTypes(assemblySymbol.GlobalNamespace);
 
             // Example: Filter types or perform additional logic
-            foreach (var type in allTypes.OfType<INamedTypeSymbol>().Where(t => t.IsRecord))
+            foreach (var type in allTypes.OfType<INamedTypeSymbol>().Where(t => t.IsRecord && t.Name.EndsWith(commandSuffix)))
             {
-                if (type.Name.EndsWith(commandSuffix))
-                {
-                    yield return type;
-                }
+                yield return type;
             }
         }
+    }
+
+    private Dictionary<string, string> ParseConfigFile(string content)
+    {
+        var dictionary = new Dictionary<string, string>();
+        var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var line in lines)
+        {
+            var parts = line.Split('=');
+            if (parts.Length == 2)
+            {
+                dictionary[parts[0].Trim()] = parts[1].Trim();
+            }
+        }
+
+        return dictionary;
     }
 
     private IEnumerable<INamedTypeSymbol> GetAllTypes(INamespaceSymbol namespaceSymbol)
@@ -141,7 +171,7 @@ public class CommandProcessor(IServiceProvider serviceProvider): ICommandProcess
 {{");
         foreach (var handler in handlers)
         {
-            var methodSymbol = handler as IMethodSymbol;
+            var methodSymbol = handler;
             var handlerReturnType = methodSymbol.ReturnType;
             var parameterType = methodSymbol.Parameters[0].Type;
             var typeSymbol = methodSymbol.ContainingType;

@@ -1,0 +1,3 @@
+﻿command_suffix=Command
+command_handler_name=Execute
+contracts_projects=Contracts

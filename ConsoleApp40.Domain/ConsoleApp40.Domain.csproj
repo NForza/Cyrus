@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="cqrsConfig.json" />
+    <None Remove="cqrsConfig.txt" />
   </ItemGroup>
 
   <ItemGroup>
-    <AdditionalFiles Include="cqrsConfig.json" />
+    <AdditionalFiles Include="cqrsConfig.txt" />
   </ItemGroup>
 
   <ItemGroup>
