@@ -1,0 +1,9 @@
+{
+  "contracts": {
+    "projectSuffix": "Contracts"
+  },
+  "commands": {
+    "contractSuffix": "Command",
+    "handlerMethodName": "Execute"
+  }
+}
