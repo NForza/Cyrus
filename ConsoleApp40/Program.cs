@@ -4,14 +4,12 @@ using Microsoft.Extensions.Hosting;
 using NForza.Cqrs;
 
 var host = Host.CreateDefaultBuilder(args)
-            .ConfigureServices((_, services) =>
-            {
-                services.AddCqrs();
-            })
+            .ConfigureServices(services => services.AddCqrs())
             .Build();
 
-var commandProcessor = host.Services.GetRequiredService<ICommandProcessor>();
+var commandDispatcher = host.Services.GetRequiredService<ICommandDispatcher>();
 
-int result = commandProcessor.Execute(new AddCustomerCommand("John Doe", "123 Main St"));
+CommandResult addResult = await commandDispatcher.Execute(new AddCustomerCommand("John Doe", "123 Main St"));
 
-bool success = commandProcessor.Execute(new DeleteCustomerCommand(42));
+CommandResult deleteResult = await commandDispatcher.Execute(new DeleteCustomerCommand(42));
+
