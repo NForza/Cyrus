@@ -1,0 +1,6 @@
+﻿contracts: Contracts
+commands:
+  suffix: Command
+  handlerName: Execute
+
+  

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using NForza.Cqrs.Generator;
 
 #pragma warning disable RS1035 // Do not use banned APIs for analyzers
 
@@ -24,13 +25,13 @@ public class CqrsGenerator : ISourceGenerator
         }
 #endif
         var additionalFile = context.AdditionalFiles
-            .FirstOrDefault(file => Path.GetFileName(file.Path) == "cqrsConfig.txt");
+            .FirstOrDefault(file => Path.GetFileName(file.Path) == "cqrsConfig.yaml");
         string configContent = additionalFile.GetText(context.CancellationToken)?.ToString() ?? string.Empty;
 
         var configuration = ParseConfigFile(configContent);
-        IEnumerable<string> contractSuffix = configuration["contracts_projects"]?.Split(',').Select(s => s.Trim()) ?? ["Contracts"];
-        var commandSuffix = configuration["command_suffix"] ?? "Command";
-        var methodHandlerName = configuration["command_handler_name"] ?? "Execute";
+        IEnumerable<string> contractSuffix = configuration.Contracts;
+        var commandSuffix = configuration.Commands.Suffix;
+        var methodHandlerName = configuration.Commands.HandlerName;
 
         var commands = GetAllCommandsFromContractsAssemblies(context.Compilation, contractSuffix, commandSuffix).ToList();
         var handlers = context.Compilation
@@ -89,21 +90,10 @@ public class CqrsGenerator : ISourceGenerator
         }
     }
 
-    private Dictionary<string, string> ParseConfigFile(string content)
+    private CqrsConfig ParseConfigFile(string content)
     {
-        var dictionary = new Dictionary<string, string>();
-        var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
-        foreach (var line in lines)
-        {
-            var parts = line.Split('=');
-            if (parts.Length == 2)
-            {
-                dictionary[parts[0].Trim()] = parts[1].Trim();
-            }
-        }
-
-        return dictionary;
+        var config = YamlParser.ReadYaml(content);
+        return new CqrsConfig(config);
     }
 
     private IEnumerable<INamedTypeSymbol> GetAllTypes(INamespaceSymbol namespaceSymbol)

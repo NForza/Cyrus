@@ -10,6 +10,7 @@ var host = Host.CreateDefaultBuilder(args)
 var commandDispatcher = host.Services.GetRequiredService<ICommandDispatcher>();
 
 CommandResult addResult = await commandDispatcher.Execute(new AddCustomerCommand("John Doe", "123 Main St"));
+CommandResult updateResult = await commandDispatcher.Execute(new UpdateCustomerCommand(42, "John Doe", "123 Main St"));
 
 CommandResult deleteResult = await commandDispatcher.Execute(new DeleteCustomerCommand(42));
 
