@@ -5,14 +5,12 @@ namespace NForza.Cqrs.Generator;
 
 public class CqrsConfig
 {
-    private Dictionary<string, List<string>> config;
-
     public CqrsConfig(Dictionary<string, List<string>> config)
     {
         var contracts = config["contracts"];
         if (contracts != null)
         {
-            Contracts = contracts.ToArray();
+            Contracts = [.. contracts];
         }
         var suffix = config["suffix"];
         if (suffix != null)

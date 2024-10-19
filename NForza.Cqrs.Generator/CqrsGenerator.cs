@@ -5,11 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using NForza.Cqrs.Generator;
 
 #pragma warning disable RS1035 // Do not use banned APIs for analyzers
 
-namespace NForza.Cqrs;
+namespace NForza.Cqrs.Generator;
 
 [Generator]
 public class CqrsGenerator : ISourceGenerator
@@ -34,25 +33,68 @@ public class CqrsGenerator : ISourceGenerator
         var methodHandlerName = configuration.Commands.HandlerName;
 
         var commands = GetAllCommandsFromContractsAssemblies(context.Compilation, contractSuffix, commandSuffix).ToList();
+        VerifyCommands(context, commands);
+
         var handlers = context.Compilation
             .GetSymbolsWithName(s => s == methodHandlerName, SymbolFilter.Member)
             .OfType<IMethodSymbol>()
             .Where(m => m.Parameters.Length == 1 && commands.Contains(m.Parameters[0].Type, SymbolEqualityComparer.Default))
+            .Where(m => ReturnsTaskOfCommandResult(context, m))
             .ToList();
-
-        foreach (var command in commands)
-        {
-            Debug.WriteLine($"Found command: {command.Name}");
-        }
-
-        foreach (var handlerType in handlers.Select(m => m.ContainingType))
-        {
-            Debug.WriteLine($"Found handler: {handlerType.Name}");
-        }
 
         GenerateCommandDispatcherExtensionMethods(context, handlers);
 
         GenerateServiceCollectionExtensions(context, handlers);
+    }
+
+    private static bool ReturnsTaskOfCommandResult(GeneratorExecutionContext context, IMethodSymbol handlerType)
+    {
+        Debug.WriteLine($"Found handler: {handlerType.Name}");
+
+        if (IsTaskOfCommandResult(handlerType.ReturnType, context.Compilation))
+        {
+            return true;
+        }
+        else
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                 new DiagnosticDescriptor(
+                     "SG0001",
+                     "Incorrect return type for command handler",
+                     "Method {0} returns {1}. All methods must return Task<CommandResult>.",
+                     "NForza.Cqrs",
+                     DiagnosticSeverity.Error,
+                     true), handlerType.Locations.FirstOrDefault(), handlerType.Name, handlerType.ReturnType.Name));
+            return false;
+        }
+    }
+
+    private static bool IsTaskOfCommandResult(ITypeSymbol returnType, Compilation compilation)
+    {
+        // Check if the return type is a Task
+        if (returnType is INamedTypeSymbol namedTypeSymbol)
+        {
+            if (namedTypeSymbol.IsGenericType &&
+                    namedTypeSymbol.ConstructedFrom.ToDisplayString() == "System.Threading.Tasks.Task<TResult>")
+            {
+
+                var genericArguments = namedTypeSymbol.TypeArguments;
+                if (genericArguments.Length == 1)
+                {
+                    var commandResultSymbol = compilation.GetTypeByMetadataName("NForza.Cqrs.CommandResult");
+                    return SymbolEqualityComparer.Default.Equals(genericArguments[0], commandResultSymbol);
+                }
+            }// Get the generic argument
+        }
+        return false;
+    }
+
+    private static void VerifyCommands(GeneratorExecutionContext context, List<INamedTypeSymbol> commands)
+    {
+        foreach (var command in commands)
+        {
+            Debug.WriteLine($"Found command: {command.Name}");
+        }
     }
 
     private IEnumerable<INamedTypeSymbol> GetAllCommandsFromContractsAssemblies(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string commandSuffix)
@@ -69,8 +111,7 @@ public class CqrsGenerator : ISourceGenerator
 
         foreach (var reference in compilation.References)
         {
-            var assemblySymbol = compilation.GetAssemblyOrModuleSymbol(reference) as IAssemblySymbol;
-            if (assemblySymbol == null
+            if (compilation.GetAssemblyOrModuleSymbol(reference) is not IAssemblySymbol assemblySymbol
                 ||
                 assemblySymbol.Name.StartsWith("System")
                 ||
@@ -79,10 +120,8 @@ public class CqrsGenerator : ISourceGenerator
                 !contractProjectSuffixes.Any(assemblySymbol.Name.EndsWith))
                 continue;
 
-            // Recursively find all types in the assembly
             var allTypes = GetAllTypes(assemblySymbol.GlobalNamespace);
 
-            // Example: Filter types or perform additional logic
             foreach (var type in allTypes.OfType<INamedTypeSymbol>().Where(t => t.IsRecord && t.Name.EndsWith(commandSuffix)))
             {
                 yield return type;
@@ -117,7 +156,7 @@ public class CqrsGenerator : ISourceGenerator
 
     private void GenerateServiceCollectionExtensions(GeneratorExecutionContext context, List<IMethodSymbol> handlers)
     {
-        StringBuilder source = new StringBuilder();
+        StringBuilder source = new();
         source.Append($@"// <auto-generated/>
 using System;
 using Microsoft.Extensions.DependencyInjection;
@@ -163,7 +202,7 @@ public static class ServiceCollectionExtensions
 
     private static void GenerateCommandDispatcherExtensionMethods(GeneratorExecutionContext context, List<IMethodSymbol> handlers)
     {
-        StringBuilder source = new StringBuilder();
+        StringBuilder source = new();
         source.Append($@"// <auto-generated/>
 using System;
 using System.Threading;
@@ -176,9 +215,7 @@ public static class CommandDispatcherExtensions
         foreach (var handler in handlers)
         {
             var methodSymbol = handler;
-            var handlerReturnType = methodSymbol.ReturnType;
             var parameterType = methodSymbol.Parameters[0].Type;
-            var typeSymbol = methodSymbol.ContainingType;
             source.Append($@"
     public static Task<CommandResult> Execute(this ICommandDispatcher dispatcher, {parameterType} command, CancellationToken cancellationToken = default) 
         => dispatcher.ExecuteInternal(command, cancellationToken);");
@@ -188,31 +225,6 @@ public static class CommandDispatcherExtensions
 }}
 ");
         context.AddSource($"CommandProcessor.g.cs", source.ToString());
-    }
-
-    private static void GenerateLocalCommandBus(GeneratorExecutionContext context, List<IMethodSymbol> handlers)
-    {
-        StringBuilder source = new StringBuilder();
-        source.Append($@"// <auto-generated/>
-using System;
-
-namespace NForza.Cqrs;
-
-public interface ICommandProcessor
-{{");
-        foreach (var handler in handlers)
-        {
-            var methodSymbol = handler as IMethodSymbol;
-            var handlerReturnType = methodSymbol.ReturnType;
-            var parameterType = methodSymbol.Parameters[0].Type;
-            var typeSymbol = methodSymbol.ContainingType;
-            source.Append($@"
-    {handlerReturnType.ToDisplayString()} Execute({parameterType} command);");
-        }
-        source.Append($@"
-}}
-");
-        context.AddSource($"ICommandDispatcher.g.cs", source.ToString());
     }
 
     public void Initialize(GeneratorInitializationContext context)
