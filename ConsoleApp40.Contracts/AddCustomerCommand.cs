@@ -1,3 +1,3 @@
-﻿namespace ConsoleApp40.Contracts;
+﻿namespace DemoApp.Contracts;
 
-public partial record AddCustomerCommand(string Name, string Address);
+public partial record AddCustomerCommand(Name Name, Address Address);

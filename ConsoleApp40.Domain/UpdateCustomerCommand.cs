@@ -1,3 +1,5 @@
-﻿namespace ConsoleApp40.Contracts;
+﻿using DemoApp.Contracts;
 
-public record UpdateCustomerCommand(int CustomerId, string Name, string Address);
+namespace DemoApp.Domain;
+
+public record UpdateCustomerCommand(CustomerId CustomerId, Name Name, string Address);

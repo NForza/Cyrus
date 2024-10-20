@@ -1,3 +1,3 @@
-﻿namespace ConsoleApp40.Contracts;
+﻿namespace DemoApp.Contracts;
 
-public partial record DeleteCustomerCommand(int Id);
+public partial record DeleteCustomerCommand(CustomerId Id);

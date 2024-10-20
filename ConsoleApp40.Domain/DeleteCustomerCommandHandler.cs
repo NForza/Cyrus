@@ -1,7 +1,7 @@
-﻿using ConsoleApp40.Contracts;
+﻿using DemoApp.Contracts;
 using NForza.Cqrs;
 
-namespace ConsoleApp40.Domain;
+namespace DemoApp.Domain;
 
 public class DeleteCustomerCommandHandler
 {

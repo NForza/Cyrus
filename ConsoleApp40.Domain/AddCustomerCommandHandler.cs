@@ -1,7 +1,7 @@
-﻿using ConsoleApp40.Contracts;
+﻿using DemoApp.Contracts;
 using NForza.Cqrs;
 
-namespace ConsoleApp40.Domain;
+namespace DemoApp.Domain;
 
 public class AddCustomerCommandHandler
 {
@@ -10,4 +10,4 @@ public class AddCustomerCommandHandler
         Console.WriteLine($"Customer created: {command.Name}, {command.Address}");
         return Task.FromResult(CommandResult.CompletedSuccessfully);
     }
- }
+}

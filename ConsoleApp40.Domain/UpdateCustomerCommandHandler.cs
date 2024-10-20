@@ -1,7 +1,6 @@
-﻿using ConsoleApp40.Contracts;
-using NForza.Cqrs;
+﻿using NForza.Cqrs;
 
-namespace ConsoleApp40.Domain;
+namespace DemoApp.Domain;
 
 public class UpdateCustomerCommandHandler
 {

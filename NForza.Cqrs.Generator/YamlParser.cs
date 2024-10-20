@@ -28,7 +28,7 @@ internal class YamlParser
             else
             {
                 // Split key and value
-                var parts = trimmedLine.Split(new[] { ':' }, 2);
+                var parts = trimmedLine.Split([':'], 2);
                 if (parts.Length == 2)
                 {
                     currentKey = parts[0].Trim();
@@ -37,7 +37,7 @@ internal class YamlParser
                     // Initialize the list for this key
                     if (!result.ContainsKey(currentKey))
                     {
-                        result[currentKey] = new List<string>();
+                        result[currentKey] = [];
                     }
                     result[currentKey].Add(value);
                 }

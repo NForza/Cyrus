@@ -1,4 +1,5 @@
-﻿using ConsoleApp40.Contracts;
+﻿using DemoApp.Contracts;
+using DemoApp.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NForza.Cqrs;
@@ -9,8 +10,8 @@ var host = Host.CreateDefaultBuilder(args)
 
 var commandDispatcher = host.Services.GetRequiredService<ICommandDispatcher>();
 
-CommandResult addResult = await commandDispatcher.Execute(new AddCustomerCommand("John Doe", "123 Main St"));
-CommandResult updateResult = await commandDispatcher.Execute(new UpdateCustomerCommand(42, "John Doe", "123 Main St"));
+CommandResult addResult = await commandDispatcher.Execute(new AddCustomerCommand(new("John Doe"), new("123 Main St")));
+CommandResult updateResult = await commandDispatcher.Execute(new UpdateCustomerCommand(new(42), new("John Doe"), new("123 Main St")));
 
-CommandResult deleteResult = await commandDispatcher.Execute(new DeleteCustomerCommand(42));
+CommandResult deleteResult = await commandDispatcher.Execute(new DeleteCustomerCommand(new(42)));
 
