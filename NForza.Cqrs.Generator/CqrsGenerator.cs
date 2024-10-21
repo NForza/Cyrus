@@ -99,6 +99,11 @@ public class CqrsGenerator : ISourceGenerator
 
     private IEnumerable<INamedTypeSymbol> GetAllCommandsFromContractsAssemblies(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string commandSuffix)
     {
+        bool IsStruct(INamedTypeSymbol typeSymbol)
+        {
+            return typeSymbol.IsValueType && typeSymbol.TypeKind == TypeKind.Struct;
+        }
+
         var commandsInDomain = compilation.GetSymbolsWithName(s => s.EndsWith(commandSuffix), SymbolFilter.Type)
             .OfType<INamedTypeSymbol>()
             .Where(t => t.IsRecord)
@@ -122,9 +127,10 @@ public class CqrsGenerator : ISourceGenerator
 
             var allTypes = GetAllTypes(assemblySymbol.GlobalNamespace);
 
-            foreach (var type in allTypes.OfType<INamedTypeSymbol>().Where(t => t.IsRecord && t.Name.EndsWith(commandSuffix)))
+            foreach (var t in allTypes)
             {
-                yield return type;
+                if (IsStruct(t))
+                    yield return t;
             }
         }
     }

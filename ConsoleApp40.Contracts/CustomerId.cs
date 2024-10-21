@@ -2,7 +2,5 @@
 
 namespace DemoApp.Contracts;
 
-public record CustomerId(int Value) : TypedId<int>(Value)
-{
-    public override bool IsValid() => Value > 0;
-}
+[TypedId]
+public partial record struct CustomerId(Guid Value);

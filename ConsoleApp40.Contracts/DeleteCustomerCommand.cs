@@ -1,3 +1,3 @@
 ﻿namespace DemoApp.Contracts;
 
-public partial record DeleteCustomerCommand(CustomerId Id);
+public partial record struct DeleteCustomerCommand(CustomerId Id);

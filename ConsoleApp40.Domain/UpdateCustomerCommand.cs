@@ -2,4 +2,5 @@
 
 namespace DemoApp.Domain;
 
-public record UpdateCustomerCommand(CustomerId CustomerId, Name Name, string Address);
+public record struct UpdateCustomerCommand(CustomerId CustomerId, Name Name, string Address);
+

@@ -1,3 +1,3 @@
 ﻿namespace DemoApp.Contracts;
 
-public partial record AddCustomerCommand(Name Name, Address Address);
+public partial record struct AddCustomerCommand(Name Name, Address Address);

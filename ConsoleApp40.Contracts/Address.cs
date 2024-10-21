@@ -2,7 +2,5 @@
 
 namespace DemoApp.Contracts;
 
-public record Address(string Value) : TypedId<string>(Value)
-{
-    public override bool IsValid() => !string.IsNullOrEmpty(Value);
-}
+[TypedId]
+public partial record struct Address(string Value);

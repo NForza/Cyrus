@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NForza.TypedIds\NForza.TypedIds.csproj" />
+    <ProjectReference Include="..\NForza.TypedIds.Generator\NForza.TypedIds.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>
