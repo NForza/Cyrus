@@ -171,8 +171,9 @@ namespace NForza.Cqrs;
 
 public static class ServiceCollectionExtensions
 {{
-    public static IServiceCollection AddCqrs(this IServiceCollection services)
+    public static IServiceCollection AddCqrs(this IServiceCollection services, Action<CqrsOptions>? options = null)
     {{
+        options?.Invoke(new CqrsOptions(services));
         services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
         services.AddSingleton<ICommandBus, LocalCommandBus>(); 
         services.AddSingleton<IEventBus, EventBus>(); 
@@ -182,6 +183,7 @@ public static class ServiceCollectionExtensions
             source.Append($@"
         services.AddTransient<{typeToRegister.ToDisplayString()}>();");
         }
+
 
         source.Append($@"
         return services;

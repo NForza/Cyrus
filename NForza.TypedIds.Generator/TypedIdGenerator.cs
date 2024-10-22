@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -119,18 +117,26 @@ public partial class PLACEHOLDERIDTypeConverter : System.ComponentModel.TypeConv
     {
         var source = new StringBuilder($@"
 using System;
+using NForza.TypedIds;
 
 namespace {item.ContainingNamespace}
 {{
-    public partial record struct {item.Name}
+    public partial record struct {item.Name}: ITypedId
     {{
         {GenerateConstructor(item)}
         public static {item.ToDisplayString()} Empty => new {item.Name}({GetDefault(item)});
         {GenerateIsNullOrEmpty(item)}
+        {GenerateCastOperatorsToUnderlyingType(item)}
     }}
 }}
 ");
         context.AddSource($"{item.Name}.g.cs", source.ToString());
+    }
+
+    private string GenerateCastOperatorsToUnderlyingType(INamedTypeSymbol item)
+    {
+        return @$"public static implicit operator {GetUnderlyingType(item)?.ToDisplayString()}({item.ToDisplayString()} typedId) => typedId.Value;
+        public static explicit operator {item.ToDisplayString()}({GetUnderlyingType(item)?.ToDisplayString()} value) => new(value);";
     }
 
     private object GetDefault(INamedTypeSymbol item)

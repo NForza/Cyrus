@@ -7,12 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.10" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleApp40.Domain\DemoApp.Domain.csproj" />
+    <ProjectReference Include="..\DemoApp.Domain\DemoApp.Domain.csproj" />
+    <ProjectReference Include="..\NForza.Cqrs.WebApi\NForza.Cqrs.WebApi.csproj" />
   </ItemGroup>
 
 </Project>
