@@ -4,7 +4,7 @@ using NForza.Cqrs.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddTransient<EndpointGroup, CustomerEndpointGroup>();
+builder.Services.AddEndpointGroup<CustomerEndpointGroup>();
 builder.Services.AddCqrs(o => o.AddEndpoints());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
