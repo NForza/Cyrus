@@ -6,7 +6,7 @@ namespace NForza.Cqrs.WebApi;
 
 public static class CqrsOptionsExtensions
 {
-    public static CqrsOptions AddEndpoints(this CqrsOptions options)
+    public static CqrsOptions AddCqrsEndpoints(this CqrsOptions options)
     {
         options.Services.AddSingleton(sp =>
         {
@@ -14,12 +14,12 @@ public static class CqrsOptionsExtensions
             IEnumerable<EndpointDefinition> definitions = groups.SelectMany(g => g.EndpointDefinitions);
             return definitions.OfType<CommandEndpointDefinition>();
         });
+        options.Services.AddTransient<IConfigureOptions<JsonOptions>, JsonOptionsConfigurator>();
         return options;
     }
 
     public static CqrsOptions ConfigureJsonConverters(this CqrsOptions options)
     {
-        options.Services.AddTransient<IConfigureOptions<JsonOptions>, JsonOptionsConfigurator>();
         return options;
     }
 }

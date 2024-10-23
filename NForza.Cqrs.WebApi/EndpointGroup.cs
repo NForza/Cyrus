@@ -1,27 +1,20 @@
 ﻿namespace NForza.Cqrs.WebApi;
 
-public class EndpointGroup
+public class EndpointGroup(string tag, string path)
 {
-    private Dictionary<Type, EndpointDefinition> endpoints = [];
-    private readonly string path;
+    private readonly Dictionary<Type, EndpointDefinition> endpoints = [];
 
     public EndpointGroup(string tag) : this(tag, tag.ToLowerInvariant())
     {
     }
 
-    public EndpointGroup(string tag, string path)
-    {
-        this.Tags = [tag];
-        this.path = path;
-    }
-
-    public string[] Tags { get; private set; } = [];
+    public string[] Tags { get; private set; } = [tag];
 
     internal IEnumerable<EndpointDefinition> EndpointDefinitions => endpoints.Values;
 
     public CommandEndpointBuilder CommandEndpoint<T>()
     {
-        CommandEndpointDefinition endpointDefinition = new CommandEndpointDefinition(typeof(T));
+        CommandEndpointDefinition endpointDefinition = new(typeof(T));
         if (!endpoints.TryAdd(typeof(T), endpointDefinition))
         {
             throw new InvalidOperationException($"Endpoint for {typeof(T).Name} already exists.");
@@ -33,7 +26,7 @@ public class EndpointGroup
 
     public QueryEndpointBuilder QueryEndpoint<T>()
     {
-        QueryEndpointDefinition endpointDefinition = new QueryEndpointDefinition(typeof(T));
+        QueryEndpointDefinition endpointDefinition = new(typeof(T));
         if (!endpoints.TryAdd(typeof(T), endpointDefinition))
         {
             throw new InvalidOperationException($"Endpoint for {typeof(T).Name} already exists.");

@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Net.Mime;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Builder;
@@ -8,10 +9,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 
 namespace NForza.Cqrs.WebApi;
 
-public static class EndpointCommandMappingExtensions
+public static partial class EndpointCommandMappingExtensions
 {
     public static IEndpointRouteBuilder MapCommands(this IEndpointRouteBuilder endpoints)
     {
@@ -19,7 +21,6 @@ public static class EndpointCommandMappingExtensions
 
         foreach (var commandEndpoint in commandEndpoints)
         {
-            var methodAttribute = commandEndpoint.Method;
             MapCommand(endpoints, commandEndpoint);
         }
         return endpoints;
@@ -48,16 +49,36 @@ public static class EndpointCommandMappingExtensions
 
                     return commandResult.Succeeded ? Results.Ok(commandResult) : Results.Problem(JsonSerializer.Serialize(commandResult.Errors));
                 })
-            .WithOpenApi()
+            .WithOpenApi(operation =>
+                {
+                    foreach (var param in FindAllParametersInRoute(endpointDefinition.Path))
+                    {
+                        operation.Parameters.Add(
+                            new OpenApiParameter()
+                            {
+                                Name = param,
+                                In = ParameterLocation.Path,
+                                Required = true,
+                                Schema = new OpenApiSchema() { Type = "string" }
+                            });
+                    }
+                    return operation;
+                })
             .Accepts(endpointDefinition.EndpointType, MediaTypeNames.Application.Json)
-            .WithTags(endpointDefinition.Tags)
-        ;
+            .WithTags(endpointDefinition.Tags);
+
+    static IEnumerable<string> FindAllParametersInRoute(string route)
+    {
+        var rgx = ParameterRegex();
+        MatchCollection matches = rgx.Matches(route);
+        return matches.Select(m => m.Groups["parameter"].Value);
+    }
+
 
     internal static bool ValidateObject(Type objectType, object queryObject, IServiceProvider serviceProvider, out object? problem)
     {
         var validatorType = typeof(IValidator<>).MakeGenericType(objectType);
-        IValidator? validator = serviceProvider.GetService(validatorType) as IValidator;
-        if (validator == null)
+        if (serviceProvider.GetService(validatorType) is not IValidator validator)
         {
             problem = null;
             return true;
@@ -78,8 +99,11 @@ public static class EndpointCommandMappingExtensions
 
     private static async Task<object?> CreateCommandObject(CommandEndpointDefinition endpointDefinition, HttpContext ctx)
     {
-        var inputMappingPolicy = endpointDefinition.InputMappingPolicyType != null ? 
+        var inputMappingPolicy = endpointDefinition.InputMappingPolicyType != null ?
             (InputMappingPolicy)ctx.RequestServices.GetRequiredService(endpointDefinition.InputMappingPolicyType) : new DefaultCommandInputMappingPolicy(ctx);
         return await inputMappingPolicy.MapInputAsync(endpointDefinition.EndpointType);
     }
+
+    [GeneratedRegex(@"\{(?<parameter>\w+)\}")]
+    private static partial Regex ParameterRegex();
 }

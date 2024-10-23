@@ -1,27 +1,25 @@
 using DemoApp.WebApi;
+using Microsoft.Extensions.Options;
 using NForza.Cqrs;
+using NForza.TypedIds;
 using NForza.Cqrs.WebApi;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
-internal class Program
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddEndpointGroup<CustomerEndpointGroup>();
+builder.Services.AddCqrs(o => o.AddCqrsEndpoints());
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddTypedIds();
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+if (app.Environment.IsDevelopment())
 {
-    private static void Main(string[] args)
-    {
-        var builder = WebApplication.CreateBuilder(args);
-
-        builder.Services.AddEndpointGroup<CustomerEndpointGroup>();
-        builder.Services.AddJsonConverters();
-        builder.Services.AddCqrs(o => o.AddEndpoints().ConfigureJsonConverters());
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
-
-        var app = builder.Build();
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
-        app.MapCqrs();
-        app.UseHttpsRedirection();
-        app.Run();
-    }
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+app.MapCqrs();
+app.UseHttpsRedirection();
+await app.RunAsync();
