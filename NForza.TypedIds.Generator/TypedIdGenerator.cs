@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-#pragma warning disable RS1035 // Do not use banned APIs for analyzers
 
 namespace NForza.TypedIds.Generator;
 
@@ -13,7 +12,7 @@ public class TypedIdGenerator : ISourceGenerator
 {
     public void Execute(GeneratorExecutionContext context)
     {
-#if DEBUG1 //remove the 1 to enable debugging when compiling source code
+#if DEBUG//remove the 1 to enable debugging when compiling source code
         //This will launch the debugger when the generator is running
         //You might have to do a Rebuild to get the generator to run
         if (!Debugger.IsAttached)
@@ -40,69 +39,31 @@ public class TypedIdGenerator : ISourceGenerator
 
         string? source = underlyingTypeName switch
         {
-            "System.Guid" => GetGuidConverter(item),
-            "string" => GetStringConverter(item),
+            "System.Guid" => GetGuidConverter(),
+            "string" => GetStringConverter(),
             _ => null
         };
 
         if (source == null)
             return;
 
-        source = source.Replace("PLACEHOLDERID", item.Name);
+        string fullyQualifiedNamespace = item.ContainingNamespace.ToDisplayString();
+        source = source
+            .Replace("%TypedIdName%", item.Name)
+            .Replace("%NamespaceName%", fullyQualifiedNamespace);
         context.AddSource($"{item}TypeConverter.g.cs", source);
     }
 
-    private string GetStringConverter(INamedTypeSymbol item)
+    private string GetStringConverter()
     {
-        return $@"
-namespace {item.ContainingNamespace};
-          
-public partial class PLACEHOLDERIDTypeConverter : System.ComponentModel.TypeConverter
-{{
-    public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext? context, System.Type sourceType)
-        => sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
-
-    public override object? ConvertFrom(System.ComponentModel.ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
-    {{
-        return value switch
-        {{
-            string str => new CustomerId(Guid.Parse(str)),
-            _ => base.ConvertFrom(context, culture, value)
-        }};
-    }}
-
-    public override object? ConvertTo(System.ComponentModel.ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object? value, System.Type destinationType) =>
-        destinationType == typeof(string)
-            ? ((CustomerId?)value)?.Value.ToString() ?? string.Empty
-            : base.ConvertTo(context, culture, value, destinationType);
-}}";
+        var fileContents = EmbeddedResourceReader.GetResource("Templates", "StringTypeConverter.cs");
+        return fileContents;
     }
 
-    private string GetGuidConverter(INamedTypeSymbol item)
+    private string GetGuidConverter()
     {
-        return $@"
-namespace {item.ContainingNamespace};
-
-public partial class PLACEHOLDERIDTypeConverter : System.ComponentModel.TypeConverter
-{{
-    public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext? context, System.Type sourceType) 
-        => sourceType == typeof(string) || sourceType == typeof(Guid) || base.CanConvertFrom(context, sourceType);
-
-    public override object? ConvertFrom(System.ComponentModel.ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
-    {{
-        return value switch
-        {{
-            string str => new CustomerId(Guid.Parse(str)),
-            Guid guid => new CustomerId(guid),
-            _ => base.ConvertFrom(context, culture, value)
-        }};
-    }}
-
-    public override object? ConvertTo(System.ComponentModel.ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object? value, System.Type destinationType) =>
-        destinationType == typeof(string)
-            ? ((CustomerId?)value)?.Value.ToString() ?? string.Empty
-            : base.ConvertTo(context, culture, value, destinationType);
-}}";
+        var fileContents = EmbeddedResourceReader.GetResource("Templates", "GuidTypeConverter.cs");
+        return fileContents;
     }
 
     ITypeSymbol? GetUnderlyingType(INamedTypeSymbol typeSymbol)
@@ -190,8 +151,7 @@ namespace {item.ContainingNamespace}
 
             foreach (var typeDeclaration in typeDeclarations)
             {
-                var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration) as INamedTypeSymbol;
-                if (typeSymbol != null && typeSymbol.IsValueType && typeSymbol.TypeKind == TypeKind.Struct)
+                if (semanticModel.GetDeclaredSymbol(typeDeclaration) is INamedTypeSymbol typeSymbol && typeSymbol.IsValueType && typeSymbol.TypeKind == TypeKind.Struct)
                 {
                     if (typeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "TypedIdAttribute"))
                         allTypes.Add(typeSymbol);
