@@ -9,11 +9,18 @@
 
   <ItemGroup>
     <Compile Remove="Templates\GuidTypeConverter.cs" />
+    <Compile Remove="Templates\JsonConverter.cs" />
+    <Compile Remove="Templates\ServiceCollectionExtensions.cs" />
     <Compile Remove="Templates\StringTypeConverter.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Templates\ServiceCollectionExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Templates\GuidTypeConverter.cs" />
+    <EmbeddedResource Include="Templates\JsonConverter.cs" />
     <EmbeddedResource Include="Templates\StringTypeConverter.cs" />
   </ItemGroup>
 

@@ -8,6 +8,8 @@ var host = Host.CreateDefaultBuilder(args)
             .ConfigureServices(services => services.AddCqrs())
             .Build();
 
+CustomerIdJsonConverter customerIdJsonConverter = new();
+
 ICommandDispatcher commandDispatcher = host.Services.GetRequiredService<ICommandDispatcher>();
 
 CommandResult addResult = await commandDispatcher.Execute(new AddCustomerCommand(new("John Doe"), new("123 Main St")));

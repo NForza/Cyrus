@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ public class TypedIdGenerator : ISourceGenerator
 {
     public void Execute(GeneratorExecutionContext context)
     {
-#if DEBUG//remove the 1 to enable debugging when compiling source code
+#if DEBUG1 //remove the 1 to enable debugging when compiling source code
         //This will launch the debugger when the generator is running
         //You might have to do a Rebuild to get the generator to run
         if (!Debugger.IsAttached)
@@ -27,10 +28,43 @@ public class TypedIdGenerator : ISourceGenerator
             GenerateTypeConverter(context, item);
             GenerateJsonConverter(context, item);
         }
+        GenerateRegisterJsonConvertersExtensionMethod(context, typedIds);
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers", Justification = "Environment.NewLine should not be a banned API.")]
+    private void GenerateRegisterJsonConvertersExtensionMethod(GeneratorExecutionContext context, IEnumerable<INamedTypeSymbol> typedIds)
+    {
+        var source = EmbeddedResourceReader.GetResource("Templates", "ServiceCollectionExtensions.cs");
+
+        var converters = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<JsonConverter, {t.Name}JsonConverter>();"));
+
+        var namespaces = string.Join(Environment.NewLine, typedIds.Select(t => t.ContainingNamespace.ToDisplayString()).Distinct().Select(ns => $"using {ns};"));
+
+        source = source
+            .Replace("% Namespaces %", namespaces)
+            .Replace("% AddJsonConverters %", converters);
+        context.AddSource($"ServiceCollectionExtensions.g.cs", source);
     }
 
     private void GenerateJsonConverter(GeneratorExecutionContext context, INamedTypeSymbol item)
     {
+        var source = EmbeddedResourceReader.GetResource("Templates", "JsonConverter.cs");
+
+        string fullyQualifiedNamespace = item.ContainingNamespace.ToDisplayString();
+        var underlyingTypeName = GetUnderlyingType(item)?.ToDisplayString();
+
+        string? getMethodName = underlyingTypeName switch
+        {
+            "System.Guid" => "GetGuid",
+            "string" => "GetString",
+            _ => null
+        };
+
+        source = source
+            .Replace("% TypedIdName %", item.Name)
+            .Replace("% NamespaceName %", fullyQualifiedNamespace)
+            .Replace("% GetMethodName %", getMethodName);
+        context.AddSource($"{item}JsonConverter.g.cs", source);
     }
 
     private void GenerateTypeConverter(GeneratorExecutionContext context, INamedTypeSymbol item)
@@ -49,8 +83,8 @@ public class TypedIdGenerator : ISourceGenerator
 
         string fullyQualifiedNamespace = item.ContainingNamespace.ToDisplayString();
         source = source
-            .Replace("%TypedIdName%", item.Name)
-            .Replace("%NamespaceName%", fullyQualifiedNamespace);
+            .Replace("% TypedIdName %", item.Name)
+            .Replace("% NamespaceName %", fullyQualifiedNamespace);
         context.AddSource($"{item}TypeConverter.g.cs", source);
     }
 
@@ -79,9 +113,11 @@ public class TypedIdGenerator : ISourceGenerator
         var source = new StringBuilder($@"
 using System;
 using NForza.TypedIds;
+using System.Text.Json.Serialization;
 
 namespace {item.ContainingNamespace}
 {{
+    [JsonConverter(typeof({item.Name}JsonConverter))]
     public partial record struct {item.Name}: ITypedId
     {{
         {GenerateConstructor(item)}

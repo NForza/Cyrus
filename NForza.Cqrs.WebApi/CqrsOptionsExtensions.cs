@@ -1,5 +1,6 @@
-﻿using System.Linq;
+﻿using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace NForza.Cqrs.WebApi;
 
@@ -13,6 +14,12 @@ public static class CqrsOptionsExtensions
             IEnumerable<EndpointDefinition> definitions = groups.SelectMany(g => g.EndpointDefinitions);
             return definitions.OfType<CommandEndpointDefinition>();
         });
+        return options;
+    }
+
+    public static CqrsOptions ConfigureJsonConverters(this CqrsOptions options)
+    {
+        options.Services.AddTransient<IConfigureOptions<JsonOptions>, JsonOptionsConfigurator>();
         return options;
     }
 }
