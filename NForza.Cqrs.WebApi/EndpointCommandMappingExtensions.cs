@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using NForza.Cqrs.WebApi.Policies;
 
 namespace NForza.Cqrs.WebApi;
 

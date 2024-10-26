@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <Configurations>Debug;Release;DebugGenerator</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

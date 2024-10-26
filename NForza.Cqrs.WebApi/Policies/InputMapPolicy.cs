@@ -1,4 +1,4 @@
-﻿namespace NForza.Cqrs.WebApi;
+﻿namespace NForza.Cqrs.WebApi.Policies;
 
 public abstract class InputMappingPolicy
 {
