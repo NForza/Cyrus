@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace NForza.Cqrs;
 
-public class LocalCommandBus(IServiceProvider serviceProvider, HandlerDictionary handlers ) : ICommandBus
+public class LocalCommandBus(IServiceProvider serviceProvider, CommandHandlerDictionary handlers ) : ICommandBus
 {
     public Task<CommandResult> Execute(object command, CancellationToken cancellationToken)
     {            

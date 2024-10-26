@@ -63,9 +63,9 @@ public static class ServiceCollectionExtensions
         return services;
     }}
 
-    public static HandlerDictionary BuildHandlerDictionary()
+    public static CommandHandlerDictionary BuildHandlerDictionary()
     {{
-        var handlers = new HandlerDictionary();");
+        var handlers = new CommandHandlerDictionary();");
         foreach (var handler in handlers)
         {
             var handlerReturnType = handler.ReturnType;

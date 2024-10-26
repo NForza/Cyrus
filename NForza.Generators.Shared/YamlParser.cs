@@ -13,13 +13,11 @@ public class YamlParser
         {
             var trimmedLine = line.Trim();
 
-            // Skip empty lines or comments
             if (string.IsNullOrEmpty(trimmedLine) || trimmedLine.StartsWith("#"))
                 continue;
 
             if (trimmedLine.StartsWith("-"))
             {
-                // Handle list items
                 if (currentKey != null && result.ContainsKey(currentKey))
                 {
                     result[currentKey].Add(trimmedLine.Substring(1).Trim());
@@ -27,14 +25,12 @@ public class YamlParser
             }
             else
             {
-                // Split key and value
                 var parts = trimmedLine.Split([':'], 2);
                 if (parts.Length == 2)
                 {
                     currentKey = parts[0].Trim();
                     var value = parts[1].Trim();
 
-                    // Initialize the list for this key
                     if (!result.ContainsKey(currentKey))
                     {
                         result[currentKey] = [];
@@ -47,4 +43,3 @@ public class YamlParser
         return result;
     }
 }
-

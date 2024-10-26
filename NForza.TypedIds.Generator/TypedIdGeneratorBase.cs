@@ -9,7 +9,7 @@ namespace NForza.TypedIds.Generator;
 public abstract class TypedIdGeneratorBase : GeneratorBase, ISourceGenerator
 {
 
-    protected IEnumerable<INamedTypeSymbol> GetAllTypedIds(Compilation compilation)
+    protected IEnumerable<INamedTypeSymbol> GetAllTypedIds(Compilation compilation, string typedIdName)
     {
         var allTypes = new List<INamedTypeSymbol>();
 
@@ -24,7 +24,7 @@ public abstract class TypedIdGeneratorBase : GeneratorBase, ISourceGenerator
             {
                 if (semanticModel.GetDeclaredSymbol(typeDeclaration) is INamedTypeSymbol typeSymbol && typeSymbol.IsValueType && typeSymbol.TypeKind == TypeKind.Struct)
                 {
-                    if (typeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "TypedIdAttribute"))
+                    if (typeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == typedIdName))
                         allTypes.Add(typeSymbol);
                 }
             }
