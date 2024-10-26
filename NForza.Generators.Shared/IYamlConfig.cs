@@ -1,4 +1,6 @@
-﻿namespace NForza.Generators
+﻿using System.Collections.Generic;
+
+namespace NForza.Generators
 {
     public interface IYamlConfig<T>
     {

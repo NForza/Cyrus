@@ -1,8 +1,8 @@
 using DemoApp.WebApi;
 using Microsoft.Extensions.Options;
+using NForza.Cqrs.WebApi;
 using NForza.Cqrs;
 using NForza.TypedIds;
-using NForza.Cqrs.WebApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);

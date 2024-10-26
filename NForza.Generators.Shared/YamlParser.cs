@@ -2,12 +2,12 @@
 
 namespace NForza.Generators;
 
-internal class YamlParser
+public class YamlParser
 {
-    internal static Dictionary<string, List<string>> ReadYaml(string filePath)
+    public static Dictionary<string, List<string>> ReadYaml(string filePath)
     {
         var result = new Dictionary<string, List<string>>();
-        string currentKey = null;
+        string? currentKey = null;
 
         foreach (var line in filePath.Split('\n'))
         {

@@ -5,6 +5,13 @@
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <Nullable>enable</Nullable>
     <LangVersion>12</LangVersion>
+    <Configurations>Debug;Release;DebugGenerator</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGenerator|AnyCPU'">
+    <DefineConstants>$(DefineConstants);DEBUG_ANALYZER</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,8 +36,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\NForza.Generators\NForza.Generators.csproj" />
-  </ItemGroup>
+  <Import Project="..\NForza.Generators.Shared\NForza.Generators.Shared.projitems" Label="Shared" />
 
 </Project>

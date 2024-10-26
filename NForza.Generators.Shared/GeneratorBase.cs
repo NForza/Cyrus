@@ -1,4 +1,9 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Microsoft.CodeAnalysis;
+
+#pragma warning disable RS1035 // Do not use APIs banned for analyzers
 
 namespace NForza.Generators
 {

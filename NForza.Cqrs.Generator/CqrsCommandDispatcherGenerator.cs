@@ -14,7 +14,7 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, ISourceGenera
 {
     public override void Execute(GeneratorExecutionContext context)
     {
-#if DEBUG //remove the 1 to enable debugging when compiling source code
+#if DEBUG_ANALYZER //remove the 1 to enable debugging when compiling source code
         //This will launch the debugger when the generator is running
         //You might have to do a Rebuild to get the generator to run
         if (!Debugger.IsAttached)
