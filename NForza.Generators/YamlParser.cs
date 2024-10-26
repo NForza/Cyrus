@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace NForza.Cqrs.Generator;
+namespace NForza.Generators;
 
 internal class YamlParser
 {

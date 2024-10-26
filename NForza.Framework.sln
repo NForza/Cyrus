@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoApp.WebApi", "DemoApp.W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cqrs.WebApi", "NForza.Cqrs.WebApi\NForza.Cqrs.WebApi.csproj", "{9DA053D2-DDCC-4503-8032-F5CD5F99693A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Generators", "NForza.Generators\NForza.Generators.csproj", "{0E68D748-25AF-40B1-9FE5-68E0B35CC80C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{9DA053D2-DDCC-4503-8032-F5CD5F99693A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DA053D2-DDCC-4503-8032-F5CD5F99693A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DA053D2-DDCC-4503-8032-F5CD5F99693A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E68D748-25AF-40B1-9FE5-68E0B35CC80C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E68D748-25AF-40B1-9FE5-68E0B35CC80C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E68D748-25AF-40B1-9FE5-68E0B35CC80C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E68D748-25AF-40B1-9FE5-68E0B35CC80C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using NForza.Generators;
 
-namespace NForza.Cqrs.Generator;
+namespace NForza.Cqrs.Generator.Config;
 
-public class CqrsConfig
+public class CqrsConfig : IYamlConfig<CqrsConfig>
 {
-    public CqrsConfig(Dictionary<string, List<string>> config)
+    public CqrsConfig InitFrom(Dictionary<string, List<string>> config)
     {
         var contracts = config["contracts"];
         if (contracts != null)
@@ -20,10 +21,11 @@ public class CqrsConfig
         var handlerName = config["handlerName"];
         if (handlerName != null)
         {
-            Commands.HandlerName= handlerName.First();
+            Commands.HandlerName = handlerName.First();
         }
+        return this;
     }
 
     public string[] Contracts { get; set; } = ["Contracts"];
-    public CommandConfig Commands { get; set; }  = new();
+    public CommandConfig Commands { get; set; } = new();
 }

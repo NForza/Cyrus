@@ -8,7 +8,7 @@ var host = Host.CreateDefaultBuilder(args)
             .ConfigureServices(services => services.AddCqrs())
             .Build();
 
-CustomerIdJsonConverter customerIdJsonConverter = new();
+var customerIdJsonConverter = new CustomerIdJsonConverter();
 
 ICommandDispatcher commandDispatcher = host.Services.GetRequiredService<ICommandDispatcher>();
 

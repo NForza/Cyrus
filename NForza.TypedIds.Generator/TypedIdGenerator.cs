@@ -5,13 +5,14 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NForza.Generators;
 
 namespace NForza.TypedIds.Generator;
 
 [Generator]
-public class TypedIdGenerator : ISourceGenerator
+public class TypedIdGenerator : GeneratorBase, ISourceGenerator
 {
-    public void Execute(GeneratorExecutionContext context)
+    public override void Execute(GeneratorExecutionContext context)
     {
 #if DEBUG //remove the 1 to enable debugging when compiling source code
         //This will launch the debugger when the generator is running
@@ -46,7 +47,7 @@ public class TypedIdGenerator : ISourceGenerator
 
         source = source
             .Replace("% AllTypes %", types)
-            .Replace("% AllTypedIdRegstrations %", registrations)
+            .Replace("% AllTypedIdRegistrations %", registrations)
             .Replace("% Namespaces %", namespaces)
             .Replace("% AddJsonConverters %", converters);
         context.AddSource($"ServiceCollectionExtensions.g.cs", source);
@@ -174,10 +175,6 @@ namespace {item.ContainingNamespace}
             return $@"public bool IsNullOrEmpty() => string.IsNullOrEmpty(Value);";
         }
         return string.Empty;
-    }
-
-    public void Initialize(GeneratorInitializationContext context)
-    {
     }
 
     public static IEnumerable<INamedTypeSymbol> GetAllTypes(Compilation compilation)
