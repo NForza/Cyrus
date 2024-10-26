@@ -4,10 +4,10 @@ using Microsoft.OpenApi.Models;
 using NForza.TypedIds;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace DemoApp.WebApi;
+namespace NForza.Cqrs.WebApi;
 
 public class ConfigureSwaggerOptions(TypedIdDictionary typedIds) : IConfigureOptions<SwaggerGenOptions>
-{    
+{
     public void Configure(SwaggerGenOptions options)
     {
         foreach (var typedId in typedIds)
