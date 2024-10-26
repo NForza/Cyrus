@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using NForza.Generators;
@@ -18,7 +19,8 @@ public class TypedIdTypeConverterGenerator : TypedIdGeneratorBase, ISourceGenera
             Debugger.Launch();
         }
 #endif
-        var typedIds = GetAllTypedIds(context.Compilation);
+        var typedIds =
+            GetAllTypedIds(context.Compilation, "StringIdAttribute").Concat(GetAllTypedIds(context.Compilation, "GuidIdAttribute"));
         foreach (var item in typedIds)
         {
             GenerateTypeConverter(context, item);

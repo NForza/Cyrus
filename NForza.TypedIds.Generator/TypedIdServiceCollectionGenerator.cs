@@ -21,7 +21,8 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, ISourceGe
             Debugger.Launch();
         }
 #endif
-        var typedIds = GetAllTypedIds(context.Compilation);
+        var typedIds =
+            GetAllTypedIds(context.Compilation, "StringIdAttribute").Concat(GetAllTypedIds(context.Compilation, "GuidIdAttribute"));
         GenerateServiceCollectionExtensionMethod(context, typedIds);
     }
 

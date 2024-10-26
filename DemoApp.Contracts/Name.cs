@@ -2,8 +2,5 @@
 
 namespace DemoApp.Contracts;
 
-[TypedId]
-public partial record struct Name(string Value)
-{
-    public bool IsValid() => Value.Length > 0;
-}
+[StringId(minimumLength:1, maximumLength:50)]
+public partial record struct Name;
