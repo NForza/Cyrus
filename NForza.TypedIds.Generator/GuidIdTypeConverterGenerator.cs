@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using NForza.Generators;
@@ -7,7 +6,7 @@ using NForza.Generators;
 namespace NForza.TypedIds.Generator;
 
 [Generator]
-public class TypedIdTypeConverterGenerator : TypedIdGeneratorBase, ISourceGenerator
+public class GuidIdTypeConverterGenerator : TypedIdGeneratorBase, ISourceGenerator
 {
     public override void Execute(GeneratorExecutionContext context)
     {
@@ -17,40 +16,22 @@ public class TypedIdTypeConverterGenerator : TypedIdGeneratorBase, ISourceGenera
             Debugger.Launch();
         }
 #endif
-        var typedIds =
-            GetAllTypedIds(context.Compilation, "StringIdAttribute").Concat(GetAllTypedIds(context.Compilation, "GuidIdAttribute"));
+        var typedIds = GetAllTypedIds(context.Compilation, "GuidIdAttribute");
         foreach (var item in typedIds)
         {
-            GenerateTypeConverter(context, item);
+            GenerateGuidIdTypeConverter(context, item);
         }
     }
 
-
-    private void GenerateTypeConverter(GeneratorExecutionContext context, INamedTypeSymbol item)
+    private void GenerateGuidIdTypeConverter(GeneratorExecutionContext context, INamedTypeSymbol item)
     {
-        var underlyingTypeName = GetUnderlyingTypeOfTypedId(item);
-
-        string? source = underlyingTypeName switch
-        {
-            "System.Guid" => GetGuidConverter(),
-            "string" => GetStringConverter(),
-            _ => null
-        };
-
-        if (source == null)
-            return;
+        string source = GetGuidConverter();
 
         string fullyQualifiedNamespace = item.ContainingNamespace.ToDisplayString();
         source = source
             .Replace("% TypedIdName %", item.Name)
             .Replace("% NamespaceName %", fullyQualifiedNamespace);
         context.AddSource($"{item}TypeConverter.g.cs", source);
-    }
-
-    private string GetStringConverter()
-    {
-        var fileContents = EmbeddedResourceReader.GetResource(Assembly.GetExecutingAssembly(), "Templates", "StringTypeConverter.cs");
-        return fileContents;
     }
 
     private string GetGuidConverter()
