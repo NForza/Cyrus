@@ -38,7 +38,7 @@ public class StringIdTypeConverterGenerator : TypedIdGeneratorBase, ISourceGener
 
     private string GetStringConverter()
     {
-        var fileContents = EmbeddedResourceReader.GetResource(Assembly.GetExecutingAssembly(), "Templates", "StringTypeConverter.cs");
+        var fileContents = EmbeddedResourceReader.GetResource(Assembly.GetExecutingAssembly(), "Templates", "StringIdTypeConverter.cs");
         return fileContents;
     }
 }

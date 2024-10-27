@@ -18,7 +18,8 @@
     <Compile Remove="Templates\GuidTypeConverter.cs" />
     <Compile Remove="Templates\JsonConverter.cs" />
     <Compile Remove="Templates\ServiceCollectionExtensions.cs" />
-    <Compile Remove="Templates\StringTypeConverter.cs" />
+    <Compile Remove="Templates\StringId.cs" />
+    <Compile Remove="Templates\StringIdTypeConverter.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,7 +29,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Templates\GuidTypeConverter.cs" />
     <EmbeddedResource Include="Templates\JsonConverter.cs" />
-    <EmbeddedResource Include="Templates\StringTypeConverter.cs" />
+    <EmbeddedResource Include="Templates\StringId.cs" />
+    <EmbeddedResource Include="Templates\StringIdTypeConverter.cs" />
   </ItemGroup>
 
   <ItemGroup>
