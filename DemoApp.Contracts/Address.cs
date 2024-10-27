@@ -2,5 +2,5 @@
 
 namespace DemoApp.Contracts;
 
-[StringId(minimumLength:1, maximumLength:200)]
+[StringIdAttribute(minimumLength:1, maximumLength:200)]
 public partial record struct Address;

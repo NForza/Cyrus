@@ -11,10 +11,8 @@ public class TypedIdTypeConverterGenerator : TypedIdGeneratorBase, ISourceGenera
 {
     public override void Execute(GeneratorExecutionContext context)
     {
-#if DEBUG_ANALYZER //remove the 1 to enable debugging when compiling source code
-        //This will launch the debugger when the generator is running
-        //You might have to do a Rebuild to get the generator to run
-        if (!Debugger.IsAttached)
+#if DEBUG_ANALYZER 
+        if (!Debugger.IsAttached && false)
         {
             Debugger.Launch();
         }
@@ -30,7 +28,7 @@ public class TypedIdTypeConverterGenerator : TypedIdGeneratorBase, ISourceGenera
 
     private void GenerateTypeConverter(GeneratorExecutionContext context, INamedTypeSymbol item)
     {
-        var underlyingTypeName = GetUnderlyingTypeOfTypedId(item)?.ToDisplayString();
+        var underlyingTypeName = GetUnderlyingTypeOfTypedId(item);
 
         string? source = underlyingTypeName switch
         {

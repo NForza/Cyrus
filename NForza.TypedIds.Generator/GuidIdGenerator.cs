@@ -9,10 +9,8 @@ public class GuidIdGenerator : TypedIdGeneratorBase, ISourceGenerator
 {
     public override void Execute(GeneratorExecutionContext context)
     {
-#if DEBUG_ANALYZER 
-        //This will launch the debugger when the generator is running
-        //You might have to do a Rebuild to get the generator to run
-        if (!Debugger.IsAttached)
+#if DEBUG_ANALYZER
+        if (!Debugger.IsAttached && false)
         {
             Debugger.Launch();
         }
@@ -37,7 +35,7 @@ namespace {item.ContainingNamespace}
     public partial record struct {item.Name}(Guid Value): ITypedId
     {{
         {GenerateConstructor(item)}
-        public static {item.ToDisplayString()} Empty => new {item.Name}({GetDefault(item)});
+        public static {item.ToDisplayString()} Empty => new {item.Name}({GetDefault()});
         {GenerateCastOperatorsToUnderlyingType(item)}
     }}
 }}
@@ -47,11 +45,11 @@ namespace {item.ContainingNamespace}
 
     private string GenerateCastOperatorsToUnderlyingType(INamedTypeSymbol item)
     {
-        return @$"public static implicit operator {GetUnderlyingTypeOfTypedId(item)?.ToDisplayString()}({item.ToDisplayString()} typedId) => typedId.Value;
-        public static explicit operator {item.ToDisplayString()}({GetUnderlyingTypeOfTypedId(item)?.ToDisplayString()} value) => new(value);";
+        return @$"public static implicit operator {GetUnderlyingTypeOfTypedId(item)}({item.ToDisplayString()} typedId) => typedId.Value;
+        public static explicit operator {item.ToDisplayString()}({GetUnderlyingTypeOfTypedId(item)} value) => new(value);";
     }
 
-    private object GetDefault(INamedTypeSymbol item)
+    private object GetDefault()
     {
         return "Guid.Empty";
     }

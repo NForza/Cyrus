@@ -13,7 +13,6 @@ public abstract class TypedIdGeneratorBase : GeneratorBase, ISourceGenerator
     {
         var allTypes = new List<INamedTypeSymbol>();
 
-        // Traverse each syntax tree in the compilation
         foreach (var syntaxTree in compilation.SyntaxTrees)
         {
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -33,11 +32,11 @@ public abstract class TypedIdGeneratorBase : GeneratorBase, ISourceGenerator
         return allTypes;
     }
 
-    protected ITypeSymbol? GetUnderlyingTypeOfTypedId(INamedTypeSymbol typeSymbol)
+    protected string GetUnderlyingTypeOfTypedId(INamedTypeSymbol typeSymbol)
     {
-        var firstProperty = typeSymbol.GetMembers()
-              .OfType<IPropertySymbol>()
-              .FirstOrDefault();
-        return firstProperty?.Type;
+        var hasStringIdProperty = typeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "StringIdAttribute");
+        if (hasStringIdProperty)
+            return "string";
+        return "System.Guid";
     }
 }
