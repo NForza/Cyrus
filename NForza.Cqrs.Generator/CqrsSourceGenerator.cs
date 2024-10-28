@@ -19,23 +19,16 @@ public abstract class CqrsSourceGenerator : GeneratorBase
             .Where(m => ReturnsTaskOfCommandResult(context, m))
             .ToList();
 
-    protected IEnumerable<INamedTypeSymbol> GetAllCommands(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string commandSuffix)
-    {
-        static bool IsStruct(INamedTypeSymbol typeSymbol)
-        {
-            return typeSymbol.IsValueType && typeSymbol.TypeKind == TypeKind.Struct;
-        }
-
-        var commandsInDomain = compilation.GetSymbolsWithName(s => s.EndsWith(commandSuffix), SymbolFilter.Type)
-            .OfType<INamedTypeSymbol>()
-            .Where(t => t.IsRecord)
+    protected List<IMethodSymbol> GetAllQueryHandlers(GeneratorExecutionContext context, string methodHandlerName, List<INamedTypeSymbol> queries) =>
+        context.Compilation
+            .GetSymbolsWithName(s => s == methodHandlerName, SymbolFilter.Member)
+            .OfType<IMethodSymbol>()
+            .Where(m => m.Parameters.Length == 1 && queries.Contains(m.Parameters[0].Type, SymbolEqualityComparer.Default))
+            .Where(m => ReturnsTaskOfCommandResult(context, m))
             .ToList();
 
-        foreach (var command in commandsInDomain)
-        {
-            yield return command;
-        }
-
+    private IEnumerable<INamedTypeSymbol> GetAllTypesWithSuffix(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string typeSuffix)
+    {
         foreach (var reference in compilation.References)
         {
             if (compilation.GetAssemblyOrModuleSymbol(reference) is not IAssemblySymbol assemblySymbol
@@ -51,10 +44,31 @@ public abstract class CqrsSourceGenerator : GeneratorBase
 
             foreach (var t in allTypes)
             {
-                if (IsStruct(t))
+                if (t.Name.EndsWith(typeSuffix))
                     yield return t;
             }
         }
+    }
+
+    protected IEnumerable<INamedTypeSymbol> GetAllQueries(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string querySuffix)
+    {
+        var commandsInDomain = GetAllTypesWithSuffix(compilation, contractProjectSuffixes, querySuffix)
+            .Where(t => t.IsRecord);
+
+        return commandsInDomain;
+    }
+
+    protected IEnumerable<INamedTypeSymbol> GetAllCommands(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string commandSuffix)
+    {
+        static bool IsStruct(INamedTypeSymbol typeSymbol)
+        {
+            return typeSymbol.IsValueType && typeSymbol.TypeKind == TypeKind.Struct;
+        }
+
+        var commandsInDomain = GetAllTypesWithSuffix(compilation, contractProjectSuffixes, commandSuffix)
+            .Where(t => t.IsRecord && IsStruct(t));
+
+        return commandsInDomain;
     }
 
     private static bool ReturnsTaskOfCommandResult(GeneratorExecutionContext context, IMethodSymbol handlerType)

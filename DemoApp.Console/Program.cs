@@ -1,5 +1,5 @@
 ﻿using DemoApp.Contracts;
-using DemoApp.Domain;
+using DemoApp.Domain.Customer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NForza.Cqrs;
@@ -14,3 +14,5 @@ CommandResult addResult = await commandDispatcher.Execute(new AddCustomerCommand
 CommandResult updateResult = await commandDispatcher.Execute(new UpdateCustomerCommand(new(), new("John Doe"), new("123 Main St")));
 CommandResult deleteResult = await commandDispatcher.Execute(new DeleteCustomerCommand(new()));
 
+IQueryProcessor queryProcessor = host.Services.GetRequiredService<IQueryProcessor>();
+queryProcessor.Query(new AllCustomersQuery()); 

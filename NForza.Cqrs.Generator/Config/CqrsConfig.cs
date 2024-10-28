@@ -28,4 +28,5 @@ public class CqrsConfig : IYamlConfig<CqrsConfig>
 
     public string[] Contracts { get; set; } = ["Contracts"];
     public CommandConfig Commands { get; set; } = new();
+    public CommandConfig Queries { get; set; } = new() { HandlerName = "Query", Suffix = "Query" };
 }

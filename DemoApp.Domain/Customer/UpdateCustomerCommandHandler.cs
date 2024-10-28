@@ -1,6 +1,6 @@
 ﻿using NForza.Cqrs;
 
-namespace DemoApp.Domain;
+namespace DemoApp.Domain.Customer;
 
 public class UpdateCustomerCommandHandler
 {
