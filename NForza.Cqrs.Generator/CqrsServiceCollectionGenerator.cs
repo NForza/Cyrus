@@ -35,8 +35,6 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, ISourceGenera
 
     private void GenerateServiceCollectionExtensions(GeneratorExecutionContext context, List<IMethodSymbol> handlers)
     {
-        var templateSource = EmbeddedResourceReader.GetResource(typeof(CqrsServiceCollectionGenerator).Assembly, "Templates", "ServiceCollectionExtensions.cs");
-        
         StringBuilder source = new();
         foreach (var typeToRegister in handlers.Select(h => h.ContainingType).Distinct(SymbolEqualityComparer.Default))
         {
@@ -57,9 +55,13 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, ISourceGenera
         }
         string registerHandlers = source.ToString();
 
-        templateSource = templateSource
-            .Replace("% RegisterTypes %", registerTypes)
-            .Replace("% RegisterHandlers %", registerHandlers);
-        context.AddSource($"ServiceCollectionExtensions.g.cs", templateSource);
+        var replacements = new Dictionary<string, string>
+        {
+            ["RegisterTypes"] = registerTypes,
+            ["RegisterHandlers"] = registerHandlers
+        };
+
+        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("ServiceCollectionExtensions.cs", replacements);
+        context.AddSource($"ServiceCollectionExtensions.g.cs", resolvedSource);
     }
 }

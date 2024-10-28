@@ -1,6 +1,5 @@
-﻿namespace NForza.Cqrs.WebApi
+﻿namespace NForza.Cqrs.WebApi;
+
+public class SwaggerGenOptionsExtensions
 {
-    public class SwaggerGenOptionsExtensions
-    {
-    }
 }

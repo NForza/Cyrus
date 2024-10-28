@@ -2,16 +2,15 @@
 using NForza.Cqrs.WebApi;
 using NForza.Cqrs.WebApi.Policies;
 
-namespace DemoApp.WebApi
+namespace DemoApp.WebApi;
+
+public class CustomerEndpointGroup : EndpointGroup
 {
-    public class CustomerEndpointGroup : EndpointGroup
+    public CustomerEndpointGroup() : base("Customers")
     {
-        public CustomerEndpointGroup() : base("Customers")
-        {
-            CommandEndpoint<AddCustomerCommand>()
-                .Post("")
-                .AcceptedOnEvent<CustomerAddedEvent>("/customers/{Id}")
-                .OtherwiseFail();
-        }
+        CommandEndpoint<AddCustomerCommand>()
+            .Post("")
+            .AcceptedOnEvent<CustomerAddedEvent>("/customers/{Id}")
+            .OtherwiseFail();
     }
 }

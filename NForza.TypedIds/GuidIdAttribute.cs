@@ -1,7 +1,6 @@
-﻿namespace NForza.TypedIds
+﻿namespace NForza.TypedIds;
+
+[AttributeUsage(AttributeTargets.Struct)]
+public class GuidIdAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Struct)]
-    public class GuidIdAttribute : Attribute
-    {
-    }
 }
