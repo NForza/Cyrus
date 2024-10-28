@@ -1,4 +1,5 @@
 ﻿#if DEBUG_ANALYZER 
+using System.Collections.Generic;
 using System.Diagnostics;
 #endif
 using System.Linq;
@@ -28,13 +29,15 @@ public class StringIdGenerator : TypedIdGeneratorBase, ISourceGenerator
 
     private void GenerateStringId(GeneratorExecutionContext context, INamedTypeSymbol item)
     {
-        var template = EmbeddedResourceReader.GetResource(Assembly.GetExecutingAssembly(), "Templates", "StringId.cs");
+        var replacements = new Dictionary<string, string>
+        {
+            ["ItemName"] = item.Name,
+            ["Namespace"] = item.ContainingNamespace.ToDisplayString(),
+            ["CastOperators"] = GenerateCastOperatorsToUnderlyingType(item),
+            ["IsValid"] = GetIsValidExpression(item)
+        };
 
-        string resolvedSource = template
-            .Replace("% ItemName %", item.Name)
-            .Replace("% NamespaceName %", item.ContainingNamespace.ToDisplayString())
-            .Replace("% CastOperators %", GenerateCastOperatorsToUnderlyingType(item))
-            .Replace("% IsValid %", GetIsValidExpression(item));
+        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("StringId.cs", replacements);
 
         context.AddSource($"{item.Name}.g.cs", resolvedSource);
     }

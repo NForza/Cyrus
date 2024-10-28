@@ -12,10 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Templates\CommandDispatcherExtensions.cs" />
     <Compile Remove="Templates\ServiceCollectionExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Templates\CommandDispatcherExtensions.cs" />
     <EmbeddedResource Include="Templates\ServiceCollectionExtensions.cs" />
   </ItemGroup>
 

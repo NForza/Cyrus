@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using NForza.Generators;
@@ -25,18 +26,14 @@ public class GuidIdTypeConverterGenerator : TypedIdGeneratorBase, ISourceGenerat
 
     private void GenerateGuidIdTypeConverter(GeneratorExecutionContext context, INamedTypeSymbol item)
     {
-        string source = GetGuidConverter();
+        var replacements = new Dictionary<string, string>
+        {
+            ["TypedIdName"] = item.Name,
+            ["NamespaceName"] = item.ContainingNamespace.ToDisplayString()
+        };
 
-        string fullyQualifiedNamespace = item.ContainingNamespace.ToDisplayString();
-        source = source
-            .Replace("% TypedIdName %", item.Name)
-            .Replace("% NamespaceName %", fullyQualifiedNamespace);
+        string source = TemplateEngine.ReplaceInResourceTemplate("GuidTypeConverter.cs", replacements);
+
         context.AddSource($"{item}TypeConverter.g.cs", source);
-    }
-
-    private string GetGuidConverter()
-    {
-        var fileContents = EmbeddedResourceReader.GetResource(Assembly.GetExecutingAssembly(), "Templates", "GuidTypeConverter.cs");
-        return fileContents;
     }
 }

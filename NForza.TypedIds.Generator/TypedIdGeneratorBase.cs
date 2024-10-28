@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NForza.Generators;
@@ -8,7 +9,6 @@ namespace NForza.TypedIds.Generator;
 
 public abstract class TypedIdGeneratorBase : GeneratorBase, ISourceGenerator
 {
-
     protected IEnumerable<INamedTypeSymbol> GetAllTypedIds(Compilation compilation, string typedIdName)
     {
         var allTypes = new List<INamedTypeSymbol>();

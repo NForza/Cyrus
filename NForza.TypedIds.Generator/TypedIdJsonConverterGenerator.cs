@@ -1,6 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using Microsoft.CodeAnalysis;
 using NForza.Generators;
 
@@ -27,8 +28,6 @@ public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, ISourceGenera
 
     private void GenerateJsonConverter(GeneratorExecutionContext context, INamedTypeSymbol item)
     {
-        var source = EmbeddedResourceReader.GetResource(Assembly.GetExecutingAssembly(), "Templates", "JsonConverter.cs");
-
         string fullyQualifiedNamespace = item.ContainingNamespace.ToDisplayString();
         var underlyingTypeName = GetUnderlyingTypeOfTypedId(item);
 
@@ -36,13 +35,16 @@ public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, ISourceGenera
         {
             "System.Guid" => "GetGuid",
             "string" => "GetString",
-            _ => null
+            _ => throw new NotSupportedException($"Underlying type {underlyingTypeName} is not supported.")
         };
 
-        source = source
-            .Replace("% TypedIdName %", item.Name)
-            .Replace("% NamespaceName %", fullyQualifiedNamespace)
-            .Replace("% GetMethodName %", getMethodName);
+        var replacements = new Dictionary<string, string>
+        {
+            ["TypedIdName"] = item.Name,
+            ["NamespaceName"] = fullyQualifiedNamespace,
+            ["GetMethodName"] = getMethodName
+        };
+        var source = TemplateEngine.ReplaceInResourceTemplate("JsonConverter.cs", replacements);
         context.AddSource($"{item}JsonConverter.g.cs", source);
     }
 }

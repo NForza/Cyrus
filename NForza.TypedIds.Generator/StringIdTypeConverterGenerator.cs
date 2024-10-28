@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using NForza.Generators;
@@ -8,6 +9,7 @@ namespace NForza.TypedIds.Generator;
 [Generator]
 public class StringIdTypeConverterGenerator : TypedIdGeneratorBase, ISourceGenerator
 {
+ 
     public override void Execute(GeneratorExecutionContext context)
     {
 #if DEBUG_ANALYZER 
@@ -24,21 +26,14 @@ public class StringIdTypeConverterGenerator : TypedIdGeneratorBase, ISourceGener
         }
     }
 
-
     private void GenerateStringIdTypeConverter(GeneratorExecutionContext context, INamedTypeSymbol item)
     {
-        string source = GetStringConverter();
-
         string fullyQualifiedNamespace = item.ContainingNamespace.ToDisplayString();
-        source = source
-            .Replace("% TypedIdName %", item.Name)
-            .Replace("% NamespaceName %", fullyQualifiedNamespace);
-        context.AddSource($"{item}TypeConverter.g.cs", source);
-    }
-
-    private string GetStringConverter()
-    {
-        var fileContents = EmbeddedResourceReader.GetResource(Assembly.GetExecutingAssembly(), "Templates", "StringIdTypeConverter.cs");
-        return fileContents;
+        var replacements = new Dictionary<string, string> {
+            ["TypedIdName"] = item.Name,
+            ["NamespaceName"] = fullyQualifiedNamespace
+        };
+        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("StringIdTypeConverter.cs", replacements);
+        context.AddSource($"{item}TypeConverter.g.cs", resolvedSource);
     }
 }

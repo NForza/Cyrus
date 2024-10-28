@@ -1,6 +1,8 @@
-﻿using System.Diagnostics;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
+using NForza.Generators;
 
 namespace NForza.TypedIds.Generator;
 
@@ -24,38 +26,24 @@ public class GuidIdGenerator : TypedIdGeneratorBase, ISourceGenerator
 
     private void GenerateGuidId(GeneratorExecutionContext context, INamedTypeSymbol item)
     {
-        var source = new StringBuilder($@"
-using System;
-using NForza.TypedIds;
-using System.Text.Json.Serialization;
+        var replacements = new Dictionary<string, string>
+        {
+            ["ItemName"] = item.Name,
+            ["Namespace"] = item.ContainingNamespace.ToDisplayString(),
+            ["Constructor"] = GenerateConstructor(item),
+            ["CastOperators"] = GenerateCastOperatorsToUnderlyingType(item),
+            ["Default"] = "Guid.Empty"
+        };
 
-namespace {item.ContainingNamespace}
-{{
-    [JsonConverter(typeof({item.Name}JsonConverter))]
-    public partial record struct {item.Name}(Guid Value): ITypedId
-    {{
-        {GenerateConstructor(item)}
-        public static {item.ToDisplayString()} Empty => new {item.Name}({GetDefault()});
-        {GenerateCastOperatorsToUnderlyingType(item)}
-    }}
-}}
-");
+        var source = TemplateEngine.ReplaceInResourceTemplate("GuidId.cs", replacements);
+
         context.AddSource($"{item.Name}.g.cs", source.ToString());
     }
 
-    private string GenerateCastOperatorsToUnderlyingType(INamedTypeSymbol item)
-    {
-        return @$"public static implicit operator {GetUnderlyingTypeOfTypedId(item)}({item.ToDisplayString()} typedId) => typedId.Value;
+    private string GenerateCastOperatorsToUnderlyingType(INamedTypeSymbol item) => 
+        @$"public static implicit operator {GetUnderlyingTypeOfTypedId(item)}({item.ToDisplayString()} typedId) => typedId.Value;
         public static explicit operator {item.ToDisplayString()}({GetUnderlyingTypeOfTypedId(item)} value) => new(value);";
-    }
 
-    private object GetDefault()
-    {
-        return "Guid.Empty";
-    }
-
-    string GenerateConstructor(INamedTypeSymbol item)
-    {
-        return $@"public {item.Name}(): this(Guid.NewGuid()) {{}}";
-    }
+    string GenerateConstructor(INamedTypeSymbol item) => 
+        $@"public {item.Name}(): this(Guid.NewGuid()) {{}}";
 }
