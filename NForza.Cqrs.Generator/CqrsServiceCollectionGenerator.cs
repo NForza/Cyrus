@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -12,33 +13,51 @@ namespace NForza.Cqrs.Generator;
 [Generator]
 public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, ISourceGenerator
 {
+    private string registerTypes;
+
     public override void Execute(GeneratorExecutionContext context)
     {
         DebugThisGenerator(false);
 
         var configuration = ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
 
-        IEnumerable<string> contractSuffix = configuration.Contracts;
-        var commandSuffix = configuration.Commands.Suffix;
-        var methodHandlerName = configuration.Commands.HandlerName;
 
-        var commands = GetAllCommands(context.Compilation, contractSuffix, commandSuffix).ToList();
-        var handlers = GetAllCommandHandlers(context, methodHandlerName, commands);
-
-        GenerateServiceCollectionExtensions(context, handlers);
+        GenerateServiceCollectionExtensions(context, configuration);
     }
 
-    private void GenerateServiceCollectionExtensions(GeneratorExecutionContext context, List<IMethodSymbol> handlers)
+    private void GenerateServiceCollectionExtensions(GeneratorExecutionContext context, CqrsConfig configuration)
+    {
+        IEnumerable<string> contractSuffix = configuration.Contracts;
+        var commandSuffix = configuration.Commands.Suffix;
+        var commandHandlerMethodName = configuration.Commands.HandlerName;
+        var querySuffix = configuration.Queries.Suffix;
+        var queryHandlerMethodName = configuration.Queries.HandlerName;
+
+        var commands = GetAllCommands(context.Compilation, contractSuffix, commandSuffix).ToList();
+        var commandHandlers = GetAllCommandHandlers(context, commandHandlerMethodName, commands);
+        string commandHandlerTypeRegistrations = CreateRegisterTypes(commandHandlers);     
+        string commandHandlerRegistrations = CreateRegisterCommandHandler(commandHandlers);
+
+        var queries = GetAllQueries(context.Compilation, contractSuffix, querySuffix).ToList();
+        var queryHandlers = GetAllQueryHandlers(context, queryHandlerMethodName, queries);
+        string queryHandlerTypeRegistrations = CreateRegisterTypes(queryHandlers);
+        string queryHandlerRegistrations = CreateRegisterQueryHandler(commandHandlers);
+
+        var replacements = new Dictionary<string, string>
+        {
+            ["RegisterCommandHandlerTypes"] = commandHandlerTypeRegistrations,
+            ["RegisterCommandHandlers"] = commandHandlerRegistrations,
+            ["RegisterQueryHandlerTypes"] = queryHandlerTypeRegistrations,
+            ["RegisterQueryHandlers"] = queryHandlerRegistrations
+        };
+
+        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("ServiceCollectionExtensions.cs", replacements);
+        context.AddSource($"ServiceCollectionExtensions.g.cs", resolvedSource);
+    }
+
+    private string CreateRegisterQueryHandler(List<IMethodSymbol> handlers)
     {
         StringBuilder source = new();
-        foreach (var typeToRegister in handlers.Select(h => h.ContainingType).Distinct(SymbolEqualityComparer.Default))
-        {
-            source.Append($@"
-            services.AddTransient<{typeToRegister.ToDisplayString()}>();");
-        }
-        string registerTypes = source.ToString();
-
-        source.Clear();
         foreach (var handler in handlers)
         {
             var handlerReturnType = handler.ReturnType;
@@ -48,15 +67,32 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, ISourceGenera
             source.Append($@"
         handlers.AddHandler<{commandType}>((services, command) => services.GetRequiredService<{typeSymbol}>().Execute(({commandType})command));");
         }
-        string registerHandlers = source.ToString();
+        return source.ToString();
+    }
 
-        var replacements = new Dictionary<string, string>
+    private static string CreateRegisterTypes(List<IMethodSymbol> handlers)
+    {
+        var source = new StringBuilder();
+        foreach (var typeToRegister in handlers.Select(h => h.ContainingType).Distinct(SymbolEqualityComparer.Default))
         {
-            ["RegisterTypes"] = registerTypes,
-            ["RegisterHandlers"] = registerHandlers
-        };
+            source.Append($@"
+            services.AddTransient<{typeToRegister.ToDisplayString()}>();");
+        }
+        return source.ToString();
+    }
 
-        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("ServiceCollectionExtensions.cs", replacements);
-        context.AddSource($"ServiceCollectionExtensions.g.cs", resolvedSource);
+    private static string CreateRegisterCommandHandler(List<IMethodSymbol> handlers)
+    {
+        StringBuilder source = new();
+        foreach (var handler in handlers)
+        {
+            var handlerReturnType = handler.ReturnType;
+            var commandType = handler.Parameters[0].Type;
+            var typeSymbol = handler.ContainingType;
+
+            source.Append($@"
+        handlers.AddHandler<{commandType}>((services, command) => services.GetRequiredService<{typeSymbol}>().Execute(({commandType})command));");
+        }
+        return source.ToString();
     }
 }

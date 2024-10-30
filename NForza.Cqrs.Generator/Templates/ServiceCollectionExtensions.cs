@@ -13,15 +13,24 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IQueryProcessor, QueryProcessor>();
         services.AddSingleton<ICommandBus, LocalCommandBus>(); 
         services.AddSingleton<IEventBus, EventBus>(); 
-        services.AddSingleton(BuildHandlerDictionary());
+        services.AddSingleton(BuildCommandHandlerDictionary());
+        services.AddSingleton(BuildQueryHandlerDictionary());
         % RegisterTypes %
         return services;
     }
 
-    public static CommandHandlerDictionary BuildHandlerDictionary()
+    public static CommandHandlerDictionary BuildCommandHandlerDictionary()
     {
         var handlers = new CommandHandlerDictionary();
-        % RegisterHandlers %
+        % RegisterCommandHandlers %
         return handlers;
     }
+
+    public static QueryProcessorDictionary BuildQueryHandlerDictionary()
+    {
+        var handlers = new QueryProcessorHandlerDictionary();
+        % RegisterQueryHandlers %
+        return handlers;
+    }
+
 }
