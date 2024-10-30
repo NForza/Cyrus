@@ -10,6 +10,7 @@ public static class ServiceCollectionExtensions
     {
         options?.Invoke(new CqrsOptions(services));
         services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
+        services.AddSingleton<IQueryProcessor, QueryProcessor>();
         services.AddSingleton<ICommandBus, LocalCommandBus>(); 
         services.AddSingleton<IEventBus, EventBus>(); 
         services.AddSingleton(BuildHandlerDictionary());

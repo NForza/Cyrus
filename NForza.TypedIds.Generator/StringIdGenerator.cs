@@ -1,9 +1,7 @@
 ﻿#if DEBUG_ANALYZER 
 using System.Collections.Generic;
-using System.Diagnostics;
 #endif
 using System.Linq;
-using System.Reflection;
 using Microsoft.CodeAnalysis;
 using NForza.Generators;
 
@@ -14,12 +12,8 @@ public class StringIdGenerator : TypedIdGeneratorBase, ISourceGenerator
 {
     public override void Execute(GeneratorExecutionContext context)
     {
-#if DEBUG_ANALYZER 
-        if (!Debugger.IsAttached && false)
-        {
-            Debugger.Launch();
-        }
-#endif
+        DebugThisGenerator(false);
+
         var typedIds = GetAllTypedIds(context.Compilation, "StringIdAttribute");
         foreach (var item in typedIds)
         {

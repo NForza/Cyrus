@@ -1,4 +1,4 @@
-﻿using DemoApp.Contracts;
+﻿using DemoApp.Contracts.Customers;
 using NForza.Cqrs;
 
 namespace DemoApp.Domain.Customer;

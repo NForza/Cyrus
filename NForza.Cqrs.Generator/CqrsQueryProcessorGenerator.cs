@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using NForza.Cqrs.Generator.Config;
 using NForza.Generators;
 
 #pragma warning disable RS1035 // Do not use banned APIs for analyzers
@@ -15,20 +13,16 @@ public class CqrsQueryHandlerGenerator : CqrsSourceGenerator, ISourceGenerator
 {    
     public override void Execute(GeneratorExecutionContext context)
     {
-#if DEBUG_ANALYZER 
-        if (!Debugger.IsAttached && false)
-        {
-            Debugger.Launch();
-        }
-#endif
-        var configuration = ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
+        DebugThisGenerator(false);
+
+        base.Execute(context);
 
         IEnumerable<string> contractSuffix = configuration.Contracts;
-        var querySuffix = configuration.Commands.Suffix;
-        var methodHandlerName = configuration.Commands.HandlerName;
+        var querySuffix = configuration.Queries.Suffix;
+        var methodHandlerName = configuration.Queries.HandlerName;
 
-        var commands = GetAllQueries(context.Compilation, contractSuffix, querySuffix).ToList();
-        var handlers = GetAllQueryHandlers(context, methodHandlerName, commands);
+        var queries = GetAllQueries(context.Compilation, contractSuffix, querySuffix).ToList();
+        var handlers = GetAllQueryHandlers(context, methodHandlerName, queries);
 
         GenerateQueryProcessorExtensionMethods(context, handlers);
     }
@@ -40,9 +34,10 @@ public class CqrsQueryHandlerGenerator : CqrsSourceGenerator, ISourceGenerator
         {
             var methodSymbol = handler;
             var parameterType = methodSymbol.Parameters[0].Type;
+            var returnType = methodSymbol.ReturnType;
             source.Append($@"
-    public static Task<CommandResult> Execute(this IQueryProcessor queryProcessor, {parameterType} command, CancellationToken cancellationToken = default) 
-        => queryProcessor.QueryInternal(command, cancellationToken);");
+    public static {returnType} Query(this IQueryProcessor queryProcessor, {parameterType} command, CancellationToken cancellationToken = default) 
+        => queryProcessor.QueryInternal<{parameterType}, {returnType}>(command, cancellationToken);");
         }
 
         var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("QueryProcessorExtensions.cs", new Dictionary<string, string>

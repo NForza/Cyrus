@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -15,12 +14,9 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, ISourceGenera
 {    
     public override void Execute(GeneratorExecutionContext context)
     {
-#if DEBUG_ANALYZER 
-        if (!Debugger.IsAttached && false)
-        {
-            Debugger.Launch();
-        }
-#endif
+        DebugThisGenerator(false);
+
+        base.Execute(context);
         var configuration = ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
 
         IEnumerable<string> contractSuffix = configuration.Contracts;

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
@@ -13,12 +12,8 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, ISourceGe
 {
     public override void Execute(GeneratorExecutionContext context)
     {
-#if DEBUG_ANALYZER 
-        if (!Debugger.IsAttached && false)
-        {
-            Debugger.Launch();
-        }
-#endif
+        DebugThisGenerator(false);
+
         var typedIds =
             GetAllTypedIds(context.Compilation, "StringIdAttribute").Concat(GetAllTypedIds(context.Compilation, "GuidIdAttribute"));
         GenerateServiceCollectionExtensionMethod(context, typedIds);

@@ -1,4 +1,4 @@
-﻿using DemoApp.Contracts;
+﻿using DemoApp.Contracts.Customers;
 using NForza.Cqrs.WebApi;
 using NForza.Cqrs.WebApi.Policies;
 

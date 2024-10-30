@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using NForza.Cqrs.Generator.Config;
 using NForza.Generators;
 
 #pragma warning disable RS1035 // Do not use banned APIs for analyzers
@@ -11,6 +12,9 @@ namespace NForza.Cqrs.Generator;
 
 public abstract class CqrsSourceGenerator : GeneratorBase
 {
+    protected CqrsConfig configuration;
+    protected CqrsConfig Configuration => configuration;
+
     protected List<IMethodSymbol> GetAllCommandHandlers(GeneratorExecutionContext context, string methodHandlerName, List<INamedTypeSymbol> commands) =>
         context.Compilation
             .GetSymbolsWithName(s => s == methodHandlerName, SymbolFilter.Member)
@@ -19,16 +23,20 @@ public abstract class CqrsSourceGenerator : GeneratorBase
             .Where(m => ReturnsTaskOfCommandResult(context, m))
             .ToList();
 
-    protected List<IMethodSymbol> GetAllQueryHandlers(GeneratorExecutionContext context, string methodHandlerName, List<INamedTypeSymbol> queries) =>
-        context.Compilation
-            .GetSymbolsWithName(s => s == methodHandlerName, SymbolFilter.Member)
-            .OfType<IMethodSymbol>()
-            .Where(m => m.Parameters.Length == 1 && queries.Contains(m.Parameters[0].Type, SymbolEqualityComparer.Default))
-            .Where(m => ReturnsTaskOfCommandResult(context, m))
-            .ToList();
+    protected List<IMethodSymbol> GetAllQueryHandlers(GeneratorExecutionContext context, string methodHandlerName, List<INamedTypeSymbol> queries)
+    {
+        var symbolsWithCorrectName = context.Compilation.GetSymbolsWithName(s => s == methodHandlerName, SymbolFilter.Member);
+        var methodsWithCorrectName = symbolsWithCorrectName.OfType<IMethodSymbol>();
+        var methodsWithCorrectNameAndParameters = methodsWithCorrectName.Where(m => m.Parameters.Length == 1 && queries.Contains(m.Parameters[0].Type, SymbolEqualityComparer.Default));
+        return methodsWithCorrectNameAndParameters.ToList();
+    }
 
     private IEnumerable<INamedTypeSymbol> GetAllTypesWithSuffix(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string typeSuffix)
     {
+        var typesInCurrentCompilation = compilation.GetSymbolsWithName(s => s.EndsWith(typeSuffix), SymbolFilter.Type).OfType<INamedTypeSymbol>();
+        foreach (var t in typesInCurrentCompilation)
+            yield return t;
+
         foreach (var reference in compilation.References)
         {
             if (compilation.GetAssemblyOrModuleSymbol(reference) is not IAssemblySymbol assemblySymbol
@@ -50,23 +58,23 @@ public abstract class CqrsSourceGenerator : GeneratorBase
         }
     }
 
+    static bool IsStruct(INamedTypeSymbol typeSymbol)
+    {
+        return typeSymbol.IsValueType && typeSymbol.TypeKind == TypeKind.Struct;
+    }
+
     protected IEnumerable<INamedTypeSymbol> GetAllQueries(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string querySuffix)
     {
-        var commandsInDomain = GetAllTypesWithSuffix(compilation, contractProjectSuffixes, querySuffix)
-            .Where(t => t.IsRecord);
+        var queriesInDomain = GetAllTypesWithSuffix(compilation, contractProjectSuffixes, querySuffix)
+            .ToList();
 
-        return commandsInDomain;
+        return queriesInDomain;
     }
 
     protected IEnumerable<INamedTypeSymbol> GetAllCommands(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string commandSuffix)
     {
-        static bool IsStruct(INamedTypeSymbol typeSymbol)
-        {
-            return typeSymbol.IsValueType && typeSymbol.TypeKind == TypeKind.Struct;
-        }
-
         var commandsInDomain = GetAllTypesWithSuffix(compilation, contractProjectSuffixes, commandSuffix)
-            .Where(t => t.IsRecord && IsStruct(t));
+            .Where(t => IsStruct(t));
 
         return commandsInDomain;
     }
@@ -112,7 +120,8 @@ public abstract class CqrsSourceGenerator : GeneratorBase
         return false;
     }
 
-    public override void Initialize(GeneratorInitializationContext context)
+    public override void Execute(GeneratorExecutionContext context)
     {
+        configuration ??= ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
     }
 }

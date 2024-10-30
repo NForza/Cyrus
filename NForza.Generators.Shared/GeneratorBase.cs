@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -19,6 +20,16 @@ public abstract class GeneratorBase : ISourceGenerator
         string configContent = additionalFile?.GetText(context.CancellationToken)?.ToString() ?? string.Empty;
         var config = YamlParser.ReadYaml(configContent);
         return new T().InitFrom(config);
+    }
+
+    public void DebugThisGenerator(bool debug)
+    {
+#if DEBUG_ANALYZER
+        if (!Debugger.IsAttached && debug)
+        {
+            Debugger.Launch();
+        }
+#endif
     }
 
     protected IEnumerable<INamedTypeSymbol> GetAllTypes(INamespaceSymbol namespaceSymbol)

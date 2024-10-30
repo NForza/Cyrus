@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Reflection;
 using Microsoft.CodeAnalysis;
 using NForza.Generators;
 
@@ -12,12 +10,8 @@ public class StringIdTypeConverterGenerator : TypedIdGeneratorBase, ISourceGener
  
     public override void Execute(GeneratorExecutionContext context)
     {
-#if DEBUG_ANALYZER 
-        if (!Debugger.IsAttached && false)
-        {
-            Debugger.Launch();
-        }
-#endif
+        DebugThisGenerator(false);
+
         var stringIds =
             GetAllTypedIds(context.Compilation, "StringIdAttribute");
         foreach (var item in stringIds)

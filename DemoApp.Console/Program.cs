@@ -1,4 +1,4 @@
-﻿using DemoApp.Contracts;
+﻿using DemoApp.Contracts.Customers;
 using DemoApp.Domain.Customer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

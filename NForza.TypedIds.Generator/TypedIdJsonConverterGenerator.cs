@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using NForza.Generators;
@@ -12,12 +11,8 @@ public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, ISourceGenera
 {
     public override void Execute(GeneratorExecutionContext context)
     {
-#if DEBUG_ANALYZER 
-        if (!Debugger.IsAttached && false)
-        {
-            Debugger.Launch();
-        }
-#endif
+        DebugThisGenerator(false);
+
         var typedIds = 
             GetAllTypedIds(context.Compilation, "StringIdAttribute").Concat(GetAllTypedIds(context.Compilation, "GuidIdAttribute"));
         foreach (var item in typedIds)
