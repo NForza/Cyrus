@@ -13,14 +13,11 @@ namespace NForza.Cqrs.Generator;
 [Generator]
 public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, ISourceGenerator
 {
-    private string registerTypes;
-
     public override void Execute(GeneratorExecutionContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
 
         var configuration = ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
-
 
         GenerateServiceCollectionExtensions(context, configuration);
     }
@@ -41,7 +38,7 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, ISourceGenera
         var queries = GetAllQueries(context.Compilation, contractSuffix, querySuffix).ToList();
         var queryHandlers = GetAllQueryHandlers(context, queryHandlerMethodName, queries);
         string queryHandlerTypeRegistrations = CreateRegisterTypes(queryHandlers);
-        string queryHandlerRegistrations = CreateRegisterQueryHandler(commandHandlers);
+        string queryHandlerRegistrations = CreateRegisterQueryHandler(queryHandlers);
 
         var replacements = new Dictionary<string, string>
         {
@@ -55,17 +52,16 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, ISourceGenera
         context.AddSource($"ServiceCollectionExtensions.g.cs", resolvedSource);
     }
 
-    private string CreateRegisterQueryHandler(List<IMethodSymbol> handlers)
+    private string CreateRegisterQueryHandler(List<IMethodSymbol> queryHandlers)
     {
         StringBuilder source = new();
-        foreach (var handler in handlers)
+        foreach (var handler in queryHandlers)
         {
-            var handlerReturnType = handler.ReturnType;
-            var commandType = handler.Parameters[0].Type;
+            var queryType = handler.Parameters[0].Type;
             var typeSymbol = handler.ContainingType;
 
             source.Append($@"
-        handlers.AddHandler<{commandType}>((services, command) => services.GetRequiredService<{typeSymbol}>().Execute(({commandType})command));");
+        handlers.AddHandler<{queryType}>((services, command) => services.GetRequiredService<{typeSymbol}>().Execute(({queryType})command));");
         }
         return source.ToString();
     }
@@ -86,7 +82,6 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, ISourceGenera
         StringBuilder source = new();
         foreach (var handler in handlers)
         {
-            var handlerReturnType = handler.ReturnType;
             var commandType = handler.Parameters[0].Type;
             var typeSymbol = handler.ContainingType;
 
