@@ -61,15 +61,15 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, ISourceGenera
             var typeSymbol = handler.ContainingType;
 
             source.Append($@"
-        handlers.AddHandler<{queryType}>((services, command) => services.GetRequiredService<{typeSymbol}>().Execute(({queryType})command));");
+        handlers.AddHandler<{queryType}>((services, command) => services.GetRequiredService<{typeSymbol}>().Query(({queryType})command));");
         }
         return source.ToString();
     }
 
-    private static string CreateRegisterTypes(List<IMethodSymbol> handlers)
+    private static string CreateRegisterTypes(List<IMethodSymbol> commandHandlers)
     {
         var source = new StringBuilder();
-        foreach (var typeToRegister in handlers.Select(h => h.ContainingType).Distinct(SymbolEqualityComparer.Default))
+        foreach (var typeToRegister in commandHandlers.Select(h => h.ContainingType).Distinct(SymbolEqualityComparer.Default))
         {
             source.Append($@"
             services.AddTransient<{typeToRegister.ToDisplayString()}>();");

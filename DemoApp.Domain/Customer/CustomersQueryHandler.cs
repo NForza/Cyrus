@@ -9,7 +9,7 @@ public class CustomersQueryHandler
         return [];
     }
 
-    public static Customer Query(CustomerByIdQuery query)
+    public Customer Query(CustomerByIdQuery query)
     {
         return new(query.Id, "Customer-"+ query.Id);
     }
