@@ -15,7 +15,7 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, ISourceGenera
 {
     public override void Execute(GeneratorExecutionContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
 
         var configuration = ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
 

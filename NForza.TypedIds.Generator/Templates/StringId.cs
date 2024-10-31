@@ -11,4 +11,5 @@ public partial record struct % ItemName %(string Value): ITypedId
     public bool IsEmpty() => string.IsNullOrEmpty(Value);
     % CastOperators %
     % IsValid %
+    public override string ToString() => Value.ToString();
 }
