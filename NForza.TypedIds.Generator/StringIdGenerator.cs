@@ -59,6 +59,6 @@ public class StringIdGenerator : TypedIdGeneratorBase, ISourceGenerator
     private string GenerateCastOperatorsToUnderlyingType(INamedTypeSymbol item)
     {
         return @$"public static implicit operator {GetUnderlyingTypeOfTypedId(item)}({item.ToDisplayString()} typedId) => typedId.Value;
-        public static explicit operator {item.ToDisplayString()}({GetUnderlyingTypeOfTypedId(item)} value) => new(value);";
+    public static explicit operator {item.ToDisplayString()}({GetUnderlyingTypeOfTypedId(item)} value) => new(value);";
     }
 }

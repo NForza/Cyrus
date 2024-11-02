@@ -4,8 +4,19 @@ using NForza.Cqrs.WebApi;
 using NForza.Cqrs;
 using NForza.TypedIds;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using MassTransit;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddMassTransit(cfg =>
+{
+    cfg.AddConsumers(Assembly.GetExecutingAssembly());
+    cfg.UsingInMemory((context, cfg) =>
+    {
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 builder.Services.AddEndpointGroup<CustomerEndpointGroup>();
 builder.Services.AddCqrs(o => o.AddCqrsEndpoints());

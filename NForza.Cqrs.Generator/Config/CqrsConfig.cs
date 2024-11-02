@@ -23,10 +23,17 @@ public class CqrsConfig : IYamlConfig<CqrsConfig>
         {
             Commands.HandlerName = handlerName.First();
         }
+
+        var eventBus = config["eventBus"];
+        if (eventBus != null)
+        {
+            EventBus = eventBus.First();
+        }
         return this;
     }
 
     public string[] Contracts { get; set; } = ["Contracts"];
     public CommandConfig Commands { get; set; } = new();
     public CommandConfig Queries { get; set; } = new() { HandlerName = "Query", Suffix = "Query" };
+    public string EventBus { get; set; } = "Local";
 }

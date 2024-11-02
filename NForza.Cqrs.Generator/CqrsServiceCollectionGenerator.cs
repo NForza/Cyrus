@@ -32,20 +32,24 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, ISourceGenera
 
         var commands = GetAllCommands(context.Compilation, contractSuffix, commandSuffix).ToList();
         var commandHandlers = GetAllCommandHandlers(context, commandHandlerMethodName, commands);
-        string commandHandlerTypeRegistrations = CreateRegisterTypes(commandHandlers);     
+        string commandHandlerTypeRegistrations = CreateRegisterTypes(commandHandlers);
         string commandHandlerRegistrations = CreateRegisterCommandHandler(commandHandlers);
 
         var queries = GetAllQueries(context.Compilation, contractSuffix, querySuffix).ToList();
         var queryHandlers = GetAllQueryHandlers(context, queryHandlerMethodName, queries);
         string queryHandlerTypeRegistrations = CreateRegisterTypes(queryHandlers);
         string queryHandlerRegistrations = CreateRegisterQueryHandler(queryHandlers);
+        string eventBusRegistration = $@"services.AddSingleton<IEventBus, {configuration.EventBus}EventBus>();";
+        string usings = configuration.EventBus == "MassTransit" ? "using NForza.Cqrs.MassTransit;" : "";
 
         var replacements = new Dictionary<string, string>
         {
             ["RegisterCommandHandlerTypes"] = commandHandlerTypeRegistrations,
             ["RegisterCommandHandlers"] = commandHandlerRegistrations,
             ["RegisterQueryHandlerTypes"] = queryHandlerTypeRegistrations,
-            ["RegisterQueryHandlers"] = queryHandlerRegistrations
+            ["RegisterQueryHandlers"] = queryHandlerRegistrations,
+            ["RegisterEventBus"] = eventBusRegistration,
+            ["Usings"] = usings
         };
 
         var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("ServiceCollectionExtensions.cs", replacements);
@@ -60,8 +64,17 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, ISourceGenera
             var queryType = handler.Parameters[0].Type;
             var typeSymbol = handler.ContainingType;
 
-            source.Append($@"
-        handlers.AddHandler<{queryType}>((services, command) => services.GetRequiredService<{typeSymbol}>().Query(({queryType})command));");
+            if (handler.IsStatic)
+            {
+                source.Append($@"
+        handlers.AddHandler<{queryType}>((_, query) => {typeSymbol}.Query(({queryType})query));");
+            }
+            else
+            {
+                source.Append($@"
+        handlers.AddHandler<{queryType}>((services, query) => services.GetRequiredService<{typeSymbol}>().Query(({queryType})query));");
+
+            }
         }
         return source.ToString();
     }
@@ -84,9 +97,16 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, ISourceGenera
         {
             var commandType = handler.Parameters[0].Type;
             var typeSymbol = handler.ContainingType;
-
-            source.Append($@"
+            if (handler.IsStatic)
+            {
+                source.Append($@"
+        handlers.AddHandler<{commandType}>((_, command) => {typeSymbol}.Execute(({commandType})command));");
+            }
+            else
+            {
+                source.Append($@"
         handlers.AddHandler<{commandType}>((services, command) => services.GetRequiredService<{typeSymbol}>().Execute(({commandType})command));");
+            }
         }
         return source.ToString();
     }

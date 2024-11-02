@@ -1,3 +1,3 @@
 ﻿namespace DemoApp.Contracts.Customers;
 
-public record struct CustomerAddedEvent(CustomerId Id);
+public record CustomerAddedEvent(CustomerId Id, Name name, Address address);

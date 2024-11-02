@@ -5,5 +5,5 @@ commands:
 queries:
   suffix: Query
   handlerName: Execute
-
+eventBus: MassTransit
   

@@ -6,8 +6,7 @@ namespace NForza.TypedIds.Generator;
 
 [Generator]
 public class StringIdTypeConverterGenerator : TypedIdGeneratorBase, ISourceGenerator
-{
- 
+{ 
     public override void Execute(GeneratorExecutionContext context)
     {
         DebugThisGenerator(false);

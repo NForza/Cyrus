@@ -23,7 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DemoApp.Contracts\DemoApp.Contracts.csproj" />    
+    <ProjectReference Include="..\DemoApp.Contracts\DemoApp.Contracts.csproj" />
+    <ProjectReference Include="..\NForza.Cqrs.MassTransit\NForza.Cqrs.MassTransit.csproj" />    
     <ProjectReference Include="..\NForza.Cqrs\NForza.Cqrs.csproj" />
     <ProjectReference Include="..\NForza.Cqrs.Generator\NForza.Cqrs.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\NForza.TypedIds\NForza.TypedIds.csproj" />

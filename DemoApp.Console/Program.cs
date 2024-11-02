@@ -1,12 +1,23 @@
-﻿using DemoApp.Contracts;
+﻿using System.Reflection;
 using DemoApp.Contracts.Customers;
 using DemoApp.Domain.Customer;
+using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NForza.Cqrs;
 
 var host = Host.CreateDefaultBuilder(args)
-            .ConfigureServices(services => services.AddCqrs())
+            .ConfigureServices(services => services
+                .AddCqrs()
+                .AddMassTransit( cfg =>
+                {
+                    cfg.AddConsumers(Assembly.GetExecutingAssembly());
+                    cfg.UsingInMemory((context, cfg) =>
+                    {
+                        cfg.ConfigureEndpoints(context);
+                    });
+                })
+            )
             .Build();
 
 ICommandDispatcher commandDispatcher = host.Services.GetRequiredService<ICommandDispatcher>();
