@@ -12,5 +12,7 @@ public class CustomerEndpointGroup : EndpointGroup
             .Post("")
             .AcceptedOnEvent<CustomerAddedEvent>("/customers/{Id}")
             .OtherwiseFail();
+        QueryEndpoint<AllCustomersQuery>()
+            .Get("/customers");
     }
 }
