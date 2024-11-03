@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -63,26 +62,27 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, ISourceGenera
         {
             var queryType = handler.Parameters[0].Type;
             var typeSymbol = handler.ContainingType;
+            var returnType = handler.ReturnType;
 
             if (handler.IsStatic)
             {
                 source.Append($@"
-        handlers.AddHandler<{queryType}>((_, query) => {typeSymbol}.Query(({queryType})query));");
+        handlers.AddHandler<{queryType}, {returnType}>((_, query, token) => {typeSymbol}.Query(({queryType})query));");
             }
             else
             {
                 source.Append($@"
-        handlers.AddHandler<{queryType}>((services, query) => services.GetRequiredService<{typeSymbol}>().Query(({queryType})query));");
+        handlers.AddHandler<{queryType}, {returnType}>((services, query, token) => services.GetRequiredService<{typeSymbol}>().Query(({queryType})query));");
 
             }
         }
         return source.ToString();
     }
 
-    private static string CreateRegisterTypes(List<IMethodSymbol> commandHandlers)
+    private static string CreateRegisterTypes(List<IMethodSymbol> handlers)
     {
         var source = new StringBuilder();
-        foreach (var typeToRegister in commandHandlers.Select(h => h.ContainingType).Distinct(SymbolEqualityComparer.Default))
+        foreach (var typeToRegister in handlers.Select(h => h.ContainingType).Distinct(SymbolEqualityComparer.Default))
         {
             source.Append($@"
             services.AddTransient<{typeToRegister.ToDisplayString()}>();");

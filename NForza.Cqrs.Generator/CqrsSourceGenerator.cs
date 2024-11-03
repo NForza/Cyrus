@@ -27,8 +27,18 @@ public abstract class CqrsSourceGenerator : GeneratorBase
     {
         var symbolsWithCorrectName = context.Compilation.GetSymbolsWithName(s => s == methodHandlerName, SymbolFilter.Member);
         var methodsWithCorrectName = symbolsWithCorrectName.OfType<IMethodSymbol>();
-        var methodsWithCorrectNameAndParameters = methodsWithCorrectName.Where(m => m.Parameters.Length == 1 && queries.Contains(m.Parameters[0].Type, SymbolEqualityComparer.Default));
+        var methodsWithCorrectNameAndParameters = methodsWithCorrectName
+            .Where(m => HasQueryHandlerASignature(m, queries));
         return methodsWithCorrectNameAndParameters.ToList();
+
+        static bool HasQueryHandlerASignature(IMethodSymbol method, List<INamedTypeSymbol> queries)
+        {
+            return method.Parameters.Length <= 2
+                               &&
+                               queries.Contains(method.Parameters[0].Type, SymbolEqualityComparer.Default)
+                               &&
+                               (method.Parameters.Length == 1 || method.Parameters[1].Name == "CancellationToken");
+        }
     }
 
     private IEnumerable<INamedTypeSymbol> GetAllTypesWithSuffix(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string typeSuffix)

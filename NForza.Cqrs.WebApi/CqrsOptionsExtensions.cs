@@ -14,6 +14,12 @@ public static class CqrsOptionsExtensions
             IEnumerable<EndpointDefinition> definitions = groups.SelectMany(g => g.EndpointDefinitions);
             return definitions.OfType<CommandEndpointDefinition>();
         });
+        options.Services.AddSingleton(sp =>
+        {
+            IEnumerable<EndpointGroup> groups = sp.GetServices<EndpointGroup>();
+            IEnumerable<EndpointDefinition> definitions = groups.SelectMany(g => g.EndpointDefinitions);
+            return definitions.OfType<QueryEndpointDefinition>();
+        });
         options.Services.AddTransient<IConfigureOptions<JsonOptions>, JsonOptionsConfigurator>();
         return options;
     }
