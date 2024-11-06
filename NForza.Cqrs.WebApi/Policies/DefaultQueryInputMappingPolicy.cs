@@ -15,14 +15,17 @@ public class DefaultQueryInputMappingPolicy(HttpContext httpContext) : InputMapp
 
     public override Task<object> MapInputAsync(Type typeToCreate)
     {
-        static ConstructorInfo FindConstructorForQuery(Type queryType)
+        static ConstructorInfo? FindConstructorForQuery(Type queryType)
         {
-            if (queryType.GetConstructors().Length > 1)
+            ConstructorInfo[] constructorInfos = queryType.GetConstructors();
+            if (constructorInfos.Length > 1)
                 throw new ArgumentException($"More than one constructor found for query {queryType.Name}.");
-            return queryType.GetConstructors().First();
+            return constructorInfos.FirstOrDefault();
         }
 
         var constructor = FindConstructorForQuery(typeToCreate);
+        if (constructor == null)
+            return Task.FromResult(Activator.CreateInstance(typeToCreate)!);
         List<object?> parameters = [];
         foreach (var parameter in constructor.GetParameters())
             if (httpContext.Request.RouteValues.TryGetValue(parameter.Name!, out var value))

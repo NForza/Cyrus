@@ -1,4 +1,5 @@
-﻿using DemoApp.Contracts.Customers;
+﻿using DemoApp.Contracts;
+using DemoApp.Contracts.Customers;
 
 namespace DemoApp.Domain.Customer;
 
@@ -6,7 +7,10 @@ public class CustomersQueryHandler
 {
     public List<Customer> Query(AllCustomersQuery query)
     {
-        return [];
+        var customers = Enumerable.Range(1, 10)
+            .Select(i => new Customer(new(), new($"Customer-{i}")))
+            .ToList();  
+        return customers;
     }
 
     public static Customer Query(CustomerByIdQuery query)

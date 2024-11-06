@@ -83,7 +83,7 @@ public static class IEndpointRouteBuilderExtensions
     {
         var queryInputMappingPolicy = endpointDefinition.InputMappingPolicyType != null ?
             (InputMappingPolicy)ctx.RequestServices.GetRequiredService(endpointDefinition.InputMappingPolicyType)
-            : ctx.RequestServices.GetRequiredService<DefaultQueryInputMappingPolicy>();
+            : new DefaultQueryInputMappingPolicy(ctx);
         return queryInputMappingPolicy.MapInputAsync(endpointDefinition.EndpointType);
     }
 }
