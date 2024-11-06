@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -23,9 +25,42 @@ public class CqrsQueryObjectGenerator : CqrsSourceGenerator, ISourceGenerator
         var methodHandlerName = Configuration.Queries.HandlerName;
 
         var endpoints = GetAllEndpoints(context.Compilation);
+        var ctors = GetConstructorsFromEndpoints(endpoints);
+        var expressions = GetExpressionsFromConstructors(ctors);
+
+        foreach (var expression in expressions)
+        {
+            Console.WriteLine(expression.ToFullString());
+        }
     }
 
-    private object GetAllEndpoints(Compilation compilation)
+    private IEnumerable<ExpressionStatementSyntax> GetExpressionsFromConstructors(IEnumerable<IMethodSymbol> ctors)
+    {
+        return ctors
+            .SelectMany(c =>
+                {
+                    var ctor = c.DeclaringSyntaxReferences.FirstOrDefault().GetSyntax() as ConstructorDeclarationSyntax;
+
+                    if (ctor != null)
+                    {
+                        var expressionStatements = ctor
+                            .DescendantNodes()
+                            .OfType<ExpressionStatementSyntax>();
+                        return expressionStatements;
+                    }
+                    return null;
+                })
+            .Where(expr => expr is not null);
+    }
+
+    private IEnumerable<IMethodSymbol> GetConstructorsFromEndpoints(List<INamedTypeSymbol> endpoints)
+    {
+        return endpoints
+            .Select(e => e.Constructors.FirstOrDefault(c => c.Parameters.Length == 0))
+            .Where(c => c is not null);
+    }
+
+    private List<INamedTypeSymbol> GetAllEndpoints(Compilation compilation)
     {
         var baseTypeSymbol = compilation.GetTypeByMetadataName("NForza.Cqrs.WebApi.EndpointGroup");
         var derivedClasses = new List<INamedTypeSymbol>();
