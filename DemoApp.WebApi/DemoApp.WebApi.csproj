@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Configurations>Debug;Release;DebugGenerator</Configurations>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>./obj/generated</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DemoApp.Domain\DemoApp.Domain.csproj" />
     <ProjectReference Include="..\NForza.Cqrs.WebApi\NForza.Cqrs.WebApi.csproj" />
+    <ProjectReference Include="..\NForza.Cqrs.WebApi.Generator\NForza.Cqrs.WebApi.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NForza.Generators;
 
 #pragma warning disable RS1035 // Do not use banned APIs for analyzers
@@ -9,11 +10,11 @@ using NForza.Generators;
 namespace NForza.Cqrs.Generator;
 
 [Generator]
-public class CqrsQueryHandlerGenerator : CqrsSourceGenerator, ISourceGenerator
-{    
+public class CqrsQueryObjectGenerator : CqrsSourceGenerator, ISourceGenerator
+{
     public override void Execute(GeneratorExecutionContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
 
         base.Execute(context);
 
@@ -21,10 +22,37 @@ public class CqrsQueryHandlerGenerator : CqrsSourceGenerator, ISourceGenerator
         var querySuffix = Configuration.Queries.Suffix;
         var methodHandlerName = Configuration.Queries.HandlerName;
 
-        var queries = GetAllQueries(context.Compilation, contractSuffix, querySuffix).ToList();
-        var handlers = GetAllQueryHandlers(context, methodHandlerName, queries);
+        var endpoints = GetAllEndpoints(context.Compilation);
+    }
 
-        GenerateQueryProcessorExtensionMethods(context, handlers);
+    private object GetAllEndpoints(Compilation compilation)
+    {
+        var baseTypeSymbol = compilation.GetTypeByMetadataName("NForza.Cqrs.WebApi.EndpointGroup");
+        var derivedClasses = new List<INamedTypeSymbol>();
+
+        foreach (var syntaxTree in compilation.SyntaxTrees)
+        {
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+
+            var classDeclarations = syntaxTree.GetRoot()
+                .DescendantNodes()
+                .OfType<ClassDeclarationSyntax>();
+
+            foreach (var classDeclaration in classDeclarations)
+            {
+                var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration) as INamedTypeSymbol;
+
+                if (classSymbol != null && classSymbol.BaseType != null)
+                {
+                    if (classSymbol.BaseType.Equals(baseTypeSymbol, SymbolEqualityComparer.Default))
+                    {
+                        derivedClasses.Add(classSymbol);
+                    }
+                }
+            }
+        }
+
+        return derivedClasses;
     }
 
     private void GenerateQueryProcessorExtensionMethods(GeneratorExecutionContext context, List<IMethodSymbol> handlers)

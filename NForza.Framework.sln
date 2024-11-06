@@ -13,17 +13,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp.Contracts", "DemoAp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cqrs.Generator", "NForza.Cqrs.Generator\NForza.Cqrs.Generator.csproj", "{F27EF578-FB35-4F25-91CE-DA03287D0AF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.TypedIds", "NForza.TypedIds\NForza.TypedIds.csproj", "{958260C7-CCD4-41A8-8A11-E6EEF486FDDD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.TypedIds", "NForza.TypedIds\NForza.TypedIds.csproj", "{958260C7-CCD4-41A8-8A11-E6EEF486FDDD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.TypedIds.Generator", "NForza.TypedIds.Generator\NForza.TypedIds.Generator.csproj", "{3F85014B-FFD3-4E33-A8A6-400563FB6F79}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.TypedIds.Generator", "NForza.TypedIds.Generator\NForza.TypedIds.Generator.csproj", "{3F85014B-FFD3-4E33-A8A6-400563FB6F79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoApp.WebApi", "DemoApp.WebApi\DemoApp.WebApi.csproj", "{239395A0-21EF-4967-BBFB-371BCB9CE1CF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp.WebApi", "DemoApp.WebApi\DemoApp.WebApi.csproj", "{239395A0-21EF-4967-BBFB-371BCB9CE1CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cqrs.WebApi", "NForza.Cqrs.WebApi\NForza.Cqrs.WebApi.csproj", "{9DA053D2-DDCC-4503-8032-F5CD5F99693A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cqrs.WebApi", "NForza.Cqrs.WebApi\NForza.Cqrs.WebApi.csproj", "{9DA053D2-DDCC-4503-8032-F5CD5F99693A}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "NForza.Generators.Shared", "NForza.Generators.Shared\NForza.Generators.Shared.shproj", "{DF876A8C-1AA7-4E00-AD03-54FA1A0174AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cqrs.MassTransit", "NForza.Cqrs.MassTransit\NForza.Cqrs.MassTransit.csproj", "{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cqrs.MassTransit", "NForza.Cqrs.MassTransit\NForza.Cqrs.MassTransit.csproj", "{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cqrs.WebApi.Generator", "NForza.Cqrs.WebApi.Generator\NForza.Cqrs.WebApi.Generator.csproj", "{AE73250C-6DCF-49AB-A383-26E13F7FD54B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -92,6 +94,12 @@ Global
 		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.DebugGenerator|Any CPU.Build.0 = Debug|Any CPU
 		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE73250C-6DCF-49AB-A383-26E13F7FD54B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE73250C-6DCF-49AB-A383-26E13F7FD54B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE73250C-6DCF-49AB-A383-26E13F7FD54B}.DebugGenerator|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE73250C-6DCF-49AB-A383-26E13F7FD54B}.DebugGenerator|Any CPU.Build.0 = Debug|Any CPU
+		{AE73250C-6DCF-49AB-A383-26E13F7FD54B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE73250C-6DCF-49AB-A383-26E13F7FD54B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -101,6 +109,7 @@ Global
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		NForza.Generators.Shared\NForza.Generators.Shared.projitems*{3f85014b-ffd3-4e33-a8a6-400563fb6f79}*SharedItemsImports = 5
+		NForza.Generators.Shared\NForza.Generators.Shared.projitems*{ae73250c-6dcf-49ab-a383-26e13f7fd54b}*SharedItemsImports = 5
 		NForza.Generators.Shared\NForza.Generators.Shared.projitems*{df876a8c-1aa7-4e00-ad03-54fa1a0174ac}*SharedItemsImports = 13
 		NForza.Generators.Shared\NForza.Generators.Shared.projitems*{f27ef578-fb35-4f25-91ce-da03287d0af1}*SharedItemsImports = 5
 	EndGlobalSection

@@ -14,5 +14,7 @@ public class CustomerEndpointGroup : EndpointGroup
             .OtherwiseFail();
         QueryEndpoint<AllCustomersQuery>()
             .Get("/customers");
+        QueryEndpoint<CustomerByIdQuery>()
+            .Get("/customers/{Id}");
     }
 }

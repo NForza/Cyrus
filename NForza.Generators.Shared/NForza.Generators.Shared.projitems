@@ -9,6 +9,10 @@
     <Import_RootNamespace>NForza.Generators</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Config\CommandConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Config\CqrsConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Config\QueryConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CqrsSourceGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EmbeddedResourceReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GeneratorBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IYamlConfig.cs" />

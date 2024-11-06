@@ -12,7 +12,7 @@ namespace NForza.Cqrs.Generator;
 
 public abstract class CqrsSourceGenerator : GeneratorBase
 {
-    protected CqrsConfig configuration;
+    private CqrsConfig configuration;
     protected CqrsConfig Configuration => configuration;
 
     protected List<IMethodSymbol> GetAllCommandHandlers(GeneratorExecutionContext context, string methodHandlerName, List<INamedTypeSymbol> commands) =>
@@ -113,10 +113,11 @@ public abstract class CqrsSourceGenerator : GeneratorBase
 
     private static bool IsTaskOfCommandResult(ITypeSymbol returnType, Compilation compilation)
     {
+        INamedTypeSymbol taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
         if (returnType is INamedTypeSymbol namedTypeSymbol)
         {
             if (namedTypeSymbol.IsGenericType &&
-                    namedTypeSymbol.ConstructedFrom.ToDisplayString() == "System.Threading.Tasks.Task<TResult>")
+                    namedTypeSymbol.ConstructedFrom.Equals(taskSymbol, SymbolEqualityComparer.Default))
             {
 
                 var genericArguments = namedTypeSymbol.TypeArguments;

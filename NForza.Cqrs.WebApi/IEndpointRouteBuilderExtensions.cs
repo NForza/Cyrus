@@ -27,45 +27,47 @@ public static class IEndpointRouteBuilderExtensions
         return endpoints; ;
     }
 
-    internal static RouteHandlerBuilder MapQuery(this IEndpointRouteBuilder endpoints, QueryEndpointDefinition endpointDefinition, Type queryResultType) => endpoints.MapGet(endpointDefinition.Path, async (HttpContext ctx, IServiceProvider serviceProvider, IQueryProcessor queryProcessor)
-        =>
-    {
-        var queryObject = await CreateQueryObjectAsync(endpointDefinition, ctx);
+    internal static RouteHandlerBuilder MapQuery(this IEndpointRouteBuilder endpoints, QueryEndpointDefinition endpointDefinition, Type queryResultType) 
+        => endpoints
+            .MapGet(endpointDefinition.Path, async (HttpContext ctx, IServiceProvider serviceProvider, IQueryProcessor queryProcessor)
+                =>
+            {
+                var queryObject = await CreateQueryObjectAsync(endpointDefinition, ctx);
 
-        if (!EndpointCommandMappingExtensions.ValidateObject(endpointDefinition.EndpointType, queryObject, ctx.RequestServices, out var problem))
-            return Results.BadRequest(problem);
+                if (!EndpointCommandMappingExtensions.ValidateObject(endpointDefinition.EndpointType, queryObject, ctx.RequestServices, out var problem))
+                    return Results.BadRequest(problem);
 
-        var queryResult = queryProcessor.QueryInternal(queryObject, endpointDefinition.QueryType, CancellationToken.None);
+                var queryResult = queryProcessor.QueryInternal(queryObject, endpointDefinition.QueryType, CancellationToken.None);
 
-        var queryResultPolicies = endpointDefinition.QueryResultPolicies;
-        foreach (var policy in queryResultPolicies)
-        {
-            queryResult = policy.MapFromQueryResult(queryResult);
-            var result = policy.CreateResultFromQueryResult(queryResult);
-            if (result != null)
-                return result;
-        }
-
-        return DefaultQueryPolicy(queryResult);
-    })
-    .WithTags(endpointDefinition.Tags)
-    .WithOpenApi(operation =>
-    {
-        foreach (var param in FindAllParametersInRoute(endpointDefinition.Path))
-        {
-            operation.Parameters.Add(
-                new OpenApiParameter()
+                var queryResultPolicies = endpointDefinition.QueryResultPolicies;
+                foreach (var policy in queryResultPolicies)
                 {
-                    Name = param,
-                    In = ParameterLocation.Path,
-                    Required = true,
-                    Schema = new OpenApiSchema() { Type = "string" }
-                });
-        }
-        return operation;
-    })
-    .WithMetadata(
-        new ProducesResponseTypeAttribute(queryResultType, 200));
+                    queryResult = policy.MapFromQueryResult(queryResult);
+                    var result = policy.CreateResultFromQueryResult(queryResult);
+                    if (result != null)
+                        return result;
+                }
+
+                return DefaultQueryPolicy(queryResult);
+            })
+            .WithTags(endpointDefinition.Tags)
+            .WithOpenApi(operation =>
+            {
+                foreach (var param in FindAllParametersInRoute(endpointDefinition.Path))
+                {
+                    operation.Parameters.Add(
+                        new OpenApiParameter()
+                        {
+                            Name = param,
+                            In = ParameterLocation.Path,
+                            Required = true,
+                            Schema = new OpenApiSchema() { Type = "string" }
+                        });
+                }
+                return operation;
+            })
+            .WithMetadata(
+                new ProducesResponseTypeAttribute(queryResultType, 200));
 
     static IEnumerable<string> FindAllParametersInRoute(string route)
     {

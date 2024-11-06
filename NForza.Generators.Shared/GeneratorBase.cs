@@ -18,6 +18,10 @@ public abstract class GeneratorBase : ISourceGenerator
         var additionalFile = context.AdditionalFiles
             .FirstOrDefault(file => Path.GetFileName(file.Path) == configFileName);
         string configContent = additionalFile?.GetText(context.CancellationToken)?.ToString() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(configContent))
+        {
+            return new T();
+        }
         var config = YamlParser.ReadYaml(configContent);
         return new T().InitFrom(config);
     }
