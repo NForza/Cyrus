@@ -38,8 +38,8 @@ public class StringIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
 
     private static bool IsRecordWithStringIdAttribute(SyntaxNode syntaxNode)
     {
-        bool isRecordWithStringId = syntaxNode is RecordDeclarationSyntax recordDecl &&
-                       recordDecl.HasAttribute("StringId");
+        bool isRecordWithStringId = syntaxNode is RecordDeclarationSyntax recordDeclaration &&
+                       recordDeclaration.HasAttribute("StringId");
         return isRecordWithStringId;
     }
 
@@ -49,9 +49,6 @@ public class StringIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
         var model = context.SemanticModel;
 
         var symbol = model.GetDeclaredSymbol(recordStruct) as INamedTypeSymbol;
-        if (symbol == null)
-            return null;
-
         return symbol;
     }
 
