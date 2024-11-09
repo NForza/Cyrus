@@ -16,13 +16,30 @@ public abstract class CqrsSourceGenerator : GeneratorBase
     private CqrsConfig configuration;
     protected CqrsConfig Configuration => configuration;
 
-    protected List<IMethodSymbol> GetAllCommandHandlers(GeneratorExecutionContext context, string methodHandlerName, List<INamedTypeSymbol> commands) =>
-        context.Compilation
-            .GetSymbolsWithName(s => s == methodHandlerName, SymbolFilter.Member)
-            .OfType<IMethodSymbol>()
-            .Where(m => m.Parameters.Length == 1 && commands.Contains(m.Parameters[0].Type, SymbolEqualityComparer.Default))
-            .Where(m => ReturnsTaskOfCommandResult(context, m))
-            .ToList();
+    protected List<IMethodSymbol> GetAllCommandHandlers(GeneratorExecutionContext context, string methodHandlerName, List<INamedTypeSymbol> commands)
+    {
+        INamedTypeSymbol commandResultSymbol = context.Compilation.GetTypeByMetadataName("NForza.Cqrs.CommandResult")!;
+
+        IEnumerable<IMethodSymbol> methodsEndingWithCommand = context.Compilation
+                    .GetSymbolsWithName(s => s == methodHandlerName, SymbolFilter.Member)
+                    .OfType<IMethodSymbol>()
+                    .Where(m => m.Parameters.Length == 1 && commands.Contains(m.Parameters[0].Type, SymbolEqualityComparer.Default))
+                    .ToList();
+        var asyncCommandHandlers = methodsEndingWithCommand
+            .Where(m => ReturnsTaskOfCommandResult(context, m));
+        var syncCommandHandlers = methodsEndingWithCommand
+            .Where(m => m.ReturnType.Equals(commandResultSymbol, SymbolEqualityComparer.Default));
+
+        var invalidHandlers = methodsEndingWithCommand.Except(asyncCommandHandlers).Except(syncCommandHandlers);
+        foreach (var invalidHandler in invalidHandlers)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                new DiagnosticDescriptor("CQRS001", "Invalid command handler", $"Command handler {invalidHandler.Name} has invalid signature", "NForza.Cqrs", DiagnosticSeverity.Error, true),
+                invalidHandler.Locations.First()));
+        }
+
+        return asyncCommandHandlers.Concat(syncCommandHandlers).ToList();
+    }
 
     protected List<IMethodSymbol> GetAllQueryHandlers(GeneratorExecutionContext context, string methodHandlerName, List<INamedTypeSymbol> queries)
     {
@@ -94,22 +111,7 @@ public abstract class CqrsSourceGenerator : GeneratorBase
     {
         Debug.WriteLine($"Found handler: {handlerType.Name}");
 
-        if (IsTaskOfCommandResult(handlerType.ReturnType, context.Compilation))
-        {
-            return true;
-        }
-        else
-        {
-            context.ReportDiagnostic(Diagnostic.Create(
-                 new DiagnosticDescriptor(
-                     "SG0001",
-                     "Incorrect return type for command handler",
-                     "Method {0} returns {1}. All methods must return Task<CommandResult>.",
-                     "NForza.Cqrs",
-                     DiagnosticSeverity.Error,
-                     true), handlerType.Locations.FirstOrDefault(), handlerType.Name, handlerType.ReturnType.Name));
-            return false;
-        }
+        return IsTaskOfCommandResult(handlerType.ReturnType, context.Compilation);
     }
 
     private static bool IsTaskOfCommandResult(ITypeSymbol returnType, Compilation compilation)

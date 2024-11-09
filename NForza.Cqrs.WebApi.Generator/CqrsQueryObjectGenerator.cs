@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -16,7 +17,7 @@ public class CqrsQueryObjectGenerator : CqrsSourceGenerator, ISourceGenerator
 {
     public override void Execute(GeneratorExecutionContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
 
         base.Execute(context);
 
@@ -30,8 +31,17 @@ public class CqrsQueryObjectGenerator : CqrsSourceGenerator, ISourceGenerator
 
         foreach (var expression in expressions)
         {
-            Console.WriteLine(expression.ToFullString());
+            BuildExpressionList(expression);
         }
+    }
+
+    private List<Expression> BuildExpressionList(ExpressionStatementSyntax expression)
+    {
+        if (expression.Expression is InvocationExpressionSyntax invocation && invocation.Expression is MemberAccessExpressionSyntax memberAccess)
+        {
+            Console.WriteLine(memberAccess.Name.Identifier.Text);
+        }
+        return null;
     }
 
     private IEnumerable<ExpressionStatementSyntax> GetExpressionsFromConstructors(IEnumerable<IMethodSymbol> ctors)
@@ -53,42 +63,15 @@ public class CqrsQueryObjectGenerator : CqrsSourceGenerator, ISourceGenerator
             .Where(expr => expr is not null);
     }
 
-    private IEnumerable<IMethodSymbol> GetConstructorsFromEndpoints(List<INamedTypeSymbol> endpoints)
+    private IEnumerable<IMethodSymbol> GetConstructorsFromEndpoints(IEnumerable<INamedTypeSymbol> endpoints)
     {
         return endpoints
             .Select(e => e.Constructors.FirstOrDefault(c => c.Parameters.Length == 0))
             .Where(c => c is not null);
     }
 
-    private List<INamedTypeSymbol> GetAllEndpoints(Compilation compilation)
-    {
-        var baseTypeSymbol = compilation.GetTypeByMetadataName("NForza.Cqrs.WebApi.EndpointGroup");
-        var derivedClasses = new List<INamedTypeSymbol>();
-
-        foreach (var syntaxTree in compilation.SyntaxTrees)
-        {
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-
-            var classDeclarations = syntaxTree.GetRoot()
-                .DescendantNodes()
-                .OfType<ClassDeclarationSyntax>();
-
-            foreach (var classDeclaration in classDeclarations)
-            {
-                var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration) as INamedTypeSymbol;
-
-                if (classSymbol != null && classSymbol.BaseType != null)
-                {
-                    if (classSymbol.BaseType.Equals(baseTypeSymbol, SymbolEqualityComparer.Default))
-                    {
-                        derivedClasses.Add(classSymbol);
-                    }
-                }
-            }
-        }
-
-        return derivedClasses;
-    }
+    private IEnumerable<INamedTypeSymbol> GetAllEndpoints(Compilation compilation) 
+        => GetAllClassesDerivedFrom(compilation, "NForza.Cqrs.WebApi.EndpointGroup");
 
     private void GenerateQueryProcessorExtensionMethods(GeneratorExecutionContext context, List<IMethodSymbol> handlers)
     {

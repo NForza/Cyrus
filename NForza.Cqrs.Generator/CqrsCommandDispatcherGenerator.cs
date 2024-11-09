@@ -31,14 +31,18 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, ISourceGenera
 
     private void GenerateCommandDispatcherExtensionMethods(GeneratorExecutionContext context, List<IMethodSymbol> handlers)
     {
+        INamedTypeSymbol taskSymbol = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
+        INamedTypeSymbol commandResultSymbol = context.Compilation.GetTypeByMetadataName("NForza.Cqrs.CommandResult");
+        var taskOfCommandResultSymbol = taskSymbol.Construct(commandResultSymbol);
+
         StringBuilder source = new();
         foreach (var handler in handlers)
         {
             var methodSymbol = handler;
             var parameterType = methodSymbol.Parameters[0].Type;
-            source.Append($@"
+                source.Append($@"
     public static Task<CommandResult> Execute(this ICommandDispatcher dispatcher, {parameterType} command, CancellationToken cancellationToken = default) 
-        => dispatcher.ExecuteInternal(command, cancellationToken);");
+        => dispatcher.ExecuteInternalAsync(command, cancellationToken);");
         }
 
         var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("CommandDispatcherExtensions.cs", new Dictionary<string, string>

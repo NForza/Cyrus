@@ -32,7 +32,7 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, ISourceGenera
         var commands = GetAllCommands(context.Compilation, contractSuffix, commandSuffix).ToList();
         var commandHandlers = GetAllCommandHandlers(context, commandHandlerMethodName, commands);
         string commandHandlerTypeRegistrations = CreateRegisterTypes(commandHandlers);
-        string commandHandlerRegistrations = CreateRegisterCommandHandler(commandHandlers);
+        string commandHandlerRegistrations = CreateRegisterCommandHandler(context, commandHandlers);
 
         var queries = GetAllQueries(context.Compilation, contractSuffix, querySuffix).ToList();
         var queryHandlers = GetAllQueryHandlers(context, queryHandlerMethodName, queries);
@@ -85,27 +85,50 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, ISourceGenera
         foreach (var typeToRegister in handlers.Select(h => h.ContainingType).Distinct(SymbolEqualityComparer.Default))
         {
             source.Append($@"
-            services.AddTransient<{typeToRegister.ToDisplayString()}>();");
+        services.AddTransient<{typeToRegister.ToDisplayString()}>();");
         }
         return source.ToString();
     }
 
-    private static string CreateRegisterCommandHandler(List<IMethodSymbol> handlers)
+    private static string CreateRegisterCommandHandler(GeneratorExecutionContext context, List<IMethodSymbol> handlers)
     {
+        INamedTypeSymbol taskSymbol = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
+        INamedTypeSymbol commandResultSymbol = context.Compilation.GetTypeByMetadataName("NForza.Cqrs.CommandResult");
+        var taskOfCommandResultSymbol = taskSymbol.Construct(commandResultSymbol);
+
         StringBuilder source = new();
         foreach (var handler in handlers)
         {
             var commandType = handler.Parameters[0].Type;
             var typeSymbol = handler.ContainingType;
-            if (handler.IsStatic)
+            var returnType = handler.ReturnType;
+            var isAsync = returnType.Equals(taskOfCommandResultSymbol, SymbolEqualityComparer.Default);
+
+            if (isAsync)
             {
-                source.Append($@"
+                if (handler.IsStatic)
+                {
+                    source.Append($@"
         handlers.AddHandler<{commandType}>((_, command) => {typeSymbol}.Execute(({commandType})command));");
+                }
+                else
+                {
+                    source.Append($@"
+        handlers.AddHandler<{commandType}>((services, command) => services.GetRequiredService<{typeSymbol}>().Execute(({commandType})command));");
+                }
             }
             else
             {
-                source.Append($@"
-        handlers.AddHandler<{commandType}>((services, command) => services.GetRequiredService<{typeSymbol}>().Execute(({commandType})command));");
+                if (handler.IsStatic)
+                {
+                    source.Append($@"
+        handlers.AddHandler<{commandType}>((_, command) => Task.FromResult({typeSymbol}.Execute(({commandType})command)));");
+                }
+                else
+                {
+                    source.Append($@"
+            handlers.AddHandler<{commandType}>((services, command) => Task.FromResult(services.GetRequiredService<{typeSymbol}>().Execute(({commandType})command)));");
+                }
             }
         }
         return source.ToString();
