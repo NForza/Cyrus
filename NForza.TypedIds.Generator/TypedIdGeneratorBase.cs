@@ -6,12 +6,10 @@ using NForza.Generators;
 
 namespace NForza.TypedIds.Generator;
 
-public abstract class TypedIdGeneratorBase : GeneratorBase, ISourceGenerator
+public abstract class TypedIdGeneratorBase : IncrementalGeneratorBase
 {
     protected IEnumerable<INamedTypeSymbol> GetAllTypedIds(Compilation compilation, string typedIdName)
     {
-        var allTypes = new List<INamedTypeSymbol>();
-
         foreach (var syntaxTree in compilation.SyntaxTrees)
         {
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -23,12 +21,10 @@ public abstract class TypedIdGeneratorBase : GeneratorBase, ISourceGenerator
                 if (semanticModel.GetDeclaredSymbol(typeDeclaration) is INamedTypeSymbol typeSymbol && typeSymbol.IsValueType && typeSymbol.TypeKind == TypeKind.Struct)
                 {
                     if (typeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == typedIdName))
-                        allTypes.Add(typeSymbol);
+                        yield return typeSymbol;
                 }
             }
         }
-
-        return allTypes;
     }
 
     protected string GetUnderlyingTypeOfTypedId(INamedTypeSymbol typeSymbol)

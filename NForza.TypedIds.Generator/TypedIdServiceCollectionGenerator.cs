@@ -1,41 +1,109 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Microsoft.CodeAnalysis;
-using NForza.Generators;
+﻿//using System.Linq;
+//using System.Text;
+//using Microsoft.CodeAnalysis;
+//using Microsoft.CodeAnalysis.CSharp.Syntax;
+//using Microsoft.CodeAnalysis.Text;
 
-namespace NForza.TypedIds.Generator;
+//namespace NForza.TypedIds.Generator;
 
-[Generator]
-public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, ISourceGenerator
-{
-    public override void Execute(GeneratorExecutionContext context)
-    {
-        DebugThisGenerator(false);
+//[Generator]
+//public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncrementalGenerator
+//{
+//    public void Initialize(IncrementalGeneratorInitializationContext context)
+//    {
+//        IncrementalValuesProvider<TypedIdDefinition?> incrementalValuesProvider = context.SyntaxProvider
+//                    .CreateSyntaxProvider(
+//                        predicate: (syntaxNode, _) => IsRecordStructWithStringIdAttribute(syntaxNode),
+//                        transform: (context, _) => GetSemanticTargetForGeneration(context));
 
-        var typedIds =
-            GetAllTypedIds(context.Compilation, "StringIdAttribute").Concat(GetAllTypedIds(context.Compilation, "GuidIdAttribute"));
-        GenerateServiceCollectionExtensionMethod(context, typedIds);
-    }
+//        var recordStructsWithAttribute = incrementalValuesProvider
+//            .Where(x => x is not null)
+//            .Select((x, _) => x!.Value)
+//            .Collect();
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers", Justification = "Environment.NewLine should not be a banned API.")]
-    private void GenerateServiceCollectionExtensionMethod(GeneratorExecutionContext context, IEnumerable<INamedTypeSymbol> typedIds)
-    {
-        var source = EmbeddedResourceReader.GetResource(Assembly.GetExecutingAssembly(), "Templates", "ServiceCollectionExtensions.cs");
+//        context.RegisterSourceOutput(recordStructsWithAttribute, (spc, recordStructs) =>
+//        {
+//            foreach (var recordStruct in recordStructs)
+//            {
+//                context.RegisterSourceOutput(recordStructsWithAttribute, (spc, recordStructs) =>
+//                {
+//                    foreach (var recordStruct in recordStructs)
+//                    {
+//                            var sourceText = GenerateCodeForRecordStruct(recordStruct);
+//                            spc.AddSource($"{recordStruct.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+//                    }
+//                });
+//                var sourceText = GenerateCodeForRecordStruct(recordStruct);
+//                spc.AddSource($"{recordStruct.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+//            }
+//        });
+//    }
 
-        var converters = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<JsonConverter, {t.Name}JsonConverter>();"));
+//    private static bool IsRecordStructWithStringIdAttribute(SyntaxNode syntaxNode)
+//    {
+//        return syntaxNode is RecordDeclarationSyntax recordDecl &&
+//               recordDecl is { ClassOrStructKeyword.Text: "struct" } &&
+//               recordDecl.AttributeLists.Count > 0;
+//    }
 
-        var namespaces = string.Join(Environment.NewLine, typedIds.Select(t => t.ContainingNamespace.ToDisplayString()).Distinct().Select(ns => $"using {ns};"));
+//    private static INamedTypeSymbol? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
+//    {
+//        var recordStruct = (RecordDeclarationSyntax)context.Node;
+//        var model = context.SemanticModel;
 
-        var types = string.Join(",", typedIds.Select(t => $"[typeof({t.ToDisplayString()})] = typeof({GetUnderlyingTypeOfTypedId(t)})"));
-        var registrations = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<{t.ToDisplayString()}>();"));
+//        var hasStringIdAttribute = recordStruct.AttributeLists
+//            .SelectMany(al => al.Attributes)
+//            .Any(attr => model.GetSymbolInfo(attr).Symbol is IMethodSymbol methodSymbol &&
+//                         methodSymbol.ContainingType.Name == "StringId");
 
-        source = source
-            .Replace("% AllTypes %", types)
-            .Replace("% AllTypedIdRegistrations %", registrations)
-            .Replace("% Namespaces %", namespaces)
-            .Replace("% AddJsonConverters %", converters);
-        context.AddSource($"ServiceCollectionExtensions.g.cs", source);
-    }
-}
+//        if (!hasStringIdAttribute)
+//            return null;
+
+//        var symbol = model.GetDeclaredSymbol(recordStruct) as INamedTypeSymbol;
+//        if (symbol == null)
+//            return null;
+
+//        return symbol;
+//    }
+
+//    private static string GenerateCodeForRecordStruct(TypedIdDefinition recordStruct)
+//    {
+//        var (name, ns) = recordStruct;
+
+//        var sb = new StringBuilder();
+//        if (!string.IsNullOrEmpty(ns))
+//        {
+//            sb.AppendLine($"namespace {ns};");
+//            sb.AppendLine();
+//        }
+
+//        sb.AppendLine($"public partial struct {name}");
+//        sb.AppendLine("{");
+//        sb.AppendLine("    public string Id { get; }");
+//        sb.AppendLine();
+//        sb.AppendLine($"    public {name}(string id) => Id = id;");
+//        sb.AppendLine("}");
+
+//        return sb.ToString();
+//    }
+
+////    [System.Diagnostics.CodeAnalysis.SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers", Justification = "Environment.NewLine should not be a banned API.")]
+////    private void GenerateServiceCollectionExtensionMethod(GeneratorExecutionContext context, IEnumerable<INamedTypeSymbol> typedIds)
+////    {
+////        var source = EmbeddedResourceReader.GetResource(Assembly.GetExecutingAssembly(), "Templates", "ServiceCollectionExtensions.cs");
+
+////        var converters = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<JsonConverter, {t.Name}JsonConverter>();"));
+
+////        var namespaces = string.Join(Environment.NewLine, typedIds.Select(t => t.ContainingNamespace.ToDisplayString()).Distinct().Select(ns => $"using {ns};"));
+
+////        var types = string.Join(",", typedIds.Select(t => $"[typeof({t.ToDisplayString()})] = typeof({GetUnderlyingTypeOfTypedId(t)})"));
+////        var registrations = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<{t.ToDisplayString()}>();"));
+
+////        source = source
+////            .Replace("% AllTypes %", types)
+////            .Replace("% AllTypedIdRegistrations %", registrations)
+////            .Replace("% Namespaces %", namespaces)
+////            .Replace("% AddJsonConverters %", converters);
+////        context.AddSource($"ServiceCollectionExtensions.g.cs", source);
+////    }
+//}

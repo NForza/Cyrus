@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis;
 
 namespace NForza.Generators;
 
-public abstract class GeneratorBase : ISourceGenerator
+public abstract class GeneratorBase 
 {
     protected TemplateEngine TemplateEngine = new(Assembly.GetExecutingAssembly(), "Templates");
     protected T ParseConfigFile<T>(GeneratorExecutionContext context, string configFileName)

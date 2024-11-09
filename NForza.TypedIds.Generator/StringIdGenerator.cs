@@ -2,38 +2,72 @@
 using System.Collections.Generic;
 #endif
 using System.Linq;
+using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using NForza.Generators;
 
 namespace NForza.TypedIds.Generator;
 
 [Generator]
-public class StringIdGenerator : TypedIdGeneratorBase, ISourceGenerator
+public class StringIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
 {
-    public override void Execute(GeneratorExecutionContext context)
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
+        var incrementalValuesProvider = context.SyntaxProvider
+                    .CreateSyntaxProvider(
+                        predicate: (syntaxNode, _) => IsRecordWithStringIdAttribute(syntaxNode),
+                        transform: (context, _) => GetSemanticTargetForGeneration(context));
 
-        var typedIds = GetAllTypedIds(context.Compilation, "StringIdAttribute");
-        foreach (var item in typedIds)
+        var recordStructsWithAttribute = incrementalValuesProvider
+            .Where(x => x is not null)
+            .Select((x, _) => x!)
+            .Collect();
+
+        context.RegisterSourceOutput(recordStructsWithAttribute, (spc, recordSymbols) =>
         {
-            GenerateStringId(context, item);
-        }
+            foreach (var recordSymbol in recordSymbols)
+            {
+                var sourceText = GenerateCodeForRecordStruct(recordSymbol);
+                spc.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            };
+        });
     }
 
-    private void GenerateStringId(GeneratorExecutionContext context, INamedTypeSymbol item)
+    private static bool IsRecordWithStringIdAttribute(SyntaxNode syntaxNode)
+    {
+        bool isRecordWithStringId = syntaxNode is RecordDeclarationSyntax recordDecl &&
+                       recordDecl.HasAttribute("StringId");
+        return isRecordWithStringId;
+    }
+
+    private static INamedTypeSymbol? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
+    {
+        var recordStruct = (RecordDeclarationSyntax)context.Node;
+        var model = context.SemanticModel;
+
+        var symbol = model.GetDeclaredSymbol(recordStruct) as INamedTypeSymbol;
+        if (symbol == null)
+            return null;
+
+        return symbol;
+    }
+
+    private string GenerateCodeForRecordStruct(INamedTypeSymbol recordSymbol)
     {
         var replacements = new Dictionary<string, string>
         {
-            ["ItemName"] = item.Name,
-            ["Namespace"] = item.ContainingNamespace.ToDisplayString(),
-            ["CastOperators"] = GenerateCastOperatorsToUnderlyingType(item),
-            ["IsValid"] = GetIsValidExpression(item)
+            ["ItemName"] = recordSymbol.Name,
+            ["Namespace"] = recordSymbol.ContainingNamespace.ToDisplayString(),
+            ["CastOperators"] = GenerateCastOperatorsToUnderlyingType(recordSymbol),
+            ["IsValid"] = GetIsValidExpression(recordSymbol)
         };
 
         var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("StringId.cs", replacements);
 
-        context.AddSource($"{item.Name}.g.cs", resolvedSource);
+        return resolvedSource;
     }
 
     private string GetIsValidExpression(INamedTypeSymbol item)

@@ -9,12 +9,14 @@
     <Import_RootNamespace>NForza.Generators</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\NForza.Generators.Shared\RecordDeclarationSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Config\CommandConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Config\CqrsConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Config\QueryConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CqrsSourceGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EmbeddedResourceReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GeneratorBase.cs" />
+    <Compile Include="..\NForza.Generators.Shared\IncrementalGeneratorBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IYamlConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TemplateEngine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)YamlParser.cs" />
