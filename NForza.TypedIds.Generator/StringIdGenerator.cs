@@ -1,6 +1,5 @@
-﻿#if DEBUG_ANALYZER 
+﻿using System;
 using System.Collections.Generic;
-#endif
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -34,13 +33,6 @@ public class StringIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
                 spc.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             };
         });
-    }
-
-    private static bool IsRecordWithStringIdAttribute(SyntaxNode syntaxNode)
-    {
-        bool isRecordWithStringId = syntaxNode is RecordDeclarationSyntax recordDeclaration &&
-                       recordDeclaration.HasAttribute("StringId");
-        return isRecordWithStringId;
     }
 
     private static INamedTypeSymbol? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)

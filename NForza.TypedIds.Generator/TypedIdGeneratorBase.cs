@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -8,6 +9,19 @@ namespace NForza.TypedIds.Generator;
 
 public abstract class TypedIdGeneratorBase : IncrementalGeneratorBase
 {
+    protected static bool IsRecordWithAttribute(SyntaxNode syntaxNode, string attributeName)
+    {
+        bool isRecordWithStringId = syntaxNode is RecordDeclarationSyntax recordDeclaration &&
+                       recordDeclaration.HasAttribute(attributeName);
+        return isRecordWithStringId;
+    }
+
+    protected bool IsRecordWithGuidIdAttribute(SyntaxNode syntaxNode)
+        => IsRecordWithAttribute(syntaxNode, "GuidId");
+
+    protected static bool IsRecordWithStringIdAttribute(SyntaxNode syntaxNode)
+        => IsRecordWithAttribute(syntaxNode, "StringId");
+
     protected IEnumerable<INamedTypeSymbol> GetAllTypedIds(Compilation compilation, string typedIdName)
     {
         foreach (var syntaxTree in compilation.SyntaxTrees)

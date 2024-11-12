@@ -13,7 +13,7 @@ public class GuidIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
         var incrementalValuesProvider = context.SyntaxProvider
                     .CreateSyntaxProvider(
                         predicate: (syntaxNode, _) => IsRecordWithGuidIdAttribute(syntaxNode),
@@ -40,13 +40,6 @@ public class GuidIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
         var model = context.SemanticModel;
 
         return model.GetDeclaredSymbol(recordStruct) as INamedTypeSymbol;
-    } 
-
-    private bool IsRecordWithGuidIdAttribute(SyntaxNode syntaxNode)
-    {
-        bool isRecordWithGuidId = syntaxNode is RecordDeclarationSyntax recordDeclaration &&
-                       recordDeclaration.HasAttribute("GuidId");
-        return isRecordWithGuidId;
     }
 
     private string GenerateGuidId(INamedTypeSymbol item)
