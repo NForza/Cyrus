@@ -5,7 +5,7 @@ using System.Runtime.InteropServices.ComTypes;
 
 namespace % Namespace %;
 
-//[JsonConverter(typeof(% ItemName %JsonConverter))]
+[JsonConverter(typeof(% ItemName %JsonConverter))]
 public partial record struct % ItemName %(Guid Value): ITypedId
 {
     % Constructor %

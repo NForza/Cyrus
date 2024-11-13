@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Generators;
 
@@ -14,11 +12,11 @@ public class StringIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
         var incrementalValuesProvider = context.SyntaxProvider
                     .CreateSyntaxProvider(
                         predicate: (syntaxNode, _) => IsRecordWithStringIdAttribute(syntaxNode),
-                        transform: (context, _) => GetSemanticTargetForGeneration(context));
+                        transform: (context, _) => GetNamedTypeSymbolFromContext(context));
 
         var recordStructsWithAttribute = incrementalValuesProvider
             .Where(x => x is not null)
@@ -33,15 +31,6 @@ public class StringIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
                 spc.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             };
         });
-    }
-
-    private static INamedTypeSymbol? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
-    {
-        var recordStruct = (RecordDeclarationSyntax)context.Node;
-        var model = context.SemanticModel;
-
-        var symbol = model.GetDeclaredSymbol(recordStruct) as INamedTypeSymbol;
-        return symbol;
     }
 
     private string GenerateCodeForRecordStruct(INamedTypeSymbol recordSymbol)

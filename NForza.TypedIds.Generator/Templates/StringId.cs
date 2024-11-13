@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace % Namespace %;
 
-//[JsonConverter(typeof(% ItemName %JsonConverter))]
+[JsonConverter(typeof(% ItemName %JsonConverter))]
 public partial record struct % ItemName %(string Value): ITypedId
 {
     public static % ItemName % Empty => new % ItemName %(string.Empty);

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Generators;
 
@@ -19,7 +18,7 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
         var incrementalValuesProvider = context.SyntaxProvider
                     .CreateSyntaxProvider(
                         predicate: (syntaxNode, _) => IsRecordWithStringIdAttribute(syntaxNode) || IsRecordWithGuidIdAttribute(syntaxNode),
-                        transform: (context, _) => GetSemanticTargetForGeneration(context));
+                        transform: (context, _) => GetNamedTypeSymbolFromContext(context));
 
         var typedIdsProvider = incrementalValuesProvider
             .Where(x => x is not null)
@@ -31,15 +30,6 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
             var sourceText = GenerateServiceCollectionExtensionMethod(typedIds);
             spc.AddSource("ServiceCollectionExtensions.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         });
-    }
-
-    private static INamedTypeSymbol? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
-    {
-        var recordStruct = (RecordDeclarationSyntax)context.Node;
-        var model = context.SemanticModel;
-
-        var symbol = model.GetDeclaredSymbol(recordStruct) as INamedTypeSymbol;
-        return symbol;
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers", Justification = "<Pending>")]

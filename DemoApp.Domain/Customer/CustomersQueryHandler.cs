@@ -1,5 +1,4 @@
-﻿using DemoApp.Contracts;
-using DemoApp.Contracts.Customers;
+﻿using DemoApp.Contracts.Customers;
 
 namespace DemoApp.Domain.Customer;
 

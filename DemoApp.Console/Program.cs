@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using DemoApp.Contracts;
 using DemoApp.Contracts.Customers;
 using DemoApp.Domain.Customer;
 using MassTransit;

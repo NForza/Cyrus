@@ -1,33 +1,49 @@
-﻿//using System.Collections.Generic;
-//using Microsoft.CodeAnalysis;
-//using NForza.Generators;
+﻿using System.Collections.Generic;
+using System.Text;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
+using NForza.Generators;
 
-//namespace NForza.TypedIds.Generator;
+namespace NForza.TypedIds.Generator;
 
-//[Generator]
-//public class GuidIdTypeConverterGenerator : TypedIdGeneratorBase, ISourceGenerator
-//{
-//    public override void Execute(GeneratorExecutionContext context)
-//    {
-//        DebugThisGenerator(false);
+[Generator]
+public class GuidIdTypeConverterGenerator : TypedIdGeneratorBase, IIncrementalGenerator
+{
+    public void Initialize(IncrementalGeneratorInitializationContext context)
+    {
+        DebugThisGenerator(false);
 
-//        var typedIds = GetAllTypedIds(context.Compilation, "GuidIdAttribute");
-//        foreach (var item in typedIds)
-//        {
-//            GenerateGuidIdTypeConverter(context, item);
-//        }
-//    }
+        var incrementalValuesProvider = context.SyntaxProvider
+                    .CreateSyntaxProvider(
+                        predicate: (syntaxNode, _) => IsRecordWithGuidIdAttribute(syntaxNode),
+                        transform: (context, _) => GetNamedTypeSymbolFromContext(context));
 
-//    private void GenerateGuidIdTypeConverter(GeneratorExecutionContext context, INamedTypeSymbol item)
-//    {
-//        var replacements = new Dictionary<string, string>
-//        {
-//            ["TypedIdName"] = item.Name,
-//            ["NamespaceName"] = item.ContainingNamespace.ToDisplayString()
-//        };
+        var recordStructsWithAttribute = incrementalValuesProvider
+            .Where(x => x is not null)
+            .Select((x, _) => x!)
+            .Collect();
 
-//        string source = TemplateEngine.ReplaceInResourceTemplate("GuidTypeConverter.cs", replacements);
+        context.RegisterSourceOutput(recordStructsWithAttribute, (spc, recordSymbols) =>
+        {
+            foreach (var recordSymbol in recordSymbols)
+            {
+                var sourceText = GenerateGuidIdTypeConverter(recordSymbol);
+                spc.AddSource($"{recordSymbol}TypeConverter.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            };
+        });
+    }
 
-//        context.AddSource($"{item}TypeConverter.g.cs", source);
-//    }
-//}
+
+    private string GenerateGuidIdTypeConverter(INamedTypeSymbol item)
+    {
+        var replacements = new Dictionary<string, string>
+        {
+            ["TypedIdName"] = item.Name,
+            ["NamespaceName"] = item.ContainingNamespace.ToDisplayString()
+        };
+
+        string source = TemplateEngine.ReplaceInResourceTemplate("GuidTypeConverter.cs", replacements);
+
+        return source;
+    }
+}

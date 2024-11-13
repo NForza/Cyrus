@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -47,5 +46,14 @@ public abstract class TypedIdGeneratorBase : IncrementalGeneratorBase
         if (hasStringIdProperty)
             return "string";
         return "System.Guid";
+    }
+
+    protected INamedTypeSymbol? GetNamedTypeSymbolFromContext(GeneratorSyntaxContext context)
+    {
+        var recordStruct = (RecordDeclarationSyntax)context.Node;
+        var model = context.SemanticModel;
+
+        var symbol = model.GetDeclaredSymbol(recordStruct) as INamedTypeSymbol;
+        return symbol;
     }
 }
