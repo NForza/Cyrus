@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -13,8 +14,8 @@ namespace NForza.Cqrs.Generator;
 
 public abstract class CqrsSourceGenerator : GeneratorBase
 {
-    private CqrsConfig configuration;
-    protected CqrsConfig Configuration => configuration;
+    private IncrementalValueProvider<ImmutableArray<CqrsConfig>>? configuration;
+    protected IncrementalValueProvider<ImmutableArray<CqrsConfig>>? Configuration => configuration;
 
     protected List<IMethodSymbol> GetAllCommandHandlers(GeneratorExecutionContext context, string methodHandlerName, List<INamedTypeSymbol> commands)
     {
@@ -39,6 +40,15 @@ public abstract class CqrsSourceGenerator : GeneratorBase
         }
 
         return asyncCommandHandlers.Concat(syncCommandHandlers).ToList();
+    }
+
+    protected IMethodSymbol? GetMethodSymbolFromContext(GeneratorSyntaxContext context)
+    {
+        var recordStruct = (MethodDeclarationSyntax)context.Node;
+        var model = context.SemanticModel;
+
+        var symbol = model.GetDeclaredSymbol(recordStruct) as IMethodSymbol;
+        return symbol;
     }
 
     protected List<IMethodSymbol> GetAllQueryHandlers(GeneratorExecutionContext context, string methodHandlerName, List<INamedTypeSymbol> queries)
@@ -161,7 +171,7 @@ public abstract class CqrsSourceGenerator : GeneratorBase
         }
     }
 
-    public override void Execute(GeneratorExecutionContext context)
+    public void GetConfig(IncrementalGeneratorInitializationContext context)
     {
         configuration ??= ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
     }

@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using NForza.Cqrs.Generator.Config;
 using NForza.Generators;
 
@@ -10,29 +13,56 @@ using NForza.Generators;
 namespace NForza.Cqrs.Generator;
 
 [Generator]
-public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, ISourceGenerator
-{    
-    public override void Execute(GeneratorExecutionContext context)
+public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, IIncrementalGenerator
+{
+    public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        var configProvider = ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
 
-        base.Execute(context);
-        var configuration = ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
+        var incrementalValuesProvider = context.SyntaxProvider
+            .CreateSyntaxProvider(
+                predicate: (syntaxNode, _) => IsCommandHandler(syntaxNode),
+                transform: (context, _) => GetMethodSymbolFromContext(context));
 
-        IEnumerable<string> contractSuffix = configuration.Contracts;
-        var commandSuffix = configuration.Commands.Suffix;
-        var methodHandlerName = configuration.Commands.HandlerName;
+        var recordStructsWithAttribute = incrementalValuesProvider
+            .Where(x => x is not null)
+            .Select((x, _) => x!)
+            .Collect();
 
-        var commands = GetAllCommands(context.Compilation, contractSuffix, commandSuffix).ToList();
-        var handlers = GetAllCommandHandlers(context, methodHandlerName, commands);
+        var combinedProvider = context.CompilationProvider
+            .Combine(recordStructsWithAttribute);
 
-        GenerateCommandDispatcherExtensionMethods(context, handlers);
+        var third = combinedProvider
+            .Combine(configProvider);
+
+
+        context.RegisterSourceOutput(combinedProvider, (spc, source) =>
+        {
+            var (compilation, recordSymbols) = source;
+            var sourceText = GenerateCommandDispatcherExtensionMethods(compilation, recordSymbols);
+                spc.AddSource($"CommandDispatcher.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+        });
+
+        //IEnumerable<string> contractSuffix = configuration.Contracts;
+        //var commandSuffix = configuration.Commands.Suffix;
+        //var methodHandlerName = configuration.Commands.HandlerName;
+
+       // GenerateCommandDispatcherExtensionMethods(context, handlers);
     }
 
-    private void GenerateCommandDispatcherExtensionMethods(GeneratorExecutionContext context, List<IMethodSymbol> handlers)
+    private bool IsCommandHandler(SyntaxNode syntaxNode)
+     => syntaxNode is MethodDeclarationSyntax methodDeclarationSyntax
+        &&
+        methodDeclarationSyntax.Identifier.Text.EndsWith("Execute")
+        &&
+        methodDeclarationSyntax.ParameterList.Parameters.Count == 1
+        &&
+        GetTypeName(methodDeclarationSyntax.ParameterList.Parameters[0].Type).EndsWith("Command");
+
+    private string GenerateCommandDispatcherExtensionMethods(Compilation compilation, ImmutableArray<IMethodSymbol> handlers)
     {
-        INamedTypeSymbol taskSymbol = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
-        INamedTypeSymbol commandResultSymbol = context.Compilation.GetTypeByMetadataName("NForza.Cqrs.CommandResult");
+        INamedTypeSymbol taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
+        INamedTypeSymbol commandResultSymbol = compilation.GetTypeByMetadataName("NForza.Cqrs.CommandResult");
         var taskOfCommandResultSymbol = taskSymbol.Construct(commandResultSymbol);
 
         StringBuilder source = new();
@@ -50,6 +80,6 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, ISourceGenera
             ["ExecuteMethods"] = source.ToString()
         });
 
-        context.AddSource($"CommandDispatcher.g.cs", resolvedSource.ToString());
+        return resolvedSource.ToString();
     }
 }

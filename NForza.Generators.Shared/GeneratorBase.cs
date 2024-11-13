@@ -1,29 +1,31 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
 
 namespace NForza.Generators;
 
-public abstract class GeneratorBase 
+public abstract class GeneratorBase
 {
     protected TemplateEngine TemplateEngine = new(Assembly.GetExecutingAssembly(), "Templates");
-    protected T ParseConfigFile<T>(GeneratorExecutionContext context, string configFileName)
+    protected IncrementalValueProvider<ImmutableArray<T>> ParseConfigFile<T>(IncrementalGeneratorInitializationContext context, string configFileName)
         where T : IYamlConfig<T>, new()
     {
-        var additionalFile = context.AdditionalFiles
-            .FirstOrDefault(file => Path.GetFileName(file.Path) == configFileName);
-        string configContent = additionalFile?.GetText(context.CancellationToken)?.ToString() ?? string.Empty;
-        if (string.IsNullOrWhiteSpace(configContent))
-        {
-            return new T();
-        }
-        var config = YamlParser.ReadYaml(configContent);
-        return new T().InitFrom(config);
+        var additionalFile = context.AdditionalTextsProvider
+            .Where(file => Path.GetFileName(file.Path) == configFileName)
+            .Select((file, token) =>
+            {
+                var content = file.GetText(token)?.ToString();
+                var config = YamlParser.ReadYaml(content ?? "");
+                return new T().InitFrom(config);
+            });
+        return additionalFile.Collect();
     }
 
     public void DebugThisGenerator(bool debug)
@@ -54,7 +56,23 @@ public abstract class GeneratorBase
         }
     }
 
-    public virtual void Initialize(GeneratorInitializationContext context) { }
+    public virtual void Initialize(IncrementalGeneratorInitializationContext context) { }
 
-    public abstract void Execute(GeneratorExecutionContext context);
+    protected string GetTypeName(TypeSyntax typeSyntax)
+    {
+        switch (typeSyntax)
+        {
+            case IdentifierNameSyntax identifierName:
+                return identifierName.Identifier.Text;
+
+            case QualifiedNameSyntax qualifiedName:
+                return qualifiedName.Right.Identifier.Text;
+
+            case PredefinedTypeSyntax predefinedType:
+                return predefinedType.Keyword.Text;
+
+            default:
+                return typeSyntax.ToString(); // Fallback for complex types (e.g., arrays, generics)
+        }
+    }
 }
