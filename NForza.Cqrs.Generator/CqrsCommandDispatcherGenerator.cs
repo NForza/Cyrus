@@ -8,8 +8,6 @@ using Microsoft.CodeAnalysis.Text;
 using NForza.Cqrs.Generator.Config;
 using NForza.Generators;
 
-#pragma warning disable RS1035 // Do not use banned APIs for analyzers
-
 namespace NForza.Cqrs.Generator;
 
 [Generator]
@@ -17,6 +15,7 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, IIncrementalG
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        DebugThisGenerator(false);
         var configProvider = ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
 
         var incrementalValuesProvider = context.SyntaxProvider
@@ -35,10 +34,9 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, IIncrementalG
         var third = combinedProvider
             .Combine(configProvider);
 
-
-        context.RegisterSourceOutput(combinedProvider, (spc, source) =>
+        context.RegisterSourceOutput(third, (spc, source) =>
         {
-            var (compilation, recordSymbols) = source;
+            var ((compilation, recordSymbols), config) = source;
             var sourceText = GenerateCommandDispatcherExtensionMethods(compilation, recordSymbols);
                 spc.AddSource($"CommandDispatcher.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         });
@@ -49,15 +47,6 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, IIncrementalG
 
        // GenerateCommandDispatcherExtensionMethods(context, handlers);
     }
-
-    private bool IsCommandHandler(SyntaxNode syntaxNode)
-     => syntaxNode is MethodDeclarationSyntax methodDeclarationSyntax
-        &&
-        methodDeclarationSyntax.Identifier.Text.EndsWith("Execute")
-        &&
-        methodDeclarationSyntax.ParameterList.Parameters.Count == 1
-        &&
-        GetTypeName(methodDeclarationSyntax.ParameterList.Parameters[0].Type).EndsWith("Command");
 
     private string GenerateCommandDispatcherExtensionMethods(Compilation compilation, ImmutableArray<IMethodSymbol> handlers)
     {

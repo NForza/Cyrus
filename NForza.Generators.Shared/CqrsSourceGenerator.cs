@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
+using NForza.Cqrs.Generator;
 using NForza.Cqrs.Generator.Config;
 using NForza.Generators;
 
@@ -14,8 +17,8 @@ namespace NForza.Cqrs.Generator;
 
 public abstract class CqrsSourceGenerator : GeneratorBase
 {
-    private IncrementalValueProvider<ImmutableArray<CqrsConfig>>? configuration;
-    protected IncrementalValueProvider<ImmutableArray<CqrsConfig>>? Configuration => configuration;
+    private IncrementalValueProvider<CqrsConfig>? configuration;
+    protected IncrementalValueProvider<CqrsConfig>? Configuration => configuration;
 
     protected List<IMethodSymbol> GetAllCommandHandlers(GeneratorExecutionContext context, string methodHandlerName, List<INamedTypeSymbol> commands)
     {
@@ -175,4 +178,31 @@ public abstract class CqrsSourceGenerator : GeneratorBase
     {
         configuration ??= ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
     }
+
+    protected bool IsCommandHandler(SyntaxNode syntaxNode)
+     => syntaxNode is MethodDeclarationSyntax methodDeclarationSyntax
+        &&
+        methodDeclarationSyntax.Identifier.Text.EndsWith("Execute")
+        &&
+        methodDeclarationSyntax.ParameterList.Parameters.Count == 1
+        &&
+        GetTypeName(methodDeclarationSyntax.ParameterList.Parameters[0].Type).EndsWith("Command");
+
+    protected bool IsQueryHandler(SyntaxNode syntaxNode)
+    {
+        return
+            syntaxNode is MethodDeclarationSyntax methodDeclaration
+            &&
+            methodDeclaration.Identifier.Text.EndsWith("Query")
+            &&
+            methodDeclaration.ParameterList.Parameters.Count == 1
+            &&
+            GetTypeName(methodDeclaration.ParameterList.Parameters[0].Type).EndsWith("Query");
+    }
+
+    protected bool IsQueryHandler(IMethodSymbol symbol)
+        => symbol.Name.EndsWith("Query") && symbol.Parameters.Length == 1 && symbol.Parameters[0].Type.Name.EndsWith("Query");
+
+    protected bool IsCommandHandler(IMethodSymbol symbol) 
+        => symbol.Name.EndsWith("Execute") && symbol.Parameters.Length == 1 && symbol.Parameters[0].Type.Name.EndsWith("Command");
 }

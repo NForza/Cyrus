@@ -15,8 +15,7 @@ public static class ServiceCollectionExtensions
         % RegisterEventBus % 
         services.AddSingleton(BuildCommandHandlerDictionary());
         services.AddSingleton(BuildQueryHandlerDictionary());
-        % RegisterCommandHandlerTypes %
-        % RegisterQueryHandlerTypes %
+        % RegisterHandlerTypes %
         return services;
     }
 
@@ -33,5 +32,4 @@ public static class ServiceCollectionExtensions
         % RegisterQueryHandlers %
         return handlers;
     }
-
 }
