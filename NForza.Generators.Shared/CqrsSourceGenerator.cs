@@ -179,7 +179,7 @@ public abstract class CqrsSourceGenerator : GeneratorBase
         configuration ??= ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
     }
 
-    protected bool IsCommandHandler(SyntaxNode syntaxNode)
+    protected bool CouldBeCommandHandler(SyntaxNode syntaxNode)
      => syntaxNode is MethodDeclarationSyntax methodDeclarationSyntax
         &&
         methodDeclarationSyntax.Identifier.Text.EndsWith("Execute")
@@ -188,21 +188,19 @@ public abstract class CqrsSourceGenerator : GeneratorBase
         &&
         GetTypeName(methodDeclarationSyntax.ParameterList.Parameters[0].Type).EndsWith("Command");
 
-    protected bool IsQueryHandler(SyntaxNode syntaxNode)
+    protected bool CouldBeQueryHandler(SyntaxNode syntaxNode)
     {
         return
             syntaxNode is MethodDeclarationSyntax methodDeclaration
-            &&
-            methodDeclaration.Identifier.Text.EndsWith("Query")
             &&
             methodDeclaration.ParameterList.Parameters.Count == 1
             &&
             GetTypeName(methodDeclaration.ParameterList.Parameters[0].Type).EndsWith("Query");
     }
 
-    protected bool IsQueryHandler(IMethodSymbol symbol)
-        => symbol.Name.EndsWith("Query") && symbol.Parameters.Length == 1 && symbol.Parameters[0].Type.Name.EndsWith("Query");
+    protected bool IsQueryHandler(IMethodSymbol symbol, string queryMethodName, string querySuffix)
+        => symbol.Name == queryMethodName && symbol.Parameters.Length == 1 && symbol.Parameters[0].Type.Name.EndsWith(querySuffix);
 
-    protected bool IsCommandHandler(IMethodSymbol symbol) 
-        => symbol.Name.EndsWith("Execute") && symbol.Parameters.Length == 1 && symbol.Parameters[0].Type.Name.EndsWith("Command");
+    protected bool IsCommandHandler(IMethodSymbol symbol, string commandHandlerName, string commandSuffix) 
+        => symbol.Name.EndsWith(commandHandlerName) && symbol.Parameters.Length == 1 && symbol.Parameters[0].Type.Name.EndsWith(commandSuffix);
 }

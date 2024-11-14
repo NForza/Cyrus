@@ -21,12 +21,16 @@ public class CqrsQueryHandlerGenerator : CqrsSourceGenerator, IIncrementalGenera
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => IsQueryHandler(syntaxNode),
+                predicate: (syntaxNode, _) => syntaxNode is MethodDeclarationSyntax,
                 transform: (context, _) => GetMethodSymbolFromContext(context));
 
-        var allQueryHandlersProvider = incrementalValuesProvider
-            .Where(x => x is not null)
-            .Select((x, _) => x!)
+        var allQueryHandlersProvider = incrementalValuesProvider.Combine(configProvider)
+            .Where(x =>
+            {
+                var (methodNode, config) = x;
+                return IsQueryHandler(methodNode, config.Queries.HandlerName, config.Queries.Suffix);
+            })
+            .Select((x, _) => x.Left!)
             .Collect();
 
         context.RegisterSourceOutput(allQueryHandlersProvider, (spc, queryHandlers) =>
@@ -36,7 +40,7 @@ public class CqrsQueryHandlerGenerator : CqrsSourceGenerator, IIncrementalGenera
         });
     }
 
-    private string GenerateQueryProcessorExtensionMethods( ImmutableArray<IMethodSymbol> handlers)
+    private string GenerateQueryProcessorExtensionMethods(ImmutableArray<IMethodSymbol> handlers)
     {
         StringBuilder source = new();
         foreach (var handler in handlers)

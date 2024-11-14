@@ -1,6 +1,7 @@
 using DemoApp.WebApi;
 using Microsoft.Extensions.Options;
 using NForza.Cqrs.WebApi;
+using NForza.Cqrs;
 using NForza.TypedIds;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using MassTransit;

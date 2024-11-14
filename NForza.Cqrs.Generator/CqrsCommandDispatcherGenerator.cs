@@ -20,12 +20,15 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, IIncrementalG
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => IsCommandHandler(syntaxNode),
+                predicate: (syntaxNode, _) => CouldBeCommandHandler(syntaxNode),
                 transform: (context, _) => GetMethodSymbolFromContext(context));
 
-        var recordStructsWithAttribute = incrementalValuesProvider
-            .Where(x => x is not null)
-            .Select((x, _) => x!)
+        var recordStructsWithAttribute = incrementalValuesProvider.Combine(configProvider)
+            .Where(x => {
+                var (methodNode, config) = x;
+                return IsCommandHandler(methodNode, config.Commands.HandlerName, config.Commands.Suffix);
+             })
+            .Select((x, _) => x.Left!)
             .Collect();
 
         var combinedProvider = context.CompilationProvider

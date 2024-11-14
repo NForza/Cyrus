@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
@@ -21,19 +20,23 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => IsCommandHandler(syntaxNode) || IsQueryHandler(syntaxNode),
+                predicate: (syntaxNode, _) => CouldBeCommandHandler(syntaxNode) || CouldBeQueryHandler(syntaxNode),
                 transform: (context, _) => GetMethodSymbolFromContext(context));
 
-        var allHandlersProvider = incrementalValuesProvider
-            .Where(x => x is not null)
-            .Select((x, _) => x!)
+        var allHandlersProvider = incrementalValuesProvider.Combine(configProvider)
+            .Where(x =>
+            {
+                var (handler, config) = x;
+                return IsCommandHandler(handler, config.Commands.HandlerName, config.Commands.Suffix) || IsQueryHandler(handler, config.Queries.HandlerName, config.Queries.Suffix);
+            })
+            .Select((x, _) => x.Left!)
             .Collect();
 
-        var combinedProvider = context.CompilationProvider.Combine(allHandlersProvider.Combine(configProvider));
+        var combinedProvider = context.CompilationProvider.Combine(allHandlersProvider).Combine(configProvider);
 
         context.RegisterSourceOutput(combinedProvider, (sourceProductionContext, source) =>
         {
-            var (compilation, (handlers, config)) = source;
+            var ((compilation, handlers), config) = source;
             var sourceText = GenerateServiceCollectionExtensions(handlers, config, compilation);
             sourceProductionContext.AddSource($"ServiceCollection.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         });
@@ -42,8 +45,8 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
     private string GenerateServiceCollectionExtensions(ImmutableArray<IMethodSymbol> handlers, CqrsConfig configuration, Compilation compilation)
     {
         string handlerTypeRegistrations = CreateRegisterTypes(handlers);
-        string queryHandlerRegistrations = CreateRegisterQueryHandler(handlers.Where(IsQueryHandler));
-        string commandHandlerRegistrations = CreateRegisterCommandHandler(handlers.Where(IsCommandHandler), compilation);
+        string queryHandlerRegistrations = CreateRegisterQueryHandler(handlers.Where(x => IsQueryHandler(x, configuration.Queries.HandlerName, configuration.Queries.Suffix)));
+        string commandHandlerRegistrations = CreateRegisterCommandHandler(handlers.Where(x => IsCommandHandler(x, configuration.Commands.HandlerName, configuration.Commands.Suffix)), compilation);
         string eventBusRegistration = $@"services.AddSingleton<IEventBus, {configuration.EventBus}EventBus>();";
         string usings = configuration.EventBus == "MassTransit" ? "using NForza.Cqrs.MassTransit;" : "";
 

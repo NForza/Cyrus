@@ -4,6 +4,6 @@ commands:
   handlerName: Execute
 queries:
   suffix: Query
-  handlerName: Execute
+  handlerName: Query
 eventBus: MassTransit
   

@@ -4,12 +4,12 @@ namespace DemoApp.Domain.Customer;
 
 public class CustomersQueryHandler
 {
-    public List<Customer> Query(AllCustomersQuery query)
+    public Task<List<Customer>> Query(AllCustomersQuery query)
     {
         var customers = Enumerable.Range(1, 10)
             .Select(i => new Customer(new(), new($"Customer-{i}")))
             .ToList();  
-        return customers;
+        return Task.FromResult(customers);
     }
 
     public static Customer Query(CustomerByIdQuery query)
