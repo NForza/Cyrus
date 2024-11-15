@@ -6,6 +6,7 @@ using NForza.TypedIds;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using MassTransit;
 using System.Reflection;
+using NForza.Cqrs.WebApi.Policies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,12 @@ builder.Services.AddMassTransit(cfg =>
     });
 });
 
+//needs to be generated
 builder.Services.AddEndpointGroup<CustomerEndpointGroup>();
+builder.Services.AddTransient<DefaultQueryInputMappingPolicy>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<IQueryFactory, QueryFactory>();
+
 builder.Services.AddCqrs(o => o.AddCqrsEndpoints());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddTypedIds();

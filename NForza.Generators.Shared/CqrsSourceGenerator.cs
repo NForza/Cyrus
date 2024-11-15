@@ -3,15 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
-using NForza.Cqrs.Generator;
 using NForza.Cqrs.Generator.Config;
 using NForza.Generators;
-
-#pragma warning disable RS1035 // Do not use banned APIs for analyzers
 
 namespace NForza.Cqrs.Generator;
 
@@ -20,31 +15,6 @@ public abstract class CqrsSourceGenerator : GeneratorBase
     private IncrementalValueProvider<CqrsConfig>? configuration;
     protected IncrementalValueProvider<CqrsConfig>? Configuration => configuration;
 
-    protected List<IMethodSymbol> GetAllCommandHandlers(GeneratorExecutionContext context, string methodHandlerName, List<INamedTypeSymbol> commands)
-    {
-        INamedTypeSymbol commandResultSymbol = context.Compilation.GetTypeByMetadataName("NForza.Cqrs.CommandResult")!;
-
-        IEnumerable<IMethodSymbol> methodsEndingWithCommand = context.Compilation
-                    .GetSymbolsWithName(s => s == methodHandlerName, SymbolFilter.Member)
-                    .OfType<IMethodSymbol>()
-                    .Where(m => m.Parameters.Length == 1 && commands.Contains(m.Parameters[0].Type, SymbolEqualityComparer.Default))
-                    .ToList();
-        var asyncCommandHandlers = methodsEndingWithCommand
-            .Where(m => ReturnsTaskOfCommandResult(context, m));
-        var syncCommandHandlers = methodsEndingWithCommand
-            .Where(m => m.ReturnType.Equals(commandResultSymbol, SymbolEqualityComparer.Default));
-
-        var invalidHandlers = methodsEndingWithCommand.Except(asyncCommandHandlers).Except(syncCommandHandlers);
-        foreach (var invalidHandler in invalidHandlers)
-        {
-            context.ReportDiagnostic(Diagnostic.Create(
-                new DiagnosticDescriptor("CQRS001", "Invalid command handler", $"Command handler {invalidHandler.Name} has invalid signature", "NForza.Cqrs", DiagnosticSeverity.Error, true),
-                invalidHandler.Locations.First()));
-        }
-
-        return asyncCommandHandlers.Concat(syncCommandHandlers).ToList();
-    }
-
     protected IMethodSymbol? GetMethodSymbolFromContext(GeneratorSyntaxContext context)
     {
         var recordStruct = (MethodDeclarationSyntax)context.Node;
@@ -52,24 +22,6 @@ public abstract class CqrsSourceGenerator : GeneratorBase
 
         var symbol = model.GetDeclaredSymbol(recordStruct) as IMethodSymbol;
         return symbol;
-    }
-
-    protected List<IMethodSymbol> GetAllQueryHandlers(GeneratorExecutionContext context, string methodHandlerName, List<INamedTypeSymbol> queries)
-    {
-        var symbolsWithCorrectName = context.Compilation.GetSymbolsWithName(s => s == methodHandlerName, SymbolFilter.Member);
-        var methodsWithCorrectName = symbolsWithCorrectName.OfType<IMethodSymbol>();
-        var methodsWithCorrectNameAndParameters = methodsWithCorrectName
-            .Where(m => HasQueryHandlerASignature(m, queries));
-        return methodsWithCorrectNameAndParameters.ToList();
-
-        static bool HasQueryHandlerASignature(IMethodSymbol method, List<INamedTypeSymbol> queries)
-        {
-            return method.Parameters.Length <= 2
-                               &&
-                               queries.Contains(method.Parameters[0].Type, SymbolEqualityComparer.Default)
-                               &&
-                               (method.Parameters.Length == 1 || method.Parameters[1].Name == "CancellationToken");
-        }
     }
 
     private IEnumerable<INamedTypeSymbol> GetAllTypesWithSuffix(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string typeSuffix)
@@ -120,33 +72,6 @@ public abstract class CqrsSourceGenerator : GeneratorBase
         return commandsInDomain;
     }
 
-    private static bool ReturnsTaskOfCommandResult(GeneratorExecutionContext context, IMethodSymbol handlerType)
-    {
-        Debug.WriteLine($"Found handler: {handlerType.Name}");
-
-        return IsTaskOfCommandResult(handlerType.ReturnType, context.Compilation);
-    }
-
-    private static bool IsTaskOfCommandResult(ITypeSymbol returnType, Compilation compilation)
-    {
-        INamedTypeSymbol taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
-        if (returnType is INamedTypeSymbol namedTypeSymbol)
-        {
-            if (namedTypeSymbol.IsGenericType &&
-                    namedTypeSymbol.ConstructedFrom.Equals(taskSymbol, SymbolEqualityComparer.Default))
-            {
-
-                var genericArguments = namedTypeSymbol.TypeArguments;
-                if (genericArguments.Length == 1)
-                {
-                    var commandResultSymbol = compilation.GetTypeByMetadataName("NForza.Cqrs.CommandResult");
-                    return SymbolEqualityComparer.Default.Equals(genericArguments[0], commandResultSymbol);
-                }
-            }
-        }
-        return false;
-    }
-
     protected IEnumerable<INamedTypeSymbol> GetAllClassesDerivedFrom(Compilation compilation, string className)
     {
         var baseTypeSymbol = compilation.GetTypeByMetadataName(className);
@@ -182,20 +107,14 @@ public abstract class CqrsSourceGenerator : GeneratorBase
     protected bool CouldBeCommandHandler(SyntaxNode syntaxNode)
      => syntaxNode is MethodDeclarationSyntax methodDeclarationSyntax
         &&
-        methodDeclarationSyntax.Identifier.Text.EndsWith("Execute")
-        &&
-        methodDeclarationSyntax.ParameterList.Parameters.Count == 1
-        &&
-        GetTypeName(methodDeclarationSyntax.ParameterList.Parameters[0].Type).EndsWith("Command");
+        methodDeclarationSyntax.ParameterList.Parameters.Count == 1;
 
     protected bool CouldBeQueryHandler(SyntaxNode syntaxNode)
     {
         return
             syntaxNode is MethodDeclarationSyntax methodDeclaration
             &&
-            methodDeclaration.ParameterList.Parameters.Count == 1
-            &&
-            GetTypeName(methodDeclaration.ParameterList.Parameters[0].Type).EndsWith("Query");
+            methodDeclaration.ParameterList.Parameters.Count == 1;
     }
 
     protected bool IsQueryHandler(IMethodSymbol symbol, string queryMethodName, string querySuffix)

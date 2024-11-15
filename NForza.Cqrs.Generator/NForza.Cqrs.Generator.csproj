@@ -13,11 +13,13 @@
 
   <ItemGroup>
     <Compile Remove="Templates\CommandDispatcherExtensions.cs" />
+    <Compile Remove="Templates\QueryFactory.cs" />
     <Compile Remove="Templates\QueryProcessorExtensions.cs" />
     <Compile Remove="Templates\ServiceCollectionExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Templates\QueryFactory.cs" />
     <EmbeddedResource Include="Templates\QueryProcessorExtensions.cs" />
     <EmbeddedResource Include="Templates\CommandDispatcherExtensions.cs" />
     <EmbeddedResource Include="Templates\ServiceCollectionExtensions.cs" />

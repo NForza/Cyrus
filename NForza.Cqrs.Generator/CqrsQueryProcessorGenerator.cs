@@ -21,7 +21,7 @@ public class CqrsQueryHandlerGenerator : CqrsSourceGenerator, IIncrementalGenera
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => syntaxNode is MethodDeclarationSyntax,
+                predicate: (syntaxNode, _) => CouldBeQueryHandler(syntaxNode),
                 transform: (context, _) => GetMethodSymbolFromContext(context));
 
         var allQueryHandlersProvider = incrementalValuesProvider.Combine(configProvider)
