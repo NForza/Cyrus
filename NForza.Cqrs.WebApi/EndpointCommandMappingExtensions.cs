@@ -38,7 +38,7 @@ public static partial class EndpointCommandMappingExtensions
                     if (!ValidateObject(endpointDefinition.EndpointType, commandObject, ctx.RequestServices, out var problem))
                         return Results.BadRequest(problem);
 
-                    var commandResult = await commandDispatcher.ExecuteInternal(commandObject, CancellationToken.None);
+                    var commandResult = await commandDispatcher.ExecuteInternalAsync(commandObject, CancellationToken.None);
 
                     var commandResultAttributes = endpointDefinition.CommandResultPolicies;
                     foreach (var policy in commandResultAttributes)

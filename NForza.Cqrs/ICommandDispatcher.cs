@@ -5,5 +5,6 @@ namespace NForza.Cqrs;
 
 public interface ICommandDispatcher
 {
-    Task<CommandResult> ExecuteInternal(object command, CancellationToken cancellationToken);
+    Task<CommandResult> ExecuteInternalAsync(object command, CancellationToken cancellationToken);
+    CommandResult ExecuteInternalSync(object command);
 }

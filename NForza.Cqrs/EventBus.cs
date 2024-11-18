@@ -2,7 +2,7 @@
 
 namespace NForza.Cqrs;
 
-public class EventBus : IEventBus
+public class LocalEventBus : IEventBus
 {
     public Task Publish(object @event)
     {

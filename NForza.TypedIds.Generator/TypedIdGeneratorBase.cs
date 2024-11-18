@@ -6,14 +6,23 @@ using NForza.Generators;
 
 namespace NForza.TypedIds.Generator;
 
-public abstract class TypedIdGeneratorBase : GeneratorBase, ISourceGenerator
+public abstract class TypedIdGeneratorBase : IncrementalGeneratorBase
 {
+    protected static bool IsRecordWithAttribute(SyntaxNode syntaxNode, string attributeName)
+    {
+        bool isRecordWithStringId = syntaxNode is RecordDeclarationSyntax recordDeclaration &&
+                       recordDeclaration.HasAttribute(attributeName);
+        return isRecordWithStringId;
+    }
+
+    protected bool IsRecordWithGuidIdAttribute(SyntaxNode syntaxNode)
+        => IsRecordWithAttribute(syntaxNode, "GuidId");
+
+    protected static bool IsRecordWithStringIdAttribute(SyntaxNode syntaxNode)
+        => IsRecordWithAttribute(syntaxNode, "StringId");
 
     protected IEnumerable<INamedTypeSymbol> GetAllTypedIds(Compilation compilation, string typedIdName)
     {
-        var allTypes = new List<INamedTypeSymbol>();
-
-        // Traverse each syntax tree in the compilation
         foreach (var syntaxTree in compilation.SyntaxTrees)
         {
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -25,19 +34,26 @@ public abstract class TypedIdGeneratorBase : GeneratorBase, ISourceGenerator
                 if (semanticModel.GetDeclaredSymbol(typeDeclaration) is INamedTypeSymbol typeSymbol && typeSymbol.IsValueType && typeSymbol.TypeKind == TypeKind.Struct)
                 {
                     if (typeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == typedIdName))
-                        allTypes.Add(typeSymbol);
+                        yield return typeSymbol;
                 }
             }
         }
-
-        return allTypes;
     }
 
-    protected ITypeSymbol? GetUnderlyingTypeOfTypedId(INamedTypeSymbol typeSymbol)
+    protected string GetUnderlyingTypeOfTypedId(INamedTypeSymbol typeSymbol)
     {
-        var firstProperty = typeSymbol.GetMembers()
-              .OfType<IPropertySymbol>()
-              .FirstOrDefault();
-        return firstProperty?.Type;
+        var hasStringIdProperty = typeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "StringIdAttribute");
+        if (hasStringIdProperty)
+            return "string";
+        return "System.Guid";
+    }
+
+    protected INamedTypeSymbol? GetNamedTypeSymbolFromContext(GeneratorSyntaxContext context)
+    {
+        var recordStruct = (RecordDeclarationSyntax)context.Node;
+        var model = context.SemanticModel;
+
+        var symbol = model.GetDeclaredSymbol(recordStruct) as INamedTypeSymbol;
+        return symbol;
     }
 }

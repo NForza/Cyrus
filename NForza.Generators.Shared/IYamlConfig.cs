@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace NForza.Generators
+namespace NForza.Generators;
+
+public interface IYamlConfig<T>
 {
-    public interface IYamlConfig<T>
-    {
-        T InitFrom(Dictionary<string, List<string>> config);
-    }
+    T InitFrom(Dictionary<string, List<string>> config);
 }

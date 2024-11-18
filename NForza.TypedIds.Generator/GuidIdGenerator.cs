@@ -1,63 +1,57 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
+using NForza.Generators;
 
 namespace NForza.TypedIds.Generator;
 
 [Generator]
-public class GuidIdGenerator : TypedIdGeneratorBase, ISourceGenerator
+public class GuidIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
 {
-    public override void Execute(GeneratorExecutionContext context)
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-#if DEBUG_ANALYZER 
-        //This will launch the debugger when the generator is running
-        //You might have to do a Rebuild to get the generator to run
-        if (!Debugger.IsAttached)
+        DebugThisGenerator(false);
+        var incrementalValuesProvider = context.SyntaxProvider
+                    .CreateSyntaxProvider(
+                        predicate: (syntaxNode, _) => IsRecordWithGuidIdAttribute(syntaxNode),
+                        transform: (context, _) => GetNamedTypeSymbolFromContext(context));
+
+        var recordStructsWithAttribute = incrementalValuesProvider
+            .Where(x => x is not null)
+            .Select((x, _) => x!)
+            .Collect();
+
+        context.RegisterSourceOutput(recordStructsWithAttribute, (spc, recordSymbols) =>
         {
-            Debugger.Launch();
-        }
-#endif
-        var typedIds = GetAllTypedIds(context.Compilation, "GuidIdAttribute");
-        foreach (var item in typedIds)
+            foreach (var recordSymbol in recordSymbols)
+            {
+                var sourceText = GenerateGuidId(recordSymbol);
+                spc.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            };
+        });
+    }
+
+    private string GenerateGuidId(INamedTypeSymbol item)
+    {
+        var replacements = new Dictionary<string, string>
         {
-            GenerateGuidId(context, item);
-        }
+            ["ItemName"] = item.Name,
+            ["Namespace"] = item.ContainingNamespace.ToDisplayString(),
+            ["Constructor"] = GenerateConstructor(item),
+            ["CastOperators"] = GenerateCastOperatorsToUnderlyingType(item),
+            ["Default"] = "Guid.Empty"
+        };
+
+        var source = TemplateEngine.ReplaceInResourceTemplate("GuidId.cs", replacements);
+
+        return source;
     }
 
-    private void GenerateGuidId(GeneratorExecutionContext context, INamedTypeSymbol item)
-    {
-        var source = new StringBuilder($@"
-using System;
-using NForza.TypedIds;
-using System.Text.Json.Serialization;
+    private string GenerateCastOperatorsToUnderlyingType(INamedTypeSymbol item) =>
+        @$"public static implicit operator {GetUnderlyingTypeOfTypedId(item)}({item.ToDisplayString()} typedId) => typedId.Value;
+    public static explicit operator {item.ToDisplayString()}({GetUnderlyingTypeOfTypedId(item)} value) => new(value);";
 
-namespace {item.ContainingNamespace}
-{{
-    [JsonConverter(typeof({item.Name}JsonConverter))]
-    public partial record struct {item.Name}(Guid Value): ITypedId
-    {{
-        {GenerateConstructor(item)}
-        public static {item.ToDisplayString()} Empty => new {item.Name}({GetDefault(item)});
-        {GenerateCastOperatorsToUnderlyingType(item)}
-    }}
-}}
-");
-        context.AddSource($"{item.Name}.g.cs", source.ToString());
-    }
-
-    private string GenerateCastOperatorsToUnderlyingType(INamedTypeSymbol item)
-    {
-        return @$"public static implicit operator {GetUnderlyingTypeOfTypedId(item)?.ToDisplayString()}({item.ToDisplayString()} typedId) => typedId.Value;
-        public static explicit operator {item.ToDisplayString()}({GetUnderlyingTypeOfTypedId(item)?.ToDisplayString()} value) => new(value);";
-    }
-
-    private object GetDefault(INamedTypeSymbol item)
-    {
-        return "Guid.Empty";
-    }
-
-    string GenerateConstructor(INamedTypeSymbol item)
-    {
-        return $@"public {item.Name}(): this(Guid.NewGuid()) {{}}";
-    }
+    string GenerateConstructor(INamedTypeSymbol item) =>
+        $@"public {item.Name}(): this(Guid.NewGuid()) {{}}";
 }

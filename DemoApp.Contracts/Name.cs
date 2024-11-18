@@ -2,5 +2,5 @@
 
 namespace DemoApp.Contracts;
 
-[StringId(minimumLength:1, maximumLength:50)]
+[StringId(1, 50)]
 public partial record struct Name;

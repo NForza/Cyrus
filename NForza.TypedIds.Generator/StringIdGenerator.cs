@@ -1,63 +1,76 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
+using NForza.Generators;
 
 namespace NForza.TypedIds.Generator;
 
 [Generator]
-public class StringIdGenerator : TypedIdGeneratorBase, ISourceGenerator
+public class StringIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
 {
-    public override void Execute(GeneratorExecutionContext context)
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-#if DEBUG_ANALYZER 
-        //This will launch the debugger when the generator is running
-        //You might have to do a Rebuild to get the generator to run
-        if (!Debugger.IsAttached)
+        DebugThisGenerator(false);
+        var incrementalValuesProvider = context.SyntaxProvider
+                    .CreateSyntaxProvider(
+                        predicate: (syntaxNode, _) => IsRecordWithStringIdAttribute(syntaxNode),
+                        transform: (context, _) => GetNamedTypeSymbolFromContext(context));
+
+        var recordStructsWithAttribute = incrementalValuesProvider
+            .Where(x => x is not null)
+            .Select((x, _) => x!)
+            .Collect();
+
+        context.RegisterSourceOutput(recordStructsWithAttribute, (spc, recordSymbols) =>
         {
-            Debugger.Launch();
-        }
-#endif
-        var typedIds = GetAllTypedIds(context.Compilation, "StringIdAttribute");
-        foreach (var item in typedIds)
-        {
-            GenerateStringId(context, item);
-        }
+            foreach (var recordSymbol in recordSymbols)
+            {
+                var sourceText = GenerateCodeForRecordStruct(recordSymbol);
+                spc.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            };
+        });
     }
 
-    private void GenerateStringId(GeneratorExecutionContext context, INamedTypeSymbol item)
+    private string GenerateCodeForRecordStruct(INamedTypeSymbol recordSymbol)
     {
-        var source = new StringBuilder($@"
-using System;
-using NForza.TypedIds;
-using System.Text.Json.Serialization;
+        var replacements = new Dictionary<string, string>
+        {
+            ["ItemName"] = recordSymbol.Name,
+            ["Namespace"] = recordSymbol.ContainingNamespace.ToDisplayString(),
+            ["CastOperators"] = GenerateCastOperatorsToUnderlyingType(recordSymbol),
+            ["IsValid"] = GetIsValidExpression(recordSymbol)
+        };
 
-namespace {item.ContainingNamespace}
-{{
-    [JsonConverter(typeof({item.Name}JsonConverter))]
-    public partial record struct {item.Name}(string Value): ITypedId
-    {{
-        public static {item.ToDisplayString()} Empty => new {item.Name}({GetDefault(item)});
-        {GenerateIsNullOrEmpty(item)}
-        {GenerateCastOperatorsToUnderlyingType(item)}
-    }}
-}}
-");
-        context.AddSource($"{item.Name}.g.cs", source.ToString());
+        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("StringId.cs", replacements);
+
+        return resolvedSource;
+    }
+
+    private string GetIsValidExpression(INamedTypeSymbol item)
+    {
+        var attribute = item.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "StringIdAttribute");
+        if (attribute == null)
+        {
+            return string.Empty;
+        }
+        var args = attribute.ConstructorArguments.Select(a => int.Parse(a.Value?.ToString())).ToList();
+        var min = args.Count > 0 ? args[0] : -1;
+        var max = args.Count > 1 ? args[1] : -1;
+        if (min < 0 && max < 0)
+        {
+            return string.Empty;
+        }
+        var minExpression = min < 0 ? string.Empty : $" && Value.Length >= {min}";
+        var maxExpression = max < 0 ? string.Empty : $" && Value.Length <= {max}";
+
+        return $"public bool IsValid() => !string.IsNullOrEmpty(Value){minExpression}{maxExpression};";
     }
 
     private string GenerateCastOperatorsToUnderlyingType(INamedTypeSymbol item)
     {
-        return @$"public static implicit operator {GetUnderlyingTypeOfTypedId(item)?.ToDisplayString()}({item.ToDisplayString()} typedId) => typedId.Value;
-        public static explicit operator {item.ToDisplayString()}({GetUnderlyingTypeOfTypedId(item)?.ToDisplayString()} value) => new(value);";
-    }
-
-    private object GetDefault(INamedTypeSymbol item)
-    {
-        return "string.Empty";
-    }
-
-    private object GenerateIsNullOrEmpty(INamedTypeSymbol item)
-    {
-        return $@"public bool IsNullOrEmpty() => string.IsNullOrEmpty(Value);";
+        return @$"public static implicit operator {GetUnderlyingTypeOfTypedId(item)}({item.ToDisplayString()} typedId) => typedId.Value;
+    public static explicit operator {item.ToDisplayString()}({GetUnderlyingTypeOfTypedId(item)} value) => new(value);";
     }
 }

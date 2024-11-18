@@ -1,33 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 using NForza.Generators;
 
 namespace NForza.TypedIds.Generator;
 
 [Generator]
-public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, ISourceGenerator
+public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncrementalGenerator
 {
-    public override void Execute(GeneratorExecutionContext context)
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-#if DEBUG_ANALYZER //remove the 1 to enable debugging when compiling source code
-        //This will launch the debugger when the generator is running
-        //You might have to do a Rebuild to get the generator to run
-        if (!Debugger.IsAttached)
+        DebugThisGenerator(false);
+        var incrementalValuesProvider = context.SyntaxProvider
+                    .CreateSyntaxProvider(
+                        predicate: (syntaxNode, _) => IsRecordWithStringIdAttribute(syntaxNode) || IsRecordWithGuidIdAttribute(syntaxNode),
+                        transform: (context, _) => GetNamedTypeSymbolFromContext(context));
+
+        var typedIdsProvider = incrementalValuesProvider
+            .Where(x => x is not null)
+            .Select((x, _) => x!)
+            .Collect();
+
+        context.RegisterSourceOutput(typedIdsProvider, (spc, typedIds) =>
         {
-            Debugger.Launch();
-        }
-#endif
-        var typedIds =
-            GetAllTypedIds(context.Compilation, "StringIdAttribute").Concat(GetAllTypedIds(context.Compilation, "GuidIdAttribute"));
-        GenerateServiceCollectionExtensionMethod(context, typedIds);
+            var sourceText = GenerateServiceCollectionExtensionMethod(typedIds);
+            spc.AddSource("ServiceCollectionExtensions.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+        });
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers", Justification = "Environment.NewLine should not be a banned API.")]
-    private void GenerateServiceCollectionExtensionMethod(GeneratorExecutionContext context, IEnumerable<INamedTypeSymbol> typedIds)
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers", Justification = "<Pending>")]
+    private string GenerateServiceCollectionExtensionMethod(IEnumerable<INamedTypeSymbol> typedIds)
     {
         var source = EmbeddedResourceReader.GetResource(Assembly.GetExecutingAssembly(), "Templates", "ServiceCollectionExtensions.cs");
 
@@ -43,6 +49,6 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, ISourceGe
             .Replace("% AllTypedIdRegistrations %", registrations)
             .Replace("% Namespaces %", namespaces)
             .Replace("% AddJsonConverters %", converters);
-        context.AddSource($"ServiceCollectionExtensions.g.cs", source);
+        return source;
     }
 }

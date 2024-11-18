@@ -8,8 +8,8 @@ public class % TypedIdName %JsonConverter : JsonConverter<% TypedIdName %>
 {
     public override % TypedIdName % Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var guid = reader.% GetMethodName %();  
-        return new % TypedIdName %(guid);
+        var value = reader.% GetMethodName %();  
+        return new % TypedIdName %(value);
     }
 
     public override void Write(Utf8JsonWriter writer, % TypedIdName % value, JsonSerializerOptions options)

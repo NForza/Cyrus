@@ -4,12 +4,12 @@ namespace NForza.Generators;
 
 public class YamlParser
 {
-    public static Dictionary<string, List<string>> ReadYaml(string filePath)
+    public static Dictionary<string, List<string>> ReadYaml(string fileContents)
     {
         var result = new Dictionary<string, List<string>>();
         string? currentKey = null;
 
-        foreach (var line in filePath.Split('\n'))
+        foreach (var line in fileContents.Split('\n'))
         {
             var trimmedLine = line.Trim();
 

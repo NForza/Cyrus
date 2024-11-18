@@ -1,50 +1,57 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 using NForza.Generators;
 
 namespace NForza.TypedIds.Generator;
 
 [Generator]
-public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, ISourceGenerator
+public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, IIncrementalGenerator
 {
-    public override void Execute(GeneratorExecutionContext context)
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-#if DEBUG_ANALYZER //remove the 1 to enable debugging when compiling source code
-        //This will launch the debugger when the generator is running
-        //You might have to do a Rebuild to get the generator to run
-        if (!Debugger.IsAttached)
+        DebugThisGenerator(false);
+        var incrementalValuesProvider = context.SyntaxProvider
+                     .CreateSyntaxProvider(
+                         predicate: (syntaxNode, _) => IsRecordWithStringIdAttribute(syntaxNode) || IsRecordWithGuidIdAttribute(syntaxNode),
+                         transform: (context, _) => GetNamedTypeSymbolFromContext(context));
+        var typedIdsProvider = incrementalValuesProvider
+            .Where(x => x is not null)
+            .Select((x, _) => x!)
+            .Collect();
+
+        context.RegisterSourceOutput(typedIdsProvider, (spc, typedIds) =>
         {
-            Debugger.Launch();
-        }
-#endif
-        var typedIds = 
-            GetAllTypedIds(context.Compilation, "StringIdAttribute").Concat(GetAllTypedIds(context.Compilation, "GuidIdAttribute"));
-        foreach (var item in typedIds)
-        {
-            GenerateJsonConverter(context, item);
-        }
+            foreach (var typedId in typedIds)
+            {
+                var sourceText = GenerateJsonConverterForTypedId(typedId);
+                spc.AddSource($"{typedId.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            };
+        });
     }
 
-    private void GenerateJsonConverter(GeneratorExecutionContext context, INamedTypeSymbol item)
+    private string GenerateJsonConverterForTypedId(INamedTypeSymbol item)
     {
-        var source = EmbeddedResourceReader.GetResource(Assembly.GetExecutingAssembly(), "Templates", "JsonConverter.cs");
-
         string fullyQualifiedNamespace = item.ContainingNamespace.ToDisplayString();
-        var underlyingTypeName = GetUnderlyingTypeOfTypedId(item)?.ToDisplayString();
+        var underlyingTypeName = GetUnderlyingTypeOfTypedId(item);
 
         string? getMethodName = underlyingTypeName switch
         {
             "System.Guid" => "GetGuid",
             "string" => "GetString",
-            _ => null
+            _ => throw new NotSupportedException($"Underlying type {underlyingTypeName} is not supported.")
         };
 
-        source = source
-            .Replace("% TypedIdName %", item.Name)
-            .Replace("% NamespaceName %", fullyQualifiedNamespace)
-            .Replace("% GetMethodName %", getMethodName);
-        context.AddSource($"{item}JsonConverter.g.cs", source);
+        var replacements = new Dictionary<string, string>
+        {
+            ["TypedIdName"] = item.Name,
+            ["NamespaceName"] = fullyQualifiedNamespace,
+            ["GetMethodName"] = getMethodName
+        };
+        var source = TemplateEngine.ReplaceInResourceTemplate("JsonConverter.cs", replacements);
+        return source;
     }
 }
