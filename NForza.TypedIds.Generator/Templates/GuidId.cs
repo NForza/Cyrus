@@ -1,11 +1,13 @@
 ﻿using System;
-using NForza.TypedIds;
-using System.Text.Json.Serialization;
+using System.ComponentModel;
 using System.Runtime.InteropServices.ComTypes;
+using System.Text.Json.Serialization;
+using NForza.TypedIds;
 
 namespace % Namespace %;
 
 [JsonConverter(typeof(% ItemName %JsonConverter))]
+[TypeConverter(typeof(% ItemName %TypeConverter))]
 public partial record struct % ItemName %(Guid Value): ITypedId
 {
     % Constructor %

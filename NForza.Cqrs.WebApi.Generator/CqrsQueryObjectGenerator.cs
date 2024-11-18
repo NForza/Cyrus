@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
@@ -17,7 +18,7 @@ public class CqrsQueryFactoryGenerator : CqrsSourceGenerator, IIncrementalGenera
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
 
         var assemblyReferences = context.CompilationProvider;
 
@@ -38,7 +39,7 @@ public class CqrsQueryFactoryGenerator : CqrsSourceGenerator, IIncrementalGenera
         context.RegisterSourceOutput(typesFromReferencedAssembly, (spc, queryHandlers) =>
         {
             var sourceText = GenerateQueryFactoryExtensionMethods(queryHandlers);
-            spc.AddSource($"QueryFactory.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            spc.AddSource($"HttpContextQueryFactory.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         });
     }
 
@@ -57,10 +58,26 @@ public class CqrsQueryFactoryGenerator : CqrsSourceGenerator, IIncrementalGenera
 
     private string GenerateQueryFactoryExtensionMethods(ImmutableArray<INamedTypeSymbol> queries)
     {
+        static IEnumerable<IPropertySymbol> GetPublicProperties(INamedTypeSymbol namedTypeSymbol)
+        {
+            return namedTypeSymbol
+                .GetMembers()
+                .OfType<IPropertySymbol>() // Select only properties
+                .Where(p => p.DeclaredAccessibility == Accessibility.Public); // Filter by accessibility
+        }
+
         StringBuilder source = new();
         foreach (var query in queries)
         {
-            source.AppendLine($@"    objectFactories.Add(typeof({query}), () => new {query}());");
+            source.Append($@"    objectFactories.Add(typeof({query}), (ctx) => new {query}{{");
+
+            var propertyInitializer = new List<string>();
+            foreach(var prop in GetPublicProperties(query))
+            {
+                propertyInitializer.Add(@$"{prop.Name} = ({prop.Type})GetPropertyValue(""{prop.Name}"", ctx, typeof({prop.Type}))");
+            }
+            source.Append(string.Join(", ", propertyInitializer));  
+            source.AppendLine($@"}});");
         }
 
         var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("QueryFactory.cs", new Dictionary<string, string>

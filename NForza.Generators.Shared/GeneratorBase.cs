@@ -1,14 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NForza.Cqrs.Generator.Config;
-
-#pragma warning disable RS1035 // Do not use APIs banned for analyzers
 
 namespace NForza.Generators;
 

@@ -1,22 +1,33 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 
 namespace NForza.Cqrs.WebApi;
 
-public class QueryFactory : IQueryFactory
+public class HttpContextQueryFactory : IQueryFactory
 {
-    Dictionary<Type, Func<object>> objectFactories = new();
+    Dictionary<Type, Func<HttpContext, object>> objectFactories = new();
 
-    public QueryFactory()
+    public HttpContextQueryFactory()
     {
         % QueryFactoryMethod %
     }
 
     public object CreateFromHttpContext(Type queryType, HttpContext ctx)
     {
-        var func = objectFactories[queryType]; 
-        return func();
+        var func = objectFactories[queryType];
+        return func(ctx);
+    }
+
+    private object? GetPropertyValue(string propertyName, HttpContext ctx, Type targetType)
+    {
+        if (ctx.Request.RouteValues.TryGetValue(propertyName, out var value))
+        {
+            var converter = TypeDescriptor.GetConverter(targetType);
+            return converter.ConvertFrom(value);
+        }
+        return null;
     }
 }

@@ -23,7 +23,7 @@ builder.Services.AddMassTransit(cfg =>
 builder.Services.AddEndpointGroup<CustomerEndpointGroup>();
 builder.Services.AddTransient<DefaultQueryInputMappingPolicy>();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddTransient<IQueryFactory, QueryFactory>();
+builder.Services.AddTransient<IQueryFactory, HttpContextQueryFactory>();
 
 builder.Services.AddCqrs(o => o.AddCqrsEndpoints());
 builder.Services.AddEndpointsApiExplorer();
