@@ -10,7 +10,7 @@ public class EmbeddedResourceReader
     public static string GetResource(Assembly assembly, string folderName, string fileName)
     {
         var names = assembly.GetManifestResourceNames();
-        string resourceName = Path.Combine(folderName, fileName).Replace("\\", ".");
+        string resourceName = Path.Combine(folderName, fileName).Replace(Path.DirectorySeparatorChar, '.');
         resourceName = names.FirstOrDefault(n => n.EndsWith(resourceName));
         if (resourceName == null)
         {
