@@ -16,9 +16,11 @@
 
   <ItemGroup>
     <Compile Remove="Templates\QueryFactory.cs" />
+    <Compile Remove="Templates\RegisterEndpointGroups.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Templates\RegisterEndpointGroups.cs" />
     <EmbeddedResource Include="Templates\QueryFactory.cs" />
   </ItemGroup>
   

@@ -1,4 +1,3 @@
-using DemoApp.WebApi;
 using NForza.Cqrs.WebApi;
 using NForza.Cqrs;
 using NForza.TypedIds;
@@ -16,12 +15,8 @@ builder.Services.AddMassTransit(cfg =>
     });
 });
 
-//needs to be generated
-builder.Services.AddEndpointGroup<CustomerEndpointGroup>();
-builder.Services.AddTransient<IQueryFactory, HttpContextQueryFactory>();
-
 builder.Services.AddTypedIds();
-builder.Services.AddCqrs(o => o.AddCqrsEndpoints());
+builder.Services.AddCqrs(o => o.AddEndpointGroups());
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
@@ -29,31 +30,40 @@ public class EndpointGroupGenerator : CqrsSourceGenerator, IIncrementalGenerator
             {
                 var (classDeclaration, compilation) = pair;
                 var semanticModel = compilation.GetSemanticModel(classDeclaration.SyntaxTree);
-                return (classDeclaration, semanticModel, compilation);
+                var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration) as INamedTypeSymbol;
+
+                return (classSymbol, compilation);
             })
             .Where(providerTuple =>
             {
-                var (classDeclaration, semanticModel, compilation) = providerTuple;
-                var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration);
+                var (classSymbol, compilation) = providerTuple;
                 return classSymbol is not null
                        &&
-                       IsDirectlyDerivedFrom(classDeclaration, "NForza.Cqrs.WebApi.EndpointGroup", semanticModel, compilation);
+                       IsDirectlyDerivedFrom(classSymbol, "NForza.Cqrs.WebApi.EndpointGroup");
             })
             .Collect();
 
         context.RegisterSourceOutput(classesWithSemanticModel, (spc, classesPlusMetadata) =>
         {
-            foreach (var endpointGroup in classesPlusMetadata)
-            {
-                (var classDeclaration, var semanticModel, _) = endpointGroup;
-                var sourceText = GenerateEndpointGroupDeclarations(classDeclaration);
-                spc.AddSource($"RegisterEndpointGroups.g.cs", SourceText.From(sourceText, Encoding.UTF8));
-            };
+            var sourceText = GenerateEndpointGroupDeclarations(
+                classesPlusMetadata.Select( cmd => cmd.classSymbol ));
+            spc.AddSource($"RegisterEndpointGroups.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         });
     }
 
-    private string GenerateEndpointGroupDeclarations(ClassDeclarationSyntax classDeclaration)
+    private string GenerateEndpointGroupDeclarations(IEnumerable<INamedTypeSymbol> classSymbols)
     {
-        return "";
+        var sb = new StringBuilder();
+        foreach (var classSymbol in classSymbols) 
+        {
+            sb.AppendLine($"options.Services.AddEndpointGroup<{classSymbol}>();");
+        }
+
+        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("RegisterEndpointGroups.cs", new Dictionary<string, string>
+        {
+            ["RegisterEndpointGroups"] = sb.ToString()
+        });
+
+        return resolvedSource;
     }
 }

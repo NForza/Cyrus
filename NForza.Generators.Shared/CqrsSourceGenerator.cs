@@ -73,26 +73,12 @@ public abstract class CqrsSourceGenerator : GeneratorBase
     }
 
     protected static bool IsDirectlyDerivedFrom(
-        ClassDeclarationSyntax classDeclaration,
-        string fullyQualifiedBaseClassName,
-        SemanticModel semanticModel,
-        Compilation compilation)
+        INamedTypeSymbol classSymbol,
+        string fullyQualifiedBaseClassName)
     {
-        var targetBaseType = compilation.GetTypeByMetadataName(fullyQualifiedBaseClassName);
-        if (targetBaseType == null)
-        {
-            return false;
-        }
-
-        var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration) as INamedTypeSymbol;
-        if (classSymbol == null)
-        {
-            return false;
-        }
-
         var baseType = classSymbol.BaseType;
 
-        return SymbolEqualityComparer.Default.Equals(baseType, targetBaseType);
+        return baseType?.ToDisplayString() == fullyQualifiedBaseClassName;
     }
 
     protected IEnumerable<INamedTypeSymbol> GetAllClassesDerivedFrom(Compilation compilation, string className)
