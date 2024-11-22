@@ -1,4 +1,5 @@
 ﻿using DemoApp.Contracts.Customers;
+using DemoApp.Domain.Customer;
 using NForza.Cqrs.WebApi;
 using NForza.Cqrs.WebApi.Policies;
 
@@ -12,9 +13,15 @@ public class CustomerEndpointGroup : EndpointGroup
             .Post("")
             .AcceptedOnEvent<CustomerAddedEvent>("/customers/{Id}")
             .OtherwiseFail();
+        CommandEndpoint<UpdateCustomerCommand>()
+            .Put("")
+            .AcceptedOnEvent<CustomerUpdatedEvent>("/customers/{Id}")
+            .OtherwiseFail();       
+        
         QueryEndpoint<AllCustomersQuery>()
             .Get("/customers");
         QueryEndpoint<CustomerByIdQuery>()
             .Get("/customers/{Id}");
+
     }
 }

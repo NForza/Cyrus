@@ -3,6 +3,8 @@ using NForza.Cqrs;
 using NForza.TypedIds;
 using MassTransit;
 using System.Reflection;
+using Microsoft.AspNetCore.Diagnostics;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
 }
 app.MapCqrs();
 

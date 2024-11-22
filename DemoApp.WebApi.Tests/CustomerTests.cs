@@ -4,7 +4,6 @@ using DemoApp.Contracts;
 using DemoApp.Contracts.Customers;
 using DemoApp.Domain.Customer;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace DemoApp.WebApi.Tests
 {
@@ -23,11 +22,25 @@ namespace DemoApp.WebApi.Tests
 
         [Theory]
         [InlineData("/customers")]
-        public async Task Posting_Customers_Should_Succeed(string url)
+        public async Task Posting_Add_Customer_Command_Should_Succeed(string url)
         {
             var command = new AddCustomerCommand(new Name("Thomas"), new Address("The Netherlands"));
             var response = await client.PostAsJsonAsync(url, command);
             response.Should().NotBeNull();
+            response.StatusCode.Should().Be(HttpStatusCode.Accepted);
+            response.Headers.Location?.ToString().Should().NotBeNullOrEmpty();
+            response.Headers.Location!.ToString().Should().StartWith("/customers/");
+        }
+
+        [Theory]
+        [InlineData("/customers")]
+        public async Task Putting_Update_Customer_Command_Should_Succeed(string url)
+        {
+            var command = new UpdateCustomerCommand(new CustomerId(), new Name("Thomas"), new Address("The Netherlands"));
+            var response = await client.PutAsJsonAsync(url, command);
+            response.Should().NotBeNull();
+            var content = await response.Content.ReadAsStringAsync();
+
             response.StatusCode.Should().Be(HttpStatusCode.Accepted);
             response.Headers.Location?.ToString().Should().NotBeNullOrEmpty();
             response.Headers.Location!.ToString().Should().StartWith("/customers/");
