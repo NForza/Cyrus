@@ -13,7 +13,14 @@ public class CommandResult
         return result;
     }
 
+    public CommandResult()
+    {        
+    }
+
+    public CommandResult(params object[] events) => this.events = events.ToList();
+
     public static CommandResult FailedWithError(string errorKey, string errorDescription) => FailedWithError(new CommandError(errorKey, errorDescription));
+    public static CommandResult ReturnEvents(params object[] events) => new CommandResult() {};
     private readonly List<CommandError> errorMessages = [];
     private readonly List<object> events = [];
 
