@@ -42,7 +42,7 @@ public class GuidIdTypeConverterGenerator : TypedIdGeneratorBase, IIncrementalGe
             ["NamespaceName"] = item.ContainingNamespace.ToDisplayString()
         };
 
-        string source = TemplateEngine.ReplaceInResourceTemplate("GuidTypeConverter.cs", replacements);
+        string source = TemplateEngine.ReplaceInResourceTemplate("GuidIdTypeConverter.cs", replacements);
 
         return source;
     }

@@ -45,13 +45,20 @@ public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, IIncrementalG
             _ => throw new NotSupportedException($"Underlying type {underlyingTypeName} is not supported.")
         };
 
+        string? templateName = underlyingTypeName switch
+        {
+            "System.Guid" => "GuidIdJsonConverter.cs",
+            "string" => "StringIdJsonConverter.cs",
+            _ => throw new NotSupportedException($"Underlying type {underlyingTypeName} is not supported.")
+        };
+
         var replacements = new Dictionary<string, string>
         {
             ["TypedIdName"] = item.Name,
             ["NamespaceName"] = fullyQualifiedNamespace,
             ["GetMethodName"] = getMethodName
         };
-        var source = TemplateEngine.ReplaceInResourceTemplate("JsonConverter.cs", replacements);
+        var source = TemplateEngine.ReplaceInResourceTemplate(templateName, replacements);
         return source;
     }
 }
