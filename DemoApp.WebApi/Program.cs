@@ -1,10 +1,8 @@
-using NForza.Cqrs.WebApi;
-using NForza.Cqrs;
-using NForza.TypedIds;
 using MassTransit;
+using NForza.Lumia.TypedIds;
+using NForza.Lumia.Cqrs;
+using NForza.Lumia.Cqrs.WebApi;
 using System.Reflection;
-using Microsoft.AspNetCore.Diagnostics;
-using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 

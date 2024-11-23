@@ -1,7 +1,4 @@
-﻿
-using MassTransit;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
+﻿using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace DemoApp.WebApi.Tests
 {

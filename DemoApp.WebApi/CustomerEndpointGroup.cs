@@ -1,7 +1,7 @@
 ﻿using DemoApp.Contracts.Customers;
 using DemoApp.Domain.Customer;
-using NForza.Cqrs.WebApi;
-using NForza.Cqrs.WebApi.Policies;
+using NForza.Lumia.Cqrs.WebApi;
+using NForza.Lumia.Cqrs.WebApi.Policies;
 
 namespace DemoApp.WebApi;
 

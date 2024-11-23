@@ -1,5 +1,5 @@
 ﻿using DemoApp.Contracts.Customers;
-using NForza.Cqrs;
+using NForza.Lumia.Cqrs;
 
 namespace DemoApp.Domain.Customer;
 
