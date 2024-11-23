@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;DebugGenerator</Configurations>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath>./obj/generated</CompilerGeneratedFilesOutputPath>
+    <CompilerGeneratedFilesOutputPath>$(MSBuildProjectDirectory)/obj/$(Configuration)/generated</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,10 +24,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DemoApp.Contracts\DemoApp.Contracts.csproj" />
-    <ProjectReference Include="..\NForza.Cqrs.MassTransit\NForza.Cqrs.MassTransit.csproj" />    
-    <ProjectReference Include="..\NForza.Cqrs\NForza.Cqrs.csproj" />
-    <ProjectReference Include="..\NForza.Cqrs.Generator\NForza.Cqrs.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\NForza.TypedIds\NForza.TypedIds.csproj" />
+    <ProjectReference Include="..\NForza.Lumia.Cqrs.MassTransit\NForza.Lumia.Cqrs.MassTransit.csproj" />    
+    <ProjectReference Include="..\NForza.Lumia.Cqrs\NForza.Lumia.Cqrs.csproj" />
+    <ProjectReference Include="..\NForza.Lumia.Cqrs.Generator\NForza.Lumia.Cqrs.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\NForza.Lumia.TypedIds\NForza.Lumia.TypedIds.csproj" />
   </ItemGroup>
 
 </Project>

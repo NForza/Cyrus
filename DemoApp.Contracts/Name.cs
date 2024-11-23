@@ -1,4 +1,4 @@
-﻿using NForza.TypedIds;
+﻿using NForza.Lumia.TypedIds;
 
 namespace DemoApp.Contracts;
 

@@ -2,8 +2,5 @@
 
 namespace DemoApp.Domain.Customer;
 
-public class Customer(CustomerId id, Name name)
-{
-    public CustomerId Id { get; } = id;
-    public Name Name { get; } = name;
-}
+public record Customer(CustomerId Id, Name Name);
+
