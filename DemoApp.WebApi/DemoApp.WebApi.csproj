@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Configurations>Debug;Release;DebugGenerator</Configurations>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath>./obj/generated</CompilerGeneratedFilesOutputPath>
+    <CompilerGeneratedFilesOutputPath>$(MSBuildProjectDirectory)/obj/$(Configuration)/generated</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

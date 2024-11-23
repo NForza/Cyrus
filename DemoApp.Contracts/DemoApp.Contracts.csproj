@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;DebugGenerator</Configurations>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath>$(BaseOutputPath)\$(Configuration)\generated</CompilerGeneratedFilesOutputPath>
+    <CompilerGeneratedFilesOutputPath>$(MSBuildProjectDirectory)\obj\$(Configuration)\generated</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

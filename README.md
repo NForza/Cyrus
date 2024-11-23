@@ -1,16 +1,17 @@
-# CqrsGen - an opinionated framework for creating CQRS applications
+# Lumia - an opinionated framework for creating CQRS applications
 
-CqrsGen follows a few practices from [Domain Driven Design](https://en.wikipedia.org/wiki/Domain-driven_design) to create WebApi's quickly and pragmatically. CqrsGen is using [Roslyn Source Generators](https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.cookbook.md) to generate code rather than rely on Reflection.
+Lumia is a CQRS framework that focuses on ease of use, simplicity and having as less boilerplate code as possible. It follows a few practices from [Domain Driven Design](https://en.wikipedia.org/wiki/Domain-driven_design) to create WebApi's quickly and pragmatically. Lumia is using [Roslyn Source Generators](https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.cookbook.md) to generate code rather than rely on Reflection.
 
-CqrsGen generates code for the following parts:
+Lumia generates code for the following parts:
 
-* Strongly Typed IDs
-* Query Handlers
-* Command Handlers 
+* [Strongly Typed IDs](#strongly-typed-ids)
+* [Query Handlers](#query-handlers)
+* [Command Handlers](#command-handlers) 
+* [Application Startup](#application-startup)
 
 ### Strongly Typed IDs
 
-CqrsGen lets you define strongly typed IDs by defining a `record struct` like this:
+Lumia lets you define strongly typed IDs by defining a `record struct` like this:
 
 ```csharp
 [StringId(3, 200)]
@@ -39,3 +40,9 @@ The other supported type is a strongly typed ID based on a GUID:
 [GuidId]
 public partial record struct CustomerId;
 ```
+
+## Query Handlers
+
+## Command Handlers
+
+## Application Startup

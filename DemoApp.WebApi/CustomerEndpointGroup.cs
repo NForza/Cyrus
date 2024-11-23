@@ -13,6 +13,7 @@ public class CustomerEndpointGroup : EndpointGroup
             .Post("")
             .AcceptedOnEvent<CustomerAddedEvent>("/customers/{Id}")
             .OtherwiseFail();
+
         CommandEndpoint<UpdateCustomerCommand>()
             .Put("")
             .AcceptedOnEvent<CustomerUpdatedEvent>("/customers/{Id}")
@@ -20,8 +21,8 @@ public class CustomerEndpointGroup : EndpointGroup
         
         QueryEndpoint<AllCustomersQuery>()
             .Get("/customers");
+
         QueryEndpoint<CustomerByIdQuery>()
             .Get("/customers/{Id}");
-
     }
 }
