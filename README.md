@@ -193,4 +193,8 @@ app.MapCqrs();
 await app.RunAsync();
 ```
 
-Check the [demo solution](https://github.com/thuijer/CqrsGen/blob/master/) for more details.
+Check the [demo solution](https://github.com/thuijer/Cyrus/blob/master/) for more details.
+
+## Why Cyrus?
+
+The name stems from [Cyrus The Great](https://en.wikipedia.org/wiki/Cyrus_the_Great), who was considered a great commander, but also a great sage.
