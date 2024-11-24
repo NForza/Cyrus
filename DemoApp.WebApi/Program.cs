@@ -1,6 +1,6 @@
-using NForza.Lumia.TypedIds;
-using NForza.Lumia.Cqrs;
-using NForza.Lumia.Cqrs.WebApi;
+using NForza.Cyrus.TypedIds;
+using NForza.Cyrus.Cqrs;
+using NForza.Cyrus.Cqrs.WebApi;
 using MassTransit;
 using System.Reflection;
 

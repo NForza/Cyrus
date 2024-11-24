@@ -22,10 +22,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="DemoApp.WebApi.Tests"/>
+    <InternalsVisibleTo Include="DemoApp.WebApi.Tests" />
     <ProjectReference Include="..\DemoApp.Domain\DemoApp.Domain.csproj" />
-    <ProjectReference Include="..\NForza.Lumia.Cqrs.WebApi\NForza.Lumia.Cqrs.WebApi.csproj" />
-    <ProjectReference Include="..\NForza.Lumia.Cqrs.WebApi.Generator\NForza.Lumia.Cqrs.WebApi.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\NForza.Cyrus.Cqrs.WebApi\NForza.Cyrus.Cqrs.WebApi.csproj" />
+    <ProjectReference Include="..\NForza.Cyrus.Cqrs.WebApi.Generator\NForza.Cyrus.Cqrs.WebApi.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

@@ -1,9 +1,9 @@
 
-# Lumia - An Opinionated Framework for Creating CQRS Applications and Web APIs
+# Cyrus - An Opinionated Framework for Creating CQRS Applications and Web APIs
 
-Lumia is a CQRS framework that focuses on ease of use, simplicity, and minimizing boilerplate code. It incorporates principles from [Domain-Driven Design](https://en.wikipedia.org/wiki/Domain-driven_design) to enable the rapid and pragmatic creation of Web APIs. Lumia leverages [Roslyn Source Generators](https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.cookbook.md) to generate code rather than relying on reflection.
+Cyrus is a CQRS framework that focuses on ease of use, simplicity, and minimizing boilerplate code. It incorporates principles from [Domain-Driven Design](https://en.wikipedia.org/wiki/Domain-driven_design) to enable the rapid and pragmatic creation of Web APIs. Cyrus leverages [Roslyn Source Generators](https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.cookbook.md) to generate code rather than relying on reflection.
 
-Lumia generates code for the following components:
+Cyrus generates code for the following components:
 
 - [Strongly Typed IDs](#strongly-typed-ids)
 - [Queries and Query Handlers](#queries-and-query-handlers)
@@ -13,7 +13,7 @@ Lumia generates code for the following components:
 
 ### Strongly Typed IDs
 
-Lumia allows you to define strongly typed IDs by defining a `partial record struct` like this:
+Cyrus allows you to define strongly typed IDs by defining a `partial record struct` like this:
 
 ```csharp
 [StringId(3, 200)]
@@ -164,11 +164,11 @@ GET /customers  - Returns all customers. 200 OK when the query result is not nul
 GET /customers/{Id}  - Returns a customer with the specified Id. 200 OK when the query result is not null, and 404 Not Found when the result is null.
 ```
 
-EndpointGroups are automatically detected and registered by the Lumia generators if they derive from the `EndpointGroup` class.
+EndpointGroups are automatically detected and registered by the Cyrus generators if they derive from the `EndpointGroup` class.
 
 ### Application Startup
 
-Lumia generates several extension methods to simplify application startup.
+Cyrus generates several extension methods to simplify application startup.
 
 These methods are available on `IServiceCollection`:
 
@@ -179,7 +179,7 @@ These methods are available on `IEndpointRouteBuilder`:
 
 - `MapCqrs()` - Registers all endpoints from all known EndpointGroups.
 
-A basic Lumia application startup might look like this:
+A basic Cyrus application startup might look like this:
 
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
@@ -193,4 +193,8 @@ app.MapCqrs();
 await app.RunAsync();
 ```
 
-Check the [demo solution](https://github.com/thuijer/CqrsGen/blob/master/) for more details.
+Check the [demo solution](https://github.com/thuijer/Cyrus/blob/master/) for more details.
+
+## Why Cyrus?
+
+The name stems from [Cyrus The Great](https://en.wikipedia.org/wiki/Cyrus_the_Great), who was considered a great commander, but also a great sage.

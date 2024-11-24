@@ -4,7 +4,7 @@ using DemoApp.Domain.Customer;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using NForza.Lumia.Cqrs;
+using NForza.Cyrus.Cqrs;
 
 var host = Host.CreateDefaultBuilder(args)
             .ConfigureServices(services => services
