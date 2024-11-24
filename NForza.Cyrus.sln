@@ -1,0 +1,128 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35309.182
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp.Console", "DemoApp.Console\DemoApp.Console.csproj", "{BBF816AC-7EE4-4CE1-BC21-DC7AECA63D4B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cyrus.Cqrs", "NForza.Cyrus.Cqrs\NForza.Cyrus.Cqrs.csproj", "{9F649329-7560-47FC-9978-ECEF4E43AE53}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp.Domain", "DemoApp.Domain\DemoApp.Domain.csproj", "{B677268D-4663-427F-901B-79F1EB3D8C32}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp.Contracts", "DemoApp.Contracts\DemoApp.Contracts.csproj", "{5E034511-8871-41D2-A579-3F811B4E4647}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cyrus.Cqrs.Generator", "NForza.Cyrus.Cqrs.Generator\NForza.Cyrus.Cqrs.Generator.csproj", "{F27EF578-FB35-4F25-91CE-DA03287D0AF1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cyrus.TypedIds", "NForza.Cyrus.TypedIds\NForza.Cyrus.TypedIds.csproj", "{958260C7-CCD4-41A8-8A11-E6EEF486FDDD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cyrus.TypedIds.Generator", "NForza.Cyrus.TypedIds.Generator\NForza.Cyrus.TypedIds.Generator.csproj", "{3F85014B-FFD3-4E33-A8A6-400563FB6F79}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp.WebApi", "DemoApp.WebApi\DemoApp.WebApi.csproj", "{239395A0-21EF-4967-BBFB-371BCB9CE1CF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cyrus.Cqrs.WebApi", "NForza.Cyrus.Cqrs.WebApi\NForza.Cyrus.Cqrs.WebApi.csproj", "{9DA053D2-DDCC-4503-8032-F5CD5F99693A}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "NForza.Cyrus.Generators.Shared", "NForza.Cyrus.Generators.Shared\NForza.Cyrus.Generators.Shared.shproj", "{DF876A8C-1AA7-4E00-AD03-54FA1A0174AC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cyrus.Cqrs.MassTransit", "NForza.Cyrus.Cqrs.MassTransit\NForza.Cyrus.Cqrs.MassTransit.csproj", "{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.Cqrs.WebApi.Generator", "NForza.Cyrus.Cqrs.WebApi.Generator\NForza.Cyrus.Cqrs.WebApi.Generator.csproj", "{AE73250C-6DCF-49AB-A383-26E13F7FD54B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoApp.WebApi.Tests", "DemoApp.WebApi.Tests\DemoApp.WebApi.Tests.csproj", "{4EFD0A43-5F57-4EDC-8860-F0BBC590C545}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		DebugGenerator|Any CPU = DebugGenerator|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BBF816AC-7EE4-4CE1-BC21-DC7AECA63D4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBF816AC-7EE4-4CE1-BC21-DC7AECA63D4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBF816AC-7EE4-4CE1-BC21-DC7AECA63D4B}.DebugGenerator|Any CPU.ActiveCfg = DebugGenerator|Any CPU
+		{BBF816AC-7EE4-4CE1-BC21-DC7AECA63D4B}.DebugGenerator|Any CPU.Build.0 = DebugGenerator|Any CPU
+		{BBF816AC-7EE4-4CE1-BC21-DC7AECA63D4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBF816AC-7EE4-4CE1-BC21-DC7AECA63D4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F649329-7560-47FC-9978-ECEF4E43AE53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F649329-7560-47FC-9978-ECEF4E43AE53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F649329-7560-47FC-9978-ECEF4E43AE53}.DebugGenerator|Any CPU.ActiveCfg = DebugGenerator|Any CPU
+		{9F649329-7560-47FC-9978-ECEF4E43AE53}.DebugGenerator|Any CPU.Build.0 = DebugGenerator|Any CPU
+		{9F649329-7560-47FC-9978-ECEF4E43AE53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F649329-7560-47FC-9978-ECEF4E43AE53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B677268D-4663-427F-901B-79F1EB3D8C32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B677268D-4663-427F-901B-79F1EB3D8C32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B677268D-4663-427F-901B-79F1EB3D8C32}.DebugGenerator|Any CPU.ActiveCfg = DebugGenerator|Any CPU
+		{B677268D-4663-427F-901B-79F1EB3D8C32}.DebugGenerator|Any CPU.Build.0 = DebugGenerator|Any CPU
+		{B677268D-4663-427F-901B-79F1EB3D8C32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B677268D-4663-427F-901B-79F1EB3D8C32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E034511-8871-41D2-A579-3F811B4E4647}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E034511-8871-41D2-A579-3F811B4E4647}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E034511-8871-41D2-A579-3F811B4E4647}.DebugGenerator|Any CPU.ActiveCfg = DebugGenerator|Any CPU
+		{5E034511-8871-41D2-A579-3F811B4E4647}.DebugGenerator|Any CPU.Build.0 = DebugGenerator|Any CPU
+		{5E034511-8871-41D2-A579-3F811B4E4647}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E034511-8871-41D2-A579-3F811B4E4647}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F27EF578-FB35-4F25-91CE-DA03287D0AF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F27EF578-FB35-4F25-91CE-DA03287D0AF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F27EF578-FB35-4F25-91CE-DA03287D0AF1}.DebugGenerator|Any CPU.ActiveCfg = DebugGenerator|Any CPU
+		{F27EF578-FB35-4F25-91CE-DA03287D0AF1}.DebugGenerator|Any CPU.Build.0 = DebugGenerator|Any CPU
+		{F27EF578-FB35-4F25-91CE-DA03287D0AF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F27EF578-FB35-4F25-91CE-DA03287D0AF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{958260C7-CCD4-41A8-8A11-E6EEF486FDDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{958260C7-CCD4-41A8-8A11-E6EEF486FDDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{958260C7-CCD4-41A8-8A11-E6EEF486FDDD}.DebugGenerator|Any CPU.ActiveCfg = DebugGenerator|Any CPU
+		{958260C7-CCD4-41A8-8A11-E6EEF486FDDD}.DebugGenerator|Any CPU.Build.0 = DebugGenerator|Any CPU
+		{958260C7-CCD4-41A8-8A11-E6EEF486FDDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{958260C7-CCD4-41A8-8A11-E6EEF486FDDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F85014B-FFD3-4E33-A8A6-400563FB6F79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F85014B-FFD3-4E33-A8A6-400563FB6F79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F85014B-FFD3-4E33-A8A6-400563FB6F79}.DebugGenerator|Any CPU.ActiveCfg = DebugGenerator|Any CPU
+		{3F85014B-FFD3-4E33-A8A6-400563FB6F79}.DebugGenerator|Any CPU.Build.0 = DebugGenerator|Any CPU
+		{3F85014B-FFD3-4E33-A8A6-400563FB6F79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F85014B-FFD3-4E33-A8A6-400563FB6F79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{239395A0-21EF-4967-BBFB-371BCB9CE1CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{239395A0-21EF-4967-BBFB-371BCB9CE1CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{239395A0-21EF-4967-BBFB-371BCB9CE1CF}.DebugGenerator|Any CPU.ActiveCfg = DebugGenerator|Any CPU
+		{239395A0-21EF-4967-BBFB-371BCB9CE1CF}.DebugGenerator|Any CPU.Build.0 = DebugGenerator|Any CPU
+		{239395A0-21EF-4967-BBFB-371BCB9CE1CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{239395A0-21EF-4967-BBFB-371BCB9CE1CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DA053D2-DDCC-4503-8032-F5CD5F99693A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DA053D2-DDCC-4503-8032-F5CD5F99693A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DA053D2-DDCC-4503-8032-F5CD5F99693A}.DebugGenerator|Any CPU.ActiveCfg = DebugGenerator|Any CPU
+		{9DA053D2-DDCC-4503-8032-F5CD5F99693A}.DebugGenerator|Any CPU.Build.0 = DebugGenerator|Any CPU
+		{9DA053D2-DDCC-4503-8032-F5CD5F99693A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DA053D2-DDCC-4503-8032-F5CD5F99693A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.DebugGenerator|Any CPU.ActiveCfg = Debug|Any CPU
+		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.DebugGenerator|Any CPU.Build.0 = Debug|Any CPU
+		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE73250C-6DCF-49AB-A383-26E13F7FD54B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE73250C-6DCF-49AB-A383-26E13F7FD54B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE73250C-6DCF-49AB-A383-26E13F7FD54B}.DebugGenerator|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE73250C-6DCF-49AB-A383-26E13F7FD54B}.DebugGenerator|Any CPU.Build.0 = Debug|Any CPU
+		{AE73250C-6DCF-49AB-A383-26E13F7FD54B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE73250C-6DCF-49AB-A383-26E13F7FD54B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EFD0A43-5F57-4EDC-8860-F0BBC590C545}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EFD0A43-5F57-4EDC-8860-F0BBC590C545}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EFD0A43-5F57-4EDC-8860-F0BBC590C545}.DebugGenerator|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EFD0A43-5F57-4EDC-8860-F0BBC590C545}.DebugGenerator|Any CPU.Build.0 = Debug|Any CPU
+		{4EFD0A43-5F57-4EDC-8860-F0BBC590C545}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EFD0A43-5F57-4EDC-8860-F0BBC590C545}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0FF728AE-7BC0-4A7A-A6E6-429A2C4F93BC}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		NForza.Cyrus.Generators.Shared\NForza.Cyrus.Generators.Shared.projitems*{3f85014b-ffd3-4e33-a8a6-400563fb6f79}*SharedItemsImports = 5
+		NForza.Cyrus.Generators.Shared\NForza.Cyrus.Generators.Shared.projitems*{ae73250c-6dcf-49ab-a383-26e13f7fd54b}*SharedItemsImports = 5
+		NForza.Cyrus.Generators.Shared\NForza.Cyrus.Generators.Shared.projitems*{f27ef578-fb35-4f25-91ce-da03287d0af1}*SharedItemsImports = 5
+	EndGlobalSection
+EndGlobal

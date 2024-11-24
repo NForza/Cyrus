@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <LangVersion>12</LangVersion>
+    <Configurations>Debug;Release;DebugGenerator</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGenerator|AnyCPU'">
+    <DefineConstants>$(DefineConstants);DEBUG_ANALYZER</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Templates\CommandDispatcherExtensions.cs" />
+    <Compile Remove="Templates\QueryFactory.cs" />
+    <Compile Remove="Templates\QueryProcessorExtensions.cs" />
+    <Compile Remove="Templates\ServiceCollectionExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\QueryFactory.cs" />
+    <EmbeddedResource Include="Templates\QueryProcessorExtensions.cs" />
+    <EmbeddedResource Include="Templates\CommandDispatcherExtensions.cs" />
+    <EmbeddedResource Include="Templates\ServiceCollectionExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <Import Project="..\NForza.Cyrus.Generators.Shared\NForza.Cyrus.Generators.Shared.projitems" Label="Shared" />
+
+</Project>
