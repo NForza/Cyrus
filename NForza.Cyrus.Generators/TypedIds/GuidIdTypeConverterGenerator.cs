@@ -2,9 +2,10 @@
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.TypedIds.Generator;
 using NForza.Generators;
 
-namespace NForza.Cyrus.TypedIds.Generator;
+namespace NForza.Cyrus.Generators.TypedIds;
 
 [Generator]
 public class GuidIdTypeConverterGenerator : TypedIdGeneratorBase, IIncrementalGenerator

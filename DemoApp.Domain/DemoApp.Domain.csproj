@@ -23,10 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NForza.Cyrus.Generators\NForza.Cyrus.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
     <ProjectReference Include="..\DemoApp.Contracts\DemoApp.Contracts.csproj" />
     <ProjectReference Include="..\NForza.Cyrus.Cqrs.MassTransit\NForza.Cyrus.Cqrs.MassTransit.csproj" />    
     <ProjectReference Include="..\NForza.Cyrus.Cqrs\NForza.Cyrus.Cqrs.csproj" />
-    <ProjectReference Include="..\NForza.Cyrus.Cqrs.Generator\NForza.Cyrus.Cqrs.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\NForza.Cyrus.TypedIds\NForza.Cyrus.TypedIds.csproj" />
   </ItemGroup>
 

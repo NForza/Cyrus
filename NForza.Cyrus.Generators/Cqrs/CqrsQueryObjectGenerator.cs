@@ -22,6 +22,17 @@ public class CqrsQueryFactoryGenerator : CqrsSourceGenerator, IIncrementalGenera
 
         var assemblyReferences = context.CompilationProvider;
 
+        var msbuildProperties = context.AnalyzerConfigOptionsProvider
+            .Select((options, cancellationToken) =>
+            {
+                if (options.GlobalOptions.TryGetValue("MSBuildProjectSdk", out var sdk))
+                {
+                    return sdk;
+                }
+
+                return null;
+            });
+
         var typesFromReferencedAssembly = assemblyReferences
             .SelectMany((compilation, _) =>
             {
@@ -36,9 +47,15 @@ public class CqrsQueryFactoryGenerator : CqrsSourceGenerator, IIncrementalGenera
             .Where(IsQuery)
             .Collect();
 
-        context.RegisterSourceOutput(typesFromReferencedAssembly, (spc, queryHandlers) =>
+        var combinedProvider = typesFromReferencedAssembly.Combine(msbuildProperties);
+
+        context.RegisterSourceOutput(combinedProvider, (spc, queryHandlers) =>
         {
-            var sourceText = GenerateQueryFactoryExtensionMethods(queryHandlers);
+            string? sdk = queryHandlers.Right;
+            if (sdk == null || !sdk.Contains("Microsoft.NET.Sdk.Web"))
+                return;
+
+            var sourceText = GenerateQueryFactoryExtensionMethods(queryHandlers.Left);
             spc.AddSource($"HttpContextQueryFactory.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         });
     }
@@ -80,7 +97,7 @@ public class CqrsQueryFactoryGenerator : CqrsSourceGenerator, IIncrementalGenera
             source.AppendLine($@"}});");
         }
 
-        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("QueryFactory.cs", new Dictionary<string, string>
+        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("HttpContextQueryFactory.cs", new Dictionary<string, string>
         {
             ["QueryFactoryMethod"] = source.ToString()
         });

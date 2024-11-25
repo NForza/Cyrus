@@ -15,7 +15,7 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, IIncrementalG
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
         var configProvider = ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
 
         var incrementalValuesProvider = context.SyntaxProvider
@@ -40,21 +40,19 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, IIncrementalG
         context.RegisterSourceOutput(third, (spc, source) =>
         {
             var ((compilation, recordSymbols), config) = source;
-            var sourceText = GenerateCommandDispatcherExtensionMethods(compilation, recordSymbols);
+
+            if (config != null)
+            {
+                var sourceText = GenerateCommandDispatcherExtensionMethods(compilation, recordSymbols);
                 spc.AddSource($"CommandDispatcher.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            }
         });
-
-        //IEnumerable<string> contractSuffix = configuration.Contracts;
-        //var commandSuffix = configuration.Commands.Suffix;
-        //var methodHandlerName = configuration.Commands.HandlerName;
-
-       // GenerateCommandDispatcherExtensionMethods(context, handlers);
     }
 
     private string GenerateCommandDispatcherExtensionMethods(Compilation compilation, ImmutableArray<IMethodSymbol> handlers)
     {
-        INamedTypeSymbol taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
-        INamedTypeSymbol commandResultSymbol = compilation.GetTypeByMetadataName("NForza.Cyrus.Cqrs.CommandResult");
+        INamedTypeSymbol taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1")!;
+        INamedTypeSymbol commandResultSymbol = compilation.GetTypeByMetadataName("NForza.Cyrus.Cqrs.CommandResult")!;
         var taskOfCommandResultSymbol = taskSymbol.Construct(commandResultSymbol);
 
         StringBuilder source = new();

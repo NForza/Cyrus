@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,8 +9,8 @@ namespace NForza.Cyrus.Cqrs.Generator;
 
 public abstract class CqrsSourceGenerator : GeneratorBase
 {
-    private IncrementalValueProvider<CqrsConfig>? configuration;
-    protected IncrementalValueProvider<CqrsConfig>? Configuration => configuration;
+    private IncrementalValueProvider<CqrsConfig?>? configuration;
+    protected IncrementalValueProvider<CqrsConfig?>? Configuration => configuration;
 
     protected IMethodSymbol? GetMethodSymbolFromContext(GeneratorSyntaxContext context)
     {
@@ -126,9 +123,9 @@ public abstract class CqrsSourceGenerator : GeneratorBase
             methodDeclaration.ParameterList.Parameters.Count == 1;
     }
 
-    protected bool IsQueryHandler(IMethodSymbol symbol, string queryMethodName, string querySuffix)
-        => symbol.Name == queryMethodName && symbol.Parameters.Length == 1 && symbol.Parameters[0].Type.Name.EndsWith(querySuffix);
+    protected bool IsQueryHandler(IMethodSymbol? symbol, string queryMethodName, string querySuffix)
+        => symbol != null && symbol.Name == queryMethodName && symbol.Parameters.Length == 1 && symbol.Parameters[0].Type.Name.EndsWith(querySuffix);
 
-    protected bool IsCommandHandler(IMethodSymbol symbol, string commandHandlerName, string commandSuffix) 
-        => symbol.Name.EndsWith(commandHandlerName) && symbol.Parameters.Length == 1 && symbol.Parameters[0].Type.Name.EndsWith(commandSuffix);
+    protected bool IsCommandHandler(IMethodSymbol? symbol, string commandHandlerName, string commandSuffix)
+        => symbol != null && symbol.Name.EndsWith(commandHandlerName) && symbol.Parameters.Length == 1 && symbol.Parameters[0].Type.Name.EndsWith(commandSuffix);
 }

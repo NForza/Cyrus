@@ -1,20 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Cqrs.Generator;
 
-namespace NForza.Cyrus.Cqrs.Generator;
+namespace NForza.Cyrus.Generators.Cqrs.WebApi;
 
 [Generator]
 public class EndpointGroupGenerator : CqrsSourceGenerator, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
+
+        var msbuildProperties = context.AnalyzerConfigOptionsProvider
+            .Select((options, cancellationToken) =>
+            {
+                if (options.GlobalOptions.TryGetValue("MSBuildProjectSdk", out var sdk))
+                {
+                    return sdk;
+                }
+
+                return null;
+            });
 
         var compilationProvider = context.CompilationProvider;
 
@@ -30,7 +41,7 @@ public class EndpointGroupGenerator : CqrsSourceGenerator, IIncrementalGenerator
             {
                 var (classDeclaration, compilation) = pair;
                 var semanticModel = compilation.GetSemanticModel(classDeclaration.SyntaxTree);
-                var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration) as INamedTypeSymbol;
+                var classSymbol = (INamedTypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration)!;
 
                 return (classSymbol, compilation);
             })
@@ -43,18 +54,25 @@ public class EndpointGroupGenerator : CqrsSourceGenerator, IIncrementalGenerator
             })
             .Collect();
 
-        context.RegisterSourceOutput(classesWithSemanticModel, (spc, classesPlusMetadata) =>
+        var classesWithSemanticModelAndMsBuildProperties = classesWithSemanticModel.Combine(msbuildProperties);
+
+        context.RegisterSourceOutput(classesWithSemanticModelAndMsBuildProperties, (spc, classesPlusMetadataAndConfig) =>
         {
-            var sourceText = GenerateEndpointGroupDeclarations(
-                classesPlusMetadata.Select( cmd => cmd.classSymbol ));
-            spc.AddSource($"RegisterEndpointGroups.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            var(classesPlusMetadata, msbuildProperties) = classesPlusMetadataAndConfig;
+
+            if (msbuildProperties != null && msbuildProperties.Contains("Microsoft.NET.Sdk.Web"))
+            {
+                var sourceText = GenerateEndpointGroupDeclarations(
+                    classesPlusMetadata.Select(cmd => cmd.classSymbol));
+                spc.AddSource($"RegisterEndpointGroups.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            }
         });
     }
 
     private string GenerateEndpointGroupDeclarations(IEnumerable<INamedTypeSymbol> classSymbols)
     {
         var sb = new StringBuilder();
-        foreach (var classSymbol in classSymbols) 
+        foreach (var classSymbol in classSymbols)
         {
             sb.AppendLine($"options.Services.AddEndpointGroup<{classSymbol}>();");
         }

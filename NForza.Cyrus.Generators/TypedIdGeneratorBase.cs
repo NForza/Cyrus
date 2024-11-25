@@ -18,6 +18,9 @@ public abstract class TypedIdGeneratorBase : IncrementalGeneratorBase
     protected bool IsRecordWithGuidIdAttribute(SyntaxNode syntaxNode)
         => IsRecordWithAttribute(syntaxNode, "GuidId");
 
+    protected bool IsRecordWithIntIdAttribute(SyntaxNode syntaxNode)
+        => IsRecordWithAttribute(syntaxNode, "IntId");
+
     protected static bool IsRecordWithStringIdAttribute(SyntaxNode syntaxNode)
         => IsRecordWithAttribute(syntaxNode, "StringId");
 
@@ -45,6 +48,9 @@ public abstract class TypedIdGeneratorBase : IncrementalGeneratorBase
         var hasStringIdProperty = typeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "StringIdAttribute");
         if (hasStringIdProperty)
             return "string";
+        var hasIntIdProperty = typeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "IntIdAttribute");
+        if (hasIntIdProperty)
+            return "int";
         return "System.Guid";
     }
 

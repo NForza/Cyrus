@@ -16,7 +16,7 @@ public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, IIncrementalG
         DebugThisGenerator(false);
         var incrementalValuesProvider = context.SyntaxProvider
                      .CreateSyntaxProvider(
-                         predicate: (syntaxNode, _) => IsRecordWithStringIdAttribute(syntaxNode) || IsRecordWithGuidIdAttribute(syntaxNode),
+                         predicate: (syntaxNode, _) => IsRecordWithStringIdAttribute(syntaxNode) || IsRecordWithGuidIdAttribute(syntaxNode) || IsRecordWithIntIdAttribute(syntaxNode),
                          transform: (context, _) => GetNamedTypeSymbolFromContext(context));
         var typedIdsProvider = incrementalValuesProvider
             .Where(x => x is not null)
@@ -42,6 +42,7 @@ public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, IIncrementalG
         {
             "System.Guid" => "GetGuid",
             "string" => "GetString",
+            "int" => "GetInt32",
             _ => throw new NotSupportedException($"Underlying type {underlyingTypeName} is not supported.")
         };
 
@@ -49,6 +50,7 @@ public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, IIncrementalG
         {
             "System.Guid" => "GuidIdJsonConverter.cs",
             "string" => "StringIdJsonConverter.cs",
+            "int" => "IntIdJsonConverter.cs",
             _ => throw new NotSupportedException($"Underlying type {underlyingTypeName} is not supported.")
         };
 

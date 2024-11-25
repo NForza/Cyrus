@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Cqrs.Generator;
 using NForza.Cyrus.Cqrs.Generator.Config;
 using NForza.Generators;
 
-namespace NForza.Cyrus.Cqrs.Generator;
+namespace NForza.Cyrus.Generators.Cqrs;
 
 [Generator]
 public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalGenerator
@@ -37,8 +38,12 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
         context.RegisterSourceOutput(combinedProvider, (sourceProductionContext, source) =>
         {
             var ((compilation, handlers), config) = source;
-            var sourceText = GenerateServiceCollectionExtensions(handlers, config, compilation);
-            sourceProductionContext.AddSource($"ServiceCollection.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+
+            if (config != null)
+            {
+                var sourceText = GenerateServiceCollectionExtensions(handlers, config, compilation);
+                sourceProductionContext.AddSource($"ServiceCollection.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            }
         });
     }
 
@@ -59,7 +64,7 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
             ["Usings"] = usings
         };
 
-        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("ServiceCollectionExtensions.cs", replacements);
+        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("CqrsServiceCollectionExtensions.cs", replacements);
         return resolvedSource;
     }
 
@@ -100,8 +105,8 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
 
     private static string CreateRegisterCommandHandler(IEnumerable<IMethodSymbol> handlers, Compilation compilation)
     {
-        INamedTypeSymbol taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
-        INamedTypeSymbol commandResultSymbol = compilation.GetTypeByMetadataName("NForza.Cyrus.Cqrs.CommandResult");
+        INamedTypeSymbol taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1")!;
+        INamedTypeSymbol commandResultSymbol = compilation.GetTypeByMetadataName("NForza.Cyrus.Cqrs.CommandResult")!;
         var taskOfCommandResultSymbol = taskSymbol.Construct(commandResultSymbol);
 
         StringBuilder source = new();
