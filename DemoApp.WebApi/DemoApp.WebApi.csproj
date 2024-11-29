@@ -10,11 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="cqrsConfig.yaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include="cqrsConfig.yaml" />
+    <AdditionalFiles Include="cyrusConfig.yaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,10 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NForza.Cyrus.Generators\NForza.Cyrus.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <InternalsVisibleTo Include="DemoApp.WebApi.Tests" />
     <ProjectReference Include="..\DemoApp.Domain\DemoApp.Domain.csproj" />
-    <ProjectReference Include="..\NForza.Cyrus.Cqrs.WebApi\NForza.Cyrus.Cqrs.WebApi.csproj" />
-    <ProjectReference Include="..\NForza.Cyrus.Cqrs.WebApi.Generator\NForza.Cyrus.Cqrs.WebApi.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\NForza.Cyrus.WebApi\NForza.Cyrus.WebApi.csproj" />
   </ItemGroup>
 
 </Project>

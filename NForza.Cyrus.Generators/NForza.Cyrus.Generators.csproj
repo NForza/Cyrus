@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <LangVersion>12</LangVersion>
+    <Nullable>enable</Nullable>
+    <Configurations>Debug;Release;DebugGenerator</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGenerator|AnyCPU'">
+    <DefineConstants>$(DefineConstants);DEBUG_ANALYZER</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Templates\CommandDispatcherExtensions.cs" />
+    <Compile Remove="Templates\CqrsServiceCollectionExtensions.cs" />
+    <Compile Remove="Templates\GuidId.cs" />
+    <Compile Remove="Templates\GuidIdJsonConverter.cs" />
+    <Compile Remove="Templates\GuidIdTypeConverter.cs" />
+    <Compile Remove="Templates\HttpContextQueryFactory.cs" />
+    <Compile Remove="Templates\IntId.cs" />
+    <Compile Remove="Templates\IntIdJsonConverter.cs" />
+    <Compile Remove="Templates\IntIdTypeConverter.cs" />
+    <Compile Remove="Templates\QueryFactory.cs" />
+    <Compile Remove="Templates\QueryProcessorExtensions.cs" />
+    <Compile Remove="Templates\RegisterEndpointGroups.cs" />
+    <Compile Remove="Templates\ServiceCollectionExtensions.cs" />
+    <Compile Remove="Templates\StringId.cs" />
+    <Compile Remove="Templates\StringIdJsonConverter.cs" />
+    <Compile Remove="Templates\StringIdTypeConverter.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\CommandDispatcherExtensions.cs" />
+    <EmbeddedResource Include="Templates\GuidId.cs" />
+    <EmbeddedResource Include="Templates\GuidIdJsonConverter.cs" />
+    <EmbeddedResource Include="Templates\GuidIdTypeConverter.cs" />
+    <EmbeddedResource Include="Templates\HttpContextQueryFactory.cs" />
+    <EmbeddedResource Include="Templates\IntId.cs" />
+    <EmbeddedResource Include="Templates\IntIdJsonConverter.cs" />
+    <EmbeddedResource Include="Templates\IntIdTypeConverter.cs" />
+    <EmbeddedResource Include="Templates\QueryFactory.cs" />
+    <EmbeddedResource Include="Templates\QueryProcessorExtensions.cs" />
+    <EmbeddedResource Include="Templates\RegisterEndpointGroups.cs" />
+    <EmbeddedResource Include="Templates\CqrsServiceCollectionExtensions.cs" />
+    <EmbeddedResource Include="Templates\ServiceCollectionExtensions.cs" />
+    <EmbeddedResource Include="Templates\StringId.cs" />
+    <EmbeddedResource Include="Templates\StringIdJsonConverter.cs" />
+    <EmbeddedResource Include="Templates\StringIdTypeConverter.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.11.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
+  </ItemGroup>
+
+</Project>
