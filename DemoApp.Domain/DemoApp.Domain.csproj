@@ -10,11 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="cqrsConfig.yaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include="cqrsConfig.yaml" />
+    <AdditionalFiles Include="cyrusConfig.yaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NForza.Cyrus.Generators\NForza.Cyrus.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+    <ProjectReference Include="..\NForza.Cyrus.Generators\NForza.Cyrus.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\DemoApp.Contracts\DemoApp.Contracts.csproj" />
     <ProjectReference Include="..\NForza.Cyrus.Cqrs.MassTransit\NForza.Cyrus.Cqrs.MassTransit.csproj" />    
     <ProjectReference Include="..\NForza.Cyrus.Cqrs\NForza.Cyrus.Cqrs.csproj" />

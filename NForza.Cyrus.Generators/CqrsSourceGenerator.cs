@@ -107,7 +107,7 @@ public abstract class CqrsSourceGenerator : GeneratorBase
 
     public void GetConfig(IncrementalGeneratorInitializationContext context)
     {
-        configuration ??= ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
+        configuration ??= ParseConfigFile<CqrsConfig>(context, "cyrusConfig.yaml");
     }
 
     protected bool CouldBeCommandHandler(SyntaxNode syntaxNode)

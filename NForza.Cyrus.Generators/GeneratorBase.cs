@@ -14,7 +14,7 @@ public abstract class GeneratorBase
     protected IncrementalValueProvider<T?> ParseConfigFile<T>(IncrementalGeneratorInitializationContext context, string configFileName)
         where T : IYamlConfig<T>, new()
     {
-        var configFile = context.AdditionalTextsProvider
+        var allConfigFiles = context.AdditionalTextsProvider
             .Where(file => Path.GetFileName(file.Path) == configFileName)
             .Select((file, token) =>
             {
@@ -22,8 +22,13 @@ public abstract class GeneratorBase
                 var config = YamlParser.ReadYaml(content ?? "");
                 return new T().InitFrom(config);
             })
-            .Collect()
-            .Select((declarations, _) => declarations.FirstOrDefault());
+            .Collect();
+
+        var configFile = allConfigFiles.Select((declarations, _) =>
+        {
+            var firstConfig = declarations.FirstOrDefault();
+            return firstConfig;
+        });
 
         return configFile;
     }

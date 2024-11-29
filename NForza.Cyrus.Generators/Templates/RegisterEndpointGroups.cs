@@ -2,10 +2,11 @@
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Text;
+using NForza.Cyrus.Cqrs;
 
-namespace NForza.Cyrus.Cqrs.WebApi;
+namespace NForza.Cyrus.WebApi;
 
-public static class RegisterEndpointGroup 
+public static class AddEndpointGroupExtensions
 {
     public static CqrsOptions AddEndpointGroups(this CqrsOptions options)
     {

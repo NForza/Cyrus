@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 
-namespace NForza.Cyrus.Cqrs.WebApi;
+namespace NForza.Cyrus.WebApi;
 
 public class HttpContextQueryFactory : IQueryFactory
 {

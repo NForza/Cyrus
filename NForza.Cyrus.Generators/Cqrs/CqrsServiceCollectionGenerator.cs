@@ -17,7 +17,7 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
     {
         DebugThisGenerator(false);
 
-        var configProvider = ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
+        var configProvider = ParseConfigFile<CqrsConfig>(context, "cyrusConfig.yaml");
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(

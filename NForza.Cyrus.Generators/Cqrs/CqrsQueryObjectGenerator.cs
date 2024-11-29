@@ -22,16 +22,7 @@ public class CqrsQueryFactoryGenerator : CqrsSourceGenerator, IIncrementalGenera
 
         var assemblyReferences = context.CompilationProvider;
 
-        var msbuildProperties = context.AnalyzerConfigOptionsProvider
-            .Select((options, cancellationToken) =>
-            {
-                if (options.GlobalOptions.TryGetValue("MSBuildProjectSdk", out var sdk))
-                {
-                    return sdk;
-                }
-
-                return null;
-            });
+        var configurationProvider = ParseConfigFile<CqrsConfig>(context, "cyrusConfig.yaml");
 
         var typesFromReferencedAssembly = assemblyReferences
             .SelectMany((compilation, _) =>
@@ -47,16 +38,16 @@ public class CqrsQueryFactoryGenerator : CqrsSourceGenerator, IIncrementalGenera
             .Where(IsQuery)
             .Collect();
 
-        var combinedProvider = typesFromReferencedAssembly.Combine(msbuildProperties);
+        var combinedProvider = typesFromReferencedAssembly.Combine(configurationProvider);
 
-        context.RegisterSourceOutput(combinedProvider, (spc, queryHandlers) =>
+        context.RegisterSourceOutput(combinedProvider, (spc, queryHandlersWithConfig) =>
         {
-            string? sdk = queryHandlers.Right;
-            if (sdk == null || !sdk.Contains("Microsoft.NET.Sdk.Web"))
-                return;
-
-            var sourceText = GenerateQueryFactoryExtensionMethods(queryHandlers.Left);
-            spc.AddSource($"HttpContextQueryFactory.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            var (queryHandlers, config) = queryHandlersWithConfig;
+            if (config?.GenerationType == "webapi")
+            {
+                var sourceText = GenerateQueryFactoryExtensionMethods(queryHandlers);
+                spc.AddSource($"HttpContextQueryFactory.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            }
         });
     }
 

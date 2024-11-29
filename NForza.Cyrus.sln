@@ -15,8 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cyrus.TypedIds", "NF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp.WebApi", "DemoApp.WebApi\DemoApp.WebApi.csproj", "{239395A0-21EF-4967-BBFB-371BCB9CE1CF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cyrus.Cqrs.WebApi", "NForza.Cyrus.Cqrs.WebApi\NForza.Cyrus.Cqrs.WebApi.csproj", "{9DA053D2-DDCC-4503-8032-F5CD5F99693A}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cyrus.Cqrs.MassTransit", "NForza.Cyrus.Cqrs.MassTransit\NForza.Cyrus.Cqrs.MassTransit.csproj", "{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoApp.WebApi.Tests", "DemoApp.WebApi.Tests\DemoApp.WebApi.Tests.csproj", "{4EFD0A43-5F57-4EDC-8860-F0BBC590C545}"
@@ -27,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.Generators", "NForza.Cyrus.Generators\NForza.Cyrus.Generators.csproj", "{D53015EF-572A-40A3-BB25-760295F0EC14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.WebApi", "NForza.Cyrus.WebApi\NForza.Cyrus.WebApi.csproj", "{8B73F6D9-B89F-E17E-8BD0-08693521FD56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,12 +71,6 @@ Global
 		{239395A0-21EF-4967-BBFB-371BCB9CE1CF}.DebugGenerator|Any CPU.Build.0 = DebugGenerator|Any CPU
 		{239395A0-21EF-4967-BBFB-371BCB9CE1CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{239395A0-21EF-4967-BBFB-371BCB9CE1CF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9DA053D2-DDCC-4503-8032-F5CD5F99693A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9DA053D2-DDCC-4503-8032-F5CD5F99693A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9DA053D2-DDCC-4503-8032-F5CD5F99693A}.DebugGenerator|Any CPU.ActiveCfg = DebugGenerator|Any CPU
-		{9DA053D2-DDCC-4503-8032-F5CD5F99693A}.DebugGenerator|Any CPU.Build.0 = DebugGenerator|Any CPU
-		{9DA053D2-DDCC-4503-8032-F5CD5F99693A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9DA053D2-DDCC-4503-8032-F5CD5F99693A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.DebugGenerator|Any CPU.ActiveCfg = Debug|Any CPU
@@ -95,6 +89,12 @@ Global
 		{D53015EF-572A-40A3-BB25-760295F0EC14}.DebugGenerator|Any CPU.Build.0 = DebugGenerator|Any CPU
 		{D53015EF-572A-40A3-BB25-760295F0EC14}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D53015EF-572A-40A3-BB25-760295F0EC14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B73F6D9-B89F-E17E-8BD0-08693521FD56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B73F6D9-B89F-E17E-8BD0-08693521FD56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B73F6D9-B89F-E17E-8BD0-08693521FD56}.DebugGenerator|Any CPU.ActiveCfg = DebugGenerator|Any CPU
+		{8B73F6D9-B89F-E17E-8BD0-08693521FD56}.DebugGenerator|Any CPU.Build.0 = DebugGenerator|Any CPU
+		{8B73F6D9-B89F-E17E-8BD0-08693521FD56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B73F6D9-B89F-E17E-8BD0-08693521FD56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

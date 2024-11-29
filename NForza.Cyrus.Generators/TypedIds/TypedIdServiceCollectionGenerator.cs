@@ -27,8 +27,11 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
 
         context.RegisterSourceOutput(typedIdsProvider, (spc, typedIds) =>
         {
-            var sourceText = GenerateServiceCollectionExtensionMethod(typedIds);
-            spc.AddSource("ServiceCollectionExtensions.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            if (typedIds.Length > 0)
+            {
+                var sourceText = GenerateServiceCollectionExtensionMethod(typedIds);
+                spc.AddSource("ServiceCollectionExtensions.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            }
         });
     }
 

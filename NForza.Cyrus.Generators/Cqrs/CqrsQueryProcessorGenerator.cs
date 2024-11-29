@@ -17,7 +17,7 @@ public class CqrsQueryHandlerGenerator : CqrsSourceGenerator, IIncrementalGenera
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
         DebugThisGenerator(false);
-        var configProvider = ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
+        var configProvider = ParseConfigFile<CqrsConfig>(context, "cyrusConfig.yaml");
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(

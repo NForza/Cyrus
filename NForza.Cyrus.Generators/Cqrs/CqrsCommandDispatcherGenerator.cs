@@ -15,8 +15,8 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, IIncrementalG
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
-        var configProvider = ParseConfigFile<CqrsConfig>(context, "cqrsConfig.yaml");
+        DebugThisGenerator(false);
+        var configProvider = ParseConfigFile<CqrsConfig>(context, "cyrusConfig.yaml");
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -26,8 +26,10 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, IIncrementalG
         var recordStructsWithAttribute = incrementalValuesProvider.Combine(configProvider)
             .Where(x => {
                 var (methodNode, config) = x;
-                return IsCommandHandler(methodNode, config.Commands.HandlerName, config.Commands.Suffix);
-             })
+                if (config?.GenerationType != "domain")
+                    return false;
+                return config == null ? false : IsCommandHandler(methodNode, config.Commands.HandlerName, config.Commands.Suffix);
+            })
             .Select((x, _) => x.Left!)
             .Collect();
 

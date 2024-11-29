@@ -8,26 +8,27 @@ public class CqrsConfig : IYamlConfig<CqrsConfig>
 {
     public CqrsConfig InitFrom(Dictionary<string, List<string>> config)
     {
-        var contracts = config["contracts"];
-        if (contracts != null)
+        var type = config["type"];
+        if (type != null)
         {
-            Contracts = [.. contracts];
+            GenerationType = type.First();
         }
-        var suffix = config["suffix"];
-        if (suffix != null)
+        if (config.ContainsKey("contracts"))
         {
-            Commands.Suffix = suffix.First();
-        }
-        var handlerName = config["handlerName"];
-        if (handlerName != null)
-        {
-            Commands.HandlerName = handlerName.First();
+            Contracts = [.. config["contracts"]];
         }
 
-        var eventBus = config["eventBus"];
-        if (eventBus != null)
+        if (config.ContainsKey("suffix"))
         {
-            EventBus = eventBus.First();
+            Commands.Suffix = config["suffix"].First();
+        }
+        if (config.ContainsKey("handlerName"))
+        {
+            Commands.HandlerName = config["handlerName"].First();
+        }
+        if (config.ContainsKey("eventBus"))
+        {
+            EventBus = config["eventBus"].First();
         }
         return this;
     }
@@ -36,4 +37,5 @@ public class CqrsConfig : IYamlConfig<CqrsConfig>
     public CommandConfig Commands { get; set; } = new();
     public CommandConfig Queries { get; set; } = new() { HandlerName = "Query", Suffix = "Query" };
     public string EventBus { get; set; } = "Local";
+    public string GenerationType { get; private set; } = "domain";
 }

@@ -1,9 +1,0 @@
-﻿contracts: Contracts
-commands:
-  suffix: Command
-  handlerName: Execute
-queries:
-  suffix: Query
-  handlerName: Query
-eventBus: MassTransit
-  
