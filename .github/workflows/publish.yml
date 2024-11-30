@@ -22,14 +22,13 @@ jobs:
     - name: Extract and Update PackageVersion
       id: update_version
       run: |
-        pwsh -Command "
         # Load the .csproj file
-        [xml]$xml = Get-Content 'MyProject.csproj';
+        [xml]$xml = Get-Content '/NForza.Cyrus.Core/NForza.Cyrus.Core.csproj';
 
         # Extract the existing PackageVersion
         $packageVersion = $xml.Project.PropertyGroup.PackageVersion;
-        if (-not $packageVersion) {
-          Write-Error 'PackageVersion not found in the .csproj file';
+        if ("$packageVersion" -eq ".//NForza.Cyrus.Core/NForza.Cyrus.Core.csproj") {
+          Write-Error 'PackageVersion not found in the .csproj file or proejct ';
           exit 1;
         }
 
@@ -47,8 +46,7 @@ jobs:
 
         # Export the new version as an environment variable
         Write-Output \"new_version=$newVersion\" >> $env:GITHUB_ENV;
-        "
-        
+      shell: pwsh  
     - name: Restore dependencies
       run: dotnet restore
 
