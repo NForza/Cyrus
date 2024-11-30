@@ -5,7 +5,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>NForza.Cyrus</RootNamespace>
+    <Authors>NForza</Authors>
+    <PackageId>NForza.Cyrus.Core</PackageId>
     <PackageVersion>1.0.0</PackageVersion>
+    <Description>Opiniated source generation framework for CQRS apps</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/NForza.Cyrus</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/NForza.Cyrus</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>source-generator;csharp</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
