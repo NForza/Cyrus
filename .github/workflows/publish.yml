@@ -28,7 +28,7 @@ jobs:
         # Extract the existing PackageVersion
         $packageVersion = $xml.Project.PropertyGroup.PackageVersion;
         if ("$packageVersion" -eq ".//NForza.Cyrus.Core/NForza.Cyrus.Core.csproj") {
-          Write-Error 'PackageVersion not found in the .csproj file or proejct ';
+          Write-Error 'PackageVersion not found in the .csproj file';
           exit 1;
         }
 
@@ -37,15 +37,15 @@ jobs:
         $majorMinor = $parts[0..1] -join '.';
 
         # Update the revision with the GitHub run ID
-        $newVersion = \"$majorMinor.${{ github.run_id }}\";
-        Write-Host \"Updated PackageVersion: $newVersion\";
+        $newVersion = "$majorMinor.${{ github.run_id }}";
+        Write-Host "Updated PackageVersion: $newVersion";
         $xml.Project.PropertyGroup.PackageVersion = $newVersion;
 
         # Save the updated .csproj file
         $xml.Save('MyProject.csproj');
 
         # Export the new version as an environment variable
-        Write-Output \"new_version=$newVersion\" >> $env:GITHUB_ENV;
+        Write-Output "new_version=$newVersion" >> $env:GITHUB_ENV;
       shell: pwsh  
     - name: Restore dependencies
       run: dotnet restore
