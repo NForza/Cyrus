@@ -19,26 +19,30 @@ jobs:
       with:
         dotnet-version: '7.0'  # Use your desired .NET version
 
-    - name: Get current version
-      id: get_version
+    - name: Extract and Update PackageVersion
+      id: update_version
       run: |
-        # Extract the latest tag and generate the next revision number
-        latest_tag=$(git describe --tags --match 'v[0-9]*' --abbrev=0 || echo "v1.0.0")
-        echo "Latest tag: $latest_tag"
-        major_minor=${latest_tag%.*}
-        revision=${latest_tag##*.}
-        next_revision=$((revision + 1))
-        next_version="$major_minor.$next_revision"
-        echo "Next version: $next_version"
-        echo "next_version=$next_version" >> $GITHUB_ENV
+        # Extract the PackageVersion from the .csproj file
+        version=$(xmllint --xpath "string(//Project/PropertyGroup/PackageVersion)" MyProject.csproj)
 
-    - name: Tag the new version
-      run: |
-        # Create a new tag with the incremented version
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        git tag -a "$next_version" -m "Release $next_version"
-        git push origin "$next_version"
+        if [[ -z "$version" ]]; then
+          echo "Error: PackageVersion not found in MyProject.csproj"
+          exit 1
+        fi
+
+        # Replace the revision with the GitHub run ID
+        major_minor_patch=$(echo "$version" | cut -d'.' -f1,2)
+        new_version="${major_minor_patch}.${{ github.run_id }}"
+        echo "Updated PackageVersion: $new_version"
+
+        # Update the .csproj file with the new version
+        xmllint --shell MyProject.csproj <<EOF
+        cd //Project/PropertyGroup/PackageVersion
+        set $new_version
+        save
+        EOF
+
+        echo "new_version=$new_version" >> $GITHUB_ENV
 
     - name: Restore dependencies
       run: dotnet restore
