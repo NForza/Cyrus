@@ -19,31 +19,56 @@ jobs:
       with:
         dotnet-version: '7.0'  # Use your desired .NET version
 
+    name: Update PackageVersion and Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0'
+
     - name: Extract and Update PackageVersion
       id: update_version
       run: |
-        # Extract the PackageVersion from the .csproj file
-        version=$(xmllint --xpath "string(//Project/PropertyGroup/PackageVersion)" MyProject.csproj)
+        pwsh -Command "
+        # Load the .csproj file
+        [xml]$xml = Get-Content 'MyProject.csproj';
 
-        if [[ -z "$version" ]]; then
-          echo "Error: PackageVersion not found in MyProject.csproj"
-          exit 1
-        fi
+        # Extract the existing PackageVersion
+        $packageVersion = $xml.Project.PropertyGroup.PackageVersion;
+        if (-not $packageVersion) {
+          Write-Error 'PackageVersion not found in the .csproj file';
+          exit 1;
+        }
 
-        # Replace the revision with the GitHub run ID
-        major_minor_patch=$(echo "$version" | cut -d'.' -f1,2)
-        new_version="${major_minor_patch}.${{ github.run_id }}"
-        echo "Updated PackageVersion: $new_version"
+        # Split the version into Major.Minor.Patch
+        $parts = $packageVersion -split '\\.';
+        $majorMinor = $parts[0..1] -join '.';
 
-        # Update the .csproj file with the new version
-        xmllint --shell MyProject.csproj <<EOF
-        cd //Project/PropertyGroup/PackageVersion
-        set $new_version
-        save
-        EOF
+        # Update the revision with the GitHub run ID
+        $newVersion = \"$majorMinor.${{ github.run_id }}\";
+        Write-Host \"Updated PackageVersion: $newVersion\";
+        $xml.Project.PropertyGroup.PackageVersion = $newVersion;
 
-        echo "new_version=$new_version" >> $GITHUB_ENV
+        # Save the updated .csproj file
+        $xml.Save('MyProject.csproj');
 
+        # Export the new version as an environment variable
+        Write-Output \"new_version=$newVersion\" >> $env:GITHUB_ENV;
+        "
+        
     - name: Restore dependencies
       run: dotnet restore
 
@@ -51,7 +76,7 @@ jobs:
       run: dotnet build --configuration Release
 
     - name: Pack the NuGet package
-      run: dotnet pack --configuration Release --output ./output /p:PackageVersion=${{ env.next_version }}
+      run: dotnet pack --configuration Release --output ./output /p:PackageVersion=${{ env.new_version }}
 
     - name: Push to NuGet
       env:
