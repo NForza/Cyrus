@@ -23,7 +23,7 @@ jobs:
       id: update_version
       run: |
         # Load the .csproj file
-        [xml]$xml = Get-Content '/NForza.Cyrus.Core/NForza.Cyrus.Core.csproj';
+        [xml]$xml = Get-Content './NForza.Cyrus.Core/NForza.Cyrus.Core.csproj';
 
         # Extract the existing PackageVersion
         $packageVersion = $xml.Project.PropertyGroup.PackageVersion;
