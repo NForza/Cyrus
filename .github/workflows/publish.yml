@@ -23,10 +23,7 @@ jobs:
       run: dotnet restore "./NForza.Cyrus.sln"
 
     - name: Build the project
-      run: dotnet build --configuration Release "./NForza.Cyrus.sln"
-
-    - name: Pack the NuGet package
-      run: dotnet pack --configuration Release --output ./output /p:PackageVersion=${{ env.new_version }} "./NForza.Cyrus.sln"
+      run: dotnet build --configuration Release --output ./output "./NForza.Cyrus.sln"
 
     - name: Push to NuGet
       env:
