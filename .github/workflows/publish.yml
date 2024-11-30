@@ -19,42 +19,14 @@ jobs:
       with:
         dotnet-version: '8.0'
 
-    - name: Extract and Update PackageVersion
-      id: update_version
-      run: |
-        # Load the .csproj file
-        [xml]$xml = Get-Content './NForza.Cyrus.Core/NForza.Cyrus.Core.csproj';
-
-        # Extract the existing PackageVersion
-        $packageVersion = $xml.Project.PropertyGroup.PackageVersion;
-        if ("$packageVersion" -eq ".//NForza.Cyrus.Core/NForza.Cyrus.Core.csproj") {
-          Write-Error 'PackageVersion not found in the .csproj file';
-          exit 1;
-        }
-
-        # Split the version into Major.Minor.Patch
-        $parts = $packageVersion -split '\\.';
-        $majorMinor = $parts[0..1] -join '.';
-
-        # Update the revision with the GitHub run ID
-        $newVersion = "$majorMinor.${{ github.run_id }}";
-        Write-Host "Updated PackageVersion: $newVersion";
-        $xml.Project.PropertyGroup.PackageVersion = $newVersion;
-
-        # Save the updated .csproj file
-        $xml.Save('MyProject.csproj');
-
-        # Export the new version as an environment variable
-        Write-Output "new_version=$newVersion" >> $env:GITHUB_ENV;
-      shell: pwsh  
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore "./NForza.Cyrus.sln"
 
     - name: Build the project
-      run: dotnet build --configuration Release
+      run: dotnet build --configuration Release"./NForza.Cyrus.sln"
 
     - name: Pack the NuGet package
-      run: dotnet pack --configuration Release --output ./output /p:PackageVersion=${{ env.new_version }}
+      run: dotnet pack --configuration Release --output ./output /p:PackageVersion=${{ env.new_version }} "./NForza.Cyrus.sln"
 
     - name: Push to NuGet
       env:
