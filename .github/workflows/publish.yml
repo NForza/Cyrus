@@ -28,9 +28,6 @@ jobs:
       run: |
         sed -i 's/%VERSION%/${{ env.PACKAGE_VERSION }}/g' ${{ env.NFORZA_CYRUS_NUSPEC }}
 
-    - name: Verify file update
-      run: cat  ${{ env.NFORZA_CYRUS_NUSPEC }}
-
     - name: Restore dependencies
       run: dotnet restore "./NForza.Cyrus.sln"
 
@@ -46,6 +43,9 @@ jobs:
     - name: Pack the TypedIds project
       run: dotnet pack --configuration Release --output ./output "./NForza.Cyrus.TypedIds/NForza.Cyrus.TypedIds.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
 
+    - name: Pack the Cyrus metapackage
+      run: nuget pack -OutputDirectory ./output ${{ env.NFORZA_CYRUS_NUSPEC }}
+      
     - name: Push to NuGet
       env:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
