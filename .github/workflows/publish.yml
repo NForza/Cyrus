@@ -7,7 +7,7 @@ on:
       - main  
 
 env:
-  PACKAGE_VERSION: 1.0.2
+  PACKAGE_VERSION: 1.0.3
 
 jobs:
   publish:
@@ -29,20 +29,14 @@ jobs:
     - name: Build the project
       run: dotnet build --configuration Release "./NForza.Cyrus.sln" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
 
-    - name: Copy Packages to output
-      run: |
-        $OutputFolder = "./output"
-        if (-not (Test-Path -Path $OutputFolder)) {
-            New-Item -ItemType Directory -Path $OutputFolder
-        }
-        
-        # Find all .nupkg files in the current directory and subfolders
-        Get-ChildItem -Path . -Recurse -Filter "*.nupkg" | ForEach-Object {
-            # Move each .nupkg file to the output folder
-            Move-Item -Path $_.FullName -Destination $OutputFolder
-            Write-Host "Moved $($_.FullName)"
-        }
-      shell: pwsh
+    - name: Pack the Core project
+      run: dotnet pack --configuration Release --output ./output "./NForza.Cyrus.Core/NForza.Cyrus.Core.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
+
+    - name: Pack the Generators project
+      run: dotnet pack --configuration Release --output ./output "./NForza.Cyrus.Generators/NForza.Cyrus.Generators.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
+
+    - name: Pack the TypedIds project
+      run: dotnet pack --configuration Release --output ./output "./NForza.Cyrus.TypedIds/NForza.Cyrus.TypedIds.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
 
     - name: Push to NuGet
       env:

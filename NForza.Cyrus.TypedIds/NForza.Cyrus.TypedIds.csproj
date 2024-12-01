@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;DebugGenerator</Configurations>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <IsPackable>true</IsPackable>
     <Title>Strongly Typed IDs using source generators from NForza.Cyrus</Title>
     <PackageId>NForza.Cyrus.TypedIds</PackageId>
     <Company>NForza</Company>
