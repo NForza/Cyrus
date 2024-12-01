@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>NForza.Cyrus</id>
+    <version>%VERSION%</version>
+    <authors>NForza</authors>
+    <description>Opiniated source generation framework for CQRS apps.</description>
+    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://github.com/NForza/Cyrus</projectUrl>
+    <dependencies>
+      <dependency id="NForza.Cyrus.Core" version="%VERSION%" />
+      <dependency id="NForza.Cyrus.Generators" version="%VERSION%" />
+      <dependency id="NForza.Cyrus.TypedIds" version="%VERSION%" />
+    </dependencies>
+  </metadata>
+</package>
