@@ -5,6 +5,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;DebugGenerator</Configurations>
-  </PropertyGroup>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Strongly Typed IDs using source generators from NForza.Cyrus</Title>
+    <PackageId>NForza.Cyrus.TypedIds</PackageId>
+    <Company>NForza</Company>
+    <Authors>NForza</Authors>
+    <RepositoryUrl>https://github.com/NForza/Cyrus</RepositoryUrl>
+    <PackageTags>source-generator;csharp;cqrs;framework</PackageTags>
+    <PackageProjectUrl>https://github.com/NForza/Cyrus</PackageProjectUrl>  </PropertyGroup>
 
 </Project>
