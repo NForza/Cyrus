@@ -6,7 +6,7 @@
     <LangVersion>12</LangVersion>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;DebugGenerator</Configurations>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IsPackable>true</IsPackable>
     <Authors>NForza</Authors>
     <PackageId>NForza.Cyrus.Generators</PackageId>
     <Version>1.0.0</Version>
@@ -16,6 +16,7 @@
     <RepositoryUrl>https://github.com/NForza.Cyrus</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>source-generator;csharp</PackageTags>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGenerator|AnyCPU'">
@@ -23,6 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs/" />
     <Compile Remove="Templates\CommandDispatcherExtensions.cs" />
     <Compile Remove="Templates\CqrsServiceCollectionExtensions.cs" />
     <Compile Remove="Templates\GuidId.cs" />
@@ -39,6 +41,10 @@
     <Compile Remove="Templates\StringId.cs" />
     <Compile Remove="Templates\StringIdJsonConverter.cs" />
     <Compile Remove="Templates\StringIdTypeConverter.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="bin\Debug\netstandard2.0\NForza.Cyrus.Generators.dll" />
   </ItemGroup>
 
   <ItemGroup>
