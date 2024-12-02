@@ -4,14 +4,14 @@ using NForza.Generators;
 
 namespace NForza.Cyrus.Cqrs.Generator.Config;
 
-public class CqrsConfig : IYamlConfig<CqrsConfig>
+public class CyrusConfig : IYamlConfig<CyrusConfig>
 {
-    public CqrsConfig InitFrom(Dictionary<string, List<string>> config)
+    public CyrusConfig InitFrom(Dictionary<string, List<string>> config)
     {
         var type = config["type"];
         if (type != null)
         {
-            GenerationType = type.First();
+            GenerationType = [.. config["type"]];
         }
         if (config.ContainsKey("contracts"))
         {
@@ -35,7 +35,7 @@ public class CqrsConfig : IYamlConfig<CqrsConfig>
 
     public string[] Contracts { get; set; } = ["Contracts"];
     public CommandConfig Commands { get; set; } = new();
-    public CommandConfig Queries { get; set; } = new() { HandlerName = "Query", Suffix = "Query" };
+    public QueryConfig Queries { get; set; } = new();
     public string EventBus { get; set; } = "Local";
-    public string GenerationType { get; private set; } = "domain";
+    public string[] GenerationType { get; set; } = ["domain", "webapi"];
 }

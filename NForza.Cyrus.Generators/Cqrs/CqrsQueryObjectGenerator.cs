@@ -22,7 +22,7 @@ public class CqrsQueryFactoryGenerator : CqrsSourceGenerator, IIncrementalGenera
 
         var assemblyReferences = context.CompilationProvider;
 
-        var configurationProvider = ParseConfigFile<CqrsConfig>(context, "cyrusConfig.yaml");
+        var configurationProvider = ParseConfigFile<CyrusConfig>(context, "cyrusConfig.yaml");
 
         var typesFromReferencedAssembly = assemblyReferences
             .SelectMany((compilation, _) =>
@@ -43,7 +43,7 @@ public class CqrsQueryFactoryGenerator : CqrsSourceGenerator, IIncrementalGenera
         context.RegisterSourceOutput(combinedProvider, (spc, queryHandlersWithConfig) =>
         {
             var (queryHandlers, config) = queryHandlersWithConfig;
-            if (config?.GenerationType == "webapi")
+            if (config.GenerationType.Contains("webapi") && queryHandlers.Any())
             {
                 var sourceText = GenerateQueryFactoryExtensionMethods(queryHandlers);
                 spc.AddSource($"HttpContextQueryFactory.g.cs", SourceText.From(sourceText, Encoding.UTF8));

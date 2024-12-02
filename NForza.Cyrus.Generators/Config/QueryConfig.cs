@@ -2,6 +2,6 @@
 
 public class QueryConfig
 {
-    public string Suffix { get; set; }
-    public string HandlerName { get; set; }
+    public string Suffix { get; set; } = "Query";
+    public string HandlerName { get; set; } = "Query";
 }

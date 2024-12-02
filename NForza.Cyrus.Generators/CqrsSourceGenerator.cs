@@ -9,8 +9,8 @@ namespace NForza.Cyrus.Cqrs.Generator;
 
 public abstract class CqrsSourceGenerator : GeneratorBase
 {
-    private IncrementalValueProvider<CqrsConfig?>? configuration;
-    protected IncrementalValueProvider<CqrsConfig?>? Configuration => configuration;
+    private IncrementalValueProvider<CyrusConfig>? configuration;
+    protected IncrementalValueProvider<CyrusConfig>? Configuration => configuration;
 
     protected IMethodSymbol? GetMethodSymbolFromContext(GeneratorSyntaxContext context)
     {
@@ -107,7 +107,7 @@ public abstract class CqrsSourceGenerator : GeneratorBase
 
     public void GetConfig(IncrementalGeneratorInitializationContext context)
     {
-        configuration ??= ParseConfigFile<CqrsConfig>(context, "cyrusConfig.yaml");
+        configuration ??= ParseConfigFile<CyrusConfig>(context, "cyrusConfig.yaml");
     }
 
     protected bool CouldBeCommandHandler(SyntaxNode syntaxNode)

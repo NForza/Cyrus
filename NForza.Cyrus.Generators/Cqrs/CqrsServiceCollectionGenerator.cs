@@ -15,9 +15,9 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
 
-        var configProvider = ParseConfigFile<CqrsConfig>(context, "cyrusConfig.yaml");
+        var configProvider = ParseConfigFile<CyrusConfig>(context, "cyrusConfig.yaml");
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -39,21 +39,26 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
         {
             var ((compilation, handlers), config) = source;
 
-            if (config != null)
+            if (config != null && handlers.Any())
             {
                 var sourceText = GenerateServiceCollectionExtensions(handlers, config, compilation);
-                sourceProductionContext.AddSource($"ServiceCollection.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                    sourceProductionContext.AddSource($"ServiceCollection.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }
         });
     }
 
-    private string GenerateServiceCollectionExtensions(ImmutableArray<IMethodSymbol> handlers, CqrsConfig configuration, Compilation compilation)
+    private string GenerateServiceCollectionExtensions(ImmutableArray<IMethodSymbol> handlers, CyrusConfig configuration, Compilation compilation)
     {
         string handlerTypeRegistrations = CreateRegisterTypes(handlers);
         string queryHandlerRegistrations = CreateRegisterQueryHandler(handlers.Where(x => IsQueryHandler(x, configuration.Queries.HandlerName, configuration.Queries.Suffix)));
         string commandHandlerRegistrations = CreateRegisterCommandHandler(handlers.Where(x => IsCommandHandler(x, configuration.Commands.HandlerName, configuration.Commands.Suffix)), compilation);
         string eventBusRegistration = $@"services.AddSingleton<IEventBus, {configuration.EventBus}EventBus>();";
         string usings = configuration.EventBus == "MassTransit" ? "using NForza.Cyrus.Cqrs.MassTransit;" : "";
+
+        if (string.IsNullOrEmpty(handlerTypeRegistrations) && string.IsNullOrEmpty(queryHandlerRegistrations) && string.IsNullOrEmpty(commandHandlerRegistrations))
+        {
+            return string.Empty;
+        }
 
         var replacements = new Dictionary<string, string>
         {
@@ -70,6 +75,11 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
 
     private string CreateRegisterQueryHandler(IEnumerable<IMethodSymbol> queryHandlers)
     {
+        if (!queryHandlers.Any())
+        {
+            return string.Empty;
+        }
+
         StringBuilder source = new();
         foreach (var handler in queryHandlers)
         {
@@ -94,6 +104,11 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
 
     private static string CreateRegisterTypes(ImmutableArray<IMethodSymbol> handlers)
     {
+        if (!handlers.Any())
+        {
+            return string.Empty;    
+        }
+
         var source = new StringBuilder();
         foreach (var typeToRegister in handlers.Select(h => h.ContainingType).Distinct(SymbolEqualityComparer.Default))
         {
@@ -105,8 +120,14 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
 
     private static string CreateRegisterCommandHandler(IEnumerable<IMethodSymbol> handlers, Compilation compilation)
     {
-        INamedTypeSymbol taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1")!;
-        INamedTypeSymbol commandResultSymbol = compilation.GetTypeByMetadataName("NForza.Cyrus.Cqrs.CommandResult")!;
+        INamedTypeSymbol? taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
+        INamedTypeSymbol? commandResultSymbol = compilation.GetTypeByMetadataName("NForza.Cyrus.Cqrs.CommandResult");
+
+        if (commandResultSymbol == null || taskSymbol == null)
+        {
+            return string.Empty;
+        }
+
         var taskOfCommandResultSymbol = taskSymbol.Construct(commandResultSymbol);
 
         StringBuilder source = new();

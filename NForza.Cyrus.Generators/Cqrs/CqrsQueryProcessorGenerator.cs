@@ -17,7 +17,7 @@ public class CqrsQueryHandlerGenerator : CqrsSourceGenerator, IIncrementalGenera
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
         DebugThisGenerator(false);
-        var configProvider = ParseConfigFile<CqrsConfig>(context, "cyrusConfig.yaml");
+        var configProvider = ParseConfigFile<CyrusConfig>(context, "cyrusConfig.yaml");
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -35,8 +35,11 @@ public class CqrsQueryHandlerGenerator : CqrsSourceGenerator, IIncrementalGenera
 
         context.RegisterSourceOutput(allQueryHandlersProvider, (spc, queryHandlers) =>
         {
-            var sourceText = GenerateQueryProcessorExtensionMethods(queryHandlers);
-            spc.AddSource($"QueryProcessor.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            if (queryHandlers.Any())
+            {
+                var sourceText = GenerateQueryProcessorExtensionMethods(queryHandlers);
+                spc.AddSource($"QueryProcessor.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            }
         });
     }
 
