@@ -37,5 +37,5 @@ public class CyrusConfig : IYamlConfig<CyrusConfig>
     public CommandConfig Commands { get; set; } = new();
     public QueryConfig Queries { get; set; } = new();
     public string EventBus { get; set; } = "Local";
-    public string[] GenerationType { get; set; } = ["domain", "webapi"];
+    public string[] GenerationType { get; set; } = ["domain", "webapi", "contracts"];
 }

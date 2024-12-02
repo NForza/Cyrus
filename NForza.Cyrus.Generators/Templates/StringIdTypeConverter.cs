@@ -1,5 +1,7 @@
 ﻿using System;
 
+#nullable enable
+
 namespace % NamespaceName %;
 
 public partial class % TypedIdName %TypeConverter : System.ComponentModel.TypeConverter

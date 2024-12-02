@@ -15,7 +15,7 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
 
         var configProvider = ParseConfigFile<CyrusConfig>(context, "cyrusConfig.yaml");
 
@@ -39,7 +39,7 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
         {
             var ((compilation, handlers), config) = source;
 
-            if (config != null && handlers.Any())
+            if (config != null && config.GenerationType.Contains("domain"))
             {
                 var sourceText = GenerateServiceCollectionExtensions(handlers, config, compilation);
                     sourceProductionContext.AddSource($"ServiceCollection.g.cs", SourceText.From(sourceText, Encoding.UTF8));
@@ -75,11 +75,6 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
 
     private string CreateRegisterQueryHandler(IEnumerable<IMethodSymbol> queryHandlers)
     {
-        if (!queryHandlers.Any())
-        {
-            return string.Empty;
-        }
-
         StringBuilder source = new();
         foreach (var handler in queryHandlers)
         {
@@ -104,11 +99,6 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
 
     private static string CreateRegisterTypes(ImmutableArray<IMethodSymbol> handlers)
     {
-        if (!handlers.Any())
-        {
-            return string.Empty;    
-        }
-
         var source = new StringBuilder();
         foreach (var typeToRegister in handlers.Select(h => h.ContainingType).Distinct(SymbolEqualityComparer.Default))
         {

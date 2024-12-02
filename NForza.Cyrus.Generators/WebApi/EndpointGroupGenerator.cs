@@ -16,7 +16,7 @@ public class EndpointGroupGenerator : CqrsSourceGenerator, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
 
         var configurationProvider = ParseConfigFile<CyrusConfig>(context, "cyrusConfig.yaml");
 
