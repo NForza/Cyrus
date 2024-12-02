@@ -11,7 +11,7 @@ namespace NForza.Generators;
 public abstract class GeneratorBase
 {
     protected TemplateEngine TemplateEngine = new(Assembly.GetExecutingAssembly(), "Templates");
-    protected IncrementalValueProvider<T?> ParseConfigFile<T>(IncrementalGeneratorInitializationContext context, string configFileName)
+    protected IncrementalValueProvider<T> ParseConfigFile<T>(IncrementalGeneratorInitializationContext context, string configFileName)
         where T : IYamlConfig<T>, new()
     {
         var allConfigFiles = context.AdditionalTextsProvider
@@ -27,9 +27,8 @@ public abstract class GeneratorBase
         var configFile = allConfigFiles.Select((declarations, _) =>
         {
             var firstConfig = declarations.FirstOrDefault();
-            return firstConfig;
+            return firstConfig ?? new T();
         });
-
         return configFile;
     }
 

@@ -18,18 +18,7 @@ public class EndpointGroupGenerator : CqrsSourceGenerator, IIncrementalGenerator
     {
         DebugThisGenerator(true);
 
-        var configurationProvider = ParseConfigFile<CqrsConfig>(context, "cyrusConfig.yaml").Select((config, _) =>
-        {
-            if (config == null)
-            {
-                Debug.WriteLine("Configuration is null. Ensure cyrusConfig.yaml exists and is valid.");
-            }
-            else
-            {
-                Debug.WriteLine($"Configuration loaded!");
-            }
-            return config;
-        });
+        var configurationProvider = ParseConfigFile<CyrusConfig>(context, "cyrusConfig.yaml");
 
         var allClassesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -61,9 +50,9 @@ public class EndpointGroupGenerator : CqrsSourceGenerator, IIncrementalGenerator
         {
             var (classesModels, configuration) = classesAndConfig;
 
-            var isWebApi = configuration?.GenerationType == "webapi";
+            var isWebApi = configuration.GenerationType.Contains("webapi");
 
-            if (isWebApi)
+            if (isWebApi && classesModels.Any())
             {
                 var sourceText = GenerateEndpointGroupDeclarations(classesModels);
                 spc.AddSource($"RegisterEndpointGroups.g.cs", SourceText.From(sourceText, Encoding.UTF8));

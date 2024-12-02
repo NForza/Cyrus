@@ -15,8 +15,8 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, IIncrementalG
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
-        var configProvider = ParseConfigFile<CqrsConfig>(context, "cyrusConfig.yaml");
+        DebugThisGenerator(true);
+        var configProvider = ParseConfigFile<CyrusConfig>(context, "cyrusConfig.yaml");
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -26,9 +26,9 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, IIncrementalG
         var recordStructsWithAttribute = incrementalValuesProvider.Combine(configProvider)
             .Where(x => {
                 var (methodNode, config) = x;
-                if (config?.GenerationType != "domain")
+                if (!config.GenerationType.Contains("domain"))
                     return false;
-                return config == null ? false : IsCommandHandler(methodNode, config.Commands.HandlerName, config.Commands.Suffix);
+                return config != null && IsCommandHandler(methodNode, config.Commands.HandlerName, config.Commands.Suffix);
             })
             .Select((x, _) => x.Left!)
             .Collect();
@@ -43,18 +43,25 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, IIncrementalG
         {
             var ((compilation, recordSymbols), config) = source;
 
-            if (config != null)
+            if (config != null && recordSymbols.Any())
             {
                 var sourceText = GenerateCommandDispatcherExtensionMethods(compilation, recordSymbols);
-                spc.AddSource($"CommandDispatcher.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                if (!string.IsNullOrEmpty(sourceText))
+                {
+                    spc.AddSource($"CommandDispatcher.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                }
             }
         });
     }
 
     private string GenerateCommandDispatcherExtensionMethods(Compilation compilation, ImmutableArray<IMethodSymbol> handlers)
     {
-        INamedTypeSymbol taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1")!;
-        INamedTypeSymbol commandResultSymbol = compilation.GetTypeByMetadataName("NForza.Cyrus.Cqrs.CommandResult")!;
+        INamedTypeSymbol? taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1")!;
+        INamedTypeSymbol? commandResultSymbol = compilation.GetTypeByMetadataName("NForza.Cyrus.Cqrs.CommandResult");
+
+        if (commandResultSymbol == null || taskSymbol == null)
+            return string.Empty;
+
         var taskOfCommandResultSymbol = taskSymbol.Construct(commandResultSymbol);
 
         StringBuilder source = new();

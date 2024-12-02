@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace NForza.Cyrus.Cqrs;
+﻿namespace NForza.Cyrus.Cqrs;
 
 public class CommandResult
 {
