@@ -55,11 +55,6 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
         string eventBusRegistration = $@"services.AddSingleton<IEventBus, {configuration.EventBus}EventBus>();";
         string usings = configuration.EventBus == "MassTransit" ? "using NForza.Cyrus.Cqrs.MassTransit;" : "";
 
-        if (string.IsNullOrEmpty(handlerTypeRegistrations) && string.IsNullOrEmpty(queryHandlerRegistrations) && string.IsNullOrEmpty(commandHandlerRegistrations))
-        {
-            return string.Empty;
-        }
-
         var replacements = new Dictionary<string, string>
         {
             ["RegisterHandlerTypes"] = handlerTypeRegistrations,
