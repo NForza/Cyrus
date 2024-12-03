@@ -25,11 +25,13 @@ jobs:
         dotnet-version: '8.0'
 
     - name: Set NForza.Cyrus version
-      run: |
-        sed -i 's/%VERSION%/${{ env.PACKAGE_VERSION }}/g' ${{ env.NFORZA_CYRUS_NUSPEC }}
+      run: sed -i 's/%VERSION%/${{ env.PACKAGE_VERSION }}/g' ${{ env.NFORZA_CYRUS_NUSPEC }}
 
     - name: Restore dependencies
-      run: dotnet restore "./NForza.Cyrus.sln"
+      run: |
+        pwd
+        ls -lsaR .
+        dotnet restore "./NForza.Cyrus.sln"
 
     - name: Build the project
       run: dotnet build --configuration Release "./NForza.Cyrus.sln" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
