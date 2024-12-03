@@ -6,8 +6,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//Adds the JsonConverters for all the TypedIds
 builder.Services.AddTypedIds();
-builder.Services.AddCqrs(options => options.AddEndpointGroups());
+
+//Adds all Cyrus Cqrs  services
+builder.Services.AddCqrs(
+    //Configures all endpoints in all EndpointGroups
+    options => options.AddEndpointGroups());
 
 var app = builder.Build();
 
@@ -17,5 +23,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+//Exposes all endpoints in all EndpointGroups
 app.MapCqrs();
 app.Run();
