@@ -102,8 +102,11 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
         var source = new StringBuilder();
         foreach (var typeToRegister in handlers.Select(h => h.ContainingType).Distinct(SymbolEqualityComparer.Default))
         {
-            source.Append($@"
+            if (!typeToRegister.IsStatic)
+            {
+                source.Append($@"
         services.AddTransient<{typeToRegister.ToDisplayString()}>();");
+            }
         }
         return source.ToString();
     }
