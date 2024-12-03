@@ -1,7 +1,7 @@
 
 # Cyrus - An Opinionated Framework for Creating CQRS Applications and Web APIs
 
-Cyrus is a CQRS framework that focuses on ease of use, simplicity, and minimizing boilerplate code. It incorporates principles from [Domain-Driven Design](https://en.wikipedia.org/wiki/Domain-driven_design) to enable the rapid and pragmatic creation of Web APIs. Cyrus leverages [Roslyn Source Generators](https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.cookbook.md) to generate code rather than relying on reflection.
+Cyrus is a CQRS framework that focuses on ease of use, simplicity, and minimizing boilerplate code. It incorporates principles from [DDD](https://en.wikipedia.org/wiki/Domain-driven_design) and [Cqrs](https://en.wikipedia.org/wiki/Command_Query_Responsibility_Segregation) to enable the rapid and pragmatic creation of Web APIs. Cyrus leverages [Roslyn Source Generators](https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.cookbook.md) to generate code rather than relying on reflection.
 
 Cyrus generates code for the following components:
 

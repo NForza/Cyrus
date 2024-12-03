@@ -20,9 +20,9 @@ public class CustomerEndpointGroup : EndpointGroup
             .OtherwiseFail();       
         
         QueryEndpoint<AllCustomersQuery>()
-            .Get("/customers");
+            .Get("");
 
         QueryEndpoint<CustomerByIdQuery>()
-            .Get("/customers/{Id}");
+            .Get("{Id}");
     }
 }

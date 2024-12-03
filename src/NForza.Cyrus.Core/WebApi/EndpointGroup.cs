@@ -32,6 +32,7 @@ public class EndpointGroup(string tag, string path)
             throw new InvalidOperationException($"Endpoint for {typeof(T).Name} already exists.");
         }
         endpointDefinition.Tags = Tags;
+        endpointDefinition.GroupPath = path;
         return new QueryEndpointBuilder(endpointDefinition);
     }
 }
