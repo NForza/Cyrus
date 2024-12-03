@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Net.Mime;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using FluentValidation;
@@ -68,6 +69,7 @@ public static partial class EndpointCommandMappingExtensions
                 })
             .Accepts(endpointDefinition.EndpointType, MediaTypeNames.Application.Json)
             .WithTags(endpointDefinition.Tags);
+
 
     static IEnumerable<string> FindAllParametersInRoute(string route)
     {
