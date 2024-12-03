@@ -1,6 +1,0 @@
-@SimpleCyrusWebApi_HostAddress = http://localhost:5089
-
-GET {{SimpleCyrusWebApi_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
