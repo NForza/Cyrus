@@ -20,7 +20,7 @@ public class HttpContextQueryFactoryGenerator : CqrsSourceGenerator, IIncrementa
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
 
         var assemblyReferences = context.CompilationProvider;
 
