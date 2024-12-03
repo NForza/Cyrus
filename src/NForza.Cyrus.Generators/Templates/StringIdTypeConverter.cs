@@ -1,18 +1,19 @@
 ﻿using System;
 
+#nullable enable
+
 namespace % NamespaceName %;
 
 public partial class % TypedIdName %TypeConverter : System.ComponentModel.TypeConverter
 {
     public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext? context, System.Type sourceType)
-        => sourceType == typeof(string) || sourceType == typeof(Guid) || base.CanConvertFrom(context, sourceType);
+        => sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
 
     public override object? ConvertFrom(System.ComponentModel.ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
     {
         return value switch
         {
-            string str => new % TypedIdName % (int.Parse(str)),
-            int x => new % TypedIdName % (x),
+            string str => new % TypedIdName % (str),
             _ => base.ConvertFrom(context, culture, value)
         };
     }

@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 
 namespace NForza.Cyrus.WebApi;
 
+#nullable enable
+
 public class HttpContextQueryFactory : IQueryFactory
 {
     Dictionary<Type, Func<HttpContext, object>> objectFactories = new();

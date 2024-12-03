@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace NForza.Cyrus.Cqrs;
 
+#nullable enable
+
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddCqrs(this IServiceCollection services, Action<CqrsOptions>? options = null)

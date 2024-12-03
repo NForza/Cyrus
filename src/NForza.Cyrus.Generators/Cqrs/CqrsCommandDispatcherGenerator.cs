@@ -15,7 +15,7 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, IIncrementalG
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
         var configProvider = ParseConfigFile<CyrusConfig>(context, "cyrusConfig.yaml");
 
         var incrementalValuesProvider = context.SyntaxProvider

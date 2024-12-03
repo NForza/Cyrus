@@ -1,5 +1,7 @@
 ﻿using System;
 
+#nullable enable
+
 namespace % NamespaceName %;
 
 public partial class % TypedIdName %TypeConverter : System.ComponentModel.TypeConverter
@@ -11,8 +13,8 @@ public partial class % TypedIdName %TypeConverter : System.ComponentModel.TypeCo
     {
         return value switch
         {
-            string str => new % TypedIdName % (Guid.Parse(str)),
-            Guid guid => new % TypedIdName % (guid),
+            string str => new % TypedIdName % (int.Parse(str)),
+            int x => new % TypedIdName % (x),
             _ => base.ConvertFrom(context, culture, value)
         };
     }

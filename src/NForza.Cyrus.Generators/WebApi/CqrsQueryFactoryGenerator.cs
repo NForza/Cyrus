@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
-using System.Net.Sockets;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Cqrs.Generator;
 using NForza.Cyrus.Cqrs.Generator.Config;
 using NForza.Generators;
 
 #pragma warning disable RS1035 // Do not use banned APIs for analyzers
 
-namespace NForza.Cyrus.Cqrs.Generator;
+namespace NForza.Cyrus.Generators.WebApi;
 
 [Generator]
-public class CqrsQueryFactoryGenerator : CqrsSourceGenerator, IIncrementalGenerator
+public class HttpContextQueryFactoryGenerator : CqrsSourceGenerator, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -27,16 +29,20 @@ public class CqrsQueryFactoryGenerator : CqrsSourceGenerator, IIncrementalGenera
         var typesFromReferencedAssembly = assemblyReferences
             .SelectMany((compilation, _) =>
             {
-                var typesFromContractAssemblies = compilation.References
+                var typesFromAssemblies = compilation.References
                     .Select(ca => compilation.GetAssemblyOrModuleSymbol(ca) as IAssemblySymbol)
-                    .Where(ass => ass != null && ass.Name.EndsWith("Contracts"))
-                    .SelectMany(ass => GetAllTypesRecursively(ass.GlobalNamespace))
+                    .SelectMany(ass => ass != null ? GetAllTypesRecursively(ass.GlobalNamespace) : [])
                     .Where(IsQuery)
                     .ToList();
-                return typesFromContractAssemblies;
+
+                var csharpCompilation = (CSharpCompilation)compilation;
+                var typesInCompilation = GetAllTypesRecursively(csharpCompilation.GlobalNamespace)
+                    .Where(IsQuery)
+                    .ToList();
+
+                return typesFromAssemblies.Union(typesInCompilation, SymbolEqualityComparer.Default).OfType<INamedTypeSymbol>();
             })
-            .Where(IsQuery)
-            .Collect();
+           .Collect();
 
         var combinedProvider = typesFromReferencedAssembly.Combine(configurationProvider);
 
@@ -51,15 +57,27 @@ public class CqrsQueryFactoryGenerator : CqrsSourceGenerator, IIncrementalGenera
         });
     }
 
-    private bool IsQuery(INamedTypeSymbol symbol) 
-        => symbol.Name.EndsWith("Query") && symbol.TypeKind == TypeKind.Struct;
+    private bool IsQuery(INamedTypeSymbol symbol)
+    {
+        Debug.WriteLine(symbol.Name);
+        bool isStruct = symbol.TypeKind == TypeKind.Struct;
+        bool hasQueryName = symbol.Name.EndsWith("Query");
+        return isStruct && hasQueryName;
+    }
 
+    private static string[] assembliesToSkip = new[] { "System", "Microsoft", "mscorlib", "netstandard", "WindowsBase", "Swashbuckle" };
     private IEnumerable<INamedTypeSymbol> GetAllTypesRecursively(INamespaceSymbol ns)
     {
+        var assemblyName = ns?.ContainingAssembly?.Name;
+        if (assemblyName != null && assembliesToSkip.Any( n => assemblyName.StartsWith(n)))
+        {
+            return [];
+        }
+
         var types = ns.GetTypeMembers();
         foreach (var subNamespace in ns.GetNamespaceMembers())
         {
-            types = types.AddRange(GetAllTypesRecursively(subNamespace));            
+            types = types.AddRange(GetAllTypesRecursively(subNamespace));
         }
         return types;
     }
@@ -80,11 +98,11 @@ public class CqrsQueryFactoryGenerator : CqrsSourceGenerator, IIncrementalGenera
             source.Append($@"    objectFactories.Add(typeof({query}), (ctx) => new {query}{{");
 
             var propertyInitializer = new List<string>();
-            foreach(var prop in GetPublicProperties(query))
+            foreach (var prop in GetPublicProperties(query))
             {
                 propertyInitializer.Add(@$"{prop.Name} = ({prop.Type})GetPropertyValue(""{prop.Name}"", ctx, typeof({prop.Type}))");
             }
-            source.Append(string.Join(", ", propertyInitializer));  
+            source.Append(string.Join(", ", propertyInitializer));
             source.AppendLine($@"}});");
         }
 
