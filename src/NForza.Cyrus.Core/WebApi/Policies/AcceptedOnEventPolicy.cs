@@ -12,7 +12,7 @@ public class AcceptedOnEventPolicy<T>(string? urlPattern = null) : CommandResult
         if (result.HasEvent<T>())
         {
             T @event = result.Events.OfType<T>().First();
-            return Results.Accepted(ReplacePropertyValues(UrlPattern, @event), @event);
+            return Results.Accepted(ReplacePropertyValues(UrlPattern, @event));
         }
         return null;
     }
