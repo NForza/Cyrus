@@ -25,7 +25,7 @@ public static class IEndpointRouteBuilderExtensions
             var resultType = queryHandlerDictionary.GetQueryReturnType(queryEndpoint.QueryType);
             MapQuery(endpoints, queryEndpoint, resultType);
         }
-        return endpoints; ;
+        return endpoints;
     }
 
     internal static RouteHandlerBuilder MapQuery(this IEndpointRouteBuilder endpoints, QueryEndpointDefinition endpointDefinition, Type queryResultType) 
@@ -38,7 +38,7 @@ public static class IEndpointRouteBuilderExtensions
                 if (!EndpointCommandMappingExtensions.ValidateObject(endpointDefinition.EndpointType, queryObject, ctx.RequestServices, out var problem))
                     return Results.BadRequest(problem);
 
-                var queryResult = queryProcessor.QueryInternal(queryObject, endpointDefinition.QueryType, CancellationToken.None);
+                var queryResult = await queryProcessor.QueryInternal(queryObject, endpointDefinition.QueryType, CancellationToken.None);
 
                 var queryResultPolicies = endpointDefinition.QueryResultPolicies;
                 foreach (var policy in queryResultPolicies)
@@ -52,30 +52,9 @@ public static class IEndpointRouteBuilderExtensions
                 return DefaultQueryPolicy(queryResult);
             })
             .WithTags(endpointDefinition.Tags)
-            .WithOpenApi(operation =>
-            {
-                foreach (var param in FindAllParametersInRoute(endpointDefinition.Path))
-                {
-                    operation.Parameters.Add(
-                        new OpenApiParameter()
-                        {
-                            Name = param,
-                            In = ParameterLocation.Path,
-                            Required = true,
-                            Schema = new OpenApiSchema() { Type = "string" }
-                        });
-                }
-                return operation;
-            })
+            .WithSwaggerParameters(endpointDefinition.Path)
             .WithMetadata(
                 new ProducesResponseTypeAttribute(queryResultType, 200));
-
-    static IEnumerable<string> FindAllParametersInRoute(string route)
-    {
-        var rgx = new Regex(@"\{(?<parameter>\w+)\}");
-        MatchCollection matches = rgx.Matches(route);
-        return matches.Select(m => m.Groups["parameter"].Value);
-    }
 
     private static IResult DefaultQueryPolicy(object? queryResult)
         => queryResult == null ? Results.NotFound() : Results.Ok(queryResult);

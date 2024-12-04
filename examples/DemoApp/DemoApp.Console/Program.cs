@@ -29,7 +29,7 @@ var customerId = addResult.Events.OfType<CustomerAddedEvent>().First().Id;
 CommandResult updateResult = await commandDispatcher.Execute(new UpdateCustomerCommand(customerId, new("John Doe"), new("123 Main St")));
 CommandResult deleteResult = await commandDispatcher.Execute(new DeleteCustomerCommand(customerId));
 
-var customer = queryProcessor.Query(new CustomerByIdQuery(customerId));
+var customer = await queryProcessor.Query(new CustomerByIdQuery(customerId));
 if (customer != null)
 {
     Console.WriteLine( customer.Name );

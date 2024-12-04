@@ -7,8 +7,8 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Cqrs.Generator;
 using NForza.Cyrus.Cqrs.Generator.Config;
+using NForza.Cyrus.Generators.Cqrs;
 using NForza.Generators;
 
 #pragma warning disable RS1035 // Do not use banned APIs for analyzers

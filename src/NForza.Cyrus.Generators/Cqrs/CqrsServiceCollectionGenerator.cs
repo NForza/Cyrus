@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Cqrs.Generator;
 using NForza.Cyrus.Cqrs.Generator.Config;
 using NForza.Generators;
 
@@ -15,7 +14,7 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
 
         var configProvider = ParseConfigFile<CyrusConfig>(context, "cyrusConfig.yaml");
 
@@ -50,7 +49,7 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
     private string GenerateServiceCollectionExtensions(ImmutableArray<IMethodSymbol> handlers, CyrusConfig configuration, Compilation compilation)
     {
         string handlerTypeRegistrations = CreateRegisterTypes(handlers);
-        string queryHandlerRegistrations = CreateRegisterQueryHandler(handlers.Where(x => IsQueryHandler(x, configuration.Queries.HandlerName, configuration.Queries.Suffix)));
+        string queryHandlerRegistrations = CreateRegisterQueryHandler(handlers.Where(x => IsQueryHandler(x, configuration.Queries.HandlerName, configuration.Queries.Suffix)), compilation);
         string commandHandlerRegistrations = CreateRegisterCommandHandler(handlers.Where(x => IsCommandHandler(x, configuration.Commands.HandlerName, configuration.Commands.Suffix)), compilation);
         string eventBusRegistration = $@"services.AddSingleton<IEventBus, {configuration.EventBus}EventBus>();";
         string usings = configuration.EventBus == "MassTransit" ? "using NForza.Cyrus.Cqrs.MassTransit;" : "";
@@ -73,25 +72,50 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
         return resolvedSource;
     }
 
-    private string CreateRegisterQueryHandler(IEnumerable<IMethodSymbol> queryHandlers)
+    private string CreateRegisterQueryHandler(IEnumerable<IMethodSymbol> queryHandlers, Compilation compilation)
     {
+        INamedTypeSymbol? taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
+        if (taskSymbol == null)
+        {
+            return string.Empty;
+        }
+
         StringBuilder source = new();
         foreach (var handler in queryHandlers)
         {
             var queryType = handler.Parameters[0].Type;
             var typeSymbol = handler.ContainingType;
-            var returnType = handler.ReturnType;
-
-            if (handler.IsStatic)
+            var returnType = (INamedTypeSymbol)handler.ReturnType;
+            var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
+            if (isAsync)
             {
-                source.Append($@"
-        handlers.AddHandler<{queryType}, {returnType}>((_, query, token) => {typeSymbol}.Query(({queryType})query));");
+                returnType = returnType.TypeArguments[0] as INamedTypeSymbol;
+                if (handler.IsStatic)
+                {
+                    source.Append($@"
+        handlers.AddHandler<{queryType}, {returnType}>(async (_, query, token) => await {typeSymbol}.Query(({queryType})query));");
+                }
+                else
+                {
+                    source.Append($@"
+        handlers.AddHandler<{queryType}, {returnType}>(async (services, query, token) => await services.GetRequiredService<{typeSymbol}>().Query(({queryType})query));");
+
+                }
+
             }
             else
             {
-                source.Append($@"
-        handlers.AddHandler<{queryType}, {returnType}>((services, query, token) => services.GetRequiredService<{typeSymbol}>().Query(({queryType})query));");
+                if (handler.IsStatic)
+                {
+                    source.Append($@"
+        handlers.AddHandler<{queryType}, {returnType}>((_, query, token) => Task.FromResult<object>({typeSymbol}.Query(({queryType})query)));");
+                }
+                else
+                {
+                    source.Append($@"
+        handlers.AddHandler<{queryType}, {returnType}>((services, query, token) => Task.FromResult<object>(services.GetRequiredService<{typeSymbol}>().Query(({queryType})query)));");
 
+                }
             }
         }
         return source.ToString();

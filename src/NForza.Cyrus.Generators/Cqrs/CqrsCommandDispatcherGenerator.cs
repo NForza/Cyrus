@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Cqrs.Generator.Config;
+using NForza.Cyrus.Generators.Cqrs;
 using NForza.Generators;
 
 namespace NForza.Cyrus.Cqrs.Generator;
