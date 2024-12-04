@@ -1,4 +1,6 @@
 ﻿using NForza.Cyrus.WebApi;
+using NForza.Cyrus.WebApi.Policies;
+using SimpleCyrusWebApi.NewCustomer;
 
 namespace SimpleCyrusWebApi;
 
@@ -13,5 +15,10 @@ public class CustomerEndpointGroup: EndpointGroup
         //endpoint URL will be /customers/{Id}
         QueryEndpoint<CustomerByIdQuery>()
             .Get("{Id:guid}");
+
+        CommandEndpoint<NewCustomerCommand>()
+            .Post("")
+            .AcceptedOnEvent<CustomerCreatedEvent>("/customers/{Id}")
+            .OtherwiseFail();
     }
 }

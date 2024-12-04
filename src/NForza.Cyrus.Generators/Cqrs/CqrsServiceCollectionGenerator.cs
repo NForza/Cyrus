@@ -129,7 +129,7 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
             if (!typeToRegister.IsStatic)
             {
                 source.Append($@"
-        services.AddTransient<{typeToRegister.ToDisplayString()}>();");
+        services.AddScoped<{typeToRegister.ToDisplayString()}>();");
             }
         }
         return source.ToString();
