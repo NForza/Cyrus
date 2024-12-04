@@ -52,32 +52,9 @@ public static partial class EndpointCommandMappingExtensions
 
                     return commandResult.Succeeded ? Results.Ok(commandResult) : Results.Problem(JsonSerializer.Serialize(commandResult.Errors));
                 })
-            .WithOpenApi(operation =>
-                {
-                    foreach (var param in FindAllParametersInRoute(endpointDefinition.Path))
-                    {
-                        operation.Parameters.Add(
-                            new OpenApiParameter()
-                            {
-                                Name = param,
-                                In = ParameterLocation.Path,
-                                Required = true,
-                                Schema = new OpenApiSchema() { Type = "string" }
-                            });
-                    }
-                    return operation;
-                })
+            .WithSwaggerParameters(endpointDefinition.Path)
             .Accepts(endpointDefinition.EndpointType, MediaTypeNames.Application.Json)
             .WithTags(endpointDefinition.Tags);
-
-
-    static IEnumerable<string> FindAllParametersInRoute(string route)
-    {
-        var rgx = ParameterRegex();
-        MatchCollection matches = rgx.Matches(route);
-        return matches.Select(m => m.Groups["parameter"].Value);
-    }
-
 
     internal static bool ValidateObject(Type objectType, object queryObject, IServiceProvider serviceProvider, out object? problem)
     {
@@ -107,7 +84,4 @@ public static partial class EndpointCommandMappingExtensions
             (InputMappingPolicy)ctx.RequestServices.GetRequiredService(endpointDefinition.InputMappingPolicyType) : new DefaultCommandInputMappingPolicy(ctx);
         return await inputMappingPolicy.MapInputAsync(endpointDefinition.EndpointType);
     }
-
-    [GeneratedRegex(@"\{(?<parameter>\w+)\}")]
-    private static partial Regex ParameterRegex();
 }
