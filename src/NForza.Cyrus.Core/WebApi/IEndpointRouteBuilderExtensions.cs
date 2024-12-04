@@ -38,7 +38,7 @@ public static class IEndpointRouteBuilderExtensions
                 if (!EndpointCommandMappingExtensions.ValidateObject(endpointDefinition.EndpointType, queryObject, ctx.RequestServices, out var problem))
                     return Results.BadRequest(problem);
 
-                var queryResult = queryProcessor.QueryInternal(queryObject, endpointDefinition.QueryType, CancellationToken.None);
+                var queryResult = await queryProcessor.QueryInternal(queryObject, endpointDefinition.QueryType, CancellationToken.None);
 
                 var queryResultPolicies = endpointDefinition.QueryResultPolicies;
                 foreach (var policy in queryResultPolicies)

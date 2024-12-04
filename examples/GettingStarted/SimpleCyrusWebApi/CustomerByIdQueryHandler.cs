@@ -1,10 +1,10 @@
 ﻿namespace SimpleCyrusWebApi;
 
 // Handles requests for getting a customer by Id
-public static class CustomerByIdQueryHandler
+public class CustomerByIdQueryHandler
 {
-    public static string Query(CustomerByIdQuery query)
+    public Task<string> Query(CustomerByIdQuery query)
     {
-        return "Customer " + query.Id;
+        return Task.FromResult("Customer " + query.Id);
     }
 }

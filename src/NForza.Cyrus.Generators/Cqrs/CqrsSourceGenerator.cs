@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NForza.Cyrus.Cqrs.Generator.Config;
 using NForza.Generators;
 
-namespace NForza.Cyrus.Cqrs.Generator;
+namespace NForza.Cyrus.Generators.Cqrs;
 
 public abstract class CqrsSourceGenerator : GeneratorBase
 {
