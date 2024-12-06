@@ -27,6 +27,7 @@
     <Content Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs/" />
     <Compile Remove="Templates\CommandDispatcherExtensions.cs" />
     <Compile Remove="Templates\CqrsServiceCollectionExtensions.cs" />
+    <Compile Remove="Templates\EventConsumers.cs" />
     <Compile Remove="Templates\GuidId.cs" />
     <Compile Remove="Templates\GuidIdJsonConverter.cs" />
     <Compile Remove="Templates\GuidIdTypeConverter.cs" />
@@ -49,6 +50,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Templates\CommandDispatcherExtensions.cs" />
+    <EmbeddedResource Include="Templates\EventConsumers.cs" />
     <EmbeddedResource Include="Templates\GuidId.cs" />
     <EmbeddedResource Include="Templates\GuidIdJsonConverter.cs" />
     <EmbeddedResource Include="Templates\GuidIdTypeConverter.cs" />

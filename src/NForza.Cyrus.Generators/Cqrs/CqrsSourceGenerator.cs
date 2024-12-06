@@ -123,9 +123,20 @@ public abstract class CqrsSourceGenerator : GeneratorBase
             methodDeclaration.ParameterList.Parameters.Count == 1;
     }
 
+    protected bool CouldBeEventHandler(SyntaxNode syntaxNode)
+    {
+        return
+            syntaxNode is MethodDeclarationSyntax methodDeclaration
+            &&
+            methodDeclaration.ParameterList.Parameters.Count == 1;
+    }
+
     protected bool IsQueryHandler(IMethodSymbol? symbol, string queryMethodName, string querySuffix)
         => symbol != null && symbol.Name == queryMethodName && symbol.Parameters.Length == 1 && symbol.Parameters[0].Type.Name.EndsWith(querySuffix);
 
     protected bool IsCommandHandler(IMethodSymbol? symbol, string commandHandlerName, string commandSuffix)
         => symbol != null && symbol.Name.EndsWith(commandHandlerName) && symbol.Parameters.Length == 1 && symbol.Parameters[0].Type.Name.EndsWith(commandSuffix);
+
+    protected bool IsEventHandler(IMethodSymbol? symbol, string eventHandlerMethodName, string eventSuffix)
+        => symbol != null && symbol.Name == eventHandlerMethodName && symbol.Parameters.Length == 1 && symbol.Parameters[0].Type.Name.EndsWith(eventSuffix);   
 }

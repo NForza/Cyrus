@@ -26,9 +26,9 @@ public class CyrusConfig : IYamlConfig<CyrusConfig>
         {
             Commands.HandlerName = config["handlerName"].First();
         }
-        if (config.ContainsKey("eventBus"))
+        if (config.ContainsKey("bus"))
         {
-            EventBus = config["eventBus"].First();
+            Events.Bus = config["bus"].First();
         }
         return this;
     }
@@ -36,6 +36,6 @@ public class CyrusConfig : IYamlConfig<CyrusConfig>
     public string[] Contracts { get; set; } = ["Contracts"];
     public CommandConfig Commands { get; set; } = new();
     public QueryConfig Queries { get; set; } = new();
-    public string EventBus { get; set; } = "Local";
+    public EventConfig Events { get; set; } = new();
     public string[] GenerationType { get; set; } = ["domain", "webapi", "contracts"];
 }

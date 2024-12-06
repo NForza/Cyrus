@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MassTransit" Version="8.3.3" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
@@ -17,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\NForza.Cyrus.Core\NForza.Cyrus.Core.csproj" />
     <ProjectReference Include="..\..\..\src\NForza.Cyrus.Generators\NForza.Cyrus.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\..\src\NForza.Cyrus.MassTransit\NForza.Cyrus.MassTransit.csproj" />
     <ProjectReference Include="..\..\..\src\NForza.Cyrus.TypedIds\NForza.Cyrus.TypedIds.csproj" />
   </ItemGroup>
 
