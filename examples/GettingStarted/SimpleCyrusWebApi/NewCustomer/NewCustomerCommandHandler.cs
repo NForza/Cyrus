@@ -3,7 +3,7 @@ using SimpleCyrusWebApi.Storage;
 
 namespace SimpleCyrusWebApi.NewCustomer
 {
-    public class NewCustomerCommandHandler(DemoContext context )
+    public class NewCustomerCommandHandler(DemoContext context)
     {
         public async Task<CommandResult> Execute(NewCustomerCommand command)
         {

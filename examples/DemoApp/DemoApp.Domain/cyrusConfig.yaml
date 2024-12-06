@@ -6,5 +6,8 @@ commands:
 queries:
   suffix: Query
   handlerName: Query
-eventBus: MassTransit
+events:
+  bus: MassTransit
+  suffix: Event
+  handlerName: Handle
   
