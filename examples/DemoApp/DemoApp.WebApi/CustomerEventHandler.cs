@@ -1,5 +1,4 @@
 ﻿using DemoApp.Contracts.Customers;
-
 namespace DemoApp.WebApi;
 
 public class CustomerEventHandler

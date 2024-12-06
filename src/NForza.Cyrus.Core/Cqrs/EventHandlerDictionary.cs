@@ -8,5 +8,8 @@ namespace NForza.Cyrus.Cqrs
         {
             Add(typeof(T), handler);
         }
+
+        public IEnumerable<Action<IServiceProvider, object>> GetEventHandlers<T>() 
+            => GetValues(typeof(T));
     }
 }
