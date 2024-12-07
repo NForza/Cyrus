@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+#if DEBUG_ANALYZER
 using System.Diagnostics;
-using System.IO;
+#endif
 using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
@@ -21,7 +20,12 @@ public abstract class GeneratorBase
                 predicate: (syntaxNode, _) => syntaxNode is ClassDeclarationSyntax classDeclaration && classDeclaration.Identifier.Text == "CyrusConfiguration",
                 transform: (context, _) => GetConfigFromClass((ClassDeclarationSyntax)context.Node))
             .Collect()
-            .Select((cfgs, _) => cfgs.FirstOrDefault() ?? new GenerationConfig() { GenerationType = [ "domain", "webapi", "contracts" ]});
+            .Select((cfgs, _) => 
+            {
+                var cfg = cfgs.FirstOrDefault() ?? new GenerationConfig();
+                cfg.GenerationType ??= ["domain", "webapi", "contracts"];
+                return cfg;
+            });
         return configProvider;
     }
 

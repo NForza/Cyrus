@@ -14,7 +14,7 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
 
         var configProvider = ConfigFileProvider(context);
 
@@ -51,7 +51,7 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
         string handlerTypeRegistrations = CreateRegisterTypes(handlers);
         string queryHandlerRegistrations = CreateRegisterQueryHandler(handlers.Where(x => IsQueryHandler(x, configuration.Queries.HandlerName, configuration.Queries.Suffix)), compilation);
         string commandHandlerRegistrations = CreateRegisterCommandHandler(handlers.Where(x => IsCommandHandler(x, configuration.Commands.HandlerName, configuration.Commands.Suffix)), compilation);
-        string eventHandlerRegistrations = CreateEventHandlerRegistrations(handlers.Where(x => IsEventHandler(x, configuration.Events.HandlerName, configuration.Events.Suffix)), compilation); string usings = configuration.Events.Bus == "MassTransit" ? "using NForza.Cyrus.Cqrs.MassTransit;" : "";
+        string eventHandlerRegistrations = CreateEventHandlerRegistrations(handlers.Where(x => IsEventHandler(x, configuration.Events.HandlerName, configuration.Events.Suffix)), compilation); string usings = configuration.Events.Bus == "MassTransit" ? "using NForza.Cyrus.MassTransit;" : "";
         string eventBusRegistration = $@"services.AddSingleton<IEventBus, {configuration.Events.Bus}EventBus>();";
 
         if (string.IsNullOrEmpty(handlerTypeRegistrations) && string.IsNullOrEmpty(queryHandlerRegistrations) && string.IsNullOrEmpty(commandHandlerRegistrations))

@@ -11,7 +11,7 @@ public class QueryHandlerDictionary : Dictionary<Type, Func<IServiceProvider, ob
     {
         var func = this[typeof(TQuery)];
         func ??= (services, q, c) => throw new InvalidOperationException($"No handler found for query {typeof(TQuery).Name}");
-        return (query, cancellationToken) => (Task<TResult>) func(serviceProvider, query, cancellationToken);
+        return async (query, cancellationToken) => (TResult) await (Task<object>)func(serviceProvider, query, cancellationToken);
     }
 
     internal Func<object, CancellationToken, object> GetHandler(IServiceProvider serviceProvider, Type queryType)
