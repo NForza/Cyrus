@@ -13,12 +13,12 @@ using NForza.Generators;
 namespace NForza.Cyrus.Cqrs.Generator;
 
 [Generator]
-public class CqrsQueryHandlerGenerator : CqrsSourceGenerator, IIncrementalGenerator
+public class CqrsQueryHandlerGenerator : GeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
         DebugThisGenerator(false);
-        var configProvider = ParseConfigFile<CyrusConfig>(context, "cyrusConfig.yaml");
+        var configProvider = ConfigFileProvider(context);
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(

@@ -16,7 +16,7 @@ using NForza.Generators;
 namespace NForza.Cyrus.Generators.WebApi;
 
 [Generator]
-public class HttpContextQueryFactoryGenerator : CqrsSourceGenerator, IIncrementalGenerator
+public class HttpContextQueryFactoryGenerator : GeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -24,7 +24,7 @@ public class HttpContextQueryFactoryGenerator : CqrsSourceGenerator, IIncrementa
 
         var assemblyReferences = context.CompilationProvider;
 
-        var configurationProvider = ParseConfigFile<CyrusConfig>(context, "cyrusConfig.yaml");
+        var configurationProvider = ConfigFileProvider(context);
 
         var typesFromReferencedAssembly = assemblyReferences
             .SelectMany((compilation, _) =>
