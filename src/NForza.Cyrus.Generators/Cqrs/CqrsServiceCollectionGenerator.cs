@@ -51,8 +51,8 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
         string handlerTypeRegistrations = CreateRegisterTypes(handlers);
         string queryHandlerRegistrations = CreateRegisterQueryHandler(handlers.Where(x => IsQueryHandler(x, configuration.Queries.HandlerName, configuration.Queries.Suffix)), compilation);
         string commandHandlerRegistrations = CreateRegisterCommandHandler(handlers.Where(x => IsCommandHandler(x, configuration.Commands.HandlerName, configuration.Commands.Suffix)), compilation);
+        string eventHandlerRegistrations = CreateEventHandlerRegistrations(handlers.Where(x => IsEventHandler(x, configuration.Events.HandlerName, configuration.Events.Suffix)), compilation); string usings = configuration.Events.Bus == "MassTransit" ? "using NForza.Cyrus.Cqrs.MassTransit;" : "";
         string eventBusRegistration = $@"services.AddSingleton<IEventBus, {configuration.Events.Bus}EventBus>();";
-        string usings = configuration.Events.Bus == "MassTransit" ? "using NForza.Cyrus.Cqrs.MassTransit;" : "";
 
         if (string.IsNullOrEmpty(handlerTypeRegistrations) && string.IsNullOrEmpty(queryHandlerRegistrations) && string.IsNullOrEmpty(commandHandlerRegistrations))
         {
@@ -64,12 +64,59 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
             ["RegisterHandlerTypes"] = handlerTypeRegistrations,
             ["RegisterCommandHandlers"] = commandHandlerRegistrations,
             ["RegisterQueryHandlers"] = queryHandlerRegistrations,
+            ["RegisterEventHandlers"] = eventHandlerRegistrations,
             ["RegisterEventBus"] = eventBusRegistration,
             ["Usings"] = usings
         };
 
         var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("CqrsServiceCollectionExtensions.cs", replacements);
         return resolvedSource;
+    }
+
+    private string CreateEventHandlerRegistrations(IEnumerable<IMethodSymbol> eventHandlers, Compilation compilation)
+    {
+        INamedTypeSymbol? taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
+        if (taskSymbol == null)
+        {
+            return string.Empty;
+        }
+
+        StringBuilder source = new();
+        foreach (var eventHandler in eventHandlers)
+        {
+            var eventType = eventHandler.Parameters[0].Type;
+            var typeSymbol = eventHandler.ContainingType;
+            var returnType = (INamedTypeSymbol)eventHandler.ReturnType;
+            var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
+            if (isAsync)
+            {
+                if (eventHandler.IsStatic)
+                {
+                    source.Append($@"
+        handlers.AddEventHandler<{eventType}>((_, @event) => {typeSymbol}.Handle(({eventType})@event));");
+                }
+                else
+                {
+                    source.Append($@"
+        handlers.AddEventHandler<{eventType}>((services, @event) => services.GetRequiredService<{typeSymbol}>().Handle(({eventType})@event));");
+                }
+
+            }
+            else
+            {
+                if (eventHandler.IsStatic)
+                {
+                    source.Append($@"
+        handlers.AddEventHandler<{eventType}>((_, @event) => {typeSymbol}.Handle(({eventType})@event));");
+                }
+                else
+                {
+                    source.Append($@"
+        handlers.AddEventHandler<{eventType}>((services, @event) => services.GetRequiredService<{typeSymbol}>().Handle(({eventType})@event));");
+                }
+            }
+        }
+        return source.ToString();
     }
 
     private string CreateRegisterQueryHandler(IEnumerable<IMethodSymbol> queryHandlers, Compilation compilation)
@@ -124,9 +171,9 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
     private static string CreateRegisterTypes(ImmutableArray<IMethodSymbol> handlers)
     {
         var source = new StringBuilder();
-        foreach (var typeToRegister in handlers.Select(h => h.ContainingType).Distinct(SymbolEqualityComparer.Default))
+        foreach (var typeToRegister in handlers.Select(h => h.ContainingType).Distinct(SymbolEqualityComparer.Default).Where(h => h != null))
         {
-            if (!typeToRegister.IsStatic)
+            if (!typeToRegister!.IsStatic)
             {
                 source.Append($@"
         services.AddScoped<{typeToRegister.ToDisplayString()}>();");

@@ -11,5 +11,7 @@ namespace NForza.Cyrus
         public CyrusConfig QuerySuffix(string querySuffix) => this;
         public CyrusConfig QueryHandlerName(string queryHandlerName) => this;
         public CyrusConfig GenerateDomain() => this;
+        public CyrusConfig GenerateContracts() => this;
+        public CyrusConfig GenerateWebApi() => this;
     }
 }

@@ -10,5 +10,5 @@ public class GenerationConfig
     public CommandConfig Commands { get; set; } = new();
     public QueryConfig Queries { get; set; } = new();
     public EventConfig Events { get; set; } = new();
-    public string[] GenerationType { get; set; } = ["domain", "webapi", "contracts"];
+    public string[]? GenerationType { get; set; } = null;
 }

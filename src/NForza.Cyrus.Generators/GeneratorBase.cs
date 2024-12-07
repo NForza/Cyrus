@@ -18,10 +18,10 @@ public abstract class GeneratorBase
     {
         var configProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => syntaxNode is ClassDeclarationSyntax classDeclaration && classDeclaration.Identifier.Text == "CyrusConfig",
+                predicate: (syntaxNode, _) => syntaxNode is ClassDeclarationSyntax classDeclaration && classDeclaration.Identifier.Text == "CyrusConfiguration",
                 transform: (context, _) => GetConfigFromClass((ClassDeclarationSyntax)context.Node))
             .Collect()
-            .Select((cfgs, _) => cfgs.FirstOrDefault() ?? new GenerationConfig());
+            .Select((cfgs, _) => cfgs.FirstOrDefault() ?? new GenerationConfig() { GenerationType = [ "domain", "webapi", "contracts" ]});
         return configProvider;
     }
 
@@ -36,12 +36,27 @@ public abstract class GeneratorBase
 
         if (constructorSyntax != null)
         {
-            var methodCalls = constructorSyntax.Body!.DescendantNodes()
-                               .OfType<InvocationExpressionSyntax>();
+            var methodCalls = constructorSyntax.Body!.DescendantNodes().OfType<InvocationExpressionSyntax>();
 
             foreach (var methodCall in methodCalls)
             {
-                // Analyze each method call
+                var methodName = methodCall.Expression.ToString();
+
+                switch (methodName)
+                {
+                    case "UseMassTransit":
+                        result.Events.Bus = "MassTransit";
+                        break;
+                    case "GenerateContracts":
+                        result.GenerationType = result.GenerationType == null ? ["contracts"] : [.. result.GenerationType, "contracts"];
+                        break;
+                    case "GenerateDomain":
+                        result.GenerationType = result.GenerationType == null ? ["domain"] : [.. result.GenerationType, "domain"];
+                        break;
+                    case "GenerateWebApi":
+                        result.GenerationType = result.GenerationType == null ? ["webapi"] : [.. result.GenerationType, "webapi"];
+                        break;
+                }
             }
         }
         return result;
