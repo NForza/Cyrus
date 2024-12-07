@@ -7,17 +7,18 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Cqrs.Generator.Config;
+using NForza.Generators;
 
 namespace NForza.Cyrus.Generators.Cqrs.WebApi;
 
 [Generator]
-public class EndpointGroupGenerator : CqrsSourceGenerator, IIncrementalGenerator
+public class EndpointGroupGenerator : GeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
         DebugThisGenerator(false);
 
-        var configurationProvider = ParseConfigFile<CyrusConfig>(context, "cyrusConfig.yaml");
+        var configurationProvider = ConfigFileProvider(context);
 
         var allClassesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(

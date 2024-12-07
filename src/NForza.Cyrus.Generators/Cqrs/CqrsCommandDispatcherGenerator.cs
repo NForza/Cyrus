@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
@@ -12,19 +13,20 @@ using NForza.Generators;
 namespace NForza.Cyrus.Cqrs.Generator;
 
 [Generator]
-public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, IIncrementalGenerator
+public class CqrsCommandDispatcherGenerator : GeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
-        var configProvider = ParseConfigFile<CyrusConfig>(context, "cyrusConfig.yaml");
+        DebugThisGenerator(true);
 
-        var incrementalValuesProvider = context.SyntaxProvider
+        var configProvider = ConfigFileProvider(context);
+
+        var commandHandlerProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: (syntaxNode, _) => CouldBeCommandHandler(syntaxNode),
                 transform: (context, _) => GetMethodSymbolFromContext(context));
 
-        var recordStructsWithAttribute = incrementalValuesProvider.Combine(configProvider)
+        var recordStructsWithAttribute = commandHandlerProvider.Combine(configProvider)
             .Where(x => {
                 var (methodNode, config) = x;
                 if (!config.GenerationType.Contains("domain"))
@@ -54,6 +56,8 @@ public class CqrsCommandDispatcherGenerator : CqrsSourceGenerator, IIncrementalG
             }
         });
     }
+
+
 
     private string GenerateCommandDispatcherExtensionMethods(Compilation compilation, ImmutableArray<IMethodSymbol> handlers)
     {

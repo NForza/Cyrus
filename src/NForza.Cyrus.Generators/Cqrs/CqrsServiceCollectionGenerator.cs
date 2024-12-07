@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
@@ -11,29 +10,24 @@ using NForza.Generators;
 namespace NForza.Cyrus.Generators.Cqrs;
 
 [Generator]
-public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalGenerator
+public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
 
-        var configProvider = ParseConfigFile<CyrusConfig>(context, "cyrusConfig.yaml");
+        var configProvider = ConfigFileProvider(context);
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => CouldBeCommandHandler(syntaxNode) || CouldBeQueryHandler(syntaxNode) || CouldBeEventHandler(syntaxNode),
+                predicate: (syntaxNode, _) => CouldBeCommandHandler(syntaxNode) || CouldBeQueryHandler(syntaxNode),
                 transform: (context, _) => GetMethodSymbolFromContext(context));
 
         var allHandlersProvider = incrementalValuesProvider.Combine(configProvider)
             .Where(x =>
             {
                 var (handler, config) = x;
-                return
-                    IsCommandHandler(handler, config.Commands.HandlerName, config.Commands.Suffix)
-                    ||
-                    IsQueryHandler(handler, config.Queries.HandlerName, config.Queries.Suffix)
-                    ||
-                    IsEventHandler(handler, config.Events.HandlerName, config.Events.Suffix);
+                return IsCommandHandler(handler, config.Commands.HandlerName, config.Commands.Suffix) || IsQueryHandler(handler, config.Queries.HandlerName, config.Queries.Suffix);
             })
             .Select((x, _) => x.Left!)
             .Collect();
@@ -52,14 +46,13 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
         });
     }
 
-    private string GenerateServiceCollectionExtensions(ImmutableArray<IMethodSymbol> handlers, CyrusConfig configuration, Compilation compilation)
+    private string GenerateServiceCollectionExtensions(ImmutableArray<IMethodSymbol> handlers, GenerationConfig configuration, Compilation compilation)
     {
         string handlerTypeRegistrations = CreateRegisterTypes(handlers);
-        string queryHandlerRegistrations = CreateQueryHandlerRegistrations(handlers.Where(x => IsQueryHandler(x, configuration.Queries.HandlerName, configuration.Queries.Suffix)), compilation);
-        string commandHandlerRegistrations = CreateCommandHandlerRegistrations(handlers.Where(x => IsCommandHandler(x, configuration.Commands.HandlerName, configuration.Commands.Suffix)), compilation);
-        string eventHandlerRegistrations = CreateEventHandlerRegistrations(handlers.Where(x => IsEventHandler(x, configuration.Events.HandlerName, configuration.Events.Suffix)), compilation);
+        string queryHandlerRegistrations = CreateRegisterQueryHandler(handlers.Where(x => IsQueryHandler(x, configuration.Queries.HandlerName, configuration.Queries.Suffix)), compilation);
+        string commandHandlerRegistrations = CreateRegisterCommandHandler(handlers.Where(x => IsCommandHandler(x, configuration.Commands.HandlerName, configuration.Commands.Suffix)), compilation);
+        string eventHandlerRegistrations = CreateEventHandlerRegistrations(handlers.Where(x => IsEventHandler(x, configuration.Events.HandlerName, configuration.Events.Suffix)), compilation); string usings = configuration.Events.Bus == "MassTransit" ? "using NForza.Cyrus.MassTransit;" : "";
         string eventBusRegistration = $@"services.AddSingleton<IEventBus, {configuration.Events.Bus}EventBus>();";
-        string usings = configuration.Events.Bus == "MassTransit" ? "using NForza.Cyrus.MassTransit;" : "";
 
         if (string.IsNullOrEmpty(handlerTypeRegistrations) && string.IsNullOrEmpty(queryHandlerRegistrations) && string.IsNullOrEmpty(commandHandlerRegistrations))
         {
@@ -126,7 +119,7 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
         return source.ToString();
     }
 
-    private string CreateQueryHandlerRegistrations(IEnumerable<IMethodSymbol> queryHandlers, Compilation compilation)
+    private string CreateRegisterQueryHandler(IEnumerable<IMethodSymbol> queryHandlers, Compilation compilation)
     {
         INamedTypeSymbol? taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
         if (taskSymbol == null)
@@ -178,9 +171,9 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
     private static string CreateRegisterTypes(ImmutableArray<IMethodSymbol> handlers)
     {
         var source = new StringBuilder();
-        foreach (var typeToRegister in handlers.Select(h => h.ContainingType).Distinct(SymbolEqualityComparer.Default))
+        foreach (var typeToRegister in handlers.Select(h => h.ContainingType).Distinct(SymbolEqualityComparer.Default).Where(h => h != null))
         {
-            if (!typeToRegister.IsStatic)
+            if (!typeToRegister!.IsStatic)
             {
                 source.Append($@"
         services.AddScoped<{typeToRegister.ToDisplayString()}>();");
@@ -189,7 +182,7 @@ public class CqrsServiceCollectionGenerator : CqrsSourceGenerator, IIncrementalG
         return source.ToString();
     }
 
-    private static string CreateCommandHandlerRegistrations(IEnumerable<IMethodSymbol> handlers, Compilation compilation)
+    private static string CreateRegisterCommandHandler(IEnumerable<IMethodSymbol> handlers, Compilation compilation)
     {
         INamedTypeSymbol? taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
         INamedTypeSymbol? commandResultSymbol = compilation.GetTypeByMetadataName("NForza.Cyrus.Cqrs.CommandResult");
