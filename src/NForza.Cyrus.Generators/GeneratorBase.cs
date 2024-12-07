@@ -237,6 +237,6 @@ public abstract class GeneratorBase
     protected bool IsCommandHandler(IMethodSymbol? symbol, string commandHandlerName, string commandSuffix)
         => symbol != null && symbol.Name == commandHandlerName && symbol.Parameters.Length == 1 && symbol.Parameters[0].Type.Name.EndsWith(commandSuffix);
 
-    protected bool IsEventHandler(IMethodSymbol? symbol, string commandHandlerName, string eventSuffix)
-        => symbol != null && symbol.Name == commandHandlerName && symbol.Parameters.Length == 1 && symbol.Parameters[0].Type.Name.EndsWith(eventSuffix);
+    protected bool IsEventHandler(IMethodSymbol? symbol, string eventHandlerName, string eventSuffix)
+        => symbol != null && symbol.Name == eventHandlerName && symbol.Parameters.Length == 1 && symbol.Parameters[0].Type.Name.EndsWith(eventSuffix);
 }

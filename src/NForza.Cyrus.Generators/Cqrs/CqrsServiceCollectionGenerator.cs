@@ -20,14 +20,16 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => CouldBeCommandHandler(syntaxNode) || CouldBeQueryHandler(syntaxNode),
+                predicate: (syntaxNode, _) => CouldBeCommandHandler(syntaxNode) || CouldBeQueryHandler(syntaxNode) || CouldBeEventHandler(syntaxNode),
                 transform: (context, _) => GetMethodSymbolFromContext(context));
 
         var allHandlersProvider = incrementalValuesProvider.Combine(configProvider)
             .Where(x =>
             {
                 var (handler, config) = x;
-                return IsCommandHandler(handler, config.Commands.HandlerName, config.Commands.Suffix) || IsQueryHandler(handler, config.Queries.HandlerName, config.Queries.Suffix);
+                return IsCommandHandler(handler, config.Commands.HandlerName, config.Commands.Suffix) 
+                    || IsQueryHandler(handler, config.Queries.HandlerName, config.Queries.Suffix)
+                    || IsEventHandler(handler, config.Events.HandlerName, config.Events.Suffix);
             })
             .Select((x, _) => x.Left!)
             .Collect();

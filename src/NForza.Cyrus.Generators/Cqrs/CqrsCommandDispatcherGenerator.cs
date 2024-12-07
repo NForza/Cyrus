@@ -17,7 +17,7 @@ public class CqrsCommandDispatcherGenerator : GeneratorBase, IIncrementalGenerat
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
 
         var configProvider = ConfigFileProvider(context);
 
