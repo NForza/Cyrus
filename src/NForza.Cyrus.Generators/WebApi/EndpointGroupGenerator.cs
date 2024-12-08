@@ -63,7 +63,7 @@ public class EndpointGroupGenerator : GeneratorBase, IIncrementalGenerator
         var sb = new StringBuilder();
         foreach (var classSymbol in classSymbols)
         {
-            sb.AppendLine($"options.Services.AddEndpointGroup<{classSymbol}>();");
+            sb.AppendLine($"options.Services.AddEndpointGroup<{classSymbol.ToFullName()}>();");
         }
 
         var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("RegisterEndpointGroups.cs", new Dictionary<string, string>
