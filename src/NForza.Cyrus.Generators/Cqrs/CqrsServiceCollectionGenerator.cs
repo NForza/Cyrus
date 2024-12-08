@@ -86,7 +86,7 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
         StringBuilder source = new();
         foreach (var eventHandler in eventHandlers)
         {
-            var eventType = eventHandler.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var eventType = eventHandler.Parameters[0].Type.ToFullName();
             var typeSymbol = eventHandler.ContainingType;
             var returnType = (INamedTypeSymbol)eventHandler.ReturnType;
             var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
@@ -132,15 +132,15 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
         StringBuilder source = new();
         foreach (var handler in queryHandlers)
         {
-            var queryType = handler.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var queryType = handler.Parameters[0].Type.ToFullName();
             var typeSymbol = handler.ContainingType;
             var returnType = (INamedTypeSymbol)handler.ReturnType;
-            var returnTypeFullName = returnType?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var returnTypeFullName = returnType?.ToFullName();
             var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
             if (isAsync)
             {
                 returnType = returnType.TypeArguments[0] as INamedTypeSymbol;
-                returnTypeFullName = returnType?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                returnTypeFullName = returnType?.ToFullName();
                 if (handler.IsStatic)
                 {
                     source.Append($@"
@@ -180,7 +180,7 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
             if (!typeToRegister!.IsStatic)
             {
                 source.Append($@"
-        services.AddScoped<{typeToRegister.ToDisplayString()}>();");
+        services.AddScoped<{typeToRegister.ToFullName()}>();");
             }
         }
         return source.ToString();
@@ -201,8 +201,8 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
         StringBuilder source = new();
         foreach (var handler in handlers)
         {
-            var commandType = handler.Parameters[0].Type;
-            var typeSymbol = handler.ContainingType;
+            var commandType = handler.Parameters[0].Type.ToFullName();
+            var typeSymbol = handler.ContainingType.ToFullName();
             var returnType = handler.ReturnType;
             var isAsync = returnType.Equals(taskOfCommandResultSymbol, SymbolEqualityComparer.Default);
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Generators;
 using NForza.Generators;
 
 namespace NForza.Cyrus.Cqrs.Generator;
@@ -71,7 +72,7 @@ public class CqrsCommandDispatcherGenerator : GeneratorBase, IIncrementalGenerat
         foreach (var handler in handlers)
         {
             var methodSymbol = handler;
-            var parameterType = methodSymbol.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var parameterType = methodSymbol.Parameters[0].Type.ToFullName();
                 source.Append($@"
     public static Task<CommandResult> Execute(this ICommandDispatcher dispatcher, {parameterType} command, CancellationToken cancellationToken = default) 
         => dispatcher.ExecuteInternalAsync(command, cancellationToken);");
