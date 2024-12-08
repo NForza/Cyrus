@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Cqrs.Generator.Config;
-using NForza.Cyrus.Generators.Cqrs;
 using NForza.Generators;
 
 namespace NForza.Cyrus.Cqrs.Generator;
@@ -58,22 +54,23 @@ public class CqrsQueryHandlerGenerator : GeneratorBase, IIncrementalGenerator
         foreach (var handler in handlers)
         {
             var methodSymbol = handler;
-            var parameterType = methodSymbol.Parameters[0].Type;
+            var parameterType = methodSymbol.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
             var returnType = (INamedTypeSymbol)methodSymbol.ReturnType;
+            string returnTypeFullName = returnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
             var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
 
             if (isAsync)
             {
                 var queryType = (INamedTypeSymbol)returnType.TypeArguments[0];
                 source.Append($@"
-    public static {returnType} Query(this IQueryProcessor queryProcessor, {parameterType} command, CancellationToken cancellationToken = default) 
+    public static {returnTypeFullName} Query(this IQueryProcessor queryProcessor, {parameterType} command, CancellationToken cancellationToken = default) 
         => queryProcessor.QueryInternal<{parameterType}, {queryType}>(command, cancellationToken);");
             }
             else
             { 
                 source.Append($@"
-    public static Task<{returnType}> Query(this IQueryProcessor queryProcessor, {parameterType} command, CancellationToken cancellationToken = default) 
-        => queryProcessor.QueryInternal<{parameterType}, {returnType}>(command, cancellationToken);");
+    public static Task<{returnTypeFullName}> Query(this IQueryProcessor queryProcessor, {parameterType} command, CancellationToken cancellationToken = default) 
+        => queryProcessor.QueryInternal<{parameterType}, {returnTypeFullName}>(command, cancellationToken);");
             }
         }
 
