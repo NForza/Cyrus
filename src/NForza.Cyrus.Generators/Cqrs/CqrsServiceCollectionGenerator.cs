@@ -86,7 +86,7 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
         StringBuilder source = new();
         foreach (var eventHandler in eventHandlers)
         {
-            var eventType = eventHandler.Parameters[0].Type;
+            var eventType = eventHandler.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
             var typeSymbol = eventHandler.ContainingType;
             var returnType = (INamedTypeSymbol)eventHandler.ReturnType;
             var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
@@ -132,22 +132,24 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
         StringBuilder source = new();
         foreach (var handler in queryHandlers)
         {
-            var queryType = handler.Parameters[0].Type;
+            var queryType = handler.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
             var typeSymbol = handler.ContainingType;
             var returnType = (INamedTypeSymbol)handler.ReturnType;
+            var returnTypeFullName = returnType?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
             var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
             if (isAsync)
             {
                 returnType = returnType.TypeArguments[0] as INamedTypeSymbol;
+                returnTypeFullName = returnType?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 if (handler.IsStatic)
                 {
                     source.Append($@"
-        handlers.AddHandler<{queryType}, {returnType}>(async (_, query, token) => await {typeSymbol}.Query(({queryType})query));");
+        handlers.AddHandler<{queryType}, {returnTypeFullName}>(async (_, query, token) => await {typeSymbol}.Query(({queryType})query));");
                 }
                 else
                 {
                     source.Append($@"
-        handlers.AddHandler<{queryType}, {returnType}>(async (services, query, token) => await services.GetRequiredService<{typeSymbol}>().Query(({queryType})query));");
+        handlers.AddHandler<{queryType}, {returnTypeFullName}>(async (services, query, token) => await services.GetRequiredService<{typeSymbol}>().Query(({queryType})query));");
 
                 }
 
@@ -157,12 +159,12 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
                 if (handler.IsStatic)
                 {
                     source.Append($@"
-        handlers.AddHandler<{queryType}, {returnType}>((_, query, token) => Task.FromResult<object>({typeSymbol}.Query(({queryType})query)));");
+        handlers.AddHandler<{queryType}, {returnTypeFullName}>((_, query, token) => Task.FromResult<object>({typeSymbol}.Query(({queryType})query)));");
                 }
                 else
                 {
                     source.Append($@"
-        handlers.AddHandler<{queryType}, {returnType}>((services, query, token) => Task.FromResult<object>(services.GetRequiredService<{typeSymbol}>().Query(({queryType})query)));");
+        handlers.AddHandler<{queryType}, {returnTypeFullName}>((services, query, token) => Task.FromResult<object>(services.GetRequiredService<{typeSymbol}>().Query(({queryType})query)));");
 
                 }
             }

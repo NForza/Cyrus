@@ -4,10 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Cqrs.Generator.Config;
-using NForza.Cyrus.Generators.Cqrs;
 using NForza.Generators;
 
 namespace NForza.Cyrus.Cqrs.Generator;
@@ -29,10 +26,11 @@ public class CqrsCommandDispatcherGenerator : GeneratorBase, IIncrementalGenerat
         var recordStructsWithAttribute = commandHandlerProvider.Combine(configProvider)
             .Where(x => {
                 var (methodNode, config) = x;
-                if (!config.GenerationType.Contains("domain"))
+                if (config == null || !config.GenerationType.Contains("domain"))
                     return false;
-                return config != null && IsCommandHandler(methodNode, config.Commands.HandlerName, config.Commands.Suffix);
+                return IsCommandHandler(methodNode, config.Commands.HandlerName, config.Commands.Suffix);
             })
+            .Where(x => x.Left != null)
             .Select((x, _) => x.Left!)
             .Collect();
 
@@ -73,7 +71,7 @@ public class CqrsCommandDispatcherGenerator : GeneratorBase, IIncrementalGenerat
         foreach (var handler in handlers)
         {
             var methodSymbol = handler;
-            var parameterType = methodSymbol.Parameters[0].Type;
+            var parameterType = methodSymbol.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 source.Append($@"
     public static Task<CommandResult> Execute(this ICommandDispatcher dispatcher, {parameterType} command, CancellationToken cancellationToken = default) 
         => dispatcher.ExecuteInternalAsync(command, cancellationToken);");

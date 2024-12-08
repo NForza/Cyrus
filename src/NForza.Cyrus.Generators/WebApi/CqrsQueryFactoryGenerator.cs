@@ -7,11 +7,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Cqrs.Generator.Config;
-using NForza.Cyrus.Generators.Cqrs;
 using NForza.Generators;
-
-#pragma warning disable RS1035 // Do not use banned APIs for analyzers
 
 namespace NForza.Cyrus.Generators.WebApi;
 
@@ -49,7 +45,7 @@ public class HttpContextQueryFactoryGenerator : GeneratorBase, IIncrementalGener
         context.RegisterSourceOutput(combinedProvider, (spc, queryHandlersWithConfig) =>
         {
             var (queryHandlers, config) = queryHandlersWithConfig;
-            if (config.GenerationType.Contains("webapi") && queryHandlers.Any())
+            if (config.GenerationType.Contains("webapi"))
             {
                 var sourceText = GenerateQueryFactoryExtensionMethods(queryHandlers);
                 spc.AddSource($"HttpContextQueryFactory.g.cs", SourceText.From(sourceText, Encoding.UTF8));
@@ -66,16 +62,16 @@ public class HttpContextQueryFactoryGenerator : GeneratorBase, IIncrementalGener
     }
 
     private static string[] assembliesToSkip = new[] { "System", "Microsoft", "mscorlib", "netstandard", "WindowsBase", "Swashbuckle" };
-    private IEnumerable<INamedTypeSymbol> GetAllTypesRecursively(INamespaceSymbol ns)
+    private IEnumerable<INamedTypeSymbol> GetAllTypesRecursively(INamespaceSymbol namespaceSymbol)
     {
-        var assemblyName = ns?.ContainingAssembly?.Name;
+        var assemblyName = namespaceSymbol?.ContainingAssembly?.Name;
         if (assemblyName != null && assembliesToSkip.Any( n => assemblyName.StartsWith(n)))
         {
             return [];
         }
 
-        var types = ns.GetTypeMembers();
-        foreach (var subNamespace in ns.GetNamespaceMembers())
+        var types = namespaceSymbol.GetTypeMembers();
+        foreach (var subNamespace in namespaceSymbol.GetNamespaceMembers())
         {
             types = types.AddRange(GetAllTypesRecursively(subNamespace));
         }
@@ -88,8 +84,8 @@ public class HttpContextQueryFactoryGenerator : GeneratorBase, IIncrementalGener
         {
             return namedTypeSymbol
                 .GetMembers()
-                .OfType<IPropertySymbol>() // Select only properties
-                .Where(p => p.DeclaredAccessibility == Accessibility.Public); // Filter by accessibility
+                .OfType<IPropertySymbol>()
+                .Where(p => p.DeclaredAccessibility == Accessibility.Public); 
         }
 
         StringBuilder source = new();

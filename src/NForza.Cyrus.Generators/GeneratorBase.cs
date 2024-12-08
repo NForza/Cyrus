@@ -10,9 +10,8 @@ using NForza.Cyrus.Cqrs.Generator.Config;
 
 namespace NForza.Generators;
 
-public abstract class GeneratorBase
+public abstract class GeneratorBase : IncrementalGeneratorBase
 {
-    protected TemplateEngine TemplateEngine = new(Assembly.GetExecutingAssembly(), "Templates");
     protected IncrementalValueProvider<GenerationConfig> ConfigFileProvider(IncrementalGeneratorInitializationContext context)
     {
         var configProvider = context.SyntaxProvider
@@ -64,16 +63,6 @@ public abstract class GeneratorBase
             }
         }
         return result;
-    }
-
-    public void DebugThisGenerator(bool debug)
-    {
-#if DEBUG_ANALYZER
-        if (!Debugger.IsAttached && debug)
-        {
-            Debugger.Launch();
-        }
-#endif
     }
 
     protected IEnumerable<INamedTypeSymbol> GetAllTypes(INamespaceSymbol namespaceSymbol)
