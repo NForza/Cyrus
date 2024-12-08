@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Generators;
 using NForza.Generators;
 
 namespace NForza.Cyrus.Cqrs.Generator;
@@ -50,7 +51,7 @@ public class CqrsEventConsumerGenerator : GeneratorBase, IIncrementalGenerator
         {
             var methodSymbol = handler;
             var eventTypeName = methodSymbol.Parameters[0].Type.Name;
-            var eventTypeFullName = methodSymbol.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var eventTypeFullName = methodSymbol.Parameters[0].Type.ToFullName();
             source.Append($@"
 public class {eventTypeName}Consumer(EventHandlerDictionary eventHandlerDictionary, IServiceScopeFactory serviceScopeFactory) : EventConsumer<{eventTypeFullName}>(eventHandlerDictionary, serviceScopeFactory)
 {{

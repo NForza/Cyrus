@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Generators;
 using NForza.Generators;
 
 namespace NForza.Cyrus.Cqrs.Generator;
@@ -54,9 +55,9 @@ public class CqrsQueryHandlerGenerator : GeneratorBase, IIncrementalGenerator
         foreach (var handler in handlers)
         {
             var methodSymbol = handler;
-            var parameterType = methodSymbol.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var parameterType = methodSymbol.Parameters[0].Type.ToFullName();
             var returnType = (INamedTypeSymbol)methodSymbol.ReturnType;
-            string returnTypeFullName = returnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            string returnTypeFullName = returnType.ToFullName();
             var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
 
             if (isAsync)
