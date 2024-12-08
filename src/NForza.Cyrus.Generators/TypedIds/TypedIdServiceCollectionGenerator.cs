@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Generators;
 using NForza.Generators;
 
 namespace NForza.Cyrus.TypedIds.Generator;
@@ -44,7 +45,7 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
 
         var namespaces = string.Join(Environment.NewLine, typedIds.Select(t => t.ContainingNamespace.ToDisplayString()).Distinct().Select(ns => $"using {ns};"));
 
-        var types = string.Join(",", typedIds.Select(t => $"[typeof({t.ToDisplayString()})] = typeof({GetUnderlyingTypeOfTypedId(t)})"));
+        var types = string.Join(",", typedIds.Select(t => $"[typeof({t.ToFullName()})] = typeof({GetUnderlyingTypeOfTypedId(t)})"));
         var registrations = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<{t.ToDisplayString()}>();"));
 
         source = source
