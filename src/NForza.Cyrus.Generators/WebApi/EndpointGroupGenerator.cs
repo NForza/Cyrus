@@ -16,7 +16,7 @@ public class EndpointGroupGenerator : GeneratorBase, IIncrementalGenerator
     {
         DebugThisGenerator(false);
 
-        var configurationProvider = ConfigFileProvider(context);
+        var configurationProvider = ConfigProvider(context);
 
         var allClassesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(

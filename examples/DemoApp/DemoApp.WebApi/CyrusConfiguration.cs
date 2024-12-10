@@ -7,6 +7,7 @@ namespace SimpleCyrusWebApi
         public CyrusConfiguration()
         {
             GenerateWebApi();
+            UseContractsFromAssembliesContaining("Contracts");
         }
     }
 }

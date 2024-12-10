@@ -15,7 +15,7 @@ public class CqrsQueryHandlerGenerator : GeneratorBase, IIncrementalGenerator
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
         DebugThisGenerator(false);
-        var configProvider = ConfigFileProvider(context);
+        var configProvider = ConfigProvider(context);
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
