@@ -17,7 +17,7 @@ public class CqrsCommandDispatcherGenerator : GeneratorBase, IIncrementalGenerat
     {
         DebugThisGenerator(false);
 
-        var configProvider = ConfigFileProvider(context);
+        var configProvider = ConfigProvider(context);
 
         var commandHandlerProvider = context.SyntaxProvider
             .CreateSyntaxProvider(

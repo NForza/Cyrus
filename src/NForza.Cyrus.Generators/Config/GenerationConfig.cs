@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using NForza.Generators;
-
-namespace NForza.Cyrus.Cqrs.Generator.Config;
+﻿namespace NForza.Cyrus.Cqrs.Generator.Config;
 
 public class GenerationConfig 
 {
