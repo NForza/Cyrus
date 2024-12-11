@@ -20,7 +20,7 @@ public class HttpContextQueryFactoryGenerator : GeneratorBase, IIncrementalGener
 
         var assemblyReferences = context.CompilationProvider;
 
-        var configurationProvider = ConfigFileProvider(context);
+        var configurationProvider = ConfigProvider(context);
 
         var typesFromReferencedAssembly = assemblyReferences
             .SelectMany((compilation, _) =>

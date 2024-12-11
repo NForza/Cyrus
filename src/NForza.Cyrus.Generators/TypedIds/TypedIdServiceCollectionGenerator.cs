@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators;
+using NForza.Cyrus.Generators.TypedIds;
 using NForza.Generators;
 
 namespace NForza.Cyrus.TypedIds.Generator;
@@ -13,26 +14,39 @@ namespace NForza.Cyrus.TypedIds.Generator;
 [Generator]
 public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncrementalGenerator
 {
-    public void Initialize(IncrementalGeneratorInitializationContext context)
+    public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
-        var incrementalValuesProvider = context.SyntaxProvider
+        DebugThisGenerator(true);
+
+        var typedIdsCollectionProvider = context.SyntaxProvider
                     .CreateSyntaxProvider(
-                        predicate: (syntaxNode, _) => IsRecordWithStringIdAttribute(syntaxNode) || IsRecordWithGuidIdAttribute(syntaxNode),
+                        predicate: (syntaxNode, _) => IsRecordWithStringIdAttribute(syntaxNode) || IsRecordWithGuidIdAttribute(syntaxNode) || IsRecordWithIntIdAttribute(syntaxNode),
                         transform: (context, _) => GetNamedTypeSymbolFromContext(context));
 
-        var typedIdsProvider = incrementalValuesProvider
+        var configProvider = ConfigProvider(context);
+        var compilationProvider = context.CompilationProvider;
+
+        var typedIdsProvider = typedIdsCollectionProvider
             .Where(x => x is not null)
             .Select((x, _) => x!)
-            .Collect();
+            .Collect()
+            .Combine(configProvider)
+            .Combine(compilationProvider);
 
-        context.RegisterSourceOutput(typedIdsProvider, (spc, typedIds) =>
+        context.RegisterSourceOutput(typedIdsProvider, (spc, typedIdsWithConfig) =>
         {
-            if (typedIds.Length > 0)
-            {
-                var sourceText = GenerateServiceCollectionExtensionMethod(typedIds);
-                spc.AddSource("ServiceCollectionExtensions.g.cs", SourceText.From(sourceText, Encoding.UTF8));
-            }
+            var ((typedIds, config), compilation) = typedIdsWithConfig;
+
+            if (!config.GenerationType.Contains("webapi"))
+                return;
+
+            var referencedTypedIds = compilation.GetAllTypesFromCompilationAndReferencedAssemblies(config.Contracts)
+                .Where(nts => nts.IsTypedId());
+
+            var allTypedIds = typedIds.Concat(referencedTypedIds).ToArray();
+
+            var sourceText = GenerateServiceCollectionExtensionMethod(allTypedIds);
+            spc.AddSource("ServiceCollectionExtensions.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         });
     }
 

@@ -12,14 +12,14 @@ namespace NForza.Generators;
 
 public abstract class GeneratorBase : IncrementalGeneratorBase
 {
-    protected IncrementalValueProvider<GenerationConfig> ConfigFileProvider(IncrementalGeneratorInitializationContext context)
+    protected IncrementalValueProvider<GenerationConfig> ConfigProvider(IncrementalGeneratorInitializationContext context)
     {
         var configProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: (syntaxNode, _) => syntaxNode is ClassDeclarationSyntax classDeclaration && classDeclaration.Identifier.Text == "CyrusConfiguration",
                 transform: (context, _) => GetConfigFromClass((ClassDeclarationSyntax)context.Node))
             .Collect()
-            .Select((cfgs, _) => 
+            .Select((cfgs, _) =>
             {
                 var cfg = cfgs.FirstOrDefault() ?? new GenerationConfig();
                 cfg.GenerationType ??= ["domain", "webapi", "contracts"];
@@ -58,6 +58,14 @@ public abstract class GeneratorBase : IncrementalGeneratorBase
                         break;
                     case "GenerateWebApi":
                         result.GenerationType = result.GenerationType == null ? ["webapi"] : [.. result.GenerationType, "webapi"];
+                        break;
+                    case "UseContractsFromAssembliesContaining":
+                        result.Contracts =
+                                methodCall.ArgumentList.Arguments
+                                    .Select(argument => argument.Expression as LiteralExpressionSyntax)
+                                    .Where(literal => literal != null)
+                                    .Select(literal => literal!.Token.ValueText)
+                                    .ToArray();
                         break;
                 }
             }
@@ -99,7 +107,7 @@ public abstract class GeneratorBase : IncrementalGeneratorBase
                 return predefinedType.Keyword.Text;
 
             default:
-                return typeSyntax?.ToString() ?? ""; 
+                return typeSyntax?.ToString() ?? "";
         }
     }
 
@@ -174,7 +182,7 @@ public abstract class GeneratorBase : IncrementalGeneratorBase
         &&
         methodDeclarationSyntax.ParameterList.Parameters.Count == 1;
 
-    protected bool CouldBeQueryHandler(SyntaxNode syntaxNode) 
+    protected bool CouldBeQueryHandler(SyntaxNode syntaxNode)
         => syntaxNode is MethodDeclarationSyntax methodDeclaration
             &&
             methodDeclaration.ParameterList.Parameters.Count == 1;

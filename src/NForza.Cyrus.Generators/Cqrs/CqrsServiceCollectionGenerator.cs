@@ -16,7 +16,7 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
     {
         DebugThisGenerator(false);
 
-        var configProvider = ConfigFileProvider(context);
+        var configProvider = ConfigProvider(context);
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -87,7 +87,7 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
         foreach (var eventHandler in eventHandlers)
         {
             var eventType = eventHandler.Parameters[0].Type.ToFullName();
-            var typeSymbol = eventHandler.ContainingType;
+            var typeSymbol = eventHandler.ContainingType.ToFullName();
             var returnType = (INamedTypeSymbol)eventHandler.ReturnType;
             var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
             if (isAsync)

@@ -9,7 +9,7 @@ namespace NForza.Cyrus.TypedIds.Generator;
 [Generator]
 public class IntIdTypeConverterGenerator : TypedIdGeneratorBase, IIncrementalGenerator
 {
-    public void Initialize(IncrementalGeneratorInitializationContext context)
+    public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
         DebugThisGenerator(false);
 

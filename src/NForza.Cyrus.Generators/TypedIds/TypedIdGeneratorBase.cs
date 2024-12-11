@@ -2,11 +2,12 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NForza.Cyrus.Generators.TypedIds;
 using NForza.Generators;
 
 namespace NForza.Cyrus.TypedIds.Generator;
 
-public abstract class TypedIdGeneratorBase : IncrementalGeneratorBase
+public abstract class TypedIdGeneratorBase : GeneratorBase
 {
     protected static bool IsRecordWithAttribute(SyntaxNode syntaxNode, string attributeName)
     {
@@ -34,10 +35,9 @@ public abstract class TypedIdGeneratorBase : IncrementalGeneratorBase
 
             foreach (var typeDeclaration in typeDeclarations)
             {
-                if (semanticModel.GetDeclaredSymbol(typeDeclaration) is INamedTypeSymbol typeSymbol && typeSymbol.IsValueType && typeSymbol.TypeKind == TypeKind.Struct)
+                if (semanticModel.GetDeclaredSymbol(typeDeclaration) is INamedTypeSymbol typeSymbol && typeSymbol.IsTypedId())
                 {
-                    if (typeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == typedIdName))
-                        yield return typeSymbol;
+                    yield return typeSymbol;
                 }
             }
         }
