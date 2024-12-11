@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using NForza.Cyrus.Cqrs;
 using System.Text.Json.Serialization;
 
 % Namespaces %
 
 namespace NForza.Cyrus.TypedIds;
 
-public static class ServiceCollectionExtensions
+public static class CyrusOptionsJsonConverterExtensions
 {
     public static IServiceCollection AddJsonConverters(this IServiceCollection services)
     {
@@ -15,10 +16,10 @@ public static class ServiceCollectionExtensions
 
     private static Dictionary<Type, Type> allTypes = new() {  % AllTypes % };
 
-    public static IServiceCollection AddTypedIds(this IServiceCollection services)
+    public static CyrusOptions AddTypedIdSerializers(this CyrusOptions options)
     {
-        services.AddSingleton(sp => new TypedIdDictionary(allTypes));
-        services.AddJsonConverters();
-        return services;
+        options.Services.AddSingleton(sp => new TypedIdDictionary(allTypes));
+        options.Services.AddJsonConverters();
+        return options;
     }
 }

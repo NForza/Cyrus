@@ -22,13 +22,10 @@ builder.Services.AddMassTransit(cfg =>
     });
 });
 
-//Adds the JsonConverters for all the TypedIds
-builder.Services.AddTypedIds();
-
-//Adds all Cyrus Cqrs  services
-builder.Services.AddCqrs(
-    //Configures all endpoints in all EndpointGroups
-    options => options.AddEndpointGroups());
+//Adds all Cyrus services
+builder.Services.AddCyrus(options => options
+        .AddEndpointGroups()
+        .AddTypedIdSerializers());
 
 builder.Services.Replace(ServiceDescriptor.Singleton<IEventBus, MassTransitEventBus>());
 

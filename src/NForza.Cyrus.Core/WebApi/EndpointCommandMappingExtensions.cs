@@ -1,8 +1,6 @@
 ﻿#nullable enable
 using System.Net.Mime;
-using System.Text;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Builder;
@@ -10,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
 using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.WebApi.Policies;
 

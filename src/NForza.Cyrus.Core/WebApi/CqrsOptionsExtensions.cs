@@ -7,9 +7,9 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace NForza.Cyrus.WebApi;
 
-public static class CqrsOptionsExtensions
+public static class CyrusOptionsExtensions
 {
-    public static CqrsOptions AddCqrsEndpoints(this CqrsOptions options)
+    public static CyrusOptions AddCqrsEndpoints(this CyrusOptions options)
     {
         options.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
         options.Services.AddSingleton(sp =>
@@ -31,7 +31,7 @@ public static class CqrsOptionsExtensions
         return options;
     }
 
-    public static CqrsOptions ConfigureJsonConverters(this CqrsOptions options)
+    public static CyrusOptions ConfigureJsonConverters(this CyrusOptions options)
     {
         return options;
     }

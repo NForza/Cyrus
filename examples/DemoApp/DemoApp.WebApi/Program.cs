@@ -4,7 +4,7 @@ using NForza.Cyrus.WebApi;
 using MassTransit;
 using System.Reflection;
 using DemoApp.Domain.Customer;
-using NForza.Cyrus.MassTransit;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,8 +17,9 @@ builder.Services.AddMassTransit(cfg =>
     });
 });
 
-builder.Services.AddTypedIds();
-builder.Services.AddCqrs(o => o.AddEndpointGroups());
+builder.Services.AddValidatorsFromAssemblyContaining<Customer>();
+
+builder.Services.AddCyrus(o => o.AddEndpointGroups().AddTypedIdSerializers());
 
 builder.Services.AddEndpointsApiExplorer();
 

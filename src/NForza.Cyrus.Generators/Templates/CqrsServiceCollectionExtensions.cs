@@ -8,9 +8,9 @@ namespace NForza.Cyrus.Cqrs;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddCqrs(this IServiceCollection services, Action<CqrsOptions>? options = null)
+    public static IServiceCollection AddCyrus(this IServiceCollection services, Action<CyrusOptions>? options = null)
     {
-        options?.Invoke(new CqrsOptions(services));
+        options?.Invoke(new CyrusOptions(services));
         services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
         services.AddSingleton<IQueryProcessor, QueryProcessor>();
         services.AddSingleton<ICommandBus, LocalCommandBus>(); 

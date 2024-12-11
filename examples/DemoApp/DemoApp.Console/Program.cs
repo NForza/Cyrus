@@ -8,7 +8,7 @@ using NForza.Cyrus.Cqrs;
 
 var host = Host.CreateDefaultBuilder(args)
             .ConfigureServices(services => services
-                .AddCqrs()
+                .AddCyrus()
                 .AddMassTransit( cfg =>
                 {
                     cfg.AddConsumers(Assembly.GetExecutingAssembly());
