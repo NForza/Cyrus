@@ -34,6 +34,16 @@ namespace DemoApp.WebApi.Tests
 
         [Theory]
         [InlineData("/customers")]
+        public async Task Posting_Add_Customer_Command_Without_A_Name_Should_Return_Bad_Request(string url)
+        {
+            var command = new { Name = (string?)null, Address = "The Netherlands" };
+            var response = await client.PostAsJsonAsync(url, command);
+            response.Should().NotBeNull();
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Theory]
+        [InlineData("/customers")]
         public async Task Putting_Update_Customer_Command_Should_Succeed(string url)
         {
             var command = new UpdateCustomerCommand(new CustomerId(), new Name("Thomas"), new Address("The Netherlands"));

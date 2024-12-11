@@ -1,10 +1,10 @@
 using System.Reflection;
+using FluentValidation;
 using MassTransit;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using NForza.Cyrus.Cqrs;
-using NForza.Cyrus.MassTransit;
 using NForza.Cyrus.TypedIds;
 using NForza.Cyrus.WebApi;
+using SimpleCyrusWebApi;
 using SimpleCyrusWebApi.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,15 +22,11 @@ builder.Services.AddMassTransit(cfg =>
     });
 });
 
-//Adds the JsonConverters for all the TypedIds
-builder.Services.AddTypedIds();
-
-//Adds all Cyrus Cqrs  services
-builder.Services.AddCqrs(
-    //Configures all endpoints in all EndpointGroups
-    options => options.AddEndpointGroups());
-
-builder.Services.Replace(ServiceDescriptor.Singleton<IEventBus, MassTransitEventBus>());
+builder.Services.AddValidatorsFromAssemblies([Assembly.GetExecutingAssembly(), typeof(Customer).Assembly]);
+//Adds all Cyrus services
+builder.Services.AddCyrus(options => options
+        .AddEndpointGroups()
+        .AddTypedIdSerializers());
 
 var app = builder.Build();
 
