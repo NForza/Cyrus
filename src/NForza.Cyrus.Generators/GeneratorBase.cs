@@ -7,6 +7,7 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NForza.Cyrus.Cqrs.Generator.Config;
+using NForza.Cyrus.Generators.Config;
 
 namespace NForza.Generators;
 
@@ -22,7 +23,8 @@ public abstract class GeneratorBase : IncrementalGeneratorBase
             .Select((cfgs, _) =>
             {
                 var cfg = cfgs.FirstOrDefault() ?? new GenerationConfig();
-                cfg.GenerationType ??= ["domain", "webapi", "contracts"];
+                if (!cfg.GenerationTarget.Any())
+                    cfg.GenerationTarget.AddRange( [GenerationTarget.Domain, GenerationTarget.WebApi, GenerationTarget.Contracts]);
                 return cfg;
             });
         return configProvider;
@@ -51,13 +53,13 @@ public abstract class GeneratorBase : IncrementalGeneratorBase
                         result.Events.Bus = "MassTransit";
                         break;
                     case "GenerateContracts":
-                        result.GenerationType = result.GenerationType == null ? ["contracts"] : [.. result.GenerationType, "contracts"];
+                        result.GenerationTarget.Add(GenerationTarget.Contracts);
                         break;
                     case "GenerateDomain":
-                        result.GenerationType = result.GenerationType == null ? ["domain"] : [.. result.GenerationType, "domain"];
+                        result.GenerationTarget.Add(GenerationTarget.Domain);
                         break;
                     case "GenerateWebApi":
-                        result.GenerationType = result.GenerationType == null ? ["webapi"] : [.. result.GenerationType, "webapi"];
+                        result.GenerationTarget.Add(GenerationTarget.WebApi);
                         break;
                     case "UseContractsFromAssembliesContaining":
                         result.Contracts =

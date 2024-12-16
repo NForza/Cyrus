@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Generators.Config;
 using NForza.Generators;
 
 namespace NForza.Cyrus.Generators.Cqrs.WebApi;
@@ -48,7 +49,7 @@ public class EndpointGroupGenerator : GeneratorBase, IIncrementalGenerator
         {
             var (classesModels, configuration) = classesAndConfig;
 
-            var isWebApi = configuration.GenerationType.Contains("webapi");
+            var isWebApi = configuration.GenerationTarget.Contains(GenerationTarget.WebApi);
 
             if (isWebApi && classesModels.Any())
             {

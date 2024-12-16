@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators;
+using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.TypedIds;
 using NForza.Generators;
 
@@ -37,7 +38,7 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
         {
             var ((typedIds, config), compilation) = typedIdsWithConfig;
 
-            if (!config.GenerationType.Contains("webapi"))
+            if (!config.GenerationTarget.Contains(GenerationTarget.WebApi))
                 return;
 
             var referencedTypedIds = compilation.GetAllTypesFromCompilationAndReferencedAssemblies(config.Contracts)
