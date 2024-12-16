@@ -17,7 +17,7 @@ public static partial class EndpointCommandMappingExtensions
 {
     public static IEndpointRouteBuilder MapCommands(this IEndpointRouteBuilder endpoints)
     {
-        var commandEndpoints = endpoints.ServiceProvider.GetServices<CommandEndpointDefinition>();
+        var commandEndpoints = endpoints.ServiceProvider.GetServices<ICommandEndpointDefinition>();
 
         foreach (var commandEndpoint in commandEndpoints)
         {
@@ -26,7 +26,7 @@ public static partial class EndpointCommandMappingExtensions
         return endpoints;
     }
 
-    internal static RouteHandlerBuilder MapCommand(IEndpointRouteBuilder endpoints, CommandEndpointDefinition endpointDefinition)
+    internal static RouteHandlerBuilder MapCommand(IEndpointRouteBuilder endpoints, ICommandEndpointDefinition endpointDefinition)
         => endpoints.MapMethods(endpointDefinition.Path, [endpointDefinition.Method], async (HttpContext ctx, [FromServices] ICommandDispatcher commandDispatcher) =>
                 {
                     var commandObject = await CreateCommandObject(endpointDefinition, ctx);
@@ -75,7 +75,7 @@ public static partial class EndpointCommandMappingExtensions
         return false;
     }
 
-    private static async Task<object?> CreateCommandObject(CommandEndpointDefinition endpointDefinition, HttpContext ctx)
+    private static async Task<object?> CreateCommandObject(ICommandEndpointDefinition endpointDefinition, HttpContext ctx)
     {
         var inputMappingPolicy = endpointDefinition.InputMappingPolicyType != null ?
             (InputMappingPolicy)ctx.RequestServices.GetRequiredService(endpointDefinition.InputMappingPolicyType) : new DefaultCommandInputMappingPolicy(ctx);

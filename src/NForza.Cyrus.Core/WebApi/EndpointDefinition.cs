@@ -1,6 +1,6 @@
 ﻿namespace NForza.Cyrus.WebApi;
 
-public record EndpointDefinition(Type EndpointType)
+public record EndpointDefinition(Type EndpointType) : IEndpointDefinition
 {
     public Type? InputMappingPolicyType { get; set; } = null;
     public string Method { get; internal set; } = string.Empty;
