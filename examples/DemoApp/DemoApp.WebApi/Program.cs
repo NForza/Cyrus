@@ -33,6 +33,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapCqrs();
+app.MapCyrus();
 
 await app.RunAsync();
