@@ -1,10 +1,8 @@
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
 using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.WebApi.Policies;
 
@@ -12,7 +10,7 @@ namespace NForza.Cyrus.WebApi;
 
 public static class IEndpointRouteBuilderExtensions
 {
-    public static IEndpointRouteBuilder MapCqrs(this IEndpointRouteBuilder endpoints)
+    public static IEndpointRouteBuilder MapCyrus(this IEndpointRouteBuilder endpoints)
         => endpoints.MapQueries().MapCommands();
 
     public static IEndpointRouteBuilder MapQueries(this IEndpointRouteBuilder endpoints)

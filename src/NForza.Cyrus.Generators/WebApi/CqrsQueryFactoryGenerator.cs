@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Generators.Config;
 using NForza.Generators;
 
 namespace NForza.Cyrus.Generators.WebApi;
@@ -45,7 +46,7 @@ public class HttpContextQueryFactoryGenerator : GeneratorBase, IIncrementalGener
         context.RegisterSourceOutput(combinedProvider, (spc, queryHandlersWithConfig) =>
         {
             var (queryHandlers, config) = queryHandlersWithConfig;
-            if (config.GenerationType.Contains("webapi"))
+            if (config.GenerationTarget.Contains(GenerationTarget.WebApi))
             {
                 var sourceText = GenerateQueryFactoryExtensionMethods(queryHandlers);
                 spc.AddSource($"HttpContextQueryFactory.g.cs", SourceText.From(sourceText, Encoding.UTF8));

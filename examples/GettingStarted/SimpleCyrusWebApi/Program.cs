@@ -37,5 +37,5 @@ if (app.Environment.IsDevelopment())
 }
 
 //Exposes all endpoints in all EndpointGroups
-app.MapCqrs();
+app.MapCyrus();
 app.Run();

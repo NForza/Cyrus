@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Cqrs.Generator.Config;
+using NForza.Cyrus.Generators.Config;
 using NForza.Generators;
 
 namespace NForza.Cyrus.Generators.Cqrs;
@@ -40,7 +41,7 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
         {
             var ((compilation, handlers), config) = source;
 
-            if (config != null && config.GenerationType.Contains("domain"))
+            if (config != null && config.GenerationTarget.Contains(GenerationTarget.Domain))
             {
                 var sourceText = GenerateServiceCollectionExtensions(handlers, config, compilation);
                     sourceProductionContext.AddSource($"ServiceCollection.g.cs", SourceText.From(sourceText, Encoding.UTF8));

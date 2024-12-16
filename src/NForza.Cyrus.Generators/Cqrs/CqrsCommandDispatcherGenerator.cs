@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators;
+using NForza.Cyrus.Generators.Config;
 using NForza.Generators;
 
 namespace NForza.Cyrus.Cqrs.Generator;
@@ -27,7 +28,7 @@ public class CqrsCommandDispatcherGenerator : GeneratorBase, IIncrementalGenerat
         var recordStructsWithAttribute = commandHandlerProvider.Combine(configProvider)
             .Where(x => {
                 var (methodNode, config) = x;
-                if (config == null || !config.GenerationType.Contains("domain"))
+                if (config == null || !config.GenerationTarget.Contains(GenerationTarget.Domain))
                     return false;
                 return IsCommandHandler(methodNode, config.Commands.HandlerName, config.Commands.Suffix);
             })

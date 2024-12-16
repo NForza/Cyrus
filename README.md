@@ -103,7 +103,7 @@ Dependency injection is supported for instance methods, both synchronous and asy
 
 ### Commands and Command Handlers
 
-Commands and their handlers are structured similarly to queries. For example:
+Commands and their handlers are structured similarly to queries. Command are required to make changes to the domain and generate zero or more events inform for other parts of the solution of these changes. For example:
 
 ```csharp
 public record struct AddCustomerCommand(Name Name, Address Address);
@@ -118,7 +118,7 @@ public class AddCustomerCommandHandler
 }
 ```
 
-Command handlers must return either `CommandResult` or `Task<CommandResult>`. Events are dispatched through the system via an event bus, and you can use a local bus or integrate with an external event bus using [MassTransit](https://masstransit.io/).
+Command handlers must return either `CommandResult` or `Task<CommandResult>`. Returned events are dispatched through the system via an event bus, and you can use a local bus or integrate with an external event bus using [MassTransit](https://masstransit.io/).
 
 The conventions for command handlers are as follows:
 
@@ -172,7 +172,7 @@ Cyrus generates several extension methods to simplify application startup.
 
 These methods are available on `IServiceCollection`:
 
-- `AddCyrus(Action<CqrsOptions> cfg)` - Registers all CommandHandlers, QueryHandlers, and supporting types. Optionally takes a lambda for custom configuration.
+- `AddCyrus(Action<CyrusOptions> cfg)` - Registers all CommandHandlers, QueryHandlers, and supporting types. Optionally takes a lambda for custom configuration.
 
 These methods are available on `IEndpointRouteBuilder`:
 
@@ -183,11 +183,10 @@ A basic Cyrus application startup might look like this:
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddTypedIds();
-builder.Services.AddCqrs(o => o.AddEndpointGroups().AddTypedIdSerializers());
+builder.Services.AddCyrus(o => o.AddEndpointGroups().AddTypedIdSerializers());
 
 var app = builder.Build();
-app.MapCqrs();
+app.MapCyrus();
 
 await app.RunAsync();
 ```
