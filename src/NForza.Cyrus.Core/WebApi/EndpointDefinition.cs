@@ -1,11 +1,12 @@
 ﻿namespace NForza.Cyrus.WebApi;
 
-public record EndpointDefinition(Type EndpointType) : IEndpointDefinition
+public record EndpointDefinition<T> : IEndpointDefinition
 {
+    public Type EndpointType => typeof(T);
     public Type? InputMappingPolicyType { get; set; } = null;
-    public string Method { get; internal set; } = string.Empty;
-    public string EndpointPath { get; internal set; } = string.Empty;
-    public string GroupPath { get; internal set; } = string.Empty;
+    public string Method { get; set; } = string.Empty;
+    public string EndpointPath { get; set; } = string.Empty;
+    public string GroupPath { get; set; } = string.Empty;
     public string Path
     {
         get
@@ -18,5 +19,5 @@ public record EndpointDefinition(Type EndpointType) : IEndpointDefinition
             return result;
         }
     }
-    public string[] Tags { get; internal set; } = ["API"];
+    public string[] Tags { get; set; } = ["API"];
 }

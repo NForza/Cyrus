@@ -2,7 +2,7 @@
 
 namespace NForza.Cyrus.WebApi;
 
-public class QueryEndpointBuilder(QueryEndpointDefinition endpointDefinition)
+public class QueryEndpointBuilder(IQueryEndpointDefinition endpointDefinition)
 {
     public QueryEndpointBuilder Get(string path)
     {

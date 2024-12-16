@@ -2,7 +2,7 @@
 
 namespace NForza.Cyrus.WebApi;
 
-public class CommandEndpointBuilder(CommandEndpointDefinition endpointDefinition)
+public class CommandEndpointBuilder(ICommandEndpointDefinition endpointDefinition)
 {
     public CommandEndpointBuilder Put(string path)
     {
