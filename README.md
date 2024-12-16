@@ -172,12 +172,11 @@ Cyrus generates several extension methods to simplify application startup.
 
 These methods are available on `IServiceCollection`:
 
-- `AddTypedIds()` - Registers all generated strongly typed IDs and their associated `JsonConverters`
-- `AddCqrs(Action<CqrsOptions> cfg)` - Registers all CommandHandlers, QueryHandlers, and supporting types. Optionally takes a lambda for custom configuration.
+- `AddCyrus(Action<CqrsOptions> cfg)` - Registers all CommandHandlers, QueryHandlers, and supporting types. Optionally takes a lambda for custom configuration.
 
 These methods are available on `IEndpointRouteBuilder`:
 
-- `MapCqrs()` - Registers all endpoints from all known EndpointGroups.
+- `MapCyrus()` - Registers all endpoints from all known EndpointGroups.
 
 A basic Cyrus application startup might look like this:
 
@@ -185,7 +184,7 @@ A basic Cyrus application startup might look like this:
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddTypedIds();
-builder.Services.AddCqrs(o => o.AddEndpointGroups());
+builder.Services.AddCqrs(o => o.AddEndpointGroups().AddTypedIdSerializers());
 
 var app = builder.Build();
 app.MapCqrs();
