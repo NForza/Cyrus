@@ -12,7 +12,7 @@ public class EndpointGroup(string tag, string path)
 
     internal IEnumerable<IEndpointDefinition> EndpointDefinitions => endpoints.Values;
 
-    public CommandEndpointBuilder CommandEndpoint<T>()
+    public CommandEndpointBuilder<T> CommandEndpoint<T>()
     {
         ICommandEndpointDefinition endpointDefinition = new CommandEndpointDefinition<T>();
         if (!endpoints.TryAdd(typeof(T), endpointDefinition))
@@ -21,10 +21,10 @@ public class EndpointGroup(string tag, string path)
         }
         endpointDefinition.Tags = Tags;
         endpointDefinition.GroupPath = path;
-        return new CommandEndpointBuilder(endpointDefinition);
+        return new CommandEndpointBuilder<T>(endpointDefinition);
     }
 
-    public QueryEndpointBuilder QueryEndpoint<T>()
+    public QueryEndpointBuilder<T> QueryEndpoint<T>()
     {
         IQueryEndpointDefinition endpointDefinition = new QueryEndpointDefinition<T>();
         if (!endpoints.TryAdd(typeof(T), endpointDefinition))
@@ -33,6 +33,6 @@ public class EndpointGroup(string tag, string path)
         }
         endpointDefinition.Tags = Tags;
         endpointDefinition.GroupPath = path;
-        return new QueryEndpointBuilder(endpointDefinition);
+        return new QueryEndpointBuilder<T>(endpointDefinition);
     }
 }

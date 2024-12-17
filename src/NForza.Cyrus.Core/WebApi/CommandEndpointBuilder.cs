@@ -2,42 +2,30 @@
 
 namespace NForza.Cyrus.WebApi;
 
-public class CommandEndpointBuilder(ICommandEndpointDefinition endpointDefinition)
+public class CommandEndpointBuilder<T>(ICommandEndpointDefinition endpointDefinition)
 {
-    public CommandEndpointBuilder Put(string path)
+    public CommandResultBuilder Put(string path)
     {
         endpointDefinition.Method = "PUT";
         endpointDefinition.EndpointPath = path;
-        return this;
+        return new(endpointDefinition);
     }
 
-    public CommandEndpointBuilder Post(string path)
+    public CommandResultBuilder Post(string path)
     {
         endpointDefinition.Method = "POST";
         endpointDefinition.EndpointPath = path;
-        return this;
+        return new(endpointDefinition);
     }
 
-    public CommandEndpointBuilder Tags(params string[] tags)
-    {
-        endpointDefinition.Tags = tags;
-        return this;
-    }
-
-    public CommandEndpointBuilder MapInput<T>()
-        where T : InputMappingPolicy
+    public CommandEndpointBuilder<T> MapInput<TInput>()
+        where TInput : InputMappingPolicy
     {
         if (endpointDefinition.InputMappingPolicyType != null)
         {
             throw new InvalidOperationException($"Input mapping policy already set for {endpointDefinition.EndpointType.FullName}");
         }
-        endpointDefinition.InputMappingPolicyType = typeof(T);
-        return this;
-    }
-
-    internal CommandEndpointBuilder AddResultPolicy(CommandResultPolicy commandResultPolicy)
-    {
-        endpointDefinition.CommandResultPolicies.Add(commandResultPolicy);
+        endpointDefinition.InputMappingPolicyType = typeof(TInput);
         return this;
     }
 }

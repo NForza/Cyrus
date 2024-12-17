@@ -3,16 +3,14 @@ using NForza.Cyrus.Cqrs;
 
 namespace NForza.Cyrus.WebApi.Policies;
 
-public static class CommandEndpointBuilderExtensions
+public static class CommandResultBuilderExtensions
 {
-    public static CommandEndpointBuilder AcceptedOnEvent<T>(this CommandEndpointBuilder builder, string location = "")
+    public static CommandResultBuilder AcceptedOnEvent<T>(this CommandResultBuilder builder, string location = "")
         => builder.AddResultPolicy(new AcceptedOnEventPolicy<T>(location));
 
-    public static CommandEndpointBuilder OtherwiseFail(this CommandEndpointBuilder builder, object? errorObject = null)
+    public static CommandResultBuilder OtherwiseFail(this CommandResultBuilder builder, object? errorObject = null)
         => builder.AddResultPolicy(new OtherwiseFailPolicy(errorObject));
 
-    public static CommandEndpointBuilder Result(this CommandEndpointBuilder builder, Func<CommandResult, IResult> resultFunc)
+    public static CommandResultBuilder Result(this CommandResultBuilder builder, Func<CommandResult, IResult> resultFunc)
         => builder.AddResultPolicy(new ResultFuncPolicy(resultFunc));
-
-
 }

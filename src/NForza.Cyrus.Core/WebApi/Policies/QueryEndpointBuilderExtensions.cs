@@ -4,14 +4,14 @@ namespace NForza.Cyrus.WebApi.Policies;
 
 public static class QueryEndpointBuilderExtensions
 {
-    public static QueryEndpointBuilder OkWhenNull(this QueryEndpointBuilder builder)
+    public static QueryEndpointBuilder<T> OkWhenNull<T>(this QueryEndpointBuilder<T> builder)
         => builder.AddPolicy(new OkWhenNullPolicy());
 
-    public static QueryEndpointBuilder Map<T>(this QueryEndpointBuilder builder, Func<T, object?> mapFunc)
-        where T : class
-        => builder.AddPolicy(new MapPolicy<T>(mapFunc));
+    public static QueryEndpointBuilder<T> Map<T, TInput>(this QueryEndpointBuilder<T> builder, Func<TInput, object?> mapFunc)
+        where TInput : class
+        => builder.AddPolicy(new MapPolicy<TInput>(mapFunc));
 
-    public static QueryEndpointBuilder Result(this QueryEndpointBuilder builder, Func<object?, IResult> resultFunc)
+    public static QueryEndpointBuilder<T> Result<T>(this QueryEndpointBuilder<T> builder, Func<object?, IResult> resultFunc)
         => builder.AddPolicy(new QueryResultFuncPolicy(resultFunc));
 
 }
