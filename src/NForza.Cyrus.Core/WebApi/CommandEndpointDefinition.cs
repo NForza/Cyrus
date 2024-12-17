@@ -8,4 +8,5 @@ public record CommandEndpointDefinition<T> : EndpointDefinition<T>, ICommandEndp
 {
     public Func<object, Task<CommandResult>> ExecuteCommand { get;  set; } = _ => Task.FromResult(CommandResult.CompletedSuccessfully);
     public List<CommandResultPolicy> CommandResultPolicies { get;  set; } = [];
+    public List<InputPolicy> InputPolicies { get; set; } = [];
 }

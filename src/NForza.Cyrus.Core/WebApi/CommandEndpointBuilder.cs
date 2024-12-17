@@ -1,4 +1,5 @@
-﻿using NForza.Cyrus.WebApi.Policies;
+﻿using Microsoft.AspNetCore.Http;
+using NForza.Cyrus.WebApi.Policies;
 
 namespace NForza.Cyrus.WebApi;
 
@@ -16,6 +17,12 @@ public class CommandEndpointBuilder<T>(ICommandEndpointDefinition endpointDefini
         endpointDefinition.Method = "POST";
         endpointDefinition.EndpointPath = path;
         return new(endpointDefinition);
+    }
+
+    public CommandEndpointBuilder<T> Input(Func<T?, HttpContext, T?> augmentFunc)
+    {
+        endpointDefinition.InputPolicies.Add(new InputPolicyFunc<T>((c, ctx) => Task.FromResult(augmentFunc(c, ctx))));
+        return this;
     }
 
     public CommandEndpointBuilder<T> MapInput<TInput>()

@@ -16,7 +16,7 @@ public class CustomerEndpointGroup: EndpointGroup
         QueryEndpoint<CustomerByIdQuery>()
             .Get("{Id:guid}");
 
-        CommandEndpoint<NewCustomerCommand>()
+        CommandEndpoint<NewCustomerCommand>()            
             .Post("")
             .AcceptedOnEvent<CustomerCreatedEvent>("/customers/{Id}")
             .OtherwiseFail();
