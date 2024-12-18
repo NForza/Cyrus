@@ -47,15 +47,13 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
             var allTypedIds = typedIds.Concat(referencedTypedIds).ToArray();
 
             var sourceText = GenerateServiceCollectionExtensionMethod(allTypedIds);
-            spc.AddSource("ServiceCollectionExtensions.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            spc.AddSource("CqrsServiceCollectionExtensions.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         });
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers", Justification = "<Pending>")]
     private string GenerateServiceCollectionExtensionMethod(IEnumerable<INamedTypeSymbol> typedIds)
     {
-        var source = EmbeddedResourceReader.GetResource(Assembly.GetExecutingAssembly(), "Templates", "ServiceCollectionExtensions.cs");
-
         var converters = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<JsonConverter, {t.Name}JsonConverter>();"));
 
         var namespaces = string.Join(Environment.NewLine, typedIds.Select(t => t.ContainingNamespace.ToDisplayString()).Distinct().Select(ns => $"using {ns};"));
@@ -63,11 +61,15 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
         var types = string.Join(",", typedIds.Select(t => $"[typeof({t.ToFullName()})] = typeof({GetUnderlyingTypeOfTypedId(t)})"));
         var registrations = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<{t.ToDisplayString()}>();"));
 
-        source = source
-            .Replace("% AllTypes %", types)
-            .Replace("% AllTypedIdRegistrations %", registrations)
-            .Replace("% Namespaces %", namespaces)
-            .Replace("% AddJsonConverters %", converters);
+        var replacements = new Dictionary<string, string>()
+        {
+            ["AllTypes"] = types,
+            ["AllTypedIdRegistrations"] = registrations,
+            ["Namespaces"] = namespaces,
+            ["AddJsonConverters"] = converters
+        };
+
+        var source = TemplateEngine.ReplaceInResourceTemplate("CyrusOptionsJsonConverterExtensions.cs", replacements);        
         return source;
     }
 }

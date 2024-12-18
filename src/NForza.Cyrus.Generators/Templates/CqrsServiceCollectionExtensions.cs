@@ -7,7 +7,7 @@ namespace NForza.Cyrus.Cqrs;
 
 #nullable enable
 
-public static class ServiceCollectionExtensions
+public static class CyrusServiceCollectionExtensions
 {
     public static IServiceCollection AddCyrus(this IServiceCollection services, Action<CyrusOptions>? options = null)
     {
@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IQueryProcessor, QueryProcessor>();
         services.AddSingleton<ICommandBus, LocalCommandBus>();
         services.AddScoped<DefaultCommandInputMappingPolicy>();
-        % RegisterEventBus % 
+        % RegisterEventBus %
         services.AddSingleton(BuildCommandHandlerDictionary());
         services.AddSingleton(BuildQueryHandlerDictionary());
         services.AddSingleton(BuildEventHandlerDictionary());
