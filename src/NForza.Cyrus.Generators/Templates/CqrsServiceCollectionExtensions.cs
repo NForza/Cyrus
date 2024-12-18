@@ -16,6 +16,8 @@ public static class CyrusServiceCollectionExtensions
         services.AddSingleton<IQueryProcessor, QueryProcessor>();
         services.AddSingleton<ICommandBus, LocalCommandBus>();
         services.AddScoped<DefaultCommandInputMappingPolicy>();
+        services.AddHttpContextAccessor();
+
         % RegisterEventBus %
         services.AddSingleton(BuildCommandHandlerDictionary());
         services.AddSingleton(BuildQueryHandlerDictionary());
