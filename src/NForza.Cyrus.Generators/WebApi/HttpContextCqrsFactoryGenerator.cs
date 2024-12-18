@@ -70,7 +70,7 @@ public class HttpContextCqrsFactoryGenerator : GeneratorBase, IIncrementalGenera
         return hasCommandName && !isFrameworkAssembly;
     }
 
-    private static string[] assembliesToSkip = new[] { "System", "Microsoft", "mscorlib", "netstandard", "WindowsBase", "Swashbuckle" };
+    private static string[] assembliesToSkip = new[] { "System", "Microsoft", "mscorlib", "netstandard", "WindowsBase", "Swashbuckle", "RabbitMq", "MassTransit" };
     private IEnumerable<INamedTypeSymbol> GetAllTypesRecursively(INamespaceSymbol namespaceSymbol)
     {
         var assemblyName = namespaceSymbol?.ContainingAssembly?.Name;
@@ -100,7 +100,8 @@ public class HttpContextCqrsFactoryGenerator : GeneratorBase, IIncrementalGenera
         StringBuilder source = new();
         foreach (var query in queries)
         {
-            source.Append($@"    objectFactories.Add(typeof({query}), (ctx) => new {query}{{");
+            var queryTypeName = query.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            source.Append($@"    objectFactories.Add(typeof({queryTypeName}), (ctx) => new {queryTypeName}{{");
 
             var propertyInitializer = new List<string>();
             foreach (var prop in GetPublicProperties(query))
@@ -111,7 +112,7 @@ public class HttpContextCqrsFactoryGenerator : GeneratorBase, IIncrementalGenera
             source.AppendLine($@"}});");
         }
 
-        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("HttpContextQueryFactory.cs", new Dictionary<string, string>
+        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("HttpContextCqrsFactory.cs", new Dictionary<string, string>
         {
             ["QueryFactoryMethod"] = source.ToString()
         });
