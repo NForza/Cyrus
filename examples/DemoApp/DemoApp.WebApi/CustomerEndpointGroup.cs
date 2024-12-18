@@ -23,20 +23,17 @@ public class CustomerEndpointGroup : EndpointGroup
         CommandEndpoint<DeleteCustomerCommand>()
             .AugmentInput((commandObj, context) =>
             {
-                var command = commandObj == null ? new DeleteCustomerCommand() : (DeleteCustomerCommand)commandObj;
-                string? guid = context.Request.Headers["CompanyId"].FirstOrDefault();
-                if (guid != null)
+                if (commandObj == null)
+                    return AugmentationResult.Failed(Results.BadRequest());
+                string? apiKey = context.Request.Headers["ApiKey"].FirstOrDefault();
+                if (apiKey != null)
                 {
-                    command.Id = new CustomerId(guid);
-                    return AugmentationResult.Success(command);
+                    return AugmentationResult.Success(commandObj);
                 }
-                else
-                {
-                    return AugmentationResult.Failed(Results.BadRequest("CompanyId header is required"));
-                }
+                return AugmentationResult.Failed(Results.BadRequest("ApiKey not present"));
             })
             .Delete("{Id}")
-            .AcceptedOnEvent<CustomerUpdatedEvent>("/customers/{Id}")
+            .AcceptedWhenSucceeded()
             .OtherwiseFail();
 
         QueryEndpoint<AllCustomersQuery>()

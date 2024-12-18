@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using NForza.Cyrus.WebApi.Policies;
 % Usings %
 
 namespace NForza.Cyrus.Cqrs;
@@ -13,7 +14,8 @@ public static class ServiceCollectionExtensions
         options?.Invoke(new CyrusOptions(services));
         services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
         services.AddSingleton<IQueryProcessor, QueryProcessor>();
-        services.AddSingleton<ICommandBus, LocalCommandBus>(); 
+        services.AddSingleton<ICommandBus, LocalCommandBus>();
+        services.AddScoped<DefaultCommandInputMappingPolicy>();
         % RegisterEventBus % 
         services.AddSingleton(BuildCommandHandlerDictionary());
         services.AddSingleton(BuildQueryHandlerDictionary());

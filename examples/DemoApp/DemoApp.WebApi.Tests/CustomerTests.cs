@@ -59,7 +59,7 @@ namespace DemoApp.WebApi.Tests
 
         [Theory]
         [InlineData("/customers")]
-        public async Task Deleting_Customer_Command_Without_CustomerId_Header_Should_Fail(string url)
+        public async Task Deleting_Customer_Command_Without_ApiKey_Header_Should_Fail(string url)
         {
             var command = new DeleteCustomerCommand(new CustomerId());
             var response = await client.DeleteAsync(url + $"/{command.Id}");
@@ -67,7 +67,20 @@ namespace DemoApp.WebApi.Tests
             var content = await response.Content.ReadAsStringAsync();
 
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            content.Should().Contain("CompanyId header is required");
+            content.Should().Contain("ApiKey not present");
+        }
+
+        [Theory]
+        [InlineData("/customers")]
+        public async Task Deleting_Customer_Command_With_ApiKey_Header_Should_Succeed(string url)
+        {
+            var command = new DeleteCustomerCommand(new CustomerId());
+            client.DefaultRequestHeaders.Add("ApiKey", "1234");
+            var response = await client.DeleteAsync(url + $"/{command.Id}");
+            response.Should().NotBeNull();
+            var content = await response.Content.ReadAsStringAsync();
+
+            response.StatusCode.Should().Be(HttpStatusCode.Accepted);
         }
     }
 }

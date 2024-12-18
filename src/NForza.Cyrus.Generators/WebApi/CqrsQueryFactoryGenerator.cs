@@ -50,7 +50,7 @@ public class HttpContextCqrsFactoryGenerator : GeneratorBase, IIncrementalGenera
             if (config.GenerationTarget.Contains(GenerationTarget.WebApi))
             {
                 var sourceText = GenerateQueryFactoryExtensionMethods(queryHandlers);
-                spc.AddSource($"HttpContextQueryFactory.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                spc.AddSource($"HttpContextObjectFactory.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }
         });
     }

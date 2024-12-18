@@ -86,7 +86,7 @@ public static partial class EndpointCommandMappingExtensions
     private static async Task<object?> CreateCommandObject(ICommandEndpointDefinition endpointDefinition, HttpContext ctx)
     {
         var inputMappingPolicy = endpointDefinition.InputMappingPolicyType != null ?
-            (InputMappingPolicy)ctx.RequestServices.GetRequiredService(endpointDefinition.InputMappingPolicyType) : new DefaultCommandInputMappingPolicy(ctx);
+            (InputMappingPolicy)ctx.RequestServices.GetRequiredService(endpointDefinition.InputMappingPolicyType) : ctx.RequestServices.GetRequiredService<DefaultCommandInputMappingPolicy>();
         return await inputMappingPolicy.MapInputAsync(endpointDefinition.EndpointType);
     }
 }
