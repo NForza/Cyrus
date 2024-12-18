@@ -18,13 +18,13 @@ public class EndpointGroupGenerator : GeneratorBase, IIncrementalGenerator
 
         var configurationProvider = ConfigProvider(context);
 
-        var allClassesProvider = context.SyntaxProvider
+        var allEndpointGroupsProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: (syntaxNode, _) => syntaxNode is ClassDeclarationSyntax,
                 transform: (context, _) => (ClassDeclarationSyntax)context.Node)
              .Where(static classDeclaration => classDeclaration.BaseList is not null);
 
-        var classModels = allClassesProvider
+        var endpointGroupModelProvider = allEndpointGroupsProvider
             .Combine(context.CompilationProvider)
             .Select(static (pair, _) =>
             {
@@ -42,17 +42,17 @@ public class EndpointGroupGenerator : GeneratorBase, IIncrementalGenerator
             })
             .Collect();
 
-        var classesModelsAndConfigurationProvider = classModels.Combine(configurationProvider);
+        var endpointGroupModelsAndConfigurationProvider = endpointGroupModelProvider.Combine(configurationProvider);
 
-        context.RegisterSourceOutput(classesModelsAndConfigurationProvider, (spc, classesAndConfig) =>
+        context.RegisterSourceOutput(endpointGroupModelsAndConfigurationProvider, (spc, classesAndConfig) =>
         {
-            var (classesModels, configuration) = classesAndConfig;
+            var (endpointGroupModels, configuration) = classesAndConfig;
 
             var isWebApi = configuration.GenerationTarget.Contains(GenerationTarget.WebApi);
 
-            if (isWebApi && classesModels.Any())
+            if (isWebApi)
             {
-                var sourceText = GenerateEndpointGroupDeclarations(classesModels);
+                var sourceText = GenerateEndpointGroupDeclarations(endpointGroupModels);
                 spc.AddSource($"RegisterEndpointGroups.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }
         });
