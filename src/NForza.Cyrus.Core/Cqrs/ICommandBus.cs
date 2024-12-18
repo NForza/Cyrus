@@ -1,7 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace NForza.Cyrus.Cqrs;
+﻿namespace NForza.Cyrus.Cqrs;
 
 public interface ICommandBus
 {

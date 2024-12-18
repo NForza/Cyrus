@@ -9,7 +9,7 @@ using NForza.Cyrus.Cqrs;
 var host = Host.CreateDefaultBuilder(args)
             .ConfigureServices(services => services
                 .AddCyrus()
-                .AddMassTransit( cfg =>
+                .AddMassTransit(cfg =>
                 {
                     cfg.AddConsumers(Assembly.GetExecutingAssembly());
                     cfg.UsingInMemory((context, cfg) =>
@@ -32,5 +32,5 @@ CommandResult deleteResult = await commandDispatcher.Execute(new DeleteCustomerC
 var customer = await queryProcessor.Query(new CustomerByIdQuery(customerId));
 if (customer != null)
 {
-    Console.WriteLine( customer.Name );
+    Console.WriteLine(customer.Name);
 }

@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace DemoApp.WebApi.Tests
 {
-    internal class DemoAppTestClient 
+    internal class DemoAppTestClient
     {
         private readonly WebApplicationFactory<Program> factory;
 

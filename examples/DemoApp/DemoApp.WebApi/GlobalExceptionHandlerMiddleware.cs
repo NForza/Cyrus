@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-using System.Net;
+﻿using System.Net;
+using Microsoft.AspNetCore.Mvc;
 
 /// <summary>
 /// Middleware to handle all unhandled exceptions globally.

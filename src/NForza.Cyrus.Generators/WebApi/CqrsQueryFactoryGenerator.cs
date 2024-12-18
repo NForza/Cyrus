@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
@@ -30,7 +29,7 @@ public class HttpContextCqrsFactoryGenerator : GeneratorBase, IIncrementalGenera
                 var typesFromAssemblies = compilation.References
                     .Select(ca => compilation.GetAssemblyOrModuleSymbol(ca) as IAssemblySymbol)
                     .SelectMany(ass => ass != null ? GetAllTypesRecursively(ass.GlobalNamespace) : [])
-                    .Where(t => IsQuery(t) || IsCommand(t) )
+                    .Where(t => IsQuery(t) || IsCommand(t))
                     .ToList();
 
                 var csharpCompilation = (CSharpCompilation)compilation;
@@ -75,7 +74,7 @@ public class HttpContextCqrsFactoryGenerator : GeneratorBase, IIncrementalGenera
     private IEnumerable<INamedTypeSymbol> GetAllTypesRecursively(INamespaceSymbol namespaceSymbol)
     {
         var assemblyName = namespaceSymbol?.ContainingAssembly?.Name;
-        if (assemblyName != null && assembliesToSkip.Any( n => assemblyName.StartsWith(n)))
+        if (assemblyName != null && assembliesToSkip.Any(n => assemblyName.StartsWith(n)))
         {
             return [];
         }
@@ -95,7 +94,7 @@ public class HttpContextCqrsFactoryGenerator : GeneratorBase, IIncrementalGenera
             return namedTypeSymbol
                 .GetMembers()
                 .OfType<IPropertySymbol>()
-                .Where(p => p.DeclaredAccessibility == Accessibility.Public); 
+                .Where(p => p.DeclaredAccessibility == Accessibility.Public);
         }
 
         StringBuilder source = new();

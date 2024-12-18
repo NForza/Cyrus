@@ -68,7 +68,7 @@ public class CqrsQueryHandlerGenerator : GeneratorBase, IIncrementalGenerator
         => queryProcessor.QueryInternal<{parameterType}, {queryType}>(command, cancellationToken);");
             }
             else
-            { 
+            {
                 source.Append($@"
     public static Task<{returnTypeFullName}> Query(this IQueryProcessor queryProcessor, {parameterType} command, CancellationToken cancellationToken = default) 
         => queryProcessor.QueryInternal<{parameterType}, {returnTypeFullName}>(command, cancellationToken);");

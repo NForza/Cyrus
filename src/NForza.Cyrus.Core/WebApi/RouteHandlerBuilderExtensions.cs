@@ -12,13 +12,13 @@ public static class RouteHandlerBuilderExtensions
              {
                  operation.Parameters.Add(
                        new OpenApiParameter()
-                      {
-                          Name = param.Name,
-                          In = ParameterLocation.Path,
-                          Required = true,
-                          Schema = new OpenApiSchema() { Type = param.Type, Format = param.Format }
-                      });
+                       {
+                           Name = param.Name,
+                           In = ParameterLocation.Path,
+                           Required = true,
+                           Schema = new OpenApiSchema() { Type = param.Type, Format = param.Format }
+                       });
              }
              return operation;
-         });    
+         });
 }

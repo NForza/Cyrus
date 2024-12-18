@@ -15,7 +15,7 @@ public class MultiMap<TKey, TValue>
         list.Add(value);
     }
 
-    public IEnumerable<TValue> GetValues(TKey key) 
+    public IEnumerable<TValue> GetValues(TKey key)
         => values.TryGetValue(key, out var list) ? list : [];
 
     public bool Remove(TKey key, TValue value)

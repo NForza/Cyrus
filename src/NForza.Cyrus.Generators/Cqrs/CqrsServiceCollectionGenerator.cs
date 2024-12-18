@@ -28,7 +28,7 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
             .Where(x =>
             {
                 var (handler, config) = x;
-                return IsCommandHandler(handler, config.Commands.HandlerName, config.Commands.Suffix) 
+                return IsCommandHandler(handler, config.Commands.HandlerName, config.Commands.Suffix)
                     || IsQueryHandler(handler, config.Queries.HandlerName, config.Queries.Suffix)
                     || IsEventHandler(handler, config.Events.HandlerName, config.Events.Suffix);
             })
@@ -44,7 +44,7 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
             if (config != null && config.GenerationTarget.Contains(GenerationTarget.Domain))
             {
                 var sourceText = GenerateServiceCollectionExtensions(handlers, config, compilation);
-                    sourceProductionContext.AddSource($"ServiceCollection.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                sourceProductionContext.AddSource($"ServiceCollection.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }
         });
     }

@@ -2,7 +2,7 @@
 
 namespace SimpleCyrusWebApi
 {
-    public class CyrusConfiguration: CyrusConfig
+    public class CyrusConfiguration : CyrusConfig
     {
         public CyrusConfiguration()
         {

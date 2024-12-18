@@ -26,7 +26,7 @@ public static class IEndpointRouteBuilderExtensions
         return endpoints;
     }
 
-    internal static RouteHandlerBuilder MapQuery(this IEndpointRouteBuilder endpoints, IQueryEndpointDefinition endpointDefinition, Type queryResultType) 
+    internal static RouteHandlerBuilder MapQuery(this IEndpointRouteBuilder endpoints, IQueryEndpointDefinition endpointDefinition, Type queryResultType)
         => endpoints
             .MapGet(endpointDefinition.Path, async (HttpContext ctx, IServiceProvider serviceProvider, IQueryProcessor queryProcessor)
                 =>

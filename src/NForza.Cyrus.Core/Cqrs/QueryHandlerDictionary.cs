@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-
-namespace NForza.Cyrus.Cqrs;
+﻿namespace NForza.Cyrus.Cqrs;
 
 public class QueryHandlerDictionary : Dictionary<Type, Func<IServiceProvider, object, CancellationToken, object>>
 {
@@ -11,7 +7,7 @@ public class QueryHandlerDictionary : Dictionary<Type, Func<IServiceProvider, ob
     {
         var func = this[typeof(TQuery)];
         func ??= (services, q, c) => throw new InvalidOperationException($"No handler found for query {typeof(TQuery).Name}");
-        return async (query, cancellationToken) => (TResult) await (Task<object>)func(serviceProvider, query, cancellationToken);
+        return async (query, cancellationToken) => (TResult)await (Task<object>)func(serviceProvider, query, cancellationToken);
     }
 
     internal Func<object, CancellationToken, object> GetHandler(IServiceProvider serviceProvider, Type queryType)
@@ -22,7 +18,7 @@ public class QueryHandlerDictionary : Dictionary<Type, Func<IServiceProvider, ob
 
     public Type GetQueryReturnType(Type queryType)
     {
-        return returnTypes[queryType];        
+        return returnTypes[queryType];
     }
 
     public void AddHandler<TQuery, TResult>(Func<IServiceProvider, object, CancellationToken, Task<object>> handler)

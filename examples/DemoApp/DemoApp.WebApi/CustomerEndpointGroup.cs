@@ -1,5 +1,4 @@
-﻿using DemoApp.Contracts;
-using DemoApp.Contracts.Customers;
+﻿using DemoApp.Contracts.Customers;
 using DemoApp.Domain.Customer;
 using NForza.Cyrus.WebApi;
 using NForza.Cyrus.WebApi.Policies;
