@@ -17,8 +17,24 @@ public class CustomerEndpointGroup : EndpointGroup
         CommandEndpoint<UpdateCustomerCommand>()
             .Put("")
             .AcceptedOnEvent<CustomerUpdatedEvent>("/customers/{Id}")
-            .OtherwiseFail();       
-        
+            .OtherwiseFail();
+
+        CommandEndpoint<DeleteCustomerCommand>()
+            .AugmentInput((commandObj, context) =>
+            {
+                if (commandObj == null)
+                    return AugmentationResult.Failed(Results.BadRequest());
+                string? apiKey = context.Request.Headers["ApiKey"].FirstOrDefault();
+                if (apiKey != null)
+                {
+                    return AugmentationResult.Success(commandObj);
+                }
+                return AugmentationResult.Failed(Results.BadRequest("ApiKey not present"));
+            })
+            .Delete("{Id}")
+            .AcceptedWhenSucceeded()
+            .OtherwiseFail();
+
         QueryEndpoint<AllCustomersQuery>()
             .Get("");
 

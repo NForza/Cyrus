@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
@@ -7,13 +6,14 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.Generators.Config;
 using NForza.Generators;
 
 namespace NForza.Cyrus.Generators.WebApi;
 
 [Generator]
-public class HttpContextQueryFactoryGenerator : GeneratorBase, IIncrementalGenerator
+public class HttpContextCqrsFactoryGenerator : GeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -29,7 +29,7 @@ public class HttpContextQueryFactoryGenerator : GeneratorBase, IIncrementalGener
                 var typesFromAssemblies = compilation.References
                     .Select(ca => compilation.GetAssemblyOrModuleSymbol(ca) as IAssemblySymbol)
                     .SelectMany(ass => ass != null ? GetAllTypesRecursively(ass.GlobalNamespace) : [])
-                    .Where(IsQuery)
+                    .Where(t => IsQuery(t) || IsCommand(t))
                     .ToList();
 
                 var csharpCompilation = (CSharpCompilation)compilation;
@@ -49,7 +49,7 @@ public class HttpContextQueryFactoryGenerator : GeneratorBase, IIncrementalGener
             if (config.GenerationTarget.Contains(GenerationTarget.WebApi))
             {
                 var sourceText = GenerateQueryFactoryExtensionMethods(queryHandlers);
-                spc.AddSource($"HttpContextQueryFactory.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                spc.AddSource($"HttpContextObjectFactory.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }
         });
     }
@@ -57,16 +57,24 @@ public class HttpContextQueryFactoryGenerator : GeneratorBase, IIncrementalGener
     private bool IsQuery(INamedTypeSymbol symbol)
     {
         Debug.WriteLine(symbol.Name);
-        bool isStruct = symbol.TypeKind == TypeKind.Struct;
         bool hasQueryName = symbol.Name.EndsWith("Query");
-        return isStruct && hasQueryName;
+        bool isFrameworkAssembly = symbol.ContainingAssembly.IsFrameworkAssembly();
+        return hasQueryName && !isFrameworkAssembly;
+    }
+
+    private bool IsCommand(INamedTypeSymbol symbol)
+    {
+        Debug.WriteLine(symbol.Name);
+        bool hasCommandName = symbol.Name.EndsWith("Command");
+        bool isFrameworkAssembly = symbol.ContainingAssembly.IsFrameworkAssembly();
+        return hasCommandName && !isFrameworkAssembly;
     }
 
     private static string[] assembliesToSkip = new[] { "System", "Microsoft", "mscorlib", "netstandard", "WindowsBase", "Swashbuckle" };
     private IEnumerable<INamedTypeSymbol> GetAllTypesRecursively(INamespaceSymbol namespaceSymbol)
     {
         var assemblyName = namespaceSymbol?.ContainingAssembly?.Name;
-        if (assemblyName != null && assembliesToSkip.Any( n => assemblyName.StartsWith(n)))
+        if (assemblyName != null && assembliesToSkip.Any(n => assemblyName.StartsWith(n)))
         {
             return [];
         }
@@ -86,7 +94,7 @@ public class HttpContextQueryFactoryGenerator : GeneratorBase, IIncrementalGener
             return namedTypeSymbol
                 .GetMembers()
                 .OfType<IPropertySymbol>()
-                .Where(p => p.DeclaredAccessibility == Accessibility.Public); 
+                .Where(p => p.DeclaredAccessibility == Accessibility.Public);
         }
 
         StringBuilder source = new();

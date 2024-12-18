@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-
-namespace NForza.Cyrus.Cqrs;
+﻿namespace NForza.Cyrus.Cqrs;
 
 public interface IQueryProcessor
 {

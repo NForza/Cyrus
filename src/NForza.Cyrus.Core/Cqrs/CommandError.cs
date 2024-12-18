@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NForza.Cyrus.Cqrs;
+﻿namespace NForza.Cyrus.Cqrs;
 
 public class CommandError(string errorKey, string errorMessage)
 {

@@ -26,6 +26,7 @@
   <ItemGroup>
     <Content Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs/" />
     <Compile Remove="Templates\CommandDispatcherExtensions.cs" />
+    <Compile Remove="Templates\CqrsFactory.cs" />
     <Compile Remove="Templates\CqrsServiceCollectionExtensions.cs" />
     <Compile Remove="Templates\EventConsumers.cs" />
     <Compile Remove="Templates\GuidId.cs" />
@@ -35,7 +36,6 @@
     <Compile Remove="Templates\IntId.cs" />
     <Compile Remove="Templates\IntIdJsonConverter.cs" />
     <Compile Remove="Templates\IntIdTypeConverter.cs" />
-    <Compile Remove="Templates\QueryFactory.cs" />
     <Compile Remove="Templates\QueryProcessorExtensions.cs" />
     <Compile Remove="Templates\RegisterEndpointGroups.cs" />
     <Compile Remove="Templates\ServiceCollectionExtensions.cs" />
@@ -58,7 +58,7 @@
     <EmbeddedResource Include="Templates\IntId.cs" />
     <EmbeddedResource Include="Templates\IntIdJsonConverter.cs" />
     <EmbeddedResource Include="Templates\IntIdTypeConverter.cs" />
-    <EmbeddedResource Include="Templates\QueryFactory.cs" />
+    <EmbeddedResource Include="Templates\CqrsFactory.cs" />
     <EmbeddedResource Include="Templates\QueryProcessorExtensions.cs" />
     <EmbeddedResource Include="Templates\RegisterEndpointGroups.cs" />
     <EmbeddedResource Include="Templates\CqrsServiceCollectionExtensions.cs" />

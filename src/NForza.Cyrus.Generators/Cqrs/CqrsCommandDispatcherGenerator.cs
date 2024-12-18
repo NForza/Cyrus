@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
@@ -26,7 +25,8 @@ public class CqrsCommandDispatcherGenerator : GeneratorBase, IIncrementalGenerat
                 transform: (context, _) => GetMethodSymbolFromContext(context));
 
         var recordStructsWithAttribute = commandHandlerProvider.Combine(configProvider)
-            .Where(x => {
+            .Where(x =>
+            {
                 var (methodNode, config) = x;
                 if (config == null || !config.GenerationTarget.Contains(GenerationTarget.Domain))
                     return false;
@@ -74,7 +74,7 @@ public class CqrsCommandDispatcherGenerator : GeneratorBase, IIncrementalGenerat
         {
             var methodSymbol = handler;
             var parameterType = methodSymbol.Parameters[0].Type.ToFullName();
-                source.Append($@"
+            source.Append($@"
     public static Task<CommandResult> Execute(this ICommandDispatcher dispatcher, {parameterType} command, CancellationToken cancellationToken = default) 
         => dispatcher.ExecuteInternalAsync(command, cancellationToken);");
         }

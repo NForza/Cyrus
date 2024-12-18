@@ -24,7 +24,7 @@ public class CqrsEventConsumerGenerator : GeneratorBase, IIncrementalGenerator
 
         var allEventHandlersProvider = incrementalValuesProvider.Combine(configProvider)
             .Where(x =>
-            {                
+            {
                 var (methodNode, config) = x;
                 return config.Events.Bus == "MassTransit" && IsEventHandler(methodNode, config.Events.HandlerName, config.Events.Suffix);
             })
@@ -45,7 +45,7 @@ public class CqrsEventConsumerGenerator : GeneratorBase, IIncrementalGenerator
     }
 
     private string GenerateEventConsumers(ImmutableArray<IMethodSymbol> handlers, Compilation compilation)
-    {       
+    {
         StringBuilder source = new();
         foreach (var handler in handlers)
         {

@@ -3,7 +3,6 @@
 using System.Diagnostics;
 #endif
 using System.Linq;
-using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NForza.Cyrus.Cqrs.Generator.Config;
@@ -24,7 +23,7 @@ public abstract class GeneratorBase : IncrementalGeneratorBase
             {
                 var cfg = cfgs.FirstOrDefault() ?? new GenerationConfig();
                 if (!cfg.GenerationTarget.Any())
-                    cfg.GenerationTarget.AddRange( [GenerationTarget.Domain, GenerationTarget.WebApi, GenerationTarget.Contracts]);
+                    cfg.GenerationTarget.AddRange([GenerationTarget.Domain, GenerationTarget.WebApi, GenerationTarget.Contracts]);
                 return cfg;
             });
         return configProvider;

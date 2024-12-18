@@ -15,14 +15,14 @@ public static class CyrusOptionsExtensions
         options.Services.AddSingleton(sp =>
         {
             IEnumerable<EndpointGroup> groups = sp.GetServices<EndpointGroup>();
-            IEnumerable<EndpointDefinition> definitions = groups.SelectMany(g => g.EndpointDefinitions);
-            return definitions.OfType<CommandEndpointDefinition>();
+            IEnumerable<IEndpointDefinition> definitions = groups.SelectMany(g => g.EndpointDefinitions);
+            return definitions.OfType<ICommandEndpointDefinition>();
         });
         options.Services.AddSingleton(sp =>
         {
             IEnumerable<EndpointGroup> groups = sp.GetServices<EndpointGroup>();
-            IEnumerable<EndpointDefinition> definitions = groups.SelectMany(g => g.EndpointDefinitions);
-            return definitions.OfType<QueryEndpointDefinition>();
+            IEnumerable<IEndpointDefinition> definitions = groups.SelectMany(g => g.EndpointDefinitions);
+            return definitions.OfType<IQueryEndpointDefinition>();
         });
         options.Services.AddHttpContextAccessor();
         options.Services.AddTransient<IConfigureOptions<JsonOptions>, JsonOptionsConfigurator>();

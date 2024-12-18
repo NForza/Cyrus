@@ -1,10 +1,10 @@
-using NForza.Cyrus.TypedIds;
-using NForza.Cyrus.Cqrs;
-using NForza.Cyrus.WebApi;
-using MassTransit;
 using System.Reflection;
 using DemoApp.Domain.Customer;
 using FluentValidation;
+using MassTransit;
+using NForza.Cyrus.Cqrs;
+using NForza.Cyrus.TypedIds;
+using NForza.Cyrus.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 

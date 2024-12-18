@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -14,7 +14,7 @@ public class TemplateEngine(Assembly assembly, string folderName)
         string template = EmbeddedResourceReader.GetResource(assembly, folderName, templateName);
         foreach (var replacement in replacements)
         {
-            template = template.Replace( "% " + replacement.Key + " %", replacement.Value);
+            template = template.Replace("% " + replacement.Key + " %", replacement.Value);
         }
         ThrowIfTemplateHasUnresolvedMarkers(template);
         string generatorName = assembly.GetName().Name;

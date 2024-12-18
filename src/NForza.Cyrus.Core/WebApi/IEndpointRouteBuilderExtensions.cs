@@ -15,7 +15,7 @@ public static class IEndpointRouteBuilderExtensions
 
     public static IEndpointRouteBuilder MapQueries(this IEndpointRouteBuilder endpoints)
     {
-        var queryEndpoints = endpoints.ServiceProvider.GetServices<QueryEndpointDefinition>();
+        var queryEndpoints = endpoints.ServiceProvider.GetServices<IQueryEndpointDefinition>();
         var queryHandlerDictionary = endpoints.ServiceProvider.GetRequiredService<QueryHandlerDictionary>();
 
         foreach (var queryEndpoint in queryEndpoints)
@@ -26,7 +26,7 @@ public static class IEndpointRouteBuilderExtensions
         return endpoints;
     }
 
-    internal static RouteHandlerBuilder MapQuery(this IEndpointRouteBuilder endpoints, QueryEndpointDefinition endpointDefinition, Type queryResultType) 
+    internal static RouteHandlerBuilder MapQuery(this IEndpointRouteBuilder endpoints, IQueryEndpointDefinition endpointDefinition, Type queryResultType)
         => endpoints
             .MapGet(endpointDefinition.Path, async (HttpContext ctx, IServiceProvider serviceProvider, IQueryProcessor queryProcessor)
                 =>
@@ -57,7 +57,7 @@ public static class IEndpointRouteBuilderExtensions
     private static IResult DefaultQueryPolicy(object? queryResult)
         => queryResult == null ? Results.NotFound() : Results.Ok(queryResult);
 
-    private static Task<object> CreateQueryObjectAsync(QueryEndpointDefinition endpointDefinition, HttpContext ctx)
+    private static Task<object> CreateQueryObjectAsync(IQueryEndpointDefinition endpointDefinition, HttpContext ctx)
     {
         var queryInputMappingPolicy = endpointDefinition.InputMappingPolicyType != null ?
             (InputMappingPolicy)ctx.RequestServices.GetRequiredService(endpointDefinition.InputMappingPolicyType)

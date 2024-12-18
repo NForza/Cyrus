@@ -3,7 +3,7 @@ using NForza.Cyrus.Generators.Config;
 
 namespace NForza.Cyrus.Cqrs.Generator.Config;
 
-public class GenerationConfig 
+public class GenerationConfig
 {
     public string[] Contracts { get; set; } = ["Contracts"];
     public CommandConfig Commands { get; set; } = new();

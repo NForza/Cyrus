@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace NForza.Cyrus.Cqrs;
+﻿namespace NForza.Cyrus.Cqrs;
 
 public class CommandHandlerDictionary : Dictionary<Type, Func<IServiceProvider, object, Task<CommandResult>>>
 {

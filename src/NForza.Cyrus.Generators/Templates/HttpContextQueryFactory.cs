@@ -8,11 +8,11 @@ namespace NForza.Cyrus.WebApi;
 
 #nullable enable
 
-public class HttpContextQueryFactory : IQueryFactory
+public class HttpContextCqrsFactory : ICqrsFactory
 {
     Dictionary<Type, Func<HttpContext, object>> objectFactories = new();
 
-    public HttpContextQueryFactory()
+    public HttpContextCqrsFactory()
     {
         % QueryFactoryMethod %
     }

@@ -1,7 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
-using NForza.Cyrus.Cqrs;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.CodeAnalysis;
+using NForza.Cyrus.Cqrs;
 
 public static class CompilationExtensions
 {

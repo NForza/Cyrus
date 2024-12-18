@@ -1,43 +1,45 @@
-﻿using NForza.Cyrus.WebApi.Policies;
+﻿using Microsoft.AspNetCore.Http;
+using NForza.Cyrus.WebApi.Policies;
 
 namespace NForza.Cyrus.WebApi;
 
-public class CommandEndpointBuilder(CommandEndpointDefinition endpointDefinition)
+public class CommandEndpointBuilder<T>(ICommandEndpointDefinition endpointDefinition)
 {
-    public CommandEndpointBuilder Put(string path)
+    public CommandResultBuilder Put(string path)
     {
         endpointDefinition.Method = "PUT";
         endpointDefinition.EndpointPath = path;
-        return this;
+        return new(endpointDefinition);
     }
 
-    public CommandEndpointBuilder Post(string path)
+    public CommandResultBuilder Post(string path)
     {
         endpointDefinition.Method = "POST";
         endpointDefinition.EndpointPath = path;
-        return this;
+        return new(endpointDefinition);
     }
 
-    public CommandEndpointBuilder Tags(params string[] tags)
+    public CommandEndpointBuilder<T> AugmentInput(Func<object?, HttpContext, AugmentationResult> augmentFunc)
     {
-        endpointDefinition.Tags = tags;
+        endpointDefinition.AugmentInputPolicies.Add(new AugmentInputPolicyFunc((c, ctx) => Task.FromResult(augmentFunc(c, ctx))));
         return this;
     }
 
-    public CommandEndpointBuilder MapInput<T>()
-        where T : InputMappingPolicy
+    public CommandEndpointBuilder<T> MapInput<TInput>()
+        where TInput : InputMappingPolicy
     {
         if (endpointDefinition.InputMappingPolicyType != null)
         {
             throw new InvalidOperationException($"Input mapping policy already set for {endpointDefinition.EndpointType.FullName}");
         }
-        endpointDefinition.InputMappingPolicyType = typeof(T);
+        endpointDefinition.InputMappingPolicyType = typeof(TInput);
         return this;
     }
 
-    internal CommandEndpointBuilder AddResultPolicy(CommandResultPolicy commandResultPolicy)
+    public CommandResultBuilder Delete(string path)
     {
-        endpointDefinition.CommandResultPolicies.Add(commandResultPolicy);
-        return this;
+        endpointDefinition.Method = "DELETE";
+        endpointDefinition.EndpointPath = path;
+        return new(endpointDefinition);
     }
 }

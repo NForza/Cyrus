@@ -2,7 +2,7 @@
 
 public class EndpointGroup(string tag, string path)
 {
-    private readonly Dictionary<Type, EndpointDefinition> endpoints = [];
+    private readonly Dictionary<Type, IEndpointDefinition> endpoints = [];
 
     public EndpointGroup(string tag) : this(tag, tag.ToLowerInvariant())
     {
@@ -10,29 +10,29 @@ public class EndpointGroup(string tag, string path)
 
     public string[] Tags { get; private set; } = [tag];
 
-    internal IEnumerable<EndpointDefinition> EndpointDefinitions => endpoints.Values;
+    internal IEnumerable<IEndpointDefinition> EndpointDefinitions => endpoints.Values;
 
-    public CommandEndpointBuilder CommandEndpoint<T>()
+    public CommandEndpointBuilder<T> CommandEndpoint<T>()
     {
-        CommandEndpointDefinition endpointDefinition = new(typeof(T));
+        ICommandEndpointDefinition endpointDefinition = new CommandEndpointDefinition<T>();
         if (!endpoints.TryAdd(typeof(T), endpointDefinition))
         {
             throw new InvalidOperationException($"Endpoint for {typeof(T).Name} already exists.");
         }
         endpointDefinition.Tags = Tags;
         endpointDefinition.GroupPath = path;
-        return new CommandEndpointBuilder(endpointDefinition);
+        return new CommandEndpointBuilder<T>(endpointDefinition);
     }
 
-    public QueryEndpointBuilder QueryEndpoint<T>()
+    public QueryEndpointBuilder<T> QueryEndpoint<T>()
     {
-        QueryEndpointDefinition endpointDefinition = new(typeof(T));
+        IQueryEndpointDefinition endpointDefinition = new QueryEndpointDefinition<T>();
         if (!endpoints.TryAdd(typeof(T), endpointDefinition))
         {
             throw new InvalidOperationException($"Endpoint for {typeof(T).Name} already exists.");
         }
         endpointDefinition.Tags = Tags;
         endpointDefinition.GroupPath = path;
-        return new QueryEndpointBuilder(endpointDefinition);
+        return new QueryEndpointBuilder<T>(endpointDefinition);
     }
 }
