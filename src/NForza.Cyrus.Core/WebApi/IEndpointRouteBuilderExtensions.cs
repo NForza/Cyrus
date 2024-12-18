@@ -1,8 +1,10 @@
+using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.WebApi.Policies;
 
@@ -10,6 +12,42 @@ namespace NForza.Cyrus.WebApi;
 
 public static class IEndpointRouteBuilderExtensions
 {
+    public static IEndpointRouteBuilder MapCyrus(this IEndpointRouteBuilder endpoints, bool logCyrusConfiguration)
+    {
+        if (logCyrusConfiguration)
+        {
+            LogCyrusConfiguration(endpoints.ServiceProvider);
+        }
+        return endpoints.MapCyrus();
+    }
+
+    private static void LogCyrusConfiguration(IServiceProvider serviceProvider)
+    {
+        var sb = new StringBuilder();
+        var logger = serviceProvider.GetRequiredService<ILogger<CyrusConfig>>();
+        var queryHandlers = serviceProvider.GetRequiredService<QueryHandlerDictionary>();
+        sb.AppendLine("Queries handled:");
+        foreach (var queryHandler in queryHandlers)
+        {
+            sb.AppendLine($"- {queryHandler.Key.FullName}");
+        }
+
+        var commandHandlers = serviceProvider.GetRequiredService<CommandHandlerDictionary>();
+        sb.AppendLine("Commands handled:");
+        foreach (var commandHandler in commandHandlers)
+        {
+            sb.AppendLine($"- {commandHandler.Key.FullName}");
+        }
+
+        var eventHandlers = serviceProvider.GetRequiredService<EventHandlerDictionary>();
+        sb.AppendLine("Events handled:");
+        foreach (var eventTypeHandler in eventHandlers)
+        {
+            sb.AppendLine($"- {eventTypeHandler.Key.FullName} (#handlers: {eventTypeHandler.Value.Count})");
+        }
+        logger.LogInformation(sb.ToString());
+    }
+
     public static IEndpointRouteBuilder MapCyrus(this IEndpointRouteBuilder endpoints)
         => endpoints.MapQueries().MapCommands();
 

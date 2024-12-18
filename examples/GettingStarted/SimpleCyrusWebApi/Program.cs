@@ -8,6 +8,9 @@ using SimpleCyrusWebApi;
 using SimpleCyrusWebApi.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.AddConsole();
+builder.Logging.AddFilter("Default", LogLevel.Information);
+builder.Logging.AddFilter("Microsoft", LogLevel.Warning);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -37,5 +40,5 @@ if (app.Environment.IsDevelopment())
 }
 
 //Exposes all endpoints in all EndpointGroups
-app.MapCyrus();
+app.MapCyrus(logCyrusConfiguration: true);
 app.Run();
