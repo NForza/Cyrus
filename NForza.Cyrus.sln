@@ -17,8 +17,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoApp.WebApi.Tests", "exa
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+		.github\workflows\build-masstransit-example.yml = .github\workflows\build-masstransit-example.yml
 		NForza.Cyrus.nuspec = NForza.Cyrus.nuspec
+		.github\workflows\build.yml = .github\workflows\build.yml
 		.github\workflows\publish.yml = .github\workflows\publish.yml
 		README.md = README.md
 	EndProjectSection
@@ -27,9 +28,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.Generators", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.Core", "src\NForza.Cyrus.Core\NForza.Cyrus.Core.csproj", "{67445A91-EC9C-41D8-860C-3B7C003B776D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DemoApp", "examples\DemoApp", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DemoApp", "DemoApp", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GettingStarted", "examples\GettingStarted", "{EA70C04C-2226-48BB-8ED1-246C5BFE64D7}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GettingStarted", "GettingStarted", "{EA70C04C-2226-48BB-8ED1-246C5BFE64D7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleCyrusWebApi", "examples\GettingStarted\SimpleCyrusWebApi\SimpleCyrusWebApi.csproj", "{1A9C74B0-70AD-43CC-856A-CA74FB689054}"
 EndProject
