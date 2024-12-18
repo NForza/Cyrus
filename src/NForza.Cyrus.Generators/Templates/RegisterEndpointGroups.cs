@@ -11,7 +11,7 @@ public static class AddEndpointGroupExtensions
     public static CyrusOptions AddEndpointGroups(this CyrusOptions options)
     {
         % RegisterEndpointGroups %
-        options.Services.AddScoped<IQueryFactory, HttpContextQueryFactory>();
+        options.Services.AddScoped<ICqrsFactory, HttpContextCqrsFactory>();
 
         return options.AddCqrsEndpoints();
     }

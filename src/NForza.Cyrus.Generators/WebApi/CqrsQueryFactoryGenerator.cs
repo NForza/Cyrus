@@ -7,13 +7,14 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.Generators.Config;
 using NForza.Generators;
 
 namespace NForza.Cyrus.Generators.WebApi;
 
 [Generator]
-public class HttpContextQueryFactoryGenerator : GeneratorBase, IIncrementalGenerator
+public class HttpContextCqrsFactoryGenerator : GeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -29,7 +30,7 @@ public class HttpContextQueryFactoryGenerator : GeneratorBase, IIncrementalGener
                 var typesFromAssemblies = compilation.References
                     .Select(ca => compilation.GetAssemblyOrModuleSymbol(ca) as IAssemblySymbol)
                     .SelectMany(ass => ass != null ? GetAllTypesRecursively(ass.GlobalNamespace) : [])
-                    .Where(IsQuery)
+                    .Where(t => IsQuery(t) || IsCommand(t) )
                     .ToList();
 
                 var csharpCompilation = (CSharpCompilation)compilation;
@@ -57,9 +58,17 @@ public class HttpContextQueryFactoryGenerator : GeneratorBase, IIncrementalGener
     private bool IsQuery(INamedTypeSymbol symbol)
     {
         Debug.WriteLine(symbol.Name);
-        bool isStruct = symbol.TypeKind == TypeKind.Struct;
         bool hasQueryName = symbol.Name.EndsWith("Query");
-        return isStruct && hasQueryName;
+        bool isFrameworkAssembly = symbol.ContainingAssembly.IsFrameworkAssembly();
+        return hasQueryName && !isFrameworkAssembly;
+    }
+
+    private bool IsCommand(INamedTypeSymbol symbol)
+    {
+        Debug.WriteLine(symbol.Name);
+        bool hasCommandName = symbol.Name.EndsWith("Command");
+        bool isFrameworkAssembly = symbol.ContainingAssembly.IsFrameworkAssembly();
+        return hasCommandName && !isFrameworkAssembly;
     }
 
     private static string[] assembliesToSkip = new[] { "System", "Microsoft", "mscorlib", "netstandard", "WindowsBase", "Swashbuckle" };

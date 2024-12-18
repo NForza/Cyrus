@@ -5,7 +5,7 @@ namespace NForza.Cyrus.WebApi
 {
     public interface ICommandEndpointDefinition: IEndpointDefinition
     {
-        List<InputPolicy> InputPolicies { get; set; }
+        List<AugmentInputPolicy> AugmentInputPolicies { get; set; }
         List<CommandResultPolicy> CommandResultPolicies { get; set; }
         Func<object, Task<CommandResult>> ExecuteCommand { get; set; }
     }

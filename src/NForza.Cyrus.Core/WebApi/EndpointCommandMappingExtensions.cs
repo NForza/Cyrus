@@ -31,6 +31,14 @@ public static partial class EndpointCommandMappingExtensions
                 {
                     var commandObject = await CreateCommandObject(endpointDefinition, ctx);
 
+                    foreach (var policy in endpointDefinition.AugmentInputPolicies)
+                    {
+                        AugmentationResult augmentationResult = await policy.AugmentAsync(commandObject, ctx);
+                        if (augmentationResult.Result != null)
+                            return augmentationResult.Result;
+                        commandObject = augmentationResult.AugmentedObject;
+                    }
+
                     if (commandObject == null)
                         return Results.BadRequest("Invalid command object.");
 

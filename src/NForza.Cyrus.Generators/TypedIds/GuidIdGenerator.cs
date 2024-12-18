@@ -39,7 +39,7 @@ public class GuidIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
         {
             ["ItemName"] = item.Name,
             ["Namespace"] = item.ContainingNamespace.ToDisplayString(),
-            ["Constructor"] = GenerateConstructor(item),
+            ["Constructors"] = GenerateConstructors(item),
             ["CastOperators"] = GenerateCastOperatorsToUnderlyingType(item),
             ["Default"] = "Guid.Empty"
         };
@@ -53,6 +53,7 @@ public class GuidIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
         @$"public static implicit operator {GetUnderlyingTypeOfTypedId(item)}({item.ToDisplayString()} typedId) => typedId.Value;
     public static explicit operator {item.ToDisplayString()}({GetUnderlyingTypeOfTypedId(item)} value) => new(value);";
 
-    string GenerateConstructor(INamedTypeSymbol item) =>
-        $@"public {item.Name}(): this(Guid.NewGuid()) {{}}";
+    string GenerateConstructors(INamedTypeSymbol item) =>
+        $@"public {item.Name}(): this(Guid.NewGuid()) {{}}
+    public {item.Name}(string guid): this(Guid.Parse(guid)) {{}}";
 }

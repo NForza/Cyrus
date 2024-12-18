@@ -2,11 +2,11 @@
 
 namespace NForza.Cyrus.WebApi.Policies;
 
-public class InputPolicyFunc<T>(Func<T?, HttpContext, Task<T?>> augmentFunction) : InputPolicy
+public class AugmentInputPolicyFunc(Func<object?, HttpContext, Task<AugmentationResult>> augmentFunction) : AugmentInputPolicy
 {
-    public override async Task<object?> AugmentAsync(object? input, HttpContext httpContext)
+    public override async Task<AugmentationResult> AugmentAsync(object? input, HttpContext httpContext)
     {
-        T? result = await augmentFunction((T?)input, httpContext);
+        var result = await augmentFunction(input, httpContext);
         return result;
     }
 }

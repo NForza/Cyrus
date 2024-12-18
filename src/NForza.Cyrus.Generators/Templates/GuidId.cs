@@ -12,7 +12,7 @@ namespace % Namespace %;
 [DebuggerDisplay("{Value}")]
 public partial record struct % ItemName %(Guid Value): ITypedId, IComparable<% ItemName %>, IComparable
 {
-    % Constructor %
+    % Constructors %
     public static % ItemName % Empty => new % ItemName %(% Default %);
     % CastOperators %
     public override string ToString() => Value.ToString();

@@ -3,6 +3,8 @@ using NForza.Cyrus.WebApi.Policies;
 
 namespace NForza.Cyrus.WebApi;
 
+#nullable enable
+
 public class CommandEndpointBuilder<T>(ICommandEndpointDefinition endpointDefinition)
 {
     public CommandResultBuilder Put(string path)
@@ -19,9 +21,9 @@ public class CommandEndpointBuilder<T>(ICommandEndpointDefinition endpointDefini
         return new(endpointDefinition);
     }
 
-    public CommandEndpointBuilder<T> Input(Func<T?, HttpContext, T?> augmentFunc)
+    public CommandEndpointBuilder<T> AugmentInput(Func<object?, HttpContext, AugmentationResult> augmentFunc)
     {
-        endpointDefinition.InputPolicies.Add(new InputPolicyFunc<T>((c, ctx) => Task.FromResult(augmentFunc(c, ctx))));
+        endpointDefinition.AugmentInputPolicies.Add(new AugmentInputPolicyFunc((c, ctx) => Task.FromResult(augmentFunc(c, ctx))));
         return this;
     }
 
@@ -34,5 +36,25 @@ public class CommandEndpointBuilder<T>(ICommandEndpointDefinition endpointDefini
         }
         endpointDefinition.InputMappingPolicyType = typeof(TInput);
         return this;
+    }
+
+    public CommandResultBuilder Delete(string path)
+    {
+        endpointDefinition.Method = "DELETE";
+        endpointDefinition.EndpointPath = path;
+        return new(endpointDefinition);
+    }
+}
+
+public record struct AugmentationResult(object? AugmentedObject, IResult? Result)
+{
+    public static AugmentationResult Success(object? augmentedObject)
+    {
+        return new AugmentationResult(augmentedObject, default);
+    }
+
+    public static AugmentationResult Failed(IResult result)
+    {
+        return new AugmentationResult(default, result);
     }
 }

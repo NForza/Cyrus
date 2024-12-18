@@ -2,7 +2,7 @@
 
 namespace NForza.Cyrus.WebApi.Policies;
 
-public class DefaultQueryInputMappingPolicy(IHttpContextAccessor contextAccessor, IQueryFactory queryFactory) : InputMappingPolicy
+public class DefaultQueryInputMappingPolicy(IHttpContextAccessor contextAccessor, ICqrsFactory queryFactory) : InputMappingPolicy
 {
     public override Task<object> MapInputAsync(Type typeToCreate)
     {
