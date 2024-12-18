@@ -1,4 +1,4 @@
-name: Build NForza.Cyrus
+name: Build MassTransit example
 
 on:
   pull_request:
