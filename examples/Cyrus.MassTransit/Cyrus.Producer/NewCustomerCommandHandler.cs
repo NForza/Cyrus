@@ -1,5 +1,4 @@
 ﻿using NForza.Cyrus.Cqrs;
-using NForza.Cyrus.TypedIds;
 
 namespace Cyrus.Server;
 
