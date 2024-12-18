@@ -32,7 +32,7 @@
     <Compile Remove="Templates\GuidId.cs" />
     <Compile Remove="Templates\GuidIdJsonConverter.cs" />
     <Compile Remove="Templates\GuidIdTypeConverter.cs" />
-    <Compile Remove="Templates\HttpContextQueryFactory.cs" />
+    <Compile Remove="Templates\HttpContextCqrsFactory.cs" />
     <Compile Remove="Templates\IntId.cs" />
     <Compile Remove="Templates\IntIdJsonConverter.cs" />
     <Compile Remove="Templates\IntIdTypeConverter.cs" />
@@ -54,7 +54,7 @@
     <EmbeddedResource Include="Templates\GuidId.cs" />
     <EmbeddedResource Include="Templates\GuidIdJsonConverter.cs" />
     <EmbeddedResource Include="Templates\GuidIdTypeConverter.cs" />
-    <EmbeddedResource Include="Templates\HttpContextQueryFactory.cs" />
+    <EmbeddedResource Include="Templates\HttpContextCqrsFactory.cs" />
     <EmbeddedResource Include="Templates\IntId.cs" />
     <EmbeddedResource Include="Templates\IntIdJsonConverter.cs" />
     <EmbeddedResource Include="Templates\IntIdTypeConverter.cs" />
