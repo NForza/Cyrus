@@ -11,7 +11,7 @@ public static class AssemblyExtensions
                || name.StartsWith("System")
                || name.StartsWith("Microsoft")
                || name.StartsWith("MassTransit")
-               || name.StartsWith("RabbitMq")
+               || name.StartsWith("RabbitMQ")
                || name == "mscorlib"
                || name == "netstandard"
                || name == "WindowsBase";

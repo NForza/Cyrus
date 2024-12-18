@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
@@ -70,7 +71,7 @@ public class HttpContextCqrsFactoryGenerator : GeneratorBase, IIncrementalGenera
         return hasCommandName && !isFrameworkAssembly;
     }
 
-    private static string[] assembliesToSkip = new[] { "System", "Microsoft", "mscorlib", "netstandard", "WindowsBase", "Swashbuckle", "RabbitMq", "MassTransit" };
+    private static string[] assembliesToSkip = new[] { "System", "Microsoft", "mscorlib", "netstandard", "WindowsBase", "Swashbuckle", "RabbitMQ", "MassTransit" };
     private IEnumerable<INamedTypeSymbol> GetAllTypesRecursively(INamespaceSymbol namespaceSymbol)
     {
         var assemblyName = namespaceSymbol?.ContainingAssembly?.Name;
@@ -89,6 +90,24 @@ public class HttpContextCqrsFactoryGenerator : GeneratorBase, IIncrementalGenera
 
     private string GenerateQueryFactoryExtensionMethods(ImmutableArray<INamedTypeSymbol> queries)
     {
+        StringBuilder source = new();
+        foreach (var query in queries)
+        {
+            var queryTypeName = query.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+            source.Append($@"    objectFactories.Add(typeof({queryTypeName}), (ctx) => {GetConstructionExpression(query)}");
+        }
+        
+        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("HttpContextCqrsFactory.cs", new Dictionary<string, string>
+        {
+            ["QueryFactoryMethod"] = source.ToString()
+        });
+
+        return resolvedSource;
+    }
+
+    private string GetConstructionExpression(INamedTypeSymbol query)
+    {
         static IEnumerable<IPropertySymbol> GetPublicProperties(INamedTypeSymbol namedTypeSymbol)
         {
             return namedTypeSymbol
@@ -97,26 +116,49 @@ public class HttpContextCqrsFactoryGenerator : GeneratorBase, IIncrementalGenera
                 .Where(p => p.DeclaredAccessibility == Accessibility.Public);
         }
 
-        StringBuilder source = new();
-        foreach (var query in queries)
+        var queryTypeName = query.ToFullName();
+        var ctor = new StringBuilder(@$"new {queryTypeName}");
+        var constructorProperties = GenerateConstructorParameters(query, ctor);
+        var propertiesToInitialize = GetPublicProperties(query).Where(p => !constructorProperties.Contains(p.Name)).ToList();
+        if (propertiesToInitialize.Count > 0)
         {
-            var queryTypeName = query.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-            source.Append($@"    objectFactories.Add(typeof({queryTypeName}), (ctx) => new {queryTypeName}{{");
-
+            ctor.Append("{");
             var propertyInitializer = new List<string>();
-            foreach (var prop in GetPublicProperties(query))
+            foreach (var prop in propertiesToInitialize)
             {
-                propertyInitializer.Add(@$"{prop.Name} = ({prop.Type})GetPropertyValue(""{prop.Name}"", ctx, typeof({prop.Type}))");
+                propertyInitializer.Add(@$"{prop.Name} = ({prop.Type.ToFullName()})GetPropertyValue(""{prop.Name}"", ctx, typeof({prop.Type}))");
             }
-            source.Append(string.Join(", ", propertyInitializer));
-            source.AppendLine($@"}});");
+            ctor.Append(string.Join(", ", propertyInitializer));
+            ctor.Append("}");
         }
+        ctor.AppendLine(");");
+        return ctor.ToString();
+    }
 
-        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("HttpContextCqrsFactory.cs", new Dictionary<string, string>
+    private List<string> GenerateConstructorParameters(INamedTypeSymbol query, StringBuilder ctor)
+    {
+        var constructorWithLeastParameters = query.Constructors
+                .Where(c => c.DeclaredAccessibility == Accessibility.Public) 
+                .OrderBy(c => c.Parameters.Length)
+                .FirstOrDefault();
+        if (constructorWithLeastParameters == null)
         {
-            ["QueryFactoryMethod"] = source.ToString()
-        });
+            return [];
+        }
+        ctor.Append("(");
 
-        return resolvedSource;
+        var result = new List<string>();
+        var firstParam = constructorWithLeastParameters.Parameters.FirstOrDefault();
+        foreach (var param in constructorWithLeastParameters.Parameters)
+        {
+            if (!param.Equals(firstParam, SymbolEqualityComparer.Default))
+            {
+                ctor.Append(", ");
+            }
+            ctor.Append($"({param.Type.ToFullName()})GetPropertyValue(\"{param.Name}\", ctx, typeof({param.Type.ToFullName()}))");
+            result.Add(param.Name);
+        }
+        ctor.Append(")");
+        return result;
     }
 }
