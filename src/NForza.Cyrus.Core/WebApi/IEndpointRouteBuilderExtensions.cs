@@ -12,9 +12,9 @@ namespace NForza.Cyrus.WebApi;
 
 public static class IEndpointRouteBuilderExtensions
 {
-    public static IEndpointRouteBuilder MapCyrus(this IEndpointRouteBuilder endpoints, bool logCyrusConfiguration)
+    public static IEndpointRouteBuilder MapCyrus(this IEndpointRouteBuilder endpoints, bool logConfig)
     {
-        if (logCyrusConfiguration)
+        if (logConfig)
         {
             LogCyrusConfiguration(endpoints.ServiceProvider);
         }

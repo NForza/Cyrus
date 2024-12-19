@@ -28,6 +28,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.MapCyrus();
+app.MapCyrus(logCyrusConfiguration: true);
 
 app.Run();
