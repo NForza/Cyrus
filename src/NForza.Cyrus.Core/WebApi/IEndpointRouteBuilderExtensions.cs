@@ -29,7 +29,7 @@ public static class IEndpointRouteBuilderExtensions
         sb.AppendLine("Queries handled:");
         foreach (var queryHandler in queryHandlers)
         {
-            sb.AppendLine($"- {queryHandler.Key.FullName}");
+            sb.AppendLine($"- {queryHandler.Value.HandlerName}");
         }
 
         var commandHandlers = serviceProvider.GetRequiredService<CommandHandlerDictionary>();
