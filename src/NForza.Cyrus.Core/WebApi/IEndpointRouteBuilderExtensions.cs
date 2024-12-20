@@ -12,13 +12,10 @@ namespace NForza.Cyrus.WebApi;
 
 public static class IEndpointRouteBuilderExtensions
 {
-    public static IEndpointRouteBuilder MapCyrus(this IEndpointRouteBuilder endpoints, bool logConfig)
+    public static IEndpointRouteBuilder MapCyrus(this IEndpointRouteBuilder endpoints)
     {
-        if (logConfig)
-        {
-            LogCyrusConfiguration(endpoints.ServiceProvider);
-        }
-        return endpoints.MapCyrus();
+        LogCyrusConfiguration(endpoints.ServiceProvider);
+        return endpoints.MapQueries().MapCommands();
     }
 
     private static void LogCyrusConfiguration(IServiceProvider serviceProvider)
@@ -36,20 +33,17 @@ public static class IEndpointRouteBuilderExtensions
         sb.AppendLine("Commands handled:");
         foreach (var commandHandler in commandHandlers)
         {
-            sb.AppendLine($"- {commandHandler.Key.FullName}");
+            sb.AppendLine($"- {commandHandler.Value.HandlerName}");
         }
 
         var eventHandlers = serviceProvider.GetRequiredService<EventHandlerDictionary>();
         sb.AppendLine("Events handled:");
-        foreach (var eventTypeHandler in eventHandlers)
+        foreach (var handler in eventHandlers.SelectMany(ev => ev.Value))
         {
-            sb.AppendLine($"- {eventTypeHandler.Key.FullName} (#handlers: {eventTypeHandler.Value.Count})");
+            sb.AppendLine($"- {handler.HandlerName}");
         }
         logger.LogInformation(sb.ToString());
     }
-
-    public static IEndpointRouteBuilder MapCyrus(this IEndpointRouteBuilder endpoints)
-        => endpoints.MapQueries().MapCommands();
 
     public static IEndpointRouteBuilder MapQueries(this IEndpointRouteBuilder endpoints)
     {

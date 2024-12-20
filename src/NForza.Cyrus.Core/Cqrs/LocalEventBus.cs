@@ -7,7 +7,7 @@ public class LocalEventBus(EventHandlerDictionary eventHandlerDictionary, IServi
     public Task Publish(object @event)
     {
         var scope = serviceScopeFactory.CreateScope();
-        var handlers = eventHandlerDictionary.GetValues(@event.GetType());
+        var handlers = eventHandlerDictionary.GetEventHandlers(@event.GetType());
         foreach (var handler in handlers)
         {
             handler.Invoke(scope.ServiceProvider, @event);

@@ -40,5 +40,5 @@ if (app.Environment.IsDevelopment())
 }
 
 //Exposes all endpoints in all EndpointGroups
-app.MapCyrus(logConfig: true);
+app.MapCyrus();
 app.Run();
