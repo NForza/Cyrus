@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace NForza.Cyrus.Cqrs;
 
-public class CommandDispatcher(IEventBus eventBus, ICommandBus commandBus) : ICommandDispatcher
+public class CommandDispatcher(IEnumerable<IEventBus> eventBuses, ICommandBus commandBus) : ICommandDispatcher
 {
     public async Task<CommandResult> ExecuteInternalAsync(object command, CancellationToken cancellationToken)
     {
@@ -22,9 +22,12 @@ public class CommandDispatcher(IEventBus eventBus, ICommandBus commandBus) : ICo
 
     private async Task DispatchEvents(IEnumerable events)
     {
-        foreach (var e in events)
+        Parallel.ForEach(eventBuses, async eventBus =>
         {
-            await eventBus.Publish(e);
-        }
+            foreach (var e in events)
+            {
+                await eventBus.Publish(e);
+            }
+        });
     }
 }

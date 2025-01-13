@@ -5,6 +5,7 @@ using MassTransit;
 using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.TypedIds;
 using NForza.Cyrus.WebApi;
+using NForza.Cyrus.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,7 @@ builder.Services.AddMassTransit(cfg =>
 
 builder.Services.AddValidatorsFromAssemblyContaining<Customer>();
 
-builder.Services.AddCyrus(o => o.AddEndpointGroups().AddTypedIdSerializers());
+builder.Services.AddCyrus(o => o.AddEndpointGroups().AddTypedIdSerializers().AddSignalRHubs());
 
 builder.Services.AddEndpointsApiExplorer();
 

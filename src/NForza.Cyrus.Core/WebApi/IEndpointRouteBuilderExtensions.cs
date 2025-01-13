@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using Microsoft.Extensions.Logging;
 using NForza.Cyrus.Cqrs;
+using NForza.Cyrus.SignalR;
 using NForza.Cyrus.WebApi.Policies;
 
 namespace NForza.Cyrus.WebApi;
@@ -49,7 +51,7 @@ public static class IEndpointRouteBuilderExtensions
     }
 
     public static IEndpointRouteBuilder MapCyrus(this IEndpointRouteBuilder endpoints)
-        => endpoints.MapQueries().MapCommands();
+        => endpoints.MapQueries().MapCommands().MapSignalR();
 
     public static IEndpointRouteBuilder MapQueries(this IEndpointRouteBuilder endpoints)
     {
@@ -61,6 +63,21 @@ public static class IEndpointRouteBuilderExtensions
             var resultType = queryHandlerDictionary.GetQueryReturnType(queryEndpoint.QueryType);
             MapQuery(endpoints, queryEndpoint, resultType);
         }
+        return endpoints;
+    }
+
+    public static IEndpointRouteBuilder MapSignalR(this IEndpointRouteBuilder endpoints)
+    {
+        var hubs = endpoints.ServiceProvider.GetService<SignalRHubDictionary>();
+        if (hubs != null && hubs.Any())
+        {
+            var mapHubMethod = typeof(HubEndpointRouteBuilderExtensions).GetMethod("MapHub", [typeof(IEndpointRouteBuilder), typeof(string)]) ?? throw new InvalidOperationException("Can't find MapHub method");
+            foreach (var hub in hubs)
+            {
+                mapHubMethod.MakeGenericMethod(hub.Value).Invoke(null, [endpoints, hub.Key]);
+            }
+        }
+
         return endpoints;
     }
 

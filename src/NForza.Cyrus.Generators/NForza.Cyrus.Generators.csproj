@@ -39,6 +39,8 @@
     <Compile Remove="Templates\IntIdTypeConverter.cs" />
     <Compile Remove="Templates\QueryProcessorExtensions.cs" />
     <Compile Remove="Templates\RegisterEndpointGroups.cs" />
+    <Compile Remove="Templates\RegisterSignalRHubs.cs" />
+    <Compile Remove="Templates\SignalRHub.cs" />
     <Compile Remove="Templates\StringId.cs" />
     <Compile Remove="Templates\StringIdJsonConverter.cs" />
     <Compile Remove="Templates\StringIdTypeConverter.cs" />
@@ -60,9 +62,11 @@
     <EmbeddedResource Include="Templates\IntIdTypeConverter.cs" />
     <EmbeddedResource Include="Templates\CqrsFactory.cs" />
     <EmbeddedResource Include="Templates\QueryProcessorExtensions.cs" />
+    <EmbeddedResource Include="Templates\RegisterSignalRHubs.cs" />
     <EmbeddedResource Include="Templates\RegisterEndpointGroups.cs" />
     <EmbeddedResource Include="Templates\CqrsServiceCollectionExtensions.cs" />
     <EmbeddedResource Include="Templates\CyrusOptionsJsonConverterExtensions.cs" />
+    <EmbeddedResource Include="Templates\SignalRHub.cs" />
     <EmbeddedResource Include="Templates\StringId.cs" />
     <EmbeddedResource Include="Templates\StringIdJsonConverter.cs" />
     <EmbeddedResource Include="Templates\StringIdTypeConverter.cs" />

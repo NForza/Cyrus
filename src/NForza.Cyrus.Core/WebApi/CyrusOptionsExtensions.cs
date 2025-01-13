@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NForza.Cyrus.Cqrs;
+using NForza.Cyrus.SignalR;
 using NForza.Cyrus.WebApi.Policies;
 using Swashbuckle.AspNetCore.SwaggerGen;
 

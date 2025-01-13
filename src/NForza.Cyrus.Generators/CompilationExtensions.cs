@@ -35,7 +35,7 @@ public static class CompilationExtensions
 
     private static IEnumerable<INamedTypeSymbol> GetTypesFromReferencedAssemblies(Compilation compilation, string[] assemblySuffixes)
     {
-        var visitedAssemblies = new HashSet<IAssemblySymbol>();
+        var visitedAssemblies = new HashSet<IAssemblySymbol>(SymbolEqualityComparer.IncludeNullability);
         var assembliesToVisit = new Stack<IAssemblySymbol>();
 
         foreach (var reference in compilation.References)
