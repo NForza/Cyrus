@@ -3,5 +3,6 @@
 
     public interface ISignalRCommandBuilder<T>
     {
+        void ReplyToAllClients();
     }
 }

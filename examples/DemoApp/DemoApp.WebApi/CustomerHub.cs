@@ -8,6 +8,6 @@ public class CustomerHub : SignalRHub
     public CustomerHub()
     {
         QueryMethodFor<AllCustomersQuery>();
-        CommandMethodFor<AddCustomerCommand>();
+        CommandMethodFor<AddCustomerCommand>().ReplyToAllClients();
     }
 }

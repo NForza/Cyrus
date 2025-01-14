@@ -1,9 +1,13 @@
-﻿namespace NForza.Cyrus.SignalR;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.SignalR;
 
-public class SignalRHubDictionary : Dictionary<string, Type>
+namespace NForza.Cyrus.SignalR;
+
+public class SignalRHubDictionary : Dictionary<string, Func<IEndpointRouteBuilder, HubEndpointConventionBuilder>>
 {
-    public void AddSignalRHub<T>(string path)
+    public void AddSignalRHub<T>(string path) where T : Hub
     {
-        Add(path, typeof(T));
+        Add(path, endpoints => endpoints.MapHub<T>(path));
     }
 }

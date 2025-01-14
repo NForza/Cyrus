@@ -69,12 +69,11 @@ public static class IEndpointRouteBuilderExtensions
     public static IEndpointRouteBuilder MapSignalR(this IEndpointRouteBuilder endpoints)
     {
         var hubs = endpoints.ServiceProvider.GetService<SignalRHubDictionary>();
-        if (hubs != null && hubs.Any())
+        if (hubs != null)
         {
-            var mapHubMethod = typeof(HubEndpointRouteBuilderExtensions).GetMethod("MapHub", [typeof(IEndpointRouteBuilder), typeof(string)]) ?? throw new InvalidOperationException("Can't find MapHub method");
             foreach (var hub in hubs)
             {
-                mapHubMethod.MakeGenericMethod(hub.Value).Invoke(null, [endpoints, hub.Key]);
+                hub.Value(endpoints);
             }
         }
 
