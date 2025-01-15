@@ -1,6 +1,4 @@
-﻿using NForza.Cyrus.Core;
-
-namespace NForza.Cyrus.Cqrs
+﻿namespace NForza.Cyrus.Cqrs
 {
     public class EventHandlerDictionary : MultiMap<Type, EventHandlerDefinition>
     {

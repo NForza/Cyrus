@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NForza.Cyrus.Cqrs;
+using NForza.Cyrus.SignalR;
 using NForza.Cyrus.WebApi.Policies;
 
 namespace NForza.Cyrus.WebApi;
@@ -55,6 +56,13 @@ public static class IEndpointRouteBuilderExtensions
             var resultType = queryHandlerDictionary.GetQueryReturnType(queryEndpoint.QueryType);
             MapQuery(endpoints, queryEndpoint, resultType);
         }
+        return endpoints;
+    }
+
+    public static IEndpointRouteBuilder MapSignalR(this IEndpointRouteBuilder endpoints)
+    {
+        var hubs = endpoints.ServiceProvider.GetService<SignalRHubDictionary>();
+        hubs?.ToList().ForEach(hub => hub.Value(endpoints));
         return endpoints;
     }
 
