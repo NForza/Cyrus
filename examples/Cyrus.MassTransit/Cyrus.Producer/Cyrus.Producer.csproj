@@ -11,8 +11,8 @@
   <ItemGroup>
     <PackageReference Include="MassTransit" Version="8.3.4" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.3.4" />
-    <PackageReference Include="NForza.Cyrus" Version="1.0.32" />
-    <PackageReference Include="NForza.Cyrus.MassTransit" Version="1.0.32" />
+    <PackageReference Include="NForza.Cyrus" Version="1.0.33" />
+    <PackageReference Include="NForza.Cyrus.MassTransit" Version="1.0.33" />
   </ItemGroup>
 
   <ItemGroup>

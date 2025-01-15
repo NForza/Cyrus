@@ -89,7 +89,9 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
         foreach (var eventHandler in eventHandlers)
         {
             var eventType = eventHandler.Parameters[0].Type.ToFullName();
-            var typeSymbol = eventHandler.ContainingType.ToFullName();
+            var typeSymbol = eventHandler.ContainingType;
+            var typeSymbolName = typeSymbol.ToFullName();
+            var handlerName = $"{typeSymbol.Name}.{eventHandler.Name}({eventHandler.Parameters[0].Type.Name})";
             var returnType = (INamedTypeSymbol)eventHandler.ReturnType;
             var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
             if (isAsync)
@@ -97,12 +99,12 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
                 if (eventHandler.IsStatic)
                 {
                     source.Append($@"
-        handlers.AddEventHandler<{eventType}>((_, @event) => {typeSymbol}.Handle(({eventType})@event));");
+        handlers.AddEventHandler<{eventType}>(""static async {handlerName}"", (_, @event) => {typeSymbolName}.Handle(({eventType})@event));");
                 }
                 else
                 {
                     source.Append($@"
-        handlers.AddEventHandler<{eventType}>((services, @event) => services.GetRequiredService<{typeSymbol}>().Handle(({eventType})@event));");
+        handlers.AddEventHandler<{eventType}>(""async {handlerName}"", (services, @event) => services.GetRequiredService<{typeSymbolName}>().Handle(({eventType})@event));");
                 }
 
             }
@@ -111,12 +113,12 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
                 if (eventHandler.IsStatic)
                 {
                     source.Append($@"
-        handlers.AddEventHandler<{eventType}>((_, @event) => {typeSymbol}.Handle(({eventType})@event));");
+        handlers.AddEventHandler<{eventType}>(""static {handlerName}"", (_, @event) => {typeSymbolName}.Handle(({eventType})@event));");
                 }
                 else
                 {
                     source.Append($@"
-        handlers.AddEventHandler<{eventType}>((services, @event) => services.GetRequiredService<{typeSymbol}>().Handle(({eventType})@event));");
+        handlers.AddEventHandler<{eventType}>(""{handlerName}"", (services, @event) => services.GetRequiredService<{typeSymbolName}>().Handle(({eventType})@event));");
                 }
             }
         }
@@ -138,6 +140,7 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
             var typeSymbol = handler.ContainingType;
             var returnType = (INamedTypeSymbol)handler.ReturnType;
             var returnTypeFullName = returnType?.ToFullName();
+            var handlerName = $"{typeSymbol.Name}.{handler.Name}({handler.Parameters[0].Type.Name})";
             var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
             if (isAsync)
             {
@@ -146,12 +149,12 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
                 if (handler.IsStatic)
                 {
                     source.Append($@"
-        handlers.AddHandler<{queryType}, {returnTypeFullName}>(async (_, query, token) => await {typeSymbol}.Query(({queryType})query));");
+        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""static async {handlerName}"", async (_, query, token) => await {typeSymbol}.Query(({queryType})query));");
                 }
                 else
                 {
                     source.Append($@"
-        handlers.AddHandler<{queryType}, {returnTypeFullName}>(async (services, query, token) => await services.GetRequiredService<{typeSymbol}>().Query(({queryType})query));");
+        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""async {handlerName}"", async (services, query, token) => await services.GetRequiredService<{typeSymbol}>().Query(({queryType})query));");
 
                 }
 
@@ -161,12 +164,12 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
                 if (handler.IsStatic)
                 {
                     source.Append($@"
-        handlers.AddHandler<{queryType}, {returnTypeFullName}>((_, query, token) => Task.FromResult<object>({typeSymbol}.Query(({queryType})query)));");
+        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""static {handlerName}"", (_, query, token) => Task.FromResult<object>({typeSymbol}.Query(({queryType})query)));");
                 }
                 else
                 {
                     source.Append($@"
-        handlers.AddHandler<{queryType}, {returnTypeFullName}>((services, query, token) => Task.FromResult<object>(services.GetRequiredService<{typeSymbol}>().Query(({queryType})query)));");
+        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""{handlerName}"", (services, query, token) => Task.FromResult<object>(services.GetRequiredService<{typeSymbol}>().Query(({queryType})query)));");
 
                 }
             }
@@ -206,6 +209,7 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
             var commandType = handler.Parameters[0].Type.ToFullName();
             var typeSymbol = handler.ContainingType.ToFullName();
             var returnType = handler.ReturnType;
+            var handlerName = $"{handler.ContainingType.Name}.{handler.Name}({handler.Parameters[0].Type.Name})";
             var isAsync = returnType.Equals(taskOfCommandResultSymbol, SymbolEqualityComparer.Default);
 
             if (isAsync)
@@ -213,12 +217,12 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
                 if (handler.IsStatic)
                 {
                     source.Append($@"
-        handlers.AddHandler<{commandType}>((_, command) => {typeSymbol}.Execute(({commandType})command));");
+        handlers.AddHandler<{commandType}>(""static async {handlerName}"", (_, command) => {typeSymbol}.Execute(({commandType})command));");
                 }
                 else
                 {
                     source.Append($@"
-        handlers.AddHandler<{commandType}>((services, command) => services.GetRequiredService<{typeSymbol}>().Execute(({commandType})command));");
+        handlers.AddHandler<{commandType}>(""async {handlerName}"", (services, command) => services.GetRequiredService<{typeSymbol}>().Execute(({commandType})command));");
                 }
             }
             else
@@ -226,12 +230,12 @@ public class CqrsServiceCollectionGenerator : GeneratorBase, IIncrementalGenerat
                 if (handler.IsStatic)
                 {
                     source.Append($@"
-        handlers.AddHandler<{commandType}>((_, command) => Task.FromResult({typeSymbol}.Execute(({commandType})command)));");
+        handlers.AddHandler<{commandType}>(""static {handlerName}"", (_, command) => Task.FromResult({typeSymbol}.Execute(({commandType})command)));");
                 }
                 else
                 {
                     source.Append($@"
-            handlers.AddHandler<{commandType}>((services, command) => Task.FromResult(services.GetRequiredService<{typeSymbol}>().Execute(({commandType})command)));");
+            handlers.AddHandler<{commandType}>(""{handlerName}"", (services, command) => Task.FromResult(services.GetRequiredService<{typeSymbol}>().Execute(({commandType})command)));");
                 }
             }
         }

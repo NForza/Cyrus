@@ -1,9 +1,9 @@
 ﻿namespace NForza.Cyrus.Cqrs;
 
-public class CommandHandlerDictionary : Dictionary<Type, Func<IServiceProvider, object, Task<CommandResult>>>
+public class CommandHandlerDictionary : Dictionary<Type, CommandHandlerDefinition>
 {
-    public void AddHandler<T>(Func<IServiceProvider, object, Task<CommandResult>> handler)
+    public void AddHandler<T>(string handlerName, Func<IServiceProvider, object, Task<CommandResult>> handler)
     {
-        Add(typeof(T), (services, c) => handler(services, c));
+        Add(typeof(T), new (handlerName, (services, c) => handler(services, c)));
     }
 }
