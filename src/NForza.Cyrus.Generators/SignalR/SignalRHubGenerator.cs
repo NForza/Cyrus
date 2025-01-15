@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Cqrs.Generator.Config;
 using NForza.Cyrus.Generators.Config;
 using NForza.Generators;
 
@@ -15,7 +17,7 @@ public class SignalRHubGenerator : GeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
 
         var configurationProvider = ConfigProvider(context);
 
@@ -33,14 +35,16 @@ public class SignalRHubGenerator : GeneratorBase, IIncrementalGenerator
                 var semanticModel = compilation.GetSemanticModel(classDeclaration.SyntaxTree);
                 var classSymbol = (INamedTypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration)!;
 
-                return (classSymbol);
+                SignalRHubClassDefinition definition = new SignalRHubClassDefinition(classDeclaration, classSymbol, semanticModel);
+                return definition;
             })
-            .Where(classSymbol =>
+            .Where(signalRHubClassDefinition =>
             {
-                return classSymbol is not null
+                return signalRHubClassDefinition.Symbol is not null
                        &&
-                       IsDirectlyDerivedFrom(classSymbol, "NForza.Cyrus.SignalR.SignalRHub");
+                       IsDirectlyDerivedFrom(signalRHubClassDefinition.Symbol, "NForza.Cyrus.SignalR.SignalRHub");
             })
+            .Select((signalRHubClassDefinition, _) => signalRHubClassDefinition.Initialize())
             .Collect();
 
         var endpointGroupModelsAndConfigurationProvider = signalrHubModelProvider.Combine(configurationProvider);
@@ -59,22 +63,22 @@ public class SignalRHubGenerator : GeneratorBase, IIncrementalGenerator
                 foreach (var signalRModel in signalRModels)
                 {
                     var sourceText = GenerateSignalRHub(signalRModel);
-                    spc.AddSource($"{signalRModel.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                    spc.AddSource($"{signalRModel.Symbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
                 }
             }
         });
     }
 
-    private string GenerateSignalRHubRegistration(System.Collections.Immutable.ImmutableArray<INamedTypeSymbol> signalRModels)
+    private string GenerateSignalRHubRegistration(System.Collections.Immutable.ImmutableArray<SignalRHubClassDefinition> signalRDefinitions)
     {
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
-        string usings = string.Join(Environment.NewLine, signalRModels.Select( cm => $"using {cm.ContainingNamespace.ToFullName()};").Distinct());
+        string usings = string.Join(Environment.NewLine, signalRDefinitions.Select( cm => $"using {cm.Symbol.ContainingNamespace.ToFullName()};").Distinct());
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
 
         var sb = new StringBuilder();
-        foreach (var classSymbol in signalRModels)
+        foreach (var signalRDefinition in signalRDefinitions)
         {
-            sb.AppendLine($"signalRHubDictionary.AddSignalRHub<{classSymbol.ToFullName()}_Generated>(\"{classSymbol.Name}\");");
+            sb.AppendLine($"signalRHubDictionary.AddSignalRHub<{signalRDefinition.Symbol.ToFullName()}_Generated>({signalRDefinition.Path});");
         }
 
         var replacements = new Dictionary<string, string>
@@ -90,15 +94,15 @@ public class SignalRHubGenerator : GeneratorBase, IIncrementalGenerator
         return source;
     }
 
-    private string GenerateSignalRHub(INamedTypeSymbol classSymbol)
+    private string GenerateSignalRHub(SignalRHubClassDefinition classDefinition)
     {
-        var sb = new StringBuilder();
+        string commands = GenerateCommands(classDefinition.Commands);
 
         var replacements = new Dictionary<string, string>
         {
-            ["Name"] = classSymbol.Name,
-            ["Namespace"] = classSymbol.ContainingNamespace.ToDisplayString(),
-            ["CommandMethods"] = "",
+            ["Name"] = classDefinition.Symbol.Name,
+            ["Namespace"] = classDefinition.Symbol.ContainingNamespace.ToDisplayString(),
+            ["CommandMethods"] = commands,
             ["QueryMethods"] = "",
         };
 
@@ -106,4 +110,95 @@ public class SignalRHubGenerator : GeneratorBase, IIncrementalGenerator
 
         return source;
     }
+
+    private static string GenerateCommands(IEnumerable<SignalRCommand> signalRCommands)
+    {
+        var sb = new StringBuilder();
+        foreach (var command in signalRCommands)
+        {
+            sb.AppendLine(
+    @$"public async Task {command.MethodName}({command.FullTypeName} command) 
+    {{
+        var result = await commandDispatcher.Execute(command);
+        if (result.Succeeded)
+        {{
+            SendEvents(result.Events);
+        }}
+    }}");
+        }
+        return sb.ToString();
+    }
+}
+
+internal class SignalRCommand
+{
+    public string FullTypeName { get; internal set; }
+    public SourceText MethodName { get; internal set; }
+}
+
+internal record SignalRHubClassDefinition
+{
+    IEnumerable<InvocationExpressionSyntax> GetMethodCallsOf(SyntaxNode node, string methodName)
+    {
+        IEnumerable<InvocationExpressionSyntax> methodCalls = node
+                         .DescendantNodes()
+                         .OfType<InvocationExpressionSyntax>();
+        return methodCalls
+                 .Where(methodCall =>
+                 {
+                     return methodCall.Expression switch
+                     {
+                         IdentifierNameSyntax identifierName => identifierName.Identifier.Text == methodName,
+                         GenericNameSyntax genericNameInMember => genericNameInMember.Identifier.Text == methodName,
+                         _ => false
+                     };
+                 });
+    }
+
+    void SetPath(INamedTypeSymbol symbol, BlockSyntax? constructorBody)
+    {
+        string? usePathArgument = constructorBody != null ? GetMethodCallsOf(constructorBody, "UsePath").FirstOrDefault()?.ArgumentList.Arguments.FirstOrDefault()?.ToString() : null;
+        Path = usePathArgument ?? symbol.Name.ToLower();
+    }
+
+    public SignalRHubClassDefinition(ClassDeclarationSyntax declaration, INamedTypeSymbol symbol, SemanticModel semanticModel)
+    {
+        Declaration = declaration;
+        Symbol = symbol;
+        SemanticModel = semanticModel;
+    }
+
+    public SignalRHubClassDefinition Initialize()
+    {
+        var constructorBody = Declaration.DescendantNodes()
+            .OfType<ConstructorDeclarationSyntax>()
+            .Where(constructorDeclarationSyntax => constructorDeclarationSyntax.Body != null)
+            .FirstOrDefault()?.Body;
+
+        if (constructorBody != null)
+        {
+            SetPath(Symbol, constructorBody);
+            SetCommands(Symbol, constructorBody);
+        }
+        return this;
+    }
+
+    private void SetCommands(INamedTypeSymbol symbol, BlockSyntax constructorBody)
+    {
+        var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "CommandMethodFor")
+                .Select(ies => ies.Expression)
+                .OfType<GenericNameSyntax>();
+        var commands = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());
+        Commands = commands.Select(genericArg =>
+        {
+            var symbol = SemanticModel.GetSymbolInfo(genericArg).Symbol!;
+            return new SignalRCommand { MethodName = genericArg.GetText(), FullTypeName = symbol.ToFullName() };
+        });
+    }
+
+    public string Path { get; private set; } = "";
+    public ClassDeclarationSyntax Declaration { get; }
+    public INamedTypeSymbol Symbol { get; }
+    public SemanticModel SemanticModel { get; }
+    public IEnumerable<SignalRCommand> Commands { get; internal set; } = [];
 }

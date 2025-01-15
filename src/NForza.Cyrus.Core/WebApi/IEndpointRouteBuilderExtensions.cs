@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using Microsoft.Extensions.Logging;
 using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.SignalR;
@@ -69,14 +68,7 @@ public static class IEndpointRouteBuilderExtensions
     public static IEndpointRouteBuilder MapSignalR(this IEndpointRouteBuilder endpoints)
     {
         var hubs = endpoints.ServiceProvider.GetService<SignalRHubDictionary>();
-        if (hubs != null)
-        {
-            foreach (var hub in hubs)
-            {
-                hub.Value(endpoints);
-            }
-        }
-
+        hubs?.ToList().ForEach(hub => hub.Value(endpoints));
         return endpoints;
     }
 
