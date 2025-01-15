@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 
-namespace NForza.Cyrus.Core;
+namespace NForza.Cyrus.Cqrs;
 
-public class MultiMap<TKey, TValue>: IEnumerable<KeyValuePair<TKey, List<TValue>>>
+public class MultiMap<TKey, TValue> : IEnumerable<KeyValuePair<TKey, List<TValue>>>
     where TKey : notnull
 {
     private readonly Dictionary<TKey, List<TValue>> values = [];
@@ -22,7 +22,7 @@ public class MultiMap<TKey, TValue>: IEnumerable<KeyValuePair<TKey, List<TValue>
 
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();
-    
+
     public IEnumerable<TValue> GetValues(TKey key)
         => values.TryGetValue(key, out var list) ? list : [];
 

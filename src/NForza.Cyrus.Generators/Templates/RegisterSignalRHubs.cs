@@ -1,0 +1,28 @@
+﻿using System;
+using Microsoft.AspNetCore.SignalR;
+using System.ComponentModel;
+using System.Collections.Generic;
+using System.Text;
+using NForza.Cyrus.Cqrs;
+% Usings %
+
+#nullable enable
+
+namespace NForza.Cyrus.SignalR;
+
+public static class AddSignalRHubExtensions
+{
+    public static CyrusOptions AddSignalRHubs(this CyrusOptions options)
+    {
+        options.Services.AddSignalR();
+        options.Services.AddSingleton(BuildSignalRHubDictionary());
+        return options;
+    }
+
+    public static SignalRHubDictionary BuildSignalRHubDictionary()
+    {
+        var signalRHubDictionary = new SignalRHubDictionary();
+        % RegisterSignalRHubs %
+        return signalRHubDictionary;
+    }
+}
