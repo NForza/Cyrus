@@ -4,14 +4,12 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Generators;
 using NForza.Cyrus.Generators.Config;
-using NForza.Generators;
 
-namespace NForza.Cyrus.Cqrs.Generator;
+namespace NForza.Cyrus.Generators.Cqrs;
 
 [Generator]
-public class CqrsCommandDispatcherGenerator : GeneratorBase, IIncrementalGenerator
+public class CqrsCommandGenerator : GeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -53,6 +51,10 @@ public class CqrsCommandDispatcherGenerator : GeneratorBase, IIncrementalGenerat
                 {
                     spc.AddSource($"CommandDispatcher.g.cs", SourceText.From(sourceText, Encoding.UTF8));
                 }
+
+                string assemblyName = recordSymbols.First().ContainingAssembly.Name;
+                var commandModels = GetPartialModelClass(assemblyName, "Commands", "ModelDefinition", recordSymbols.Select(cm => ModelGenerator.For((INamedTypeSymbol)cm.Parameters[0].Type)));
+                spc.AddSource($"model-commands.g.cs", SourceText.From(commandModels, Encoding.UTF8));
             }
         });
     }
@@ -66,8 +68,6 @@ public class CqrsCommandDispatcherGenerator : GeneratorBase, IIncrementalGenerat
 
         if (commandResultSymbol == null || taskSymbol == null)
             return string.Empty;
-
-        var taskOfCommandResultSymbol = taskSymbol.Construct(commandResultSymbol);
 
         StringBuilder source = new();
         foreach (var handler in handlers)

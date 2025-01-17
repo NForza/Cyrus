@@ -28,6 +28,8 @@
     <Compile Remove="Templates\CommandDispatcherExtensions.cs" />
     <Compile Remove="Templates\CqrsFactory.cs" />
     <Compile Remove="Templates\CqrsServiceCollectionExtensions.cs" />
+    <Compile Remove="Templates\CyrusModel.cs" />
+    <Compile Remove="Templates\CyrusModelProperty.cs" />
     <Compile Remove="Templates\CyrusOptionsJsonConverterExtensions.cs" />
     <Compile Remove="Templates\EventConsumers.cs" />
     <Compile Remove="Templates\GuidId.cs" />
@@ -52,6 +54,8 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Templates\CommandDispatcherExtensions.cs" />
+    <EmbeddedResource Include="Templates\CyrusModel.cs" />
+    <EmbeddedResource Include="Templates\CyrusModelProperty.cs" />
     <EmbeddedResource Include="Templates\EventConsumers.cs" />
     <EmbeddedResource Include="Templates\GuidId.cs" />
     <EmbeddedResource Include="Templates\GuidIdJsonConverter.cs" />

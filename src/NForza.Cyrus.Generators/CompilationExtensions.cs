@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using NForza.Cyrus.Cqrs;
+using NForza.Cyrus.Generators;
 
 public static class CompilationExtensions
 {

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
@@ -30,6 +32,17 @@ public class GuidIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
                 var sourceText = GenerateGuidId(recordSymbol);
                 spc.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             };
+
+            if (recordSymbols.Any())
+            {
+                var guidModels = GetPartialModelClass(
+                    recordSymbols.First().ContainingAssembly.Name, 
+                    "Guids", 
+                    "string", 
+                    recordSymbols.Select(guid => $"\"{guid.Name}\""));
+                spc.AddSource($"model-guids.g.cs", SourceText.From(guidModels, Encoding.UTF8));
+            }
+
         });
     }
 

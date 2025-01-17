@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 
-namespace NForza.Generators;
+namespace NForza.Cyrus.Generators;
 
 public class IncrementalGeneratorBase
 {

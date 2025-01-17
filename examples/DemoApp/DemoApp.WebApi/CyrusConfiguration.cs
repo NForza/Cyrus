@@ -1,13 +1,12 @@
-﻿using NForza.Cyrus;
+﻿using NForza.Cyrus.TypedIds;
 
-namespace SimpleCyrusWebApi
+namespace DemoApp.WebApi;
+
+public class CyrusConfiguration : CyrusConfig
 {
-    public class CyrusConfiguration : CyrusConfig
+    public CyrusConfiguration()
     {
-        public CyrusConfiguration()
-        {
-            GenerateWebApi();
-            UseContractsFromAssembliesContaining("Contracts");
-        }
+        GenerateWebApi();
+        UseContractsFromAssembliesContaining("Contracts");
     }
 }

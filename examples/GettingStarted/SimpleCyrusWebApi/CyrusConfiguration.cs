@@ -1,12 +1,11 @@
-﻿using NForza.Cyrus;
+﻿using NForza.Cyrus.TypedIds;
 
-namespace SimpleCyrusWebApi
+namespace SimpleCyrusWebApi;
+
+public class CyrusConfiguration : CyrusConfig
 {
-    public class CyrusConfiguration : CyrusConfig
+    public CyrusConfiguration()
     {
-        public CyrusConfiguration()
-        {
-            UseMassTransit();
-        }
+        UseMassTransit();
     }
 }

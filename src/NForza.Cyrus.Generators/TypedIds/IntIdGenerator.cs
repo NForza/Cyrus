@@ -3,9 +3,9 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Generators;
+using NForza.Cyrus.TypedIds.Generator;
 
-namespace NForza.Cyrus.TypedIds.Generator;
+namespace NForza.Cyrus.Generators.TypedIds;
 
 [Generator]
 public class IntIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
@@ -30,6 +30,12 @@ public class IntIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
                 var sourceText = GenerateIntId(recordSymbol);
                 spc.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             };
+
+            if (recordSymbols.Any())
+            {
+                var intModels = GetPartialModelClass(recordSymbols.First().ContainingAssembly.Name, "Integers", "string", recordSymbols.Select(im => $"\"{im.Name}\""));
+                spc.AddSource($"model-ints.g.cs", SourceText.From(intModels, Encoding.UTF8));
+            }
         });
     }
 

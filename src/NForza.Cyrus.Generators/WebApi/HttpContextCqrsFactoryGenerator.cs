@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
@@ -7,9 +6,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.Generators.Config;
-using NForza.Generators;
 
 namespace NForza.Cyrus.Generators.WebApi;
 
@@ -71,7 +68,7 @@ public class HttpContextCqrsFactoryGenerator : GeneratorBase, IIncrementalGenera
         return hasCommandName && !isFrameworkAssembly;
     }
 
-    private static string[] assembliesToSkip = new[] { "System", "Microsoft", "mscorlib", "netstandard", "WindowsBase", "Swashbuckle", "RabbitMQ", "MassTransit" };
+    private static string[] assembliesToSkip = ["System", "Microsoft", "mscorlib", "netstandard", "WindowsBase", "Swashbuckle", "RabbitMQ", "MassTransit"];
     private IEnumerable<INamedTypeSymbol> GetAllTypesRecursively(INamespaceSymbol namespaceSymbol)
     {
         var assemblyName = namespaceSymbol?.ContainingAssembly?.Name;

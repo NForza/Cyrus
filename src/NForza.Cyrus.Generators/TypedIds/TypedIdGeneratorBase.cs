@@ -2,8 +2,8 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NForza.Cyrus.Generators;
 using NForza.Cyrus.Generators.TypedIds;
-using NForza.Generators;
 
 namespace NForza.Cyrus.TypedIds.Generator;
 

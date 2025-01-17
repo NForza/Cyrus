@@ -1,5 +1,4 @@
-﻿using System.Net.Mail;
-using DemoApp.Contracts.Customers;
+﻿using DemoApp.Contracts.Customers;
 using NForza.Cyrus.SignalR;
 
 namespace DemoApp.WebApi;

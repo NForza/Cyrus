@@ -16,5 +16,4 @@
     <InternalsVisibleTo Include="DemoApp.WebApi.Tests" />
     <ProjectReference Include="..\DemoApp.Domain\DemoApp.Domain.csproj" />
   </ItemGroup>
-
 </Project>

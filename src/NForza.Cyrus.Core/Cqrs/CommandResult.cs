@@ -14,14 +14,14 @@ public class CommandResult
     {
     }
 
-    public CommandResult(params object[] events) => this.events = events.ToList();
+    public CommandResult(params object[] events) => this.events = [.. events];
 
     public static CommandResult FailedWithError(string errorKey, string errorDescription) => FailedWithError(new CommandError(errorKey, errorDescription));
-    public static CommandResult ReturnEvents(params object[] events) => new CommandResult() { };
+    public static CommandResult ReturnEvents(params object[] events) => new() { };
     private readonly List<CommandError> errorMessages = [];
     private readonly List<object> events = [];
 
-    public bool Succeeded => !errorMessages.Any();
+    public bool Succeeded => errorMessages.Count == 0;
 
     public IEnumerable<CommandError> Errors => errorMessages.AsReadOnly();
 
@@ -35,7 +35,7 @@ public class CommandResult
         events.Clear();
     }
 
-    public void AddError(string errorKey, string errorDescrption) => AddError(new CommandError(errorKey, errorDescrption));
+    public void AddError(string errorKey, string errorDescription) => AddError(new CommandError(errorKey, errorDescription));
 
     public void AddErrors(IEnumerable<CommandError> messages)
     {
@@ -47,7 +47,7 @@ public class CommandResult
 
     public void AddEvent(object @event)
     {
-        if (!errorMessages.Any())
+        if (errorMessages.Count == 0)
             events.Add(@event);
     }
 

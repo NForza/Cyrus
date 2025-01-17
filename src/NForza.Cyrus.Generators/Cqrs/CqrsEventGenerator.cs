@@ -4,13 +4,11 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Generators;
-using NForza.Generators;
 
-namespace NForza.Cyrus.Cqrs.Generator;
+namespace NForza.Cyrus.Generators.Cqrs;
 
 [Generator]
-public class CqrsEventConsumerGenerator : GeneratorBase, IIncrementalGenerator
+public class CqrsEventGenerator : GeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -26,25 +24,34 @@ public class CqrsEventConsumerGenerator : GeneratorBase, IIncrementalGenerator
             .Where(x =>
             {
                 var (methodNode, config) = x;
-                return config.Events.Bus == "MassTransit" && IsEventHandler(methodNode, config.Events.HandlerName, config.Events.Suffix);
+                return IsEventHandler(methodNode, config.Events.HandlerName, config.Events.Suffix);
             })
             .Select((x, _) => x.Left!)
             .Collect();
 
-        var combinedProvider = allEventHandlersProvider.Combine(context.CompilationProvider);
+        var combinedProvider = allEventHandlersProvider.Combine(context.CompilationProvider).Combine(configProvider);
 
         context.RegisterSourceOutput(combinedProvider, (spc, eventHandlersWithCompilation) =>
         {
-            var (queryHandlers, compilation) = eventHandlersWithCompilation;
-            if (queryHandlers.Any())
+            var ((queryHandlers, compilation), config) = eventHandlersWithCompilation;
+            if (queryHandlers.Any() && config.Events.Bus == "MassTransit")
             {
-                var sourceText = GenerateEventConsumers(queryHandlers, compilation);
+                var sourceText = GenerateEventConsumers(queryHandlers);
                 spc.AddSource($"EventConsumers.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }
+
+            string assemblyName = queryHandlers.First().ContainingAssembly.Name;
+            var eventModels = GetPartialModelClass(
+                assemblyName,
+                "Events",
+                "ModelDefinition",
+                queryHandlers.Select(qh => ModelGenerator.For((INamedTypeSymbol)qh.Parameters[0].Type)));
+            spc.AddSource($"model-events.g.cs", SourceText.From(eventModels, Encoding.UTF8));
+
         });
     }
 
-    private string GenerateEventConsumers(ImmutableArray<IMethodSymbol> handlers, Compilation compilation)
+    private string GenerateEventConsumers(ImmutableArray<IMethodSymbol> handlers)
     {
         StringBuilder source = new();
         foreach (var handler in handlers)
