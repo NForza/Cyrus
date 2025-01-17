@@ -6,6 +6,7 @@ using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.TypedIds;
 using NForza.Cyrus.WebApi;
 using NForza.Cyrus.SignalR;
+using NForza.Cyrus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,12 +49,9 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowAngularApp");
 app.MapCyrus();
 
-ICyrusModel m = new NForza.Cyrus.Models.DemoApp.Contracts.CyrusModel();
-Console.WriteLine(m.Strings);
-Console.WriteLine(m.Guids);
-Console.WriteLine(m.Integers);
-Console.WriteLine(m.Events);
-Console.WriteLine(m.Commands);
-
+ICyrusModel m1 = new NForza.Cyrus.Models.DemoApp.Contracts.CyrusModel();
+ICyrusModel m2 = new NForza.Cyrus.Models.DemoApp.Domain.CyrusModel();
+var modelJson = m1.Combine(m2).AsJson();
+Console.WriteLine(modelJson);
 
 await app.RunAsync();

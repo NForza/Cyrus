@@ -10,7 +10,7 @@ using NForza.Generators;
 namespace NForza.Cyrus.Cqrs.Generator;
 
 [Generator]
-public class CqrsEventConsumerGenerator : GeneratorBase, IIncrementalGenerator
+public class CqrsEventGenerator : GeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -26,21 +26,26 @@ public class CqrsEventConsumerGenerator : GeneratorBase, IIncrementalGenerator
             .Where(x =>
             {
                 var (methodNode, config) = x;
-                return config.Events.Bus == "MassTransit" && IsEventHandler(methodNode, config.Events.HandlerName, config.Events.Suffix);
+                return IsEventHandler(methodNode, config.Events.HandlerName, config.Events.Suffix);
             })
             .Select((x, _) => x.Left!)
             .Collect();
 
-        var combinedProvider = allEventHandlersProvider.Combine(context.CompilationProvider);
+        var combinedProvider = allEventHandlersProvider.Combine(context.CompilationProvider).Combine(configProvider);
 
         context.RegisterSourceOutput(combinedProvider, (spc, eventHandlersWithCompilation) =>
         {
-            var (queryHandlers, compilation) = eventHandlersWithCompilation;
-            if (queryHandlers.Any())
+            var ((queryHandlers, compilation), config) = eventHandlersWithCompilation;
+            if (queryHandlers.Any() && config.Events.Bus == "MassTransit")
             {
                 var sourceText = GenerateEventConsumers(queryHandlers, compilation);
                 spc.AddSource($"EventConsumers.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }
+
+            string assemblyName = queryHandlers.First().ContainingAssembly.Name;
+            var commandModels = GetPartialModelClass(assemblyName, "Events", "string", queryHandlers.Select(cmd => $"\"{cmd.Parameters[0].Type.Name}\""));
+            spc.AddSource($"model-events.g.cs", SourceText.From(commandModels, Encoding.UTF8));
+
         });
     }
 

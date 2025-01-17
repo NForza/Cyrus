@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace NForza.Cyrus.Cqrs;
+namespace NForza.Cyrus.Generators;
 
 public static class AssemblyExtensions
 {

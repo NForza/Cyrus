@@ -11,7 +11,7 @@ using NForza.Generators;
 namespace NForza.Cyrus.Cqrs.Generator;
 
 [Generator]
-public class CqrsCommandDispatcherGenerator : GeneratorBase, IIncrementalGenerator
+public class CqrsCommandGenerator : GeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -53,6 +53,10 @@ public class CqrsCommandDispatcherGenerator : GeneratorBase, IIncrementalGenerat
                 {
                     spc.AddSource($"CommandDispatcher.g.cs", SourceText.From(sourceText, Encoding.UTF8));
                 }
+
+                string assemblyName = recordSymbols.First().ContainingAssembly.Name;
+                var commandModels = GetPartialModelClass(assemblyName, "Commands", "string", recordSymbols.Select(cmd => $"\"{cmd.Parameters[0].Type.Name}\""));
+                spc.AddSource($"model-commands.g.cs", SourceText.From(commandModels, Encoding.UTF8));
             }
         });
     }

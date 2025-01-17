@@ -6,7 +6,6 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.Generators.Config;
 
 namespace NForza.Cyrus.Generators.WebApi;
