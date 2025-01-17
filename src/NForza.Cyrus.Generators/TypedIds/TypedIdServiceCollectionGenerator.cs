@@ -17,7 +17,7 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
 
         var typedIdsCollectionProvider = context.SyntaxProvider
                     .CreateSyntaxProvider(

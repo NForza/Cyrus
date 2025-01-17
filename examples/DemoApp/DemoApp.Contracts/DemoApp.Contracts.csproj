@@ -19,4 +19,7 @@
     <ProjectReference Include="..\..\..\src\NForza.Cyrus.TypedIds\NForza.Cyrus.TypedIds.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+  </ItemGroup>
+  
 </Project>

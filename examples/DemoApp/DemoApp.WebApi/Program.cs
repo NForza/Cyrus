@@ -48,4 +48,12 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowAngularApp");
 app.MapCyrus();
 
+ICyrusModel m = new NForza.Cyrus.Models.DemoApp.Contracts.CyrusModel();
+Console.WriteLine(m.Strings);
+Console.WriteLine(m.Guids);
+Console.WriteLine(m.Integers);
+Console.WriteLine(m.Events);
+Console.WriteLine(m.Commands);
+
+
 await app.RunAsync();

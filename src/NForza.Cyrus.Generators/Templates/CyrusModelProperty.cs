@@ -1,0 +1,1 @@
+﻿public IEnumerable<% PropertyType %> % PropertyName % => [ % Properties % ];

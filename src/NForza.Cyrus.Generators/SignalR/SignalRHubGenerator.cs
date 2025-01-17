@@ -17,7 +17,7 @@ public class SignalRHubGenerator : GeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
 
         var configurationProvider = ConfigProvider(context);
 

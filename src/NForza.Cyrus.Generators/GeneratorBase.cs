@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 #if DEBUG_ANALYZER
 using System.Diagnostics;
 #endif
@@ -8,7 +9,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NForza.Cyrus.Cqrs.Generator.Config;
 using NForza.Cyrus.Generators.Config;
 
-namespace NForza.Generators;
+namespace NForza.Cyrus.Generators;
 
 public abstract class GeneratorBase : IncrementalGeneratorBase
 {
@@ -62,11 +63,10 @@ public abstract class GeneratorBase : IncrementalGeneratorBase
                         break;
                     case "UseContractsFromAssembliesContaining":
                         result.Contracts =
-                                methodCall.ArgumentList.Arguments
+                                [.. methodCall.ArgumentList.Arguments
                                     .Select(argument => argument.Expression as LiteralExpressionSyntax)
                                     .Where(literal => literal != null)
-                                    .Select(literal => literal!.Token.ValueText)
-                                    .ToArray();
+                                    .Select(literal => literal!.Token.ValueText)];
                         break;
                 }
             }
@@ -96,20 +96,13 @@ public abstract class GeneratorBase : IncrementalGeneratorBase
 
     protected string GetTypeName(TypeSyntax? typeSyntax)
     {
-        switch (typeSyntax)
+        return typeSyntax switch
         {
-            case IdentifierNameSyntax identifierName:
-                return identifierName.Identifier.Text;
-
-            case QualifiedNameSyntax qualifiedName:
-                return qualifiedName.Right.Identifier.Text;
-
-            case PredefinedTypeSyntax predefinedType:
-                return predefinedType.Keyword.Text;
-
-            default:
-                return typeSyntax?.ToString() ?? "";
-        }
+            IdentifierNameSyntax identifierName => identifierName.Identifier.Text,
+            QualifiedNameSyntax qualifiedName => qualifiedName.Right.Identifier.Text,
+            PredefinedTypeSyntax predefinedType => predefinedType.Keyword.Text,
+            _ => typeSyntax?.ToString() ?? "",
+        };
     }
 
     protected IEnumerable<INamedTypeSymbol> GetAllClassesDerivedFrom(Compilation compilation, string className)
@@ -126,9 +119,7 @@ public abstract class GeneratorBase : IncrementalGeneratorBase
 
             foreach (var classDeclaration in classDeclarations)
             {
-                var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration) as INamedTypeSymbol;
-
-                if (classSymbol != null && classSymbol.BaseType != null)
+                if (semanticModel.GetDeclaredSymbol(classDeclaration) is INamedTypeSymbol classSymbol && classSymbol.BaseType != null)
                 {
                     if (classSymbol.BaseType.Equals(baseTypeSymbol, SymbolEqualityComparer.Default))
                     {
@@ -227,6 +218,28 @@ public abstract class GeneratorBase : IncrementalGeneratorBase
         var baseType = classSymbol.BaseType;
 
         return baseType?.ToDisplayString() == fullyQualifiedBaseClassName;
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers", Justification = "<Pending>")]
+    public string GetPartialModelClass(string assemblyName, string propertyName, string propertyType, IEnumerable<string> propertyValues)
+    {
+        var replacements = new Dictionary<string, string>
+        {
+            ["PropertyName"] = propertyName,
+            ["PropertyType"] = propertyType,
+            ["Properties"] = string.Join(",", propertyValues)
+        };
+        var source = TemplateEngine.ReplaceInResourceTemplate("CyrusModelProperty.cs", replacements, [""]);
+
+#pragma warning disable RS1035 // Do not use APIs banned for analyzers
+        replacements = new Dictionary<string, string>
+        {
+            ["AssemblyName"] = assemblyName,
+            ["Properties"] = source
+        };
+#pragma warning restore RS1035 // Do not use APIs banned for analyzers
+        source = TemplateEngine.ReplaceInResourceTemplate("CyrusModel.cs", replacements);
+        return source;
     }
 
     protected bool IsQueryHandler(IMethodSymbol? symbol, string queryMethodName, string querySuffix)
