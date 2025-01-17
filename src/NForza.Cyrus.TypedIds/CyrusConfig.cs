@@ -1,5 +1,4 @@
-﻿
-namespace NForza.Cyrus
+﻿namespace NForza.Cyrus.TypedIds
 {
     public class CyrusConfig
     {

@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.SignalR;
+using NForza.Cyrus.TypedIds;
 using NForza.Cyrus.WebApi.Policies;
 
 namespace NForza.Cyrus.WebApi;

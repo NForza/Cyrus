@@ -1,10 +1,12 @@
-﻿namespace NForza.Cyrus.TypedIds;
+﻿using NForza.Cyrus.TypedIds.Model;
+
+namespace NForza.Cyrus.TypedIds;
 
 public interface ICyrusModel
 {
     IEnumerable<string> Guids { get => []; }
     IEnumerable<string> Integers { get => []; }
     IEnumerable<string> Strings { get => []; }
-    IEnumerable<string> Events { get => []; }
-    IEnumerable<string> Commands { get => []; }
+    IEnumerable<ModelDefinition> Events { get => []; }
+    IEnumerable<ModelDefinition> Commands { get => []; }
 }

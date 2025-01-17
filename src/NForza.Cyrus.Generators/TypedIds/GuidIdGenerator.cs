@@ -14,7 +14,7 @@ public class GuidIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
         var incrementalValuesProvider = context.SyntaxProvider
                     .CreateSyntaxProvider(
                         predicate: (syntaxNode, _) => IsRecordWithGuidIdAttribute(syntaxNode),
@@ -35,7 +35,11 @@ public class GuidIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
 
             if (recordSymbols.Any())
             {
-                var guidModels = GetPartialModelClass(recordSymbols.First().ContainingAssembly.Name, "Guids", "string", recordSymbols.Select(guid => $"\"{guid.Name}\""));
+                var guidModels = GetPartialModelClass(
+                    recordSymbols.First().ContainingAssembly.Name, 
+                    "Guids", 
+                    "string", 
+                    recordSymbols.Select(guid => $"\"{guid.Name}\""));
                 spc.AddSource($"model-guids.g.cs", SourceText.From(guidModels, Encoding.UTF8));
             }
 

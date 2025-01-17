@@ -4,10 +4,8 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Generators;
-using NForza.Generators;
 
-namespace NForza.Cyrus.Cqrs.Generator;
+namespace NForza.Cyrus.Generators.Cqrs;
 
 [Generator]
 public class CqrsEventGenerator : GeneratorBase, IIncrementalGenerator
@@ -38,18 +36,22 @@ public class CqrsEventGenerator : GeneratorBase, IIncrementalGenerator
             var ((queryHandlers, compilation), config) = eventHandlersWithCompilation;
             if (queryHandlers.Any() && config.Events.Bus == "MassTransit")
             {
-                var sourceText = GenerateEventConsumers(queryHandlers, compilation);
+                var sourceText = GenerateEventConsumers(queryHandlers);
                 spc.AddSource($"EventConsumers.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }
 
             string assemblyName = queryHandlers.First().ContainingAssembly.Name;
-            var commandModels = GetPartialModelClass(assemblyName, "Events", "string", queryHandlers.Select(cmd => $"\"{cmd.Parameters[0].Type.Name}\""));
-            spc.AddSource($"model-events.g.cs", SourceText.From(commandModels, Encoding.UTF8));
+            var eventModels = GetPartialModelClass(
+                assemblyName,
+                "Events",
+                "ModelDefinition",
+                queryHandlers.Select(qh => ModelGenerator.For((INamedTypeSymbol)qh.Parameters[0].Type)));
+            spc.AddSource($"model-events.g.cs", SourceText.From(eventModels, Encoding.UTF8));
 
         });
     }
 
-    private string GenerateEventConsumers(ImmutableArray<IMethodSymbol> handlers, Compilation compilation)
+    private string GenerateEventConsumers(ImmutableArray<IMethodSymbol> handlers)
     {
         StringBuilder source = new();
         foreach (var handler in handlers)

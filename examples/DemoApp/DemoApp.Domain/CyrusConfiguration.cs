@@ -1,4 +1,4 @@
-﻿using NForza.Cyrus;
+﻿using NForza.Cyrus.TypedIds;
 
 namespace SimpleCyrusWebApi
 {
