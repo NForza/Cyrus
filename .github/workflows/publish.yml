@@ -24,8 +24,9 @@ jobs:
       with:
         dotnet-version: '8.0'
 
-    - name: Install NuGet CLI
-      run: sudo apt-get install -y nuget
+    - uses: nuget/setup-nuget@v2
+      with:
+        nuget-version: 'latest'
 
     - name: Set NForza.Cyrus version
       run: sed -i 's/%VERSION%/${{ env.PACKAGE_VERSION }}/g' ${{ env.NFORZA_CYRUS_NUSPEC }}
