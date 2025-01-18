@@ -5,11 +5,12 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators;
+using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Cqrs.Generator;
 
 [Generator]
-public class CqrsQueryHandlerGenerator : GeneratorBase, IIncrementalGenerator
+public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {

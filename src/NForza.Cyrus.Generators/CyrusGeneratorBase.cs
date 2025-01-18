@@ -10,7 +10,7 @@ using NForza.Cyrus.Generators.Config;
 
 namespace NForza.Cyrus.Generators;
 
-public abstract class GeneratorBase : IncrementalGeneratorBase
+public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
 {
     protected IncrementalValueProvider<GenerationConfig> ConfigProvider(IncrementalGeneratorInitializationContext context)
     {

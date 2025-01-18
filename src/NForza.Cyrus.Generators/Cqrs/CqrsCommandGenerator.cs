@@ -5,11 +5,12 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
+using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Generators.Cqrs;
 
 [Generator]
-public class CqrsCommandGenerator : GeneratorBase, IIncrementalGenerator
+public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -53,7 +54,7 @@ public class CqrsCommandGenerator : GeneratorBase, IIncrementalGenerator
                 }
 
                 string assemblyName = recordSymbols.First().ContainingAssembly.Name;
-                var commandModels = GetPartialModelClass(assemblyName, "Commands", "ModelDefinition", recordSymbols.Select(cm => ModelGenerator.For((INamedTypeSymbol)cm.Parameters[0].Type)));
+                var commandModels = GetPartialModelClass(assemblyName, "Commands", "ModelDefinition", recordSymbols.Select(cm => ModelGenerator.For((INamedTypeSymbol)cm.Parameters[0].Type, compilation)));
                 spc.AddSource($"model-commands.g.cs", SourceText.From(commandModels, Encoding.UTF8));
             }
         });

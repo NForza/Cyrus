@@ -7,11 +7,12 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
+using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Generators.WebApi;
 
 [Generator]
-public class HttpContextCqrsFactoryGenerator : GeneratorBase, IIncrementalGenerator
+public class HttpContextCqrsFactoryGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
