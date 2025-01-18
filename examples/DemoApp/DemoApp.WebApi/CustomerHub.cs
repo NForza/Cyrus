@@ -12,7 +12,7 @@ public class CustomerHub : SignalRHub
         CommandMethodFor<AddCustomerCommand>(replyToAllClients: true);
         CommandMethodFor<DeleteCustomerCommand>(replyToAllClients: true);
 
-        EventToCaller<CustomerAddedEvent>();
-        EventToAll<CustomerAddedEvent>();
+        PublishesEventToCaller<CustomerAddedEvent>();
+        PublishesEventToAll<CustomerAddedEvent>();
     }
 }

@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿#if DEBUG_ANALYZER
+using System.Diagnostics;
+#endif
+using System.Reflection;
 
 namespace NForza.Cyrus.Generators;
 

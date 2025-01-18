@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace NForza.Cyrus.Generators;
+namespace NForza.Cyrus.Generators.Roslyn;
 
 public static class AssemblyExtensions
 {

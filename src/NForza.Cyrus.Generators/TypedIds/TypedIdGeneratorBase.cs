@@ -7,7 +7,7 @@ using NForza.Cyrus.Generators.TypedIds;
 
 namespace NForza.Cyrus.TypedIds.Generator;
 
-public abstract class TypedIdGeneratorBase : GeneratorBase
+public abstract class TypedIdGeneratorBase : CyrusGeneratorBase
 {
     protected static bool IsRecordWithAttribute(SyntaxNode syntaxNode, string attributeName)
     {

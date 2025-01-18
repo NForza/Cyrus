@@ -6,11 +6,12 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
+using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Generators.Cqrs.WebApi;
 
 [Generator]
-public class SignalRHubGenerator : GeneratorBase, IIncrementalGenerator
+public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
