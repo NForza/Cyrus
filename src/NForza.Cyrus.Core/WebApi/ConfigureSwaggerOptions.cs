@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using NForza.Cyrus.TypedIds;
+using NForza.Cyrus.Abstractions;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace NForza.Cyrus.WebApi;

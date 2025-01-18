@@ -1,4 +1,4 @@
-﻿namespace NForza.Cyrus.TypedIds;
+﻿namespace NForza.Cyrus.Abstractions;
 
 [AttributeUsage(AttributeTargets.Struct)]
 public class IntIdAttribute(int minimum, int maximum) : Attribute

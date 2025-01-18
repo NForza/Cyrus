@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text.Json.Serialization;
-using NForza.Cyrus.TypedIds;
+using NForza.Cyrus.Abstractions;
 
 namespace % Namespace %;
 

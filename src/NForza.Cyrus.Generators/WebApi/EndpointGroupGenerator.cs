@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
-using NForza.Generators;
 
 namespace NForza.Cyrus.Generators.Cqrs.WebApi;
 

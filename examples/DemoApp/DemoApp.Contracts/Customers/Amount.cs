@@ -1,5 +1,4 @@
-﻿
-using NForza.Cyrus.TypedIds;
+﻿using NForza.Cyrus.Abstractions;
 
 namespace DemoApp.Contracts.Customers;
 

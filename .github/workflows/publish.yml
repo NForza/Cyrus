@@ -7,7 +7,7 @@ on:
       - main  
 
 env:
-  PACKAGE_VERSION: 1.0.35
+  PACKAGE_VERSION: 1.0.36
   NFORZA_CYRUS_NUSPEC: ./src/NForza.Cyrus.nuspec
 
 jobs:

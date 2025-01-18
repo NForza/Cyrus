@@ -1,6 +1,6 @@
-﻿namespace NForza.Cyrus.TypedIds.Model;
+﻿namespace NForza.Cyrus.Abstractions.Model;
 
-public class ModelDefinitionEqualityComparer: IEqualityComparer<ModelDefinition>
+public class ModelDefinitionEqualityComparer : IEqualityComparer<ModelDefinition>
 {
     public static ModelDefinitionEqualityComparer Instance { get; } = new ModelDefinitionEqualityComparer();
 

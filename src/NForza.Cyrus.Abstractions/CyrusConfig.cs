@@ -1,4 +1,4 @@
-﻿namespace NForza.Cyrus.TypedIds
+﻿namespace NForza.Cyrus.Abstractions
 {
     public class CyrusConfig
     {

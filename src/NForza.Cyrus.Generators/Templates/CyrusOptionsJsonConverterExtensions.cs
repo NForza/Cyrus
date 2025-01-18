@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 % Namespaces %
 
-namespace NForza.Cyrus.TypedIds;
+namespace NForza.Cyrus.Abstractions;
 
 public static class CyrusOptionsJsonConverterExtensions
 {
