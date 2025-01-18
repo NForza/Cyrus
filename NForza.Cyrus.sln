@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp.Console", "examples
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp.Domain", "examples\DemoApp\DemoApp.Domain\DemoApp.Domain.csproj", "{B677268D-4663-427F-901B-79F1EB3D8C32}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cyrus.TypedIds", "src\NForza.Cyrus.TypedIds\NForza.Cyrus.TypedIds.csproj", "{958260C7-CCD4-41A8-8A11-E6EEF486FDDD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cyrus.Abstractions", "src\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj", "{958260C7-CCD4-41A8-8A11-E6EEF486FDDD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp.WebApi", "examples\DemoApp\DemoApp.WebApi\DemoApp.WebApi.csproj", "{239395A0-21EF-4967-BBFB-371BCB9CE1CF}"
 EndProject

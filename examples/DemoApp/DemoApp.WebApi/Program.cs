@@ -3,10 +3,10 @@ using DemoApp.Domain.Customer;
 using FluentValidation;
 using MassTransit;
 using NForza.Cyrus.Cqrs;
-using NForza.Cyrus.TypedIds;
 using NForza.Cyrus.WebApi;
 using NForza.Cyrus.SignalR;
-using NForza.Cyrus.TypedIds.Model;
+using NForza.Cyrus.Abstractions;
+using NForza.Cyrus.Abstractions.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 

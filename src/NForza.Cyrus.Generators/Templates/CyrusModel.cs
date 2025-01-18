@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using NForza.Cyrus.TypedIds.Model;
-using NForza.Cyrus.TypedIds;
+using NForza.Cyrus.Abstractions.Model;
+using NForza.Cyrus.Abstractions;
 
 namespace NForza.Cyrus.Models.% AssemblyName %;
 

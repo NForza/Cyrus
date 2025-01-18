@@ -1,6 +1,6 @@
-﻿using NForza.Cyrus.TypedIds.Model;
+﻿using NForza.Cyrus.Abstractions.Model;
 
-namespace NForza.Cyrus.TypedIds;
+namespace NForza.Cyrus.Abstractions;
 
 public interface ICyrusModel
 {

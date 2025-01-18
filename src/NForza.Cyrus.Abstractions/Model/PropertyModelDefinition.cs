@@ -1,4 +1,4 @@
-﻿namespace NForza.Cyrus.TypedIds.Model
+﻿namespace NForza.Cyrus.Abstractions.Model
 {
     public record PropertyModelDefinition(string Name, string Type);
 }

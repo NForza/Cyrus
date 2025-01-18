@@ -1,6 +1,4 @@
-﻿using NForza.Cyrus.TypedIds;
-
-namespace NForza.Cyrus.TypedIds.Model
+﻿namespace NForza.Cyrus.Abstractions.Model
 {
     internal class CyrusModelAggregator(IEnumerable<ICyrusModel> models) : ICyrusModel
     {

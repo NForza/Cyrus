@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 #if DEBUG_ANALYZER
 using System.Diagnostics;
 #endif

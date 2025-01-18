@@ -5,7 +5,6 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators;
-using NForza.Generators;
 
 namespace NForza.Cyrus.Cqrs.Generator;
 
