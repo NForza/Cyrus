@@ -52,12 +52,6 @@ app.MapCyrus();
 ICyrusModel m1 = new NForza.Cyrus.Models.DemoApp.Contracts.CyrusModel();
 ICyrusModel m2 = new NForza.Cyrus.Models.DemoApp.Domain.CyrusModel();
 ICyrusModel m3 = new NForza.Cyrus.Models.DemoApp.WebApi.CyrusModel();
-Console.WriteLine(m1.AsJson());
-Console.WriteLine();
-Console.WriteLine(m2.AsJson());
-Console.WriteLine();
-Console.WriteLine(m3.AsJson());
-Console.WriteLine();
 
 var modelJson = m1.Combine(m2, m3);
 Console.WriteLine(modelJson.AsJson());

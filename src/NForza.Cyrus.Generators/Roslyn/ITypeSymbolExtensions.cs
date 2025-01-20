@@ -26,14 +26,6 @@ internal static class ITypeSymbolExtensions
                 return (true, namedTypeSymbol.TypeArguments[0]);
             }
 
-            foreach (var @interface in namedTypeSymbol.AllInterfaces)
-            {
-                if (@interface.OriginalDefinition.Equals(enumerableSymbol, SymbolEqualityComparer.Default))
-                {
-                    return (true, @interface.TypeArguments[0]);
-                }
-            }
-
             if (namedTypeSymbol.OriginalDefinition.Equals(listSymbol, SymbolEqualityComparer.Default))
             {
                 return (true, namedTypeSymbol.TypeArguments[0]);

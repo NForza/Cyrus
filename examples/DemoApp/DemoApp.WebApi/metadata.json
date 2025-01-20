@@ -1,0 +1,113 @@
+{
+  "Guids": [
+    "CustomerId"
+  ],
+  "Integers": [
+    "Amount"
+  ],
+  "Strings": [
+    "Address",
+    "Name"
+  ],
+  "Events": [
+    {
+      "Name": "CustomerAddedEvent",
+      "Properties": [
+        {
+          "Name": "Id",
+          "Type": "CustomerId",
+          "IsCollection": false,
+          "IsNullable": false
+        },
+        {
+          "Name": "Name",
+          "Type": "Name",
+          "IsCollection": false,
+          "IsNullable": false
+        },
+        {
+          "Name": "Address",
+          "Type": "Address",
+          "IsCollection": false,
+          "IsNullable": false
+        }
+      ]
+    },
+    {
+      "Name": "CustomerAddedEvent",
+      "Properties": [
+        {
+          "Name": "Id",
+          "Type": "CustomerId",
+          "IsCollection": false,
+          "IsNullable": false
+        },
+        {
+          "Name": "Name",
+          "Type": "Name",
+          "IsCollection": false,
+          "IsNullable": false
+        },
+        {
+          "Name": "Address",
+          "Type": "Address",
+          "IsCollection": false,
+          "IsNullable": false
+        }
+      ]
+    }
+  ],
+  "Commands": [
+    {
+      "Name": "AddCustomerCommand",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Type": "Name",
+          "IsCollection": false,
+          "IsNullable": false
+        },
+        {
+          "Name": "Address",
+          "Type": "Address",
+          "IsCollection": false,
+          "IsNullable": false
+        }
+      ]
+    },
+    {
+      "Name": "DeleteCustomerCommand",
+      "Properties": [
+        {
+          "Name": "Id",
+          "Type": "CustomerId",
+          "IsCollection": false,
+          "IsNullable": false
+        }
+      ]
+    },
+    {
+      "Name": "UpdateCustomerCommand",
+      "Properties": [
+        {
+          "Name": "CustomerId",
+          "Type": "CustomerId",
+          "IsCollection": false,
+          "IsNullable": false
+        },
+        {
+          "Name": "Name",
+          "Type": "Name",
+          "IsCollection": false,
+          "IsNullable": false
+        },
+        {
+          "Name": "Address",
+          "Type": "String",
+          "IsCollection": true,
+          "IsNullable": true
+        }
+      ]
+    }
+  ]
+}

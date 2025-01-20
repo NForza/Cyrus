@@ -35,20 +35,22 @@ public class CqrsEventGenerator : CyrusGeneratorBase, IIncrementalGenerator
         context.RegisterSourceOutput(combinedProvider, (spc, eventHandlersWithCompilation) =>
         {
             var ((queryHandlers, compilation), config) = eventHandlersWithCompilation;
-            if (queryHandlers.Any() && config.Events.Bus == "MassTransit")
+            if (queryHandlers.Any())
             {
-                var sourceText = GenerateEventConsumers(queryHandlers);
-                spc.AddSource($"EventConsumers.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                if (config.Events.Bus == "MassTransit")
+                {
+                    var sourceText = GenerateEventConsumers(queryHandlers);
+                    spc.AddSource($"EventConsumers.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                }
+
+                string assemblyName = queryHandlers.First().ContainingAssembly.Name;
+                var eventModels = GetPartialModelClass(
+                    assemblyName,
+                    "Events",
+                    "ModelDefinition",
+                    queryHandlers.Select(qh => ModelGenerator.For((INamedTypeSymbol)qh.Parameters[0].Type, compilation)));
+                spc.AddSource($"model-events.g.cs", SourceText.From(eventModels, Encoding.UTF8));
             }
-
-            string assemblyName = queryHandlers.First().ContainingAssembly.Name;
-            var eventModels = GetPartialModelClass(
-                assemblyName,
-                "Events",
-                "ModelDefinition",
-                queryHandlers.Select(qh => ModelGenerator.For((INamedTypeSymbol)qh.Parameters[0].Type, compilation)));
-            spc.AddSource($"model-events.g.cs", SourceText.From(eventModels, Encoding.UTF8));
-
         });
     }
 
