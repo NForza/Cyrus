@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <MSBuildRuntime>CurrentRuntime</MSBuildRuntime>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Templates\interface.sbn" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\guid.sbn" />
+    <EmbeddedResource Include="Templates\string.sbn" />
+    <EmbeddedResource Include="Templates\interface.sbn" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Framework" Version="17.12.6" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.12.6" />
+    <PackageReference Include="Scriban" Version="5.12.1" />
+  </ItemGroup>
+
+</Project>

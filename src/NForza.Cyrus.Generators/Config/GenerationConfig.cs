@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using NForza.Cyrus.Generators.Config;
 
-namespace NForza.Cyrus.Cqrs.Generator.Config;
+namespace NForza.Cyrus.Generators.Config;
 
 public class GenerationConfig
 {

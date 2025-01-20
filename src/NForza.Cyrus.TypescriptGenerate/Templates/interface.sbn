@@ -1,0 +1,9 @@
+{{ for t in imports }}
+import { {{ t.name }} } from './{{ t.name }}';
+{{ end }}
+
+export class {{ name }} {
+{{ for prop in properties }}
+    public {{ prop.name }}{{ if prop.is_nullable }}?{{ end }}: {{ prop.type }}{{ if prop.is_collection }}[]{{ end }};
+{{ end }}
+}

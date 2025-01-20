@@ -1,4 +1,4 @@
-﻿namespace NForza.Cyrus.Cqrs.Generator.Config
+﻿namespace NForza.Cyrus.Generators.Config
 {
     public class EventConfig
     {
