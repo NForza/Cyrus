@@ -7,7 +7,7 @@
     <Configurations>Debug;Release;DebugGenerator</Configurations>
     <IsPackable>true</IsPackable>
     <Title>Strongly Typed IDs using source generators from NForza.Cyrus</Title>
-    <PackageId>NForza.Cyrus.TypedIds</PackageId>
+    <PackageId>NForza.Cyrus.Abstractions</PackageId>
     <Company>NForza</Company>
     <Authors>NForza</Authors>
     <RepositoryUrl>https://github.com/NForza/Cyrus</RepositoryUrl>
