@@ -50,7 +50,7 @@ jobs:
       run: dotnet pack --configuration Release --output ./output "./src/NForza.Cyrus.MassTransit/NForza.Cyrus.MassTransit.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
 
     - name: Pack the Cyrus metapackage
-      run: nuget pack -OutputDirectory ./output ${{ env.NFORZA_CYRUS_NUSPEC }}
+      run: dotnet pack --configuration Release --output ./output "./src/NForza.Cyrus.Metapackage/NForza.Cyrus.Metapackage.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
       
     - name: Push to NuGet
       env:
