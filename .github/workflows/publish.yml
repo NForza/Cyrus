@@ -43,8 +43,8 @@ jobs:
     - name: Pack the Generators project
       run: dotnet pack --configuration Release --output ./output "./src/NForza.Cyrus.Generators/NForza.Cyrus.Generators.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
 
-    - name: Pack the TypedIds project
-      run: dotnet pack --configuration Release --output ./output "./src/NForza.Cyrus.TypedIds/NForza.Cyrus.TypedIds.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
+    - name: Pack the Abstractions project
+      run: dotnet pack --configuration Release --output ./output "./src/NForza.Cyrus.Abstractions/NForza.Cyrus.Abstractions.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
 
     - name: Pack the MassTransit project
       run: dotnet pack --configuration Release --output ./output "./src/NForza.Cyrus.MassTransit/NForza.Cyrus.MassTransit.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
