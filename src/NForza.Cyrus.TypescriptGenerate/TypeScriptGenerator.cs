@@ -19,6 +19,7 @@ namespace NForza.Cyrus.TypescriptGenerate
             GenerateGuids(outputFolder, metadata);
             GenerateStrings(outputFolder, metadata);
             GenerateCommands(outputFolder, metadata);
+            GenerateEvents(outputFolder, metadata);
         }
 
         private static void GenerateGuids(string outputFolder, CyrusMetadata metadata)
@@ -46,15 +47,22 @@ namespace NForza.Cyrus.TypescriptGenerate
         private static void GenerateCommands(string outputFolder, CyrusMetadata metadata)
         {
             Template template = GetTemplate("interface");
-            if(template.HasErrors)
-            {
-                throw new InvalidOperationException("Template has errors");
-            }
             foreach (var command in metadata.Commands)
             {
                 var model = new { Imports = GetImportsFor(metadata, command).ToList(), command.Name, command.Properties };
                 var result = template.Render(model);
                 string fileName = Path.ChangeExtension(Path.Combine(outputFolder, command.Name), ".ts");
+                File.WriteAllText(fileName, result);
+            }
+        }
+        private static void GenerateEvents(string outputFolder, CyrusMetadata metadata)
+        {
+            Template template = GetTemplate("interface");
+            foreach (var @event in metadata.Events)
+            {
+                var model = new { Imports = GetImportsFor(metadata, @event).ToList(), @event.Name, @event.Properties };
+                var result = template.Render(model);
+                string fileName = Path.ChangeExtension(Path.Combine(outputFolder, @event.Name), ".ts");
                 File.WriteAllText(fileName, result);
             }
         }
