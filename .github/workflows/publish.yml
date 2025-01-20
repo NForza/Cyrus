@@ -7,7 +7,7 @@ on:
       - main  
 
 env:
-  PACKAGE_VERSION: 1.0.40
+  PACKAGE_VERSION: 1.0.41
   NFORZA_CYRUS_NUSPEC: ./src/NForza.Cyrus.nuspec
 
 jobs:
@@ -54,8 +54,11 @@ jobs:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
       run: dotnet nuget push ./output/*.nupkg --api-key $NUGET_API_KEY --source https://api.nuget.org/v3/index.json
 
+    - name: Restore the Cyrus metapackage
+      run: dotnet restore --no-build --configuration Release "./src/NForza.Cyrus.Metapackage/NForza.Cyrus.Metapackage.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }} /p:RestoreSources=./output
+
     - name: Pack the Cyrus metapackage
-      run: dotnet pack --no-build --configuration Release --output ./output-meta "./src/NForza.Cyrus.Metapackage/NForza.Cyrus.Metapackage.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }} /p:RestoreSources=./output
+      run: dotnet pack --no-build --no-restore --configuration Release --output ./output-meta "./src/NForza.Cyrus.Metapackage/NForza.Cyrus.Metapackage.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }} /p:RestoreSources=./output
       
     - name: Push to NuGet
       env:
