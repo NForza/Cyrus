@@ -1,6 +1,5 @@
-﻿namespace NForza.Cyrus.SignalR
+﻿namespace NForza.Cyrus.SignalR;
+
+public class SignalRQueryBuilder<T> : ISignalRQueryBuilder<T>
 {
-    public class SignalRQueryBuilder<T> : ISignalRQueryBuilder<T>
-    {
-    }
 }

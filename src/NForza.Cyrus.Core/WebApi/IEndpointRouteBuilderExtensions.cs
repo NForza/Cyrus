@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Cqrs;
+using NForza.Cyrus.Model;
 using NForza.Cyrus.SignalR;
 using NForza.Cyrus.WebApi.Policies;
 

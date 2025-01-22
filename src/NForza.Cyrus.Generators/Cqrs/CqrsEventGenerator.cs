@@ -47,8 +47,8 @@ public class CqrsEventGenerator : CyrusGeneratorBase, IIncrementalGenerator
                 var eventModels = GetPartialModelClass(
                     assemblyName,
                     "Events",
-                    "ModelDefinition",
-                    queryHandlers.Select(qh => ModelGenerator.For((INamedTypeSymbol)qh.Parameters[0].Type, compilation)));
+                    "ModelTypeDefinition",
+                    queryHandlers.Select(qh => ModelGenerator.ForNamedType((INamedTypeSymbol)qh.Parameters[0].Type, compilation)));
                 spc.AddSource($"model-events.g.cs", SourceText.From(eventModels, Encoding.UTF8));
             }
         });

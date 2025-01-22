@@ -20,7 +20,7 @@ public class CommandDispatcher(IEnumerable<IEventBus> eventBuses, ICommandBus co
         return result;
     }
 
-    private async Task DispatchEvents(IEnumerable events)
+    private Task DispatchEvents(IEnumerable events)
     {
         Parallel.ForEach(eventBuses, async eventBus =>
         {
@@ -29,5 +29,6 @@ public class CommandDispatcher(IEnumerable<IEventBus> eventBuses, ICommandBus co
                 await eventBus.Publish(e);
             }
         });
+        return Task.CompletedTask;
     }
 }

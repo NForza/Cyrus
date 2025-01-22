@@ -54,7 +54,7 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
                 }
 
                 string assemblyName = recordSymbols.First().ContainingAssembly.Name;
-                var commandModels = GetPartialModelClass(assemblyName, "Commands", "ModelDefinition", recordSymbols.Select(cm => ModelGenerator.For((INamedTypeSymbol)cm.Parameters[0].Type, compilation)));
+                var commandModels = GetPartialModelClass(assemblyName, "Commands", "ModelTypeDefinition", recordSymbols.Select(cm => ModelGenerator.ForNamedType((INamedTypeSymbol)cm.Parameters[0].Type, compilation)));
                 spc.AddSource($"model-commands.g.cs", SourceText.From(commandModels, Encoding.UTF8));
             }
         });

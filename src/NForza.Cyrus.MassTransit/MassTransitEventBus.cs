@@ -1,13 +1,12 @@
 ﻿using MassTransit;
 using NForza.Cyrus.Cqrs;
 
-namespace NForza.Cyrus.MassTransit
+namespace NForza.Cyrus.MassTransit;
+
+public class MassTransitEventBus(IBus bus) : IEventBus
 {
-    public class MassTransitEventBus(IBus bus) : IEventBus
+    public Task Publish(object @event)
     {
-        public Task Publish(object @event)
-        {
-            return bus.Publish(@event);
-        }
+        return bus.Publish(@event);
     }
 }

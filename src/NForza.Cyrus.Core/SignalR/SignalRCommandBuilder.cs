@@ -1,9 +1,8 @@
-﻿namespace NForza.Cyrus.SignalR
+﻿namespace NForza.Cyrus.SignalR;
+
+public class SignalRCommandBuilder<T> : ISignalRCommandBuilder<T>
 {
-    public class SignalRCommandBuilder<T> : ISignalRCommandBuilder<T>
+    public void ReplyToAllClients()
     {
-        public void ReplyToAllClients()
-        {
-        }
     }
 }
