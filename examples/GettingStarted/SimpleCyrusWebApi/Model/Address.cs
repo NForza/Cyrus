@@ -3,4 +3,4 @@
 namespace SimpleCyrusWebApi;
 
 [StringId]
-public partial record struct Name;
+public partial record struct Address;
