@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyModel;
 using NForza.Cyrus.WebApi.Policies;
 using NForza.Cyrus.Abstractions;
+using NForza.Cyrus.Abstractions.Model;
 % Usings %
 
 namespace NForza.Cyrus.Cqrs;

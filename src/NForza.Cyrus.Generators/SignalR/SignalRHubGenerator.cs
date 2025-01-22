@@ -45,11 +45,11 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
             .Select((signalRHubClassDefinition, _) => signalRHubClassDefinition.Initialize())
             .Collect();
 
-        var endpointGroupModelsAndConfigurationProvider = signalrHubModelProvider.Combine(configurationProvider);
+        var endpointGroupModelsAndConfigurationProvider = signalrHubModelProvider.Combine(configurationProvider).Combine(context.CompilationProvider);
 
         context.RegisterSourceOutput(endpointGroupModelsAndConfigurationProvider, (spc, classesAndConfig) =>
         {
-            var (signalRModels, configuration) = classesAndConfig;
+            var ((signalRModels, configuration), compilation) = classesAndConfig;
 
             var isWebApi = configuration.GenerationTarget.Contains(GenerationTarget.WebApi);
 
@@ -62,6 +62,12 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
                 {
                     var sourceText = GenerateSignalRHub(signalRModel);
                     spc.AddSource($"{signalRModel.Symbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                }
+                if (signalRModels.Any())
+                {
+                    string assemblyName = signalRModels.First().Symbol.ContainingAssembly.Name;
+                    var commandModels = GetPartialModelClass(assemblyName, "Hubs", "ModelHubDefinition", signalRModels.Select(c => ModelGenerator.ForHub(c, compilation)));
+                    spc.AddSource($"model-hubs.g.cs", SourceText.From(commandModels, Encoding.UTF8));
                 }
             }
         });
@@ -126,77 +132,4 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
         }
         return sb.ToString();
     }
-}
-
-internal class SignalRCommand
-{
-    public string FullTypeName { get; internal set; } = string.Empty;
-    public string MethodName { get; internal set; } = string.Empty;
-}
-
-internal record SignalRHubClassDefinition
-{
-    IEnumerable<InvocationExpressionSyntax> GetMethodCallsOf(SyntaxNode node, string methodName)
-    {
-        IEnumerable<InvocationExpressionSyntax> methodCalls = node
-                         .DescendantNodes()
-                         .OfType<InvocationExpressionSyntax>();
-        return methodCalls
-                 .Where(methodCall =>
-                 {
-                     return methodCall.Expression switch
-                     {
-                         IdentifierNameSyntax identifierName => identifierName.Identifier.Text == methodName,
-                         GenericNameSyntax genericNameInMember => genericNameInMember.Identifier.Text == methodName,
-                         _ => false
-                     };
-                 });
-    }
-
-    void SetPath(INamedTypeSymbol symbol, BlockSyntax? constructorBody)
-    {
-        string? usePathArgument = constructorBody != null ? GetMethodCallsOf(constructorBody, "UsePath").FirstOrDefault()?.ArgumentList.Arguments.FirstOrDefault()?.ToString() : null;
-        Path = usePathArgument ?? symbol.Name.ToLower();
-    }
-
-    public SignalRHubClassDefinition(ClassDeclarationSyntax declaration, INamedTypeSymbol symbol, SemanticModel semanticModel)
-    {
-        Declaration = declaration;
-        Symbol = symbol;
-        SemanticModel = semanticModel;
-    }
-
-    public SignalRHubClassDefinition Initialize()
-    {
-        var constructorBody = Declaration.DescendantNodes()
-            .OfType<ConstructorDeclarationSyntax>()
-            .Where(constructorDeclarationSyntax => constructorDeclarationSyntax.Body != null)
-            .FirstOrDefault()?.Body;
-
-        if (constructorBody != null)
-        {
-            SetPath(Symbol, constructorBody);
-            SetCommands(Symbol, constructorBody);
-        }
-        return this;
-    }
-
-    private void SetCommands(INamedTypeSymbol symbol, BlockSyntax constructorBody)
-    {
-        var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "CommandMethodFor")
-                .Select(ies => ies.Expression)
-                .OfType<GenericNameSyntax>();
-        var commands = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());
-        Commands = commands.Select(genericArg =>
-        {
-            var symbol = SemanticModel.GetSymbolInfo(genericArg).Symbol!;
-            return new SignalRCommand { MethodName = genericArg.GetText().ToString(), FullTypeName = symbol.ToFullName() };
-        });
-    }
-
-    public string Path { get; private set; } = "";
-    public ClassDeclarationSyntax Declaration { get; }
-    public INamedTypeSymbol Symbol { get; }
-    public SemanticModel SemanticModel { get; }
-    public IEnumerable<SignalRCommand> Commands { get; internal set; } = [];
 }
