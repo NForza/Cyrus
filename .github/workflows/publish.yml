@@ -64,7 +64,7 @@ jobs:
     
     - name: Pack the Metapackage
       run: |
-        nuget pack ./src/NForza.Cyrus.Metapackage/NForza.Cyrus.Metapackage.nuspec \
+        nuget pack ./src/NForza.Cyrus.nuspec \
           -Version ${{ env.PACKAGE_VERSION }} \
           -OutputDirectory ./output
           
