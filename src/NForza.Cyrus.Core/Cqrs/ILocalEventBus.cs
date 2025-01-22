@@ -1,8 +1,7 @@
 ﻿
-namespace NForza.Cyrus.Cqrs
+namespace NForza.Cyrus.Cqrs;
+
+public interface ILocalEventBus
 {
-    public interface ILocalEventBus
-    {
-        Task Publish(object @event);
-    }
+    Task Publish(object @event);
 }

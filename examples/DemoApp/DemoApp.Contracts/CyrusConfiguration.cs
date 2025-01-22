@@ -1,12 +1,11 @@
 ﻿using NForza.Cyrus.Abstractions;
 
-namespace SimpleCyrusWebApi
+namespace SimpleCyrusWebApi;
+
+public class CyrusConfiguration : CyrusConfig
 {
-    public class CyrusConfiguration : CyrusConfig
+    public CyrusConfiguration()
     {
-        public CyrusConfiguration()
-        {
-            GenerateContracts();
-        }
+        GenerateContracts();
     }
 }
