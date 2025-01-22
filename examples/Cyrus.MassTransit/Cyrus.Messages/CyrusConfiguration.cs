@@ -1,12 +1,11 @@
-﻿using NForza.Cyrus;
+﻿using NForza.Cyrus.Abstractions;
 
-namespace Cyrus.Server
+namespace Cyrus.Messages;
+
+public class CyrusConfiguration : CyrusConfig
 {
-    public class CyrusConfiguration : CyrusConfig
+    public CyrusConfiguration()
     {
-        public CyrusConfiguration()
-        {
-            GenerateContracts();
-        }
+        GenerateContracts();
     }
 }

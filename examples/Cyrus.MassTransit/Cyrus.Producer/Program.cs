@@ -1,4 +1,4 @@
-using NForza.Cyrus.TypedIds;
+using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.WebApi;
 using MassTransit;
@@ -28,6 +28,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.MapCyrus(logCyrusConfiguration: true);
+app.MapCyrus();
 
 app.Run();

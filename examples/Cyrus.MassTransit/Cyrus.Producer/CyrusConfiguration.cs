@@ -1,15 +1,14 @@
-﻿using NForza.Cyrus;
+﻿using NForza.Cyrus.Abstractions;
 
-namespace Cyrus.Server
+namespace Cyrus.Producer;
+
+public class CyrusConfiguration : CyrusConfig
 {
-    public class CyrusConfiguration : CyrusConfig
+    public CyrusConfiguration()
     {
-        public CyrusConfiguration()
-        {
-            UseMassTransit();
-            GenerateWebApi();
-            GenerateDomain();
-            UseContractsFromAssembliesContaining("Messages");
-        }
+        UseMassTransit();
+        GenerateWebApi();
+        GenerateDomain();
+        UseContractsFromAssembliesContaining("Messages");
     }
 }
