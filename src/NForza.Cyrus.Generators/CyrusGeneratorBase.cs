@@ -155,35 +155,6 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
         return symbol;
     }
 
-    static bool IsStruct(INamedTypeSymbol typeSymbol)
-    {
-        return typeSymbol.IsValueType && typeSymbol.TypeKind == TypeKind.Struct;
-    }
-
-    protected IEnumerable<INamedTypeSymbol> GetAllQueries(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string querySuffix)
-    {
-        var queriesInDomain = GetAllTypesWithSuffix(compilation, contractProjectSuffixes, querySuffix)
-            .ToList();
-
-        return queriesInDomain;
-    }
-
-    protected IEnumerable<INamedTypeSymbol> GetAllEvents(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string eventSuffix)
-    {
-        var eventsInDomain = GetAllTypesWithSuffix(compilation, contractProjectSuffixes, eventSuffix)
-            .ToList();
-
-        return eventsInDomain;
-    }
-
-    protected IEnumerable<INamedTypeSymbol> GetAllCommands(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string commandSuffix)
-    {
-        var commandsInDomain = GetAllTypesWithSuffix(compilation, contractProjectSuffixes, commandSuffix)
-            .Where(t => IsStruct(t));
-
-        return commandsInDomain;
-    }
-
     protected bool CouldBeCommandHandler(SyntaxNode syntaxNode)
      => syntaxNode is MethodDeclarationSyntax methodDeclarationSyntax
         &&
@@ -208,33 +179,6 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
             return isEvent;
         };
         return false;
-    }
-
-    private IEnumerable<INamedTypeSymbol> GetAllTypesWithSuffix(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string typeSuffix)
-    {
-        var typesInCurrentCompilation = compilation.GetSymbolsWithName(s => s.EndsWith(typeSuffix), SymbolFilter.Type).OfType<INamedTypeSymbol>();
-        foreach (var t in typesInCurrentCompilation)
-            yield return t;
-
-        foreach (var reference in compilation.References)
-        {
-            if (compilation.GetAssemblyOrModuleSymbol(reference) is not IAssemblySymbol assemblySymbol
-                ||
-                assemblySymbol.Name.StartsWith("System")
-                ||
-                assemblySymbol.Name.StartsWith("Microsoft")
-                ||
-                !contractProjectSuffixes.Any(assemblySymbol.Name.EndsWith))
-                continue;
-
-            var allTypes = GetAllTypes(assemblySymbol.GlobalNamespace);
-
-            foreach (var t in allTypes)
-            {
-                if (t.Name.EndsWith(typeSuffix))
-                    yield return t;
-            }
-        }
     }
 
     protected static bool IsDirectlyDerivedFrom(
