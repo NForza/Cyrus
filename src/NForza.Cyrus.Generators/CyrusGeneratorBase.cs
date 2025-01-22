@@ -146,6 +146,15 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
         return symbol;
     }
 
+    protected INamedTypeSymbol? GetRecordSymbolFromContext(GeneratorSyntaxContext context)
+    {
+        var classDeclarationSyntax = (RecordDeclarationSyntax)context.Node;
+        var model = context.SemanticModel;
+
+        var symbol = model.GetDeclaredSymbol(classDeclarationSyntax) as INamedTypeSymbol;
+        return symbol;
+    }
+
     static bool IsStruct(INamedTypeSymbol typeSymbol)
     {
         return typeSymbol.IsValueType && typeSymbol.TypeKind == TypeKind.Struct;
@@ -157,6 +166,14 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
             .ToList();
 
         return queriesInDomain;
+    }
+
+    protected IEnumerable<INamedTypeSymbol> GetAllEvents(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string eventSuffix)
+    {
+        var eventsInDomain = GetAllTypesWithSuffix(compilation, contractProjectSuffixes, eventSuffix)
+            .ToList();
+
+        return eventsInDomain;
     }
 
     protected IEnumerable<INamedTypeSymbol> GetAllCommands(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string commandSuffix)
@@ -181,6 +198,17 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
     => syntaxNode is MethodDeclarationSyntax methodDeclaration
         &&
         methodDeclaration.ParameterList.Parameters.Count == 1;
+
+    protected bool IsEvent(SyntaxNode syntaxNode)
+    {
+        var classDeclaration = syntaxNode as RecordDeclarationSyntax;
+        if(classDeclaration != null)
+        {
+            bool isEvent = classDeclaration.Identifier.Text.EndsWith("Event");
+            return isEvent;
+        };
+        return false;
+    }
 
     private IEnumerable<INamedTypeSymbol> GetAllTypesWithSuffix(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string typeSuffix)
     {

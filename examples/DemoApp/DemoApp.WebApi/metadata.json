@@ -1,112 +1,114 @@
 {
-  "Guids": [
+  "guids": [
     "CustomerId"
   ],
-  "Integers": [
+  "integers": [
     "Amount"
   ],
-  "Strings": [
+  "strings": [
     "Address",
     "Name"
   ],
-  "Events": [
+  "events": [
     {
-      "Name": "CustomerAddedEvent",
-      "Properties": [
+      "name": "CustomerAddedEvent",
+      "properties": [
         {
-          "Name": "Id",
-          "Type": "CustomerId",
-          "IsCollection": false,
-          "IsNullable": false
+          "name": "Id",
+          "type": "CustomerId",
+          "isCollection": false,
+          "isNullable": false
         },
         {
-          "Name": "Name",
-          "Type": "Name",
-          "IsCollection": false,
-          "IsNullable": false
+          "name": "Name",
+          "type": "Name",
+          "isCollection": false,
+          "isNullable": false
         },
         {
-          "Name": "Address",
-          "Type": "Address",
-          "IsCollection": false,
-          "IsNullable": false
+          "name": "Address",
+          "type": "Address",
+          "isCollection": false,
+          "isNullable": false
         }
       ]
     },
     {
-      "Name": "CustomerAddedEvent",
-      "Properties": [
+      "name": "CustomerUpdatedEvent",
+      "properties": [
         {
-          "Name": "Id",
-          "Type": "CustomerId",
-          "IsCollection": false,
-          "IsNullable": false
-        },
-        {
-          "Name": "Name",
-          "Type": "Name",
-          "IsCollection": false,
-          "IsNullable": false
-        },
-        {
-          "Name": "Address",
-          "Type": "Address",
-          "IsCollection": false,
-          "IsNullable": false
+          "name": "Id",
+          "type": "CustomerId",
+          "isCollection": false,
+          "isNullable": false
         }
       ]
     }
   ],
-  "Commands": [
+  "commands": [
     {
-      "Name": "AddCustomerCommand",
-      "Properties": [
+      "name": "AddCustomerCommand",
+      "properties": [
         {
-          "Name": "Name",
-          "Type": "Name",
-          "IsCollection": false,
-          "IsNullable": false
+          "name": "Name",
+          "type": "Name",
+          "isCollection": false,
+          "isNullable": false
         },
         {
-          "Name": "Address",
-          "Type": "Address",
-          "IsCollection": false,
-          "IsNullable": false
+          "name": "Address",
+          "type": "Address",
+          "isCollection": false,
+          "isNullable": false
         }
       ]
     },
     {
-      "Name": "DeleteCustomerCommand",
-      "Properties": [
+      "name": "DeleteCustomerCommand",
+      "properties": [
         {
-          "Name": "Id",
-          "Type": "CustomerId",
-          "IsCollection": false,
-          "IsNullable": false
+          "name": "Id",
+          "type": "CustomerId",
+          "isCollection": false,
+          "isNullable": false
         }
       ]
     },
     {
-      "Name": "UpdateCustomerCommand",
-      "Properties": [
+      "name": "UpdateCustomerCommand",
+      "properties": [
         {
-          "Name": "CustomerId",
-          "Type": "CustomerId",
-          "IsCollection": false,
-          "IsNullable": false
+          "name": "CustomerId",
+          "type": "CustomerId",
+          "isCollection": false,
+          "isNullable": false
         },
         {
-          "Name": "Name",
-          "Type": "Name",
-          "IsCollection": false,
-          "IsNullable": false
+          "name": "Name",
+          "type": "Name",
+          "isCollection": false,
+          "isNullable": false
         },
         {
-          "Name": "Address",
-          "Type": "String",
-          "IsCollection": true,
-          "IsNullable": true
+          "name": "Address",
+          "type": "String",
+          "isCollection": false,
+          "isNullable": false
         }
+      ]
+    }
+  ],
+  "hubs": [
+    {
+      "name": "CustomerHub",
+      "path": "/customer-hub",
+      "commands": [
+        "AddCustomerCommand",
+        "DeleteCustomerCommand"
+      ],
+      "events": [
+        "CustomerUpdatedEvent",
+        "CustomerAddedEvent"
       ]
     }
   ]
