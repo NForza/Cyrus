@@ -74,9 +74,9 @@ jobs:
         dotnet build \
           --configuration Release \
           --source "./output/" \
-          --source "https://api.nuget.org/v3/index.json"
+          --source "https://api.nuget.org/v3/index.json" \
           --output ./output-meta \
-          "./src/NForza.Cyrus.Metapackage/NForza.Cyrus.Metapackage.csproj" 
+          "./src/NForza.Cyrus.Metapackage/NForza.Cyrus.Metapackage.csproj" \
           /p:PackageVersion=${{ env.PACKAGE_VERSION }}     
 
     - name: Pack the Cyrus metapackage
