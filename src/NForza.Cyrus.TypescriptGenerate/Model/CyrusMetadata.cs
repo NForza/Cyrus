@@ -6,4 +6,5 @@ public class CyrusMetadata
     public Event[] Events { get; set; } = [];
     public string[] Guids { get; set; } = [];
     public string[] Strings { get; set; } = [];
+    public Hub[] Hubs { get; set; }
 }

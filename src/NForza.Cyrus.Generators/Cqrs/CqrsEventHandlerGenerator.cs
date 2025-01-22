@@ -9,37 +9,39 @@ using NForza.Cyrus.Generators.Roslyn;
 namespace NForza.Cyrus.Generators.Cqrs;
 
 [Generator]
-public class CqrsEventGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public class CqrsEventHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
         var configProvider = ConfigProvider(context);
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => IsEvent(syntaxNode),
-                transform: (context, _) => GetRecordSymbolFromContext(context));
+                predicate: (syntaxNode, _) => CouldBeEventHandler(syntaxNode),
+                transform: (context, _) => GetMethodSymbolFromContext(context));
 
-        var allEventsProvider = incrementalValuesProvider.Combine(configProvider)
-            .Where(x => x.Left is not null)
+        var allEventHandlersProvider = incrementalValuesProvider.Combine(configProvider)
+            .Where(x =>
+            {
+                var (methodNode, config) = x;
+                return IsEventHandler(methodNode, config.Events.HandlerName, config.Events.Suffix);
+            })
             .Select((x, _) => x.Left!)
             .Collect();
 
-        var combinedProvider = allEventsProvider.Combine(context.CompilationProvider);
+        var combinedProvider = allEventHandlersProvider.Combine(context.CompilationProvider).Combine(configProvider);
 
-        context.RegisterSourceOutput(combinedProvider, (spc, eventsWithCompilation) =>
+        context.RegisterSourceOutput(combinedProvider, (spc, eventHandlersWithCompilation) =>
         {
-            var (events, compilation) = eventsWithCompilation;
-            if (events.Any())
+            var ((queryHandlers, compilation), config) = eventHandlersWithCompilation;
+            if (queryHandlers.Any())
             {
-                string assemblyName = events.First().ContainingAssembly.Name;
-                var eventModels = GetPartialModelClass(
-                    assemblyName,
-                    "Events",
-                    "ModelTypeDefinition",
-                    events.Select(qh => ModelGenerator.ForNamedType(qh, compilation)));
-                spc.AddSource($"model-events.g.cs", SourceText.From(eventModels, Encoding.UTF8));
+                if (config.Events.Bus == "MassTransit")
+                {
+                    var sourceText = GenerateEventConsumers(queryHandlers);
+                    spc.AddSource($"EventConsumers.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                }
             }
         });
     }

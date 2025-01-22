@@ -6,20 +6,49 @@ using System.Reflection;
 using System.Text.Json;
 using NForza.Cyrus.TypescriptGenerate.Model;
 using Scriban;
+using Scriban.Runtime;
 
 namespace NForza.Cyrus.TypescriptGenerate
 {
     internal static class TypeScriptGenerator
     {
+        private static TemplateContext GetContext(object model)
+        {
+            var scriptObject = new ScriptObject();
+            scriptObject.Import("camel_case", (string input) =>
+            {
+                if (string.IsNullOrEmpty(input)) return input;
+                return char.ToLowerInvariant(input[0]) + input.Substring(1);
+            });
+            scriptObject.Import(model, null, null);
+            var context = new TemplateContext();
+            context.PushGlobal(scriptObject);
+            return context;
+        }
+
         public static void Generate(string metadataFile, string outputFolder)
         {
             var json = File.ReadAllText(metadataFile);
-            var metadata = JsonSerializer.Deserialize<CyrusMetadata>(json) ?? throw new InvalidOperationException("Can't read metadata");
+            var metadata = JsonSerializer.Deserialize<CyrusMetadata>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web)) ?? throw new InvalidOperationException("Can't read metadata");
 
             GenerateGuids(outputFolder, metadata);
             GenerateStrings(outputFolder, metadata);
             GenerateCommands(outputFolder, metadata);
             GenerateEvents(outputFolder, metadata);
+            GenerateHubs(outputFolder, metadata);
+
+        }
+
+        private static void GenerateHubs(string outputFolder, CyrusMetadata metadata)
+        {
+            Template template = GetTemplate("hub");
+            foreach (var hub in metadata.Hubs)
+            {
+                hub.Imports = hub.Events.Concat(hub.Commands).ToArray();
+                var result = template.Render(GetContext(hub));
+                string fileName = Path.ChangeExtension(Path.Combine(outputFolder, hub.Name), ".ts");
+                File.WriteAllText(fileName, result);
+            }
         }
 
         private static void GenerateGuids(string outputFolder, CyrusMetadata metadata)
@@ -27,7 +56,7 @@ namespace NForza.Cyrus.TypescriptGenerate
             Template template = GetTemplate("guid");
             foreach (var guid in metadata.Guids)
             {
-                var result = template.Render(new { Name = guid });
+                var result = template.Render(GetContext(new { Name = guid }));
                 string fileName = Path.ChangeExtension(Path.Combine(outputFolder, guid), ".ts");
                 File.WriteAllText(fileName, result);
             }
@@ -38,7 +67,7 @@ namespace NForza.Cyrus.TypescriptGenerate
             Template template = GetTemplate("string");
             foreach (var stringType in metadata.Strings)
             {
-                var result = template.Render(new { Name = stringType });
+                var result = template.Render(GetContext(new { Name = stringType }));
                 string fileName = Path.ChangeExtension(Path.Combine(outputFolder, stringType), ".ts");
                 File.WriteAllText(fileName, result);
             }
@@ -50,7 +79,7 @@ namespace NForza.Cyrus.TypescriptGenerate
             foreach (var command in metadata.Commands)
             {
                 var model = new { Imports = GetImportsFor(metadata, command).ToList(), command.Name, command.Properties };
-                var result = template.Render(model);
+                var result = template.Render(GetContext(model));
                 string fileName = Path.ChangeExtension(Path.Combine(outputFolder, command.Name), ".ts");
                 File.WriteAllText(fileName, result);
             }
@@ -61,7 +90,7 @@ namespace NForza.Cyrus.TypescriptGenerate
             foreach (var @event in metadata.Events)
             {
                 var model = new { Imports = GetImportsFor(metadata, @event).ToList(), @event.Name, @event.Properties };
-                var result = template.Render(model);
+                var result = template.Render(GetContext(model));
                 string fileName = Path.ChangeExtension(Path.Combine(outputFolder, @event.Name), ".ts");
                 File.WriteAllText(fileName, result);
             }

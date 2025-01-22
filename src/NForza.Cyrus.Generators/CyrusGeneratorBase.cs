@@ -146,25 +146,13 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
         return symbol;
     }
 
-    static bool IsStruct(INamedTypeSymbol typeSymbol)
+    protected INamedTypeSymbol? GetRecordSymbolFromContext(GeneratorSyntaxContext context)
     {
-        return typeSymbol.IsValueType && typeSymbol.TypeKind == TypeKind.Struct;
-    }
+        var classDeclarationSyntax = (RecordDeclarationSyntax)context.Node;
+        var model = context.SemanticModel;
 
-    protected IEnumerable<INamedTypeSymbol> GetAllQueries(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string querySuffix)
-    {
-        var queriesInDomain = GetAllTypesWithSuffix(compilation, contractProjectSuffixes, querySuffix)
-            .ToList();
-
-        return queriesInDomain;
-    }
-
-    protected IEnumerable<INamedTypeSymbol> GetAllCommands(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string commandSuffix)
-    {
-        var commandsInDomain = GetAllTypesWithSuffix(compilation, contractProjectSuffixes, commandSuffix)
-            .Where(t => IsStruct(t));
-
-        return commandsInDomain;
+        var symbol = model.GetDeclaredSymbol(classDeclarationSyntax) as INamedTypeSymbol;
+        return symbol;
     }
 
     protected bool CouldBeCommandHandler(SyntaxNode syntaxNode)
@@ -182,31 +170,15 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
         &&
         methodDeclaration.ParameterList.Parameters.Count == 1;
 
-    private IEnumerable<INamedTypeSymbol> GetAllTypesWithSuffix(Compilation compilation, IEnumerable<string> contractProjectSuffixes, string typeSuffix)
+    protected bool IsEvent(SyntaxNode syntaxNode)
     {
-        var typesInCurrentCompilation = compilation.GetSymbolsWithName(s => s.EndsWith(typeSuffix), SymbolFilter.Type).OfType<INamedTypeSymbol>();
-        foreach (var t in typesInCurrentCompilation)
-            yield return t;
-
-        foreach (var reference in compilation.References)
+        var classDeclaration = syntaxNode as RecordDeclarationSyntax;
+        if(classDeclaration != null)
         {
-            if (compilation.GetAssemblyOrModuleSymbol(reference) is not IAssemblySymbol assemblySymbol
-                ||
-                assemblySymbol.Name.StartsWith("System")
-                ||
-                assemblySymbol.Name.StartsWith("Microsoft")
-                ||
-                !contractProjectSuffixes.Any(assemblySymbol.Name.EndsWith))
-                continue;
-
-            var allTypes = GetAllTypes(assemblySymbol.GlobalNamespace);
-
-            foreach (var t in allTypes)
-            {
-                if (t.Name.EndsWith(typeSuffix))
-                    yield return t;
-            }
-        }
+            bool isEvent = classDeclaration.Identifier.Text.EndsWith("Event");
+            return isEvent;
+        };
+        return false;
     }
 
     protected static bool IsDirectlyDerivedFrom(
