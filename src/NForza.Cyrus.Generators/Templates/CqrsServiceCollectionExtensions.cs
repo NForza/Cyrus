@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyModel;
 using NForza.Cyrus.WebApi.Policies;
+using NForza.Cyrus.Abstractions;
 % Usings %
 
 namespace NForza.Cyrus.Cqrs;
@@ -17,6 +19,12 @@ public static class CyrusServiceCollectionExtensions
         services.AddSingleton<ICommandBus, LocalCommandBus>();
         services.AddScoped<DefaultCommandInputMappingPolicy>();
         services.AddHttpContextAccessor();
+
+        services.Scan(scan => scan
+            .FromDependencyContext(DependencyContext.Default!)
+            .AddClasses(classes => classes.AssignableTo<ICyrusModel>())
+            .AsImplementedInterfaces()
+            .WithTransientLifetime());
 
         % RegisterEventBus %
         services.AddSingleton(BuildCommandHandlerDictionary());

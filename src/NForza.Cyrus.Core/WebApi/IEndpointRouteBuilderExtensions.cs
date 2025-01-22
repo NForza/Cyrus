@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NForza.Cyrus.Abstractions;
+using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.SignalR;
 using NForza.Cyrus.WebApi.Policies;
@@ -17,7 +18,7 @@ public static class IEndpointRouteBuilderExtensions
     public static IEndpointRouteBuilder MapCyrus(this IEndpointRouteBuilder endpoints)
     {
         LogCyrusConfiguration(endpoints.ServiceProvider);
-        return endpoints.MapQueries().MapCommands();
+        return endpoints.MapQueries().MapCommands().MapModel().MapSignalR();
     }
 
     private static void LogCyrusConfiguration(IServiceProvider serviceProvider)
@@ -57,6 +58,17 @@ public static class IEndpointRouteBuilderExtensions
             var resultType = queryHandlerDictionary.GetQueryReturnType(queryEndpoint.QueryType);
             MapQuery(endpoints, queryEndpoint, resultType);
         }
+        return endpoints;
+    }
+
+    public static IEndpointRouteBuilder MapModel(this IEndpointRouteBuilder endpoints)
+    {
+        ICyrusModel model = CyrusModel.Aggregate(endpoints.ServiceProvider);
+        endpoints.MapGet("/model", () =>
+        {
+            string json = model.AsJson();
+            return Results.Content(json, "application/json");
+        });
         return endpoints;
     }
 

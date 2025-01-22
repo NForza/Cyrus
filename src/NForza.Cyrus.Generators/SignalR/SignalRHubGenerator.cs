@@ -130,8 +130,8 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
 
 internal class SignalRCommand
 {
-    public string FullTypeName { get; internal set; }
-    public SourceText MethodName { get; internal set; }
+    public string FullTypeName { get; internal set; } = string.Empty;
+    public string MethodName { get; internal set; } = string.Empty;
 }
 
 internal record SignalRHubClassDefinition
@@ -190,7 +190,7 @@ internal record SignalRHubClassDefinition
         Commands = commands.Select(genericArg =>
         {
             var symbol = SemanticModel.GetSymbolInfo(genericArg).Symbol!;
-            return new SignalRCommand { MethodName = genericArg.GetText(), FullTypeName = symbol.ToFullName() };
+            return new SignalRCommand { MethodName = genericArg.GetText().ToString(), FullTypeName = symbol.ToFullName() };
         });
     }
 
