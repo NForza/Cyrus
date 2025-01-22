@@ -63,7 +63,11 @@ jobs:
       run: dotnet nuget push ./output/*.nupkg --api-key $NUGET_API_KEY --source https://api.nuget.org/v3/index.json
 
     - name: Restore the Cyrus metapackage
-      run: dotnet restore "./src/NForza.Cyrus.Metapackage/NForza.Cyrus.Metapackage.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }} /p:RestoreSources="./output;https://api.nuget.org/v3/index.json"
+      run: |
+        dotnet restore "./src/NForza.Cyrus.Metapackage/NForza.Cyrus.Metapackage.csproj" \
+          /p:PackageVersion=${{ env.PACKAGE_VERSION }} \
+          --source "./output/" \
+          --source "https://api.nuget.org/v3/index.json"
 
     - name: Build the Cyrus metapackage
       run: dotnet build --no-restore --configuration Release --output ./output-meta "./src/NForza.Cyrus.Metapackage/NForza.Cyrus.Metapackage.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}     
