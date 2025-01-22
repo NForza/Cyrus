@@ -1,7 +1,7 @@
 using System.Reflection;
 using MassTransit;
 using NForza.Cyrus.Cqrs;
-using NForza.Cyrus.TypedIds;
+using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.WebApi;
 
 

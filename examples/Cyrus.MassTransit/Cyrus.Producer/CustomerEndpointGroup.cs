@@ -1,11 +1,12 @@
-﻿using NForza.Cyrus.WebApi;
+﻿using Cyrus.Server;
+using NForza.Cyrus.WebApi;
 using NForza.Cyrus.WebApi.Policies;
 
-namespace Cyrus.Server;
+namespace Cyrus.Producer;
 
 public class CustomerEndpointGroup : EndpointGroup
 {
-    public CustomerEndpointGroup()  : base("Customers")
+    public CustomerEndpointGroup() : base("Customers")
     {
         CommandEndpoint<NewCustomerCommand>()
              .Post("")

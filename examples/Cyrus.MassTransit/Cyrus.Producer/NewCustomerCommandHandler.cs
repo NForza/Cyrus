@@ -1,8 +1,9 @@
-﻿using NForza.Cyrus.Cqrs;
+﻿using Cyrus.Server;
+using NForza.Cyrus.Cqrs;
 
-namespace Cyrus.Server;
+namespace Cyrus.Producer;
 
-public class NewCustomerCommandHandler 
+public class NewCustomerCommandHandler
 {
     public CommandResult Execute(NewCustomerCommand command)
     {
