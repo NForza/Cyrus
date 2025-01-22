@@ -56,22 +56,19 @@ jobs:
 
     - name: Pack the MassTransit project
       run: dotnet pack --configuration Release --output ./output "./src/NForza.Cyrus.MassTransit/NForza.Cyrus.MassTransit.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
-
+    
+    - name: Install Mono
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y mono-complete
+    
+    - name: Pack the Metapackage
+      run: |
+        nuget pack ./src/NForza.Cyrus.nuspec \
+          -Version ${{ env.PACKAGE_VERSION }} \
+          -OutputDirectory ./output-meta
+          
     - name: Push to NuGet
       env:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-      run: dotnet nuget push ./output/*.nupkg --api-key $NUGET_API_KEY --source https://api.nuget.org/v3/index.json
-
-    # - name: Restore the Cyrus metapackage
-    #   run: dotnet restore "./src/NForza.Cyrus.Metapackage/NForza.Cyrus.Metapackage.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }} /p:RestoreSources=./output
-
-    # - name: Build the Cyrus metapackage
-    #   run: dotnet build --no-restore --configuration Release --output ./output-meta "./src/NForza.Cyrus.Metapackage/NForza.Cyrus.Metapackage.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }} /p:RestoreSources=./output      
-
-    # - name: Pack the Cyrus metapackage
-    #   run: dotnet pack --no-build --no-restore --configuration Release --output ./output-meta "./src/NForza.Cyrus.Metapackage/NForza.Cyrus.Metapackage.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }} /p:RestoreSources=./output
-      
-    # - name: Push to NuGet
-    #   env:
-    #     NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-    #   run: dotnet nuget push ./output-meta/*.nupkg --api-key $NUGET_API_KEY --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./output-meta/*.nupkg --api-key $NUGET_API_KEY --source https://api.nuget.org/v3/index.json
