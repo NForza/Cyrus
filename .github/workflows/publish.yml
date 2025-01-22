@@ -9,7 +9,6 @@ on:
 env:
   BASE_VERSION: 1.0
   NFORZA_CYRUS_NUSPEC: ./src/NForza.Cyrus.nuspec
-  PACKAGE_VERSION: ${{ env.BASE_VERSION }}.${{ github.run_number }}
 
 jobs:
   publish:
@@ -19,7 +18,10 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-
+      
+    - name: Calculate package version
+      run: echo "PACKAGE_VERSION=${BASE_VERSION}.${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+      
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
