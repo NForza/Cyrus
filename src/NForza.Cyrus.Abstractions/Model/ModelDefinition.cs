@@ -14,12 +14,12 @@ public class ModelDefinitionEqualityComparer : IEqualityComparer<ModelDefinition
         {
             return false;
         }
-        return x.Name == y.Name && x.Properties.SequenceEqual(y.Properties);
+        return x.Name == y.Name;
     }
 
     public int GetHashCode(ModelDefinition obj)
     {
-        return HashCode.Combine(obj.Name, obj.Properties);
+        return obj.Name.GetHashCode();
     }
 }
 public record ModelDefinition(string Name, IEnumerable<PropertyModelDefinition> Properties)

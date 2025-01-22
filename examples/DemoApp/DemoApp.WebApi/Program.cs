@@ -7,6 +7,7 @@ using NForza.Cyrus.WebApi;
 using NForza.Cyrus.SignalR;
 using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Abstractions.Model;
+using Microsoft.Extensions.DependencyModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,12 @@ builder.Services.AddValidatorsFromAssemblyContaining<Customer>();
 
 builder.Services.AddCyrus(o => o.AddEndpointGroups().AddTypedIdSerializers().AddSignalRHubs());
 
+builder.Services.Scan(scan => scan
+    .FromDependencyContext(DependencyContext.Default!)
+    .AddClasses(classes => classes.AssignableTo<ICyrusModel>())
+    .AsImplementedInterfaces()
+    .WithTransientLifetime());
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
@@ -49,11 +56,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowAngularApp");
 app.MapCyrus();
 
-ICyrusModel m1 = new NForza.Cyrus.Models.DemoApp.Contracts.CyrusModel();
-ICyrusModel m2 = new NForza.Cyrus.Models.DemoApp.Domain.CyrusModel();
-ICyrusModel m3 = new NForza.Cyrus.Models.DemoApp.WebApi.CyrusModel();
-
-var modelJson = m1.Combine(m2, m3);
-Console.WriteLine(modelJson.AsJson());
+ICyrusModel model = CyrusModel.Aggregate(app.Services);
+Console.WriteLine(model.AsJson());
 
 await app.RunAsync();
