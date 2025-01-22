@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="NForza.Cyrus.Core" Version="$(PackageVersion)" />
     <PackageReference Include="NForza.Cyrus.Generators" Version="$(PackageVersion)" />
-    <PackageReference Include="NForza.Cyrus.TypedIds" Version="$(PackageVersion)" />
+    <PackageReference Include="NForza.Cyrus.Abstractions" Version="$(PackageVersion)" />
     <PackageReference Include="NForza.Cyrus.MassTransit" Version="$(PackageVersion)" />
   </ItemGroup>
 </Project>
