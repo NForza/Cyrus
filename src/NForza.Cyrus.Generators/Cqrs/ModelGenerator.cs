@@ -11,7 +11,9 @@ internal class ModelGenerator
     {
         var commands = signalRHub.Commands.Select(c => $"\"{c.Name}\"");
         var commandsAsString = string.Join(",", commands);
-        return $"new ModelHubDefinition(\"{signalRHub.Name}\", [{commandsAsString}])";
+        var events = signalRHub.Events.Select(c => $"\"{c.Name}\"");
+        var eventsAsString = string.Join(",", events);
+        return $"new ModelHubDefinition(\"{signalRHub.Name}\", {signalRHub.Path} ,[{commandsAsString}], [{eventsAsString}])";
     }
 
     internal static string ForNamedType(INamedTypeSymbol method, Compilation compilation)

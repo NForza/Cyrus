@@ -49,6 +49,7 @@ internal record SignalRHubClassDefinition
         {
             SetPath(Symbol, constructorBody);
             SetCommands(Symbol, constructorBody);
+            SetEvents(Symbol, constructorBody);
         }
         return this;
     }
@@ -66,10 +67,37 @@ internal record SignalRHubClassDefinition
         });
     }
 
+    private void SetEvents(INamedTypeSymbol symbol, BlockSyntax constructorBody)
+    {
+        var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "PublishesEventToCaller")
+                .Select(ies => ies.Expression)
+                .OfType<GenericNameSyntax>();
+        var callerEventTypes = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());
+        var callerEvents = callerEventTypes.Select(genericArg =>
+        {
+            var symbol = SemanticModel.GetSymbolInfo(genericArg).Symbol!;
+            return new SignalREvent { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, FullTypeName = symbol.ToFullName(), IsBroadcast = false };
+        });
+
+        memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "PublishesEventToAll")
+                .Select(ies => ies.Expression)
+                .OfType<GenericNameSyntax>();
+        var broadcastEventTypes = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());
+        var broadcastEvents = broadcastEventTypes.Select(genericArg =>
+        {
+            var symbol = SemanticModel.GetSymbolInfo(genericArg).Symbol!;
+            return new SignalREvent { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, FullTypeName = symbol.ToFullName(), IsBroadcast = true };
+        });
+
+        Events = callerEvents.Concat(broadcastEvents);
+    }
+
+
     public string Path { get; private set; } = "";
     public ClassDeclarationSyntax Declaration { get; }
     public INamedTypeSymbol Symbol { get; }
     public SemanticModel SemanticModel { get; }
     public IEnumerable<SignalRCommand> Commands { get; internal set; } = [];
+    public IEnumerable<SignalREvent> Events { get; internal set; } = [];
     public string Name => Declaration?.Identifier.Text ?? "";
 }
