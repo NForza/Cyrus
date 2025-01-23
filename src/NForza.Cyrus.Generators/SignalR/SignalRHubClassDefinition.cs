@@ -50,6 +50,7 @@ internal record SignalRHubClassDefinition
             SetPath(Symbol, constructorBody);
             SetCommands(Symbol, constructorBody);
             SetEvents(Symbol, constructorBody);
+            SetQueries(Symbol, constructorBody);
         }
         return this;
     }
@@ -64,6 +65,19 @@ internal record SignalRHubClassDefinition
         {
             var symbol = SemanticModel.GetSymbolInfo(genericArg).Symbol!;
             return new SignalRCommand { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, FullTypeName = symbol.ToFullName() };
+        });
+    }
+
+    private void SetQueries(INamedTypeSymbol symbol, BlockSyntax constructorBody)
+    {
+        var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "QueryMethodFor")
+                .Select(ies => ies.Expression)
+                .OfType<GenericNameSyntax>();
+        var queries = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());
+        Queries = queries.Select(genericArg =>
+        {
+            var symbol = SemanticModel.GetSymbolInfo(genericArg).Symbol!;
+            return new SignalRQuery { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, FullTypeName = symbol.ToFullName() };
         });
     }
 
@@ -99,5 +113,6 @@ internal record SignalRHubClassDefinition
     public SemanticModel SemanticModel { get; }
     public IEnumerable<SignalRCommand> Commands { get; internal set; } = [];
     public IEnumerable<SignalREvent> Events { get; internal set; } = [];
+    public IEnumerable<SignalRQuery> Queries { get; internal set; } = [];
     public string Name => Declaration?.Identifier.Text ?? "";
 }

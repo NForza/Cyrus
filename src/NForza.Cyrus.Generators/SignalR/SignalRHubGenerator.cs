@@ -101,13 +101,14 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
     private string GenerateSignalRHub(SignalRHubClassDefinition classDefinition)
     {
         string commands = GenerateCommands(classDefinition.Commands);
+        string queries = GenerateQueries(classDefinition.Queries);
 
         var replacements = new Dictionary<string, string>
         {
             ["Name"] = classDefinition.Symbol.Name,
             ["Namespace"] = classDefinition.Symbol.ContainingNamespace.ToDisplayString(),
             ["CommandMethods"] = commands,
-            ["QueryMethods"] = "",
+            ["QueryMethods"] = queries,
         };
 
         var source = TemplateEngine.ReplaceInResourceTemplate("SignalRHub.cs", replacements);
@@ -128,6 +129,21 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
         {{
             SendEvents(result.Events);
         }}
+    }}");
+        }
+        return sb.ToString();
+    }
+
+    private static string GenerateQueries(IEnumerable<SignalRQuery> signalRQueries)
+    {
+        var sb = new StringBuilder();
+        foreach (var query in signalRQueries)
+        {
+            sb.AppendLine(
+    @$"public async Task {query.MethodName}({query.FullTypeName} query) 
+    {{
+        var result = await queryProcessor.Query(query);
+        SendQueryResultReply(""{query.MethodName}"", result);
     }}");
         }
         return sb.ToString();
