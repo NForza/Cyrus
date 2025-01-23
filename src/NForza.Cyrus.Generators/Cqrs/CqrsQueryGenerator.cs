@@ -1,15 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Generators.Cqrs;
 
 [Generator]
-public class CqrsEventGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public class CqrsQueryGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -18,7 +16,7 @@ public class CqrsEventGenerator : CyrusGeneratorBase, IIncrementalGenerator
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => IsEvent(syntaxNode),
+                predicate: (syntaxNode, _) => IsQuery(syntaxNode),
                 transform: (context, _) => GetRecordSymbolFromContext(context));
 
         var allEventsProvider = incrementalValuesProvider.Combine(configProvider)
@@ -36,10 +34,10 @@ public class CqrsEventGenerator : CyrusGeneratorBase, IIncrementalGenerator
                 string assemblyName = events.First().ContainingAssembly.Name;
                 var eventModels = GetPartialModelClass(
                     assemblyName,
-                    "Events",
+                    "Queries",
                     "ModelTypeDefinition",
                     events.Select(qh => ModelGenerator.ForNamedType(qh, compilation)));
-                spc.AddSource($"model-events.g.cs", SourceText.From(eventModels, Encoding.UTF8));
+                spc.AddSource($"model-queries.g.cs", SourceText.From(eventModels, Encoding.UTF8));
             }
         });
     }

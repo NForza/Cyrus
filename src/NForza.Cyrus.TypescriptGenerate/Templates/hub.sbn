@@ -14,12 +14,16 @@ export class {{ name }}Service {
       .withUrl('https://localhost:7166{{ path }}') 
       .configureLogging(signalR.LogLevel.Information)
       .build();
-
     {{ for e in events }}
     this.hubConnection.on('{{e | camel_case }}', (data: {{e}}) => {
       console.log('Received {{e}}:', data);
-    });{{ end }}
-
+    });
+    {{ end }}
+    {{ for q in queries }}  
+    this.hubConnection.on('{{q | camel_case }}Result', (data) => {
+      console.log('Received {{e}}:', data);
+    });
+    {{ end }}
     this.hubConnection.onclose((error) => {
       console.error('SignalR connection closed:', error);
     });
@@ -35,12 +39,18 @@ export class {{ name }}Service {
         console.error('SignalR Connection Error:', err);
       });
   }
-
   {{ for c in commands }}  
   public {{c | camel_case }}(command: {{c}} ): void {
     console.log('Sending {{c}}');
-    this.hubConnection.invoke('{{c}}}', command).catch((err) => {
+    this.hubConnection.invoke('{{c | camel_case }}}', command).catch((err) => {
       console.error('Error sending {{c}}:', err);
+    });
+  } {{ end }}
+  {{ for q in queries }}  
+  public {{q | camel_case }}(query: {{q}} ): void {
+    console.log('Sending {{q}}');
+    this.hubConnection.invoke('{{q | camel_case }}}', query).catch((err) => {
+      console.error('Error sending {{q}}:', err);
     });
   } {{ end }}
 }

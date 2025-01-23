@@ -7,5 +7,6 @@ public interface ICyrusModel
     IEnumerable<string> Strings { get => []; }
     IEnumerable<ModelTypeDefinition> Events { get => []; }
     IEnumerable<ModelTypeDefinition> Commands { get => []; }
+    IEnumerable<ModelTypeDefinition> Queries { get => []; }
     IEnumerable<ModelHubDefinition> Hubs { get => []; }
 }

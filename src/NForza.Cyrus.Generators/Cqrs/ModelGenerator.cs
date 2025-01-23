@@ -11,9 +11,14 @@ internal class ModelGenerator
     {
         var commands = signalRHub.Commands.Select(c => $"\"{c.Name}\"");
         var commandsAsString = string.Join(",", commands);
+
         var events = signalRHub.Events.Select(c => $"\"{c.Name}\"");
         var eventsAsString = string.Join(",", events);
-        return $"new ModelHubDefinition(\"{signalRHub.Name}\", {signalRHub.Path} ,[{commandsAsString}], [{eventsAsString}])";
+
+        var queries = signalRHub.Queries.Select(c => $"\"{c.Name}\"");
+        var queriesAsString = string.Join(",", queries);
+
+        return $"new ModelHubDefinition(\"{signalRHub.Name}\", {signalRHub.Path} ,[{commandsAsString}], [{queriesAsString}], [{eventsAsString}])";
     }
 
     internal static string ForNamedType(INamedTypeSymbol method, Compilation compilation)

@@ -98,6 +98,25 @@
       ]
     }
   ],
+  "queries": [
+    {
+      "name": "AllCustomersQuery",
+      "properties": [
+
+      ]
+    },
+    {
+      "name": "CustomerByIdQuery",
+      "properties": [
+        {
+          "name": "Id",
+          "type": "CustomerId",
+          "isCollection": false,
+          "isNullable": false
+        }
+      ]
+    }
+  ],
   "hubs": [
     {
       "name": "CustomerHub",
@@ -105,6 +124,9 @@
       "commands": [
         "AddCustomerCommand",
         "DeleteCustomerCommand"
+      ],
+      "queries": [
+        "AllCustomersQuery"
       ],
       "events": [
         "CustomerUpdatedEvent",

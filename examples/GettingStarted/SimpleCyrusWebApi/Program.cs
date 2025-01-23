@@ -14,8 +14,11 @@ builder.Logging.AddFilter("Microsoft", LogLevel.Warning);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//Add in-memory EF Core database
 builder.Services.AddDbContext<DemoContext>();
 
+//Add in-memory MassTransit bus
 builder.Services.AddMassTransit(cfg =>
 {
     cfg.AddConsumers(Assembly.GetExecutingAssembly());
@@ -26,10 +29,9 @@ builder.Services.AddMassTransit(cfg =>
 });
 
 builder.Services.AddValidatorsFromAssemblies([Assembly.GetExecutingAssembly(), typeof(Customer).Assembly]);
+
 //Adds all Cyrus services
-builder.Services.AddCyrus(options => options
-        .AddEndpointGroups()
-        .AddTypedIdSerializers());
+builder.Services.AddCyrus(options => options.AddEndpointGroups());
 
 var app = builder.Build();
 

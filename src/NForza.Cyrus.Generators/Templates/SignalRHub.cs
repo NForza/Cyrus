@@ -5,9 +5,8 @@ using NForza.Cyrus.SignalR;
 
 namespace % Namespace %;
 
-public class % Name %_Generated(ICommandDispatcher commandDispatcher) : HubBase
+public class % Name %_Generated(ICommandDispatcher commandDispatcher, IQueryProcessor queryProcessor) : HubBase
 {
-
     % CommandMethods %
     % QueryMethods %
 }
