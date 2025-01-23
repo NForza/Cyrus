@@ -103,31 +103,6 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
         };
     }
 
-    protected IEnumerable<INamedTypeSymbol> GetAllClassesDerivedFrom(Compilation compilation, string className)
-    {
-        var baseTypeSymbol = compilation.GetTypeByMetadataName(className);
-
-        foreach (var syntaxTree in compilation.SyntaxTrees)
-        {
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-
-            var classDeclarations = syntaxTree.GetRoot()
-                .DescendantNodes()
-                .OfType<ClassDeclarationSyntax>();
-
-            foreach (var classDeclaration in classDeclarations)
-            {
-                if (semanticModel.GetDeclaredSymbol(classDeclaration) is INamedTypeSymbol classSymbol && classSymbol.BaseType != null)
-                {
-                    if (classSymbol.BaseType.Equals(baseTypeSymbol, SymbolEqualityComparer.Default))
-                    {
-                        yield return classSymbol;
-                    }
-                }
-            }
-        }
-    }
-
     protected IMethodSymbol? GetMethodSymbolFromContext(GeneratorSyntaxContext context)
     {
         var recordStruct = (MethodDeclarationSyntax)context.Node;
@@ -176,6 +151,17 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
         if(classDeclaration != null)
         {
             bool isEvent = classDeclaration.Identifier.Text.EndsWith("Event");
+            return isEvent;
+        };
+        return false;
+    }
+
+    protected bool IsQuery(SyntaxNode syntaxNode)
+    {
+        var classDeclaration = syntaxNode as RecordDeclarationSyntax;
+        if (classDeclaration != null)
+        {
+            bool isEvent = classDeclaration.Identifier.Text.EndsWith("Query");
             return isEvent;
         };
         return false;

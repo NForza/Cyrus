@@ -1,7 +1,6 @@
-﻿namespace NForza.Cyrus.TypescriptGenerate.Model
+﻿namespace NForza.Cyrus.TypescriptGenerate.Model;
+
+public interface IMetaDataWithProperties
 {
-    public interface IMetaDataWithProperties
-    {
-        Property[] Properties { get; set; }
-    }
+    Property[] Properties { get; set; }
 }
