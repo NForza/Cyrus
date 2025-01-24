@@ -81,6 +81,7 @@ internal record SignalRHubClassDefinition
             var symbol = (ITypeSymbol)SemanticModel.GetSymbolInfo(genericArg).Symbol!;
             ITypeSymbol returnType = GetReturnTypeOfQuery(symbol) ?? throw new InvalidCastException("Can't find return type for " + symbol.ToFullName());
             (bool isCollection, ITypeSymbol? collectionType) = returnType?.IsCollection(SemanticModel.Compilation) ?? (false, null);
+            var isNullable = returnType?.IsNullable(SemanticModel.Compilation);
             return
                 new SignalRQuery
                 {
@@ -88,7 +89,8 @@ internal record SignalRHubClassDefinition
                     Name = symbol.Name,
                     FullTypeName = symbol.ToFullName(),
                     ReturnType = isCollection ? collectionType!.Name : returnType.Name ?? "object",
-                    ReturnsCollection = isCollection
+                    ReturnsCollection = isCollection,
+                    ReturnsNullable = isNullable ?? false
                 };
         });
     }
