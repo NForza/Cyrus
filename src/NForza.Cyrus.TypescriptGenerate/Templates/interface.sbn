@@ -4,6 +4,6 @@ import { {{ t.name }} } from './{{ t.name }}';
 
 export class {{ name }} {
 {{ for prop in properties }}
-    public {{ prop.name }}{{ if prop.is_nullable }}?{{ end }}: {{ prop.type }}{{ if prop.is_collection }}[]{{ end }};
+    public {{ prop.name }}{{ if prop.is_nullable }}?{{ end }}: {{ prop.type | to_typescript_type }}{{ if prop.is_collection }}[]{{ end }};
 {{ end }}
 }

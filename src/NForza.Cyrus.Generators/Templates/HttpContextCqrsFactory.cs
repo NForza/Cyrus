@@ -25,11 +25,23 @@ public class HttpContextCqrsFactory : ICqrsFactory
 
     private object? GetPropertyValue(string propertyName, HttpContext ctx, Type targetType)
     {
-        if (ctx.Request.RouteValues.TryGetValue(propertyName, out var value))
+        object? value = null;
+
+        if (ctx.Request.RouteValues.TryGetValue(propertyName, out var routeValue))
+        {
+            value = routeValue;
+        }
+        else if (ctx.Request.Query.TryGetValue(propertyName, out var queryValue))
+        {
+            value = queryValue.ToString(); 
+        }
+
+        if (value != null)
         {
             var converter = TypeDescriptor.GetConverter(targetType);
             return converter.ConvertFrom(value);
         }
+
         return null;
     }
 }
