@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -74,11 +75,57 @@ internal record SignalRHubClassDefinition
                 .Select(ies => ies.Expression)
                 .OfType<GenericNameSyntax>();
         var queries = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());
+
         Queries = queries.Select(genericArg =>
         {
-            var symbol = SemanticModel.GetSymbolInfo(genericArg).Symbol!;
-            return new SignalRQuery { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, FullTypeName = symbol.ToFullName() };
+            var symbol = (ITypeSymbol)SemanticModel.GetSymbolInfo(genericArg).Symbol!;
+            ITypeSymbol returnType = GetReturnTypeOfQuery(symbol) ?? throw new InvalidCastException("Can't find return type for " + symbol.ToFullName());
+            (bool isCollection, ITypeSymbol? collectionType) = returnType?.IsCollection(SemanticModel.Compilation) ?? (false, null);
+            return
+                new SignalRQuery
+                {
+                    MethodName = genericArg.GetText().ToString(),
+                    Name = symbol.Name,
+                    FullTypeName = symbol.ToFullName(),
+                    ReturnType = isCollection ? collectionType!.Name : returnType.Name ?? "object",
+                    ReturnsCollection = isCollection
+                };
         });
+    }
+
+    private ITypeSymbol? GetReturnTypeOfQuery(ITypeSymbol symbol)
+    {
+        Compilation compilation = SemanticModel.Compilation;
+        foreach (var reference in compilation.References)
+        {
+            // Get the assembly symbol for the reference
+            var assemblySymbol = compilation.GetAssemblyOrModuleSymbol(reference) as IAssemblySymbol;
+            if (assemblySymbol == null)
+                continue;
+
+            foreach (var type in assemblySymbol.GlobalNamespace.GetAllTypes())
+            {
+                foreach (var method in type.GetMembers().OfType<IMethodSymbol>())
+                {
+                    if (method.Parameters.Length == 1 && method.Name == "Query" &&
+                        SymbolEqualityComparer.Default.Equals(method.Parameters[0].Type, symbol))
+                    {
+                        var returnType = method.ReturnType;
+                        if (returnType is INamedTypeSymbol namedType &&
+                            namedType.IsGenericType &&
+                            (namedType.ConstructedFrom.ToDisplayString() == "System.Threading.Tasks.Task<TResult>" ||
+                             namedType.ConstructedFrom.ToDisplayString() == "System.Threading.Tasks.ValueTask<TResult>"))
+                        {
+                            return namedType.TypeArguments[0];
+                        }
+
+                        return returnType;
+                    }
+                }
+            }
+        }
+
+        return null; // No matching method found
     }
 
     private void SetEvents(INamedTypeSymbol symbol, BlockSyntax constructorBody)
@@ -115,4 +162,28 @@ internal record SignalRHubClassDefinition
     public IEnumerable<SignalREvent> Events { get; internal set; } = [];
     public IEnumerable<SignalRQuery> Queries { get; internal set; } = [];
     public string Name => Declaration?.Identifier.Text ?? "";
+}
+
+public static class NamespaceSymbolExtensions
+{
+    public static IEnumerable<INamedTypeSymbol> GetAllTypes(this INamespaceSymbol @namespace)
+    {
+        // Iterate over all members of the namespace
+        foreach (var member in @namespace.GetMembers())
+        {
+            if (member is INamespaceSymbol nestedNamespace)
+            {
+                // Recursively get types from nested namespaces
+                foreach (var nestedType in nestedNamespace.GetAllTypes())
+                {
+                    yield return nestedType;
+                }
+            }
+            else if (member is INamedTypeSymbol namedType)
+            {
+                // Return the named type
+                yield return namedType;
+            }
+        }
+    }
 }
