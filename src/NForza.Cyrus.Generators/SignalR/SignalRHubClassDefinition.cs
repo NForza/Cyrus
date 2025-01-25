@@ -88,9 +88,7 @@ internal record SignalRHubClassDefinition
                     MethodName = genericArg.GetText().ToString(),
                     Name = symbol.Name,
                     FullTypeName = symbol.ToFullName(),
-                    ReturnType = isCollection ? collectionType!.Name : returnType.Name ?? "object",
-                    ReturnsCollection = isCollection,
-                    ReturnsNullable = isNullable ?? false
+                    ReturnType = new( isCollection ? collectionType!.Name : returnType.Name ?? "object", isCollection, isNullable ?? false)
                 };
         });
     }

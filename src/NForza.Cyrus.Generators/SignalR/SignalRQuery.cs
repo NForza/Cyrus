@@ -1,11 +1,11 @@
-﻿namespace NForza.Cyrus.Generators.Cqrs.WebApi;
+﻿using NForza.Cyrus.Generators.SignalR;
+
+namespace NForza.Cyrus.Generators.Cqrs.WebApi;
 
 public class SignalRQuery
 {
     public string Name { get; internal set; } = string.Empty;
     public string FullTypeName { get; internal set; } = string.Empty;
     public string MethodName { get; internal set; } = string.Empty;
-    public string ReturnType { get; internal set; } = string.Empty;
-    public bool ReturnsCollection { get; set; } = false;
-    public bool ReturnsNullable { get; set; } = false;
+    public SignalRQueryReturnType ReturnType { get; internal set; } = new("", false, false);
 }

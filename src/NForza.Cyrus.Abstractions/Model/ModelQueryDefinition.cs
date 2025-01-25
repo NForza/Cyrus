@@ -1,4 +1,4 @@
 ﻿namespace NForza.Cyrus.Abstractions.Model
 {
-    public record ModelQueryDefinition(string Name, string ReturnType, bool ReturnsCollection, bool ReturnsNullable);
+    public record ModelQueryDefinition(string Name, QueryReturnType ReturnType);
 }
