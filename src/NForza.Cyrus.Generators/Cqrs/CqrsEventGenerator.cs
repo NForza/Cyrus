@@ -13,7 +13,7 @@ public class CqrsEventGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
         var configProvider = ConfigProvider(context);
 
         var incrementalValuesProvider = context.SyntaxProvider

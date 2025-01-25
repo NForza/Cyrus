@@ -16,7 +16,7 @@ internal class ModelGenerator
         var events = signalRHub.Events.Select(c => $"\"{c.Name}\"");
         var eventsAsString = string.Join(",", events);
 
-        var queries = signalRHub.Queries.Select(c => $"\"{c.Name}\"");
+        var queries = signalRHub.Queries.Select(c => $"new ModelQueryDefinition(\"{c.Name}\", new(\"{c.ReturnType.Name}\", {c.ReturnType.IsCollection.ToString().ToLower()}, {c.ReturnType.IsNullable.ToString().ToLower()}))");
         var queriesAsString = string.Join(",", queries);
 
         return $"new ModelHubDefinition(\"{signalRHub.Name}\", {signalRHub.Path} ,[{commandsAsString}], [{queriesAsString}], [{eventsAsString}])";
