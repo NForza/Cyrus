@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NForza.Cyrus.Generators;
-using NForza.Cyrus.Generators.TypedIds;
+using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.TypedIds.Generator;
 

@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace NForza.Cyrus.Generators.TypedIds;
+namespace NForza.Cyrus.Generators.Roslyn;
 
 public static class INamedTypeSymbolExtensions
 {

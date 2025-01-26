@@ -1,0 +1,19 @@
+﻿using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.InteropServices.ComTypes;
+using System.Text.Json.Serialization;
+using NForza.Cyrus.Abstractions;
+
+namespace {{ Namespace }};
+
+[JsonConverter(typeof({{ Name }}JsonConverter))]
+[TypeConverter(typeof({{ Name }}TypeConverter))]
+[DebuggerDisplay("{Value}")]
+public partial record struct {{ Name }}(int Value): ITypedId
+{
+    public static implicit operator {{ UnderlyingType }}({{ Name }} typedId) => typedId.Value;
+    public static explicit operator {{ Name }}({{ UnderlyingType }} value) => new(value);
+    public bool IsValid() => {{ if HasMinimum }}Value >= {{ Minimum }} {{ end }}{{ if HasMaximumAndMinumum }} && {{ end }}{{ if HasMaximum }}Value < {{ Maximum }}{{ end }};
+    public override string ToString() => Value.ToString();
+}

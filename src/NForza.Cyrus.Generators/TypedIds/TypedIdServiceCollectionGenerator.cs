@@ -7,7 +7,6 @@ using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
-using NForza.Cyrus.Generators.TypedIds;
 
 namespace NForza.Cyrus.TypedIds.Generator;
 
