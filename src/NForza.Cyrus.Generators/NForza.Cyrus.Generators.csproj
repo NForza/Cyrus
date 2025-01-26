@@ -54,14 +54,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="ScribanTemplates\GuidIdTypeConverter.sbn" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="ScribanTemplates\IntIdTypeConverter.sbn" />
-    <EmbeddedResource Include="ScribanTemplates\IntId.sbn" />
-    <EmbeddedResource Include="ScribanTemplates\GuidId.sbn" />
-    <EmbeddedResource Include="ScribanTemplates\GuidIdTypeConverter.sbn" />
+    <EmbeddedResource Include="TypedIds\StringId.sbn" />
+    <EmbeddedResource Include="TypedIds\IntIdTypeConverter.sbn" />
+    <EmbeddedResource Include="TypedIds\IntId.sbn" />
+    <EmbeddedResource Include="TypedIds\GuidId.sbn" />
+    <EmbeddedResource Include="TypedIds\GuidIdTypeConverter.sbn" />
     <EmbeddedResource Include="Templates\CommandDispatcherExtensions.cs" />
     <EmbeddedResource Include="Templates\CyrusModel.cs" />
     <EmbeddedResource Include="Templates\CyrusModelProperty.cs" />
