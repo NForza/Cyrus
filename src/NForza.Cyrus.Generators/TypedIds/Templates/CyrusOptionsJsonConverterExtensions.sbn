@@ -1,0 +1,32 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using NForza.Cyrus.Cqrs;
+using System.Text.Json.Serialization;
+{{for i in imports }} 
+using {{ i }};
+{{end}}
+
+namespace NForza.Cyrus.Abstractions;
+
+public static class CyrusOptionsJsonConverterExtensions
+{
+    public static IServiceCollection AddJsonConverters(this IServiceCollection services)
+    {
+{{ for t in Types }}        
+  services.AddTransient<JsonConverter, {{ t.Name }}JsonConverter>();
+{{ end }}
+        return services;
+    }
+
+    private static Dictionary<Type, Type> allTypes = new() {
+        {{ for t in Types }}        
+        [typeof({{ t.Name }})] = typeof({{ t.UnderlyingType }})"));
+        {{ end }}
+    };
+    
+    public static CyrusOptions AddTypedIdSerializers(this CyrusOptions options)
+    {
+        options.Services.AddSingleton(sp => new TypedIdDictionary(allTypes));
+        options.Services.AddJsonConverters();
+        return options;
+    }
+}

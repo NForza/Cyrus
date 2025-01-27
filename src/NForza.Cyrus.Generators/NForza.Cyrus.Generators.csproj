@@ -54,6 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="TypedIds\Templates\CyrusOptionsJsonConverterExtensions.sbn" />
     <EmbeddedResource Include="TypedIds\Templates\GuidIdJsonConverter.sbn" />
     <EmbeddedResource Include="TypedIds\Templates\IntIdJsonConverter.sbn" />
     <EmbeddedResource Include="TypedIds\Templates\StringIdJsonConverter.sbn" />
