@@ -1,9 +1,9 @@
-{{ for t in imports }}
+{{ for t in Imports }}
 import { {{ t.name }} } from './{{ t.name }}';
 {{ end }}
 
-export class {{ name }} {
-{{ for prop in properties }}
+export class {{ Name }} {
+{{ for prop in Properties }}
     public {{ prop.name }}{{ if prop.is_nullable }}?{{ end }}: {{ prop.type | to_typescript_type }}{{ if prop.is_collection }}[]{{ end }};
 {{ end }}
 }
