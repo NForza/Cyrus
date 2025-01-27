@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Generators;
 
 namespace NForza.Cyrus.TypedIds.Generator;
 
@@ -47,19 +48,19 @@ public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, IIncrementalG
 
         string? templateName = underlyingTypeName switch
         {
-            "System.Guid" => "GuidIdJsonConverter.cs",
-            "string" => "StringIdJsonConverter.cs",
-            "int" => "IntIdJsonConverter.cs",
+            "System.Guid" => "GuidIdJsonConverter",
+            "string" => "StringIdJsonConverter",
+            "int" => "IntIdJsonConverter",
             _ => throw new NotSupportedException($"Underlying type {underlyingTypeName} is not supported.")
         };
 
-        var replacements = new Dictionary<string, string>
+        var model = new 
         {
-            ["TypedIdName"] = item.Name,
-            ["NamespaceName"] = fullyQualifiedNamespace,
-            ["GetMethodName"] = getMethodName
+            Name = item.Name,
+            Namespace = fullyQualifiedNamespace,
+            GetMethod = getMethodName
         };
-        var source = TemplateEngine.ReplaceInResourceTemplate(templateName, replacements);
+        var source = ScribanEngine.Render(templateName, model);
         return source;
     }
 }
