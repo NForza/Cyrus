@@ -60,11 +60,10 @@
     <EmbeddedResource Include="Templates\CyrusModelProperty.cs" />
     <EmbeddedResource Include="Templates\EventConsumers.cs" />
     <EmbeddedResource Include="Templates\HttpContextCqrsFactory.cs" />
-    <EmbeddedResource Include="Templates\CqrsFactory.cs" />
     <EmbeddedResource Include="Cqrs\Templates\QueryProcessorExtensions.sbn" />
     <EmbeddedResource Include="Templates\RegisterSignalRHubs.cs" />
     <EmbeddedResource Include="Templates\RegisterEndpointGroups.cs" />
-    <EmbeddedResource Include="Templates\CqrsServiceCollectionExtensions.cs" />
+    <EmbeddedResource Include="Cqrs\Templates\CqrsServiceCollectionExtensions.sbn" />
     <EmbeddedResource Include="Templates\CyrusOptionsJsonConverterExtensions.cs" />
     <EmbeddedResource Include="Templates\SignalRHub.cs" />
   </ItemGroup>

@@ -4,7 +4,9 @@ using Microsoft.Extensions.DependencyModel;
 using NForza.Cyrus.WebApi.Policies;
 using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Abstractions.Model;
-% Usings %
+{{ for i in Imports }}
+using {{ i }};
+{{ end }}
 
 namespace NForza.Cyrus.Cqrs;
 
@@ -27,32 +29,32 @@ public static class CyrusServiceCollectionExtensions
             .AsImplementedInterfaces()
             .WithTransientLifetime());
 
-        % RegisterEventBus %
+        {{ RegisterEventBus }}
         services.AddSingleton(BuildCommandHandlerDictionary());
         services.AddSingleton(BuildQueryHandlerDictionary());
         services.AddSingleton(BuildEventHandlerDictionary());
-        % RegisterHandlerTypes %
+        {{ RegisterHandlerTypes }}
         return services;
     }
 
     public static CommandHandlerDictionary BuildCommandHandlerDictionary()
     {
         var handlers = new CommandHandlerDictionary();
-        % RegisterCommandHandlers %
+        {{ RegisterCommandHandlers }}
         return handlers;
     }
 
     public static QueryHandlerDictionary BuildQueryHandlerDictionary()
     {
         var handlers = new QueryHandlerDictionary();
-        % RegisterQueryHandlers %
+        {{ RegisterQueryHandlers }}
         return handlers;
     }
 
     public static EventHandlerDictionary BuildEventHandlerDictionary()
     {
         var handlers = new EventHandlerDictionary();
-        % RegisterEventHandlers %
+        {{ RegisterEventHandlers }}
         return handlers;
     }
 }

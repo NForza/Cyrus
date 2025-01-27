@@ -54,7 +54,6 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
         string queryHandlerRegistrations = CreateRegisterQueryHandler(handlers.Where(x => IsQueryHandler(x, configuration.Queries.HandlerName, configuration.Queries.Suffix)), compilation);
         string commandHandlerRegistrations = CreateRegisterCommandHandler(handlers.Where(x => IsCommandHandler(x, configuration.Commands.HandlerName, configuration.Commands.Suffix)), compilation);
         string eventHandlerRegistrations = CreateEventHandlerRegistrations(handlers.Where(x => IsEventHandler(x, configuration.Events.HandlerName, configuration.Events.Suffix)), compilation); 
-        string usings = configuration.Events.Bus == "MassTransit" ? "using NForza.Cyrus.MassTransit;" : "";
         string eventBusRegistration = $@"services.AddSingleton<IEventBus, {configuration.Events.Bus}EventBus>();";
 
         if (string.IsNullOrEmpty(handlerTypeRegistrations) && string.IsNullOrEmpty(queryHandlerRegistrations) && string.IsNullOrEmpty(commandHandlerRegistrations))
@@ -62,17 +61,17 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
             return string.Empty;
         }
 
-        var replacements = new Dictionary<string, string>
+        var model = new
         {
-            ["RegisterHandlerTypes"] = handlerTypeRegistrations,
-            ["RegisterCommandHandlers"] = commandHandlerRegistrations,
-            ["RegisterQueryHandlers"] = queryHandlerRegistrations,
-            ["RegisterEventHandlers"] = eventHandlerRegistrations,
-            ["RegisterEventBus"] = eventBusRegistration,
-            ["Usings"] = usings
+            Imports = configuration.Events.Bus == "MassTransit" ? ["NForza.Cyrus.MassTransit"] : new List<string>(),
+            RegisterHandlerTypes = handlerTypeRegistrations,
+            RegisterCommandHandlers = commandHandlerRegistrations,
+            RegisterQueryHandlers = queryHandlerRegistrations,
+            RegisterEventHandlers = eventHandlerRegistrations,
+            RegisterEventBus = eventBusRegistration,
         };
 
-        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("CqrsServiceCollectionExtensions.cs", replacements);
+        var resolvedSource = ScribanEngine.Render("CqrsServiceCollectionExtensions", model);
         return resolvedSource;
     }
 
