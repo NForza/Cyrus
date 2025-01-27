@@ -17,7 +17,6 @@ internal static class TypeScriptGenerator
     {
         var context = new TemplateContext();
         ScriptVariable metaDataVariable = ScriptVariable.Create("metadata", ScriptVariableScope.Global);
-
         var scriptObject = new ScriptObject();
         scriptObject.Import("camel_case", (string input) =>
         {
@@ -31,7 +30,15 @@ internal static class TypeScriptGenerator
             return CSharpToTypeScriptType(input, (CyrusMetadata)metaData);
         });
 
-        scriptObject.Import(model, null, null);
+        scriptObject.Import("query_return_type", (Func<HubQuery, string>)(rt =>
+        {
+            var metaData = context.GetValue(metaDataVariable);
+            var tsType = CSharpToTypeScriptType(rt.ReturnType.Name, metadata);
+            return rt.ReturnType.Name + (rt.ReturnType.IsNullable ? "?" : "") + (rt.ReturnType.IsCollection ? "[]" : "");
+        }));
+
+        scriptObject.Import(model, null, member => member?.Name ?? "");
+        context.MemberRenamer = member => member?.Name ?? "";
         context.PushGlobal(scriptObject);
         context.SetValue(metaDataVariable, metadata);
         return context;
@@ -39,6 +46,8 @@ internal static class TypeScriptGenerator
 
     private static string CSharpToTypeScriptType(string input, CyrusMetadata metadata)
     {
+        if (string.IsNullOrEmpty(input)) return "";
+
         var typeMapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "string", "string" },
@@ -89,7 +98,6 @@ internal static class TypeScriptGenerator
         Template template = GetTemplate("hub");
         foreach (var hub in metadata.Hubs)
         {
-            hub.Imports = hub.Events.Concat(hub.Commands).Concat(hub.Queries).ToArray();
             var result = template.Render(GetContext(hub, metadata));
             string fileName = Path.ChangeExtension(Path.Combine(outputFolder, hub.Name), ".ts");
             File.WriteAllText(fileName, result);
@@ -154,7 +162,7 @@ internal static class TypeScriptGenerator
         }
     }
 
-    private static IEnumerable<Import> GetImportsFor(CyrusMetadata metadata, IMetaDataWithProperties obj)
+    private static IEnumerable<Import> GetImportsFor(CyrusMetadata metadata, ITypeWithProperties obj)
     {
         foreach (var p in obj.Properties)
         {

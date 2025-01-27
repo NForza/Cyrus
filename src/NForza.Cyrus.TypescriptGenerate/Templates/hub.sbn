@@ -1,27 +1,33 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
-{{ for i in imports }}
+import { Observable, of, Subject } from 'rxjs';
+{{ for i in Imports }}
 import { {{ i }} } from './{{ i }}';{{ end }}
 
 @Injectable({
   providedIn: 'root',
 })
-export class {{ name }}Service {
+export class {{ Name }}Service {
   private hubConnection: signalR.HubConnection;
+
+{{ for q in Queries }}
+  private _{{ q.Name | camel_case }}Result: Subject<{{ query_return_type q }}> = new Subject<{{ query_return_type q }}>();
+{{ end }}
 
   constructor() {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:7166{{ path }}') 
+      .withUrl('https://localhost:7166{{ Path }}') 
       .configureLogging(signalR.LogLevel.Information)
       .build();
-    {{ for e in events }}
-    this.hubConnection.on('{{e | camel_case }}', (data: {{e}}) => {
+    {{ for e in Events }}
+    this.hubConnection.on('{{ e | camel_case }}', (data: {{e}}) => {
       console.log('Received {{e}}:', data);
     });
     {{ end }}
-    {{ for q in queries }}  
-    this.hubConnection.on('{{q | camel_case }}Result', (data) => {
+    {{ for q in Queries }}  
+    this.hubConnection.on('{{ q.Name | camel_case }}Result', (data : {{ query_return_type q }}) => {
       console.log('Received {{e}}:', data);
+      this._{{ q.Name | camel_case }}Result.next(data);
     });
     {{ end }}
     this.hubConnection.onclose((error) => {
@@ -39,18 +45,18 @@ export class {{ name }}Service {
         console.error('SignalR Connection Error:', err);
       });
   }
-  {{ for c in commands }}  
-  public {{c | camel_case }}(command: {{c}} ): void {
-    console.log('Sending {{c}}');
-    this.hubConnection.invoke('{{c | camel_case }}}', command).catch((err) => {
-      console.error('Error sending {{c}}:', err);
+  {{ for c in Commands }}  
+  public {{ c | camel_case }}(command: {{ c }} ): void {
+    console.log('Sending {{ c | camel_case }}');           
+    this.hubConnection.invoke('{{ c | camel_case }}', command).catch((err) => {
+      console.error('Error sending {{ c | camel_case }}:', err);
     });
   } {{ end }}
-  {{ for q in queries }}  
-  public {{q | camel_case }}(query: {{q}} ): void {
-    console.log('Sending {{q}}');
-    this.hubConnection.invoke('{{q | camel_case }}}', query).catch((err) => {
-      console.error('Error sending {{q}}:', err);
+  {{ for q in Queries }}  
+  public {{ q.Name | camel_case }}(query: {{ q.Name }} ): void {
+    console.log('Sending {{ q.Name | camel_case }}');
+    this.hubConnection.invoke('{{ q.Name | camel_case }}', query).catch((err) => {
+      console.error('Error sending {{ q.Name | camel_case }}:', err);
     });
   } {{ end }}
 }

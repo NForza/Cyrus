@@ -137,7 +137,14 @@
         "DeleteCustomerCommand"
       ],
       "queries": [
-        "AllCustomersQuery"
+        {
+          "name": "AllCustomersQuery",
+          "returnType": {
+            "name": "Customer",
+            "isCollection": true,
+            "isNullable": false
+          }
+        }
       ],
       "events": [
         "CustomerUpdatedEvent",

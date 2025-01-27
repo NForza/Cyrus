@@ -1,9 +1,7 @@
 ﻿namespace NForza.Cyrus.TypescriptGenerate.Model;
 
-
-public class Command: ITypeWithProperties
+public class HubQuery
 {
     public string Name { get; set; } = string.Empty;
-    public Property[] Properties { get; set; } = [];
+    public HubQueryReturnType ReturnType { get; set; } = new();
 }
-
