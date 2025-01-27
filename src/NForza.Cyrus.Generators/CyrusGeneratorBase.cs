@@ -181,7 +181,7 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
             AssemblyName = assemblyName,
             PropertyName = propertyName,
             PropertyType = propertyType,
-            Properties = propertyValues
+            Properties = string.Join(",", propertyValues)
         };
         var source = ScribanEngine.Render("CyrusModel", model);
         return source;

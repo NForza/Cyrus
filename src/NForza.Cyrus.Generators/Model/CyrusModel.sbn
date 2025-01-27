@@ -8,5 +8,5 @@ namespace NForza.Cyrus.Models.{{ AssemblyName }};
 
 public partial class CyrusModel : ICyrusModel
 {
-	public IEnumerable<{{ PropertyType }}> {{ PropertyName }} => [ {{ Properties.join }} ];
+	public IEnumerable<{{ PropertyType }}> {{ PropertyName }} => [ {{ Properties }} ];
 }
