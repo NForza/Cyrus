@@ -101,6 +101,8 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
 
     private string GenerateSignalRHub(SignalRHubClassDefinition classDefinition)
     {
+
+        //this needs to be moved to the template
         string commands = GenerateCommands(classDefinition.Commands);
         string queries = GenerateQueries(classDefinition.Queries);
 
@@ -128,7 +130,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
         var result = await commandDispatcher.Execute(command);
         if (result.Succeeded)
         {{
-            SendEvents(result.Events);
+            await SendEvents(result.Events);
         }}
     }}");
         }
@@ -144,7 +146,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
     @$"public async Task {query.MethodName}({query.FullTypeName} query) 
     {{
         var result = await queryProcessor.Query(query);
-        SendQueryResultReply(""{query.MethodName}"", result);
+        await SendQueryResultReply(""{query.MethodName}"", result);
     }}");
         }
         return sb.ToString();

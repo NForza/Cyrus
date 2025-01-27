@@ -66,9 +66,9 @@ jobs:
       run: |
         nuget pack ./src/NForza.Cyrus.nuspec \
           -Version ${{ env.PACKAGE_VERSION }} \
-          -OutputDirectory ./output-meta
+          -OutputDirectory ./output
           
     - name: Push to NuGet
       env:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-      run: dotnet nuget push ./output-meta/*.nupkg --api-key $NUGET_API_KEY --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./output/*.nupkg --api-key $NUGET_API_KEY --source https://api.nuget.org/v3/index.json
