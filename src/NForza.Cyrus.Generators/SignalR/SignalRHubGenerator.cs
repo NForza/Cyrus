@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
+using NForza.Cyrus.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Generators.Cqrs.WebApi;
@@ -85,15 +86,15 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
             sb.AppendLine($"signalRHubDictionary.AddSignalRHub<{signalRDefinition.Symbol.ToFullName()}_Generated>({signalRDefinition.Path});");
         }
 
-        var replacements = new Dictionary<string, string>
+        var model = new
         {
-            ["RegisterSignalRHubs"] = sb.ToString(),
-            ["Usings"] = usings,
-            ["CommandMethods"] = "",
-            ["QueryMethods"] = "",
+            RegisterSignalRHubs = sb.ToString(),
+            Usings = usings,
+            CommandMethods = "",
+            QueryMethods = ""
         };
 
-        var source = TemplateEngine.ReplaceInResourceTemplate("RegisterSignalRHubs.cs", replacements);
+        var source = ScribanEngine.Render("RegisterSignalRHubs", model);
 
         return source;
     }
@@ -103,15 +104,15 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
         string commands = GenerateCommands(classDefinition.Commands);
         string queries = GenerateQueries(classDefinition.Queries);
 
-        var replacements = new Dictionary<string, string>
+        var replacements = new 
         {
-            ["Name"] = classDefinition.Symbol.Name,
-            ["Namespace"] = classDefinition.Symbol.ContainingNamespace.ToDisplayString(),
-            ["CommandMethods"] = commands,
-            ["QueryMethods"] = queries,
+            classDefinition.Symbol.Name,
+            Namespace = classDefinition.Symbol.ContainingNamespace.ToDisplayString(),
+            CommandMethods = commands,
+            QueryMethods = queries,
         };
 
-        var source = TemplateEngine.ReplaceInResourceTemplate("SignalRHub.cs", replacements);
+        var source = ScribanEngine.Render("SignalRHub", replacements);
 
         return source;
     }

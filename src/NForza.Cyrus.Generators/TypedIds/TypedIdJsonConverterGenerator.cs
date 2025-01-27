@@ -56,7 +56,7 @@ public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, IIncrementalG
 
         var model = new 
         {
-            Name = item.Name,
+            item.Name,
             Namespace = fullyQualifiedNamespace,
             GetMethod = getMethodName
         };

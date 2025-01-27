@@ -14,7 +14,7 @@ public class HttpContextCqrsFactory : ICqrsFactory
 
     public HttpContextCqrsFactory()
     {
-        % QueryFactoryMethod %
+        {{ QueryFactoryMethod }}
     }
 
     public object CreateFromHttpContext(Type queryType, HttpContext ctx)

@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Text;
 using NForza.Cyrus.Cqrs;
-% Usings %
+{{ Usings }}
 
 #nullable enable
 
@@ -22,7 +22,7 @@ public static class AddSignalRHubExtensions
     public static SignalRHubDictionary BuildSignalRHubDictionary()
     {
         var signalRHubDictionary = new SignalRHubDictionary();
-        % RegisterSignalRHubs %
+        {{ RegisterSignalRHubs }}
         return signalRHubDictionary;
     }
 }

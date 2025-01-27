@@ -42,7 +42,7 @@ public class StringIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
         (int? min, int? max) = GetMinAndMaxFromType(item);
         var model = new 
         {
-            Name = item.Name,
+            item.Name,
             Namespace = item.ContainingNamespace.ToDisplayString(),
             UnderlyingType = GetUnderlyingTypeOfTypedId(item),
             Minimum = min,

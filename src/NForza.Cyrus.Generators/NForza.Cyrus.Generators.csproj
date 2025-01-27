@@ -26,17 +26,6 @@
 
   <ItemGroup>
     <Content Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs/" />
-    <Compile Remove="Templates\CommandDispatcherExtensions.cs" />
-    <Compile Remove="Templates\CqrsFactory.cs" />
-    <Compile Remove="Templates\CqrsServiceCollectionExtensions.cs" />
-    <Compile Remove="Templates\CyrusModel.cs" />
-    <Compile Remove="Templates\CyrusModelProperty.cs" />
-    <Compile Remove="Templates\EventConsumers.cs" />
-    <Compile Remove="Templates\HttpContextCqrsFactory.cs" />
-    <Compile Remove="Templates\QueryProcessorExtensions.cs" />
-    <Compile Remove="Templates\RegisterEndpointGroups.cs" />
-    <Compile Remove="Templates\RegisterSignalRHubs.cs" />
-    <Compile Remove="Templates\SignalRHub.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,13 +45,13 @@
     <EmbeddedResource Include="TypedIds\Templates\GuidIdTypeConverter.sbn" />
     <EmbeddedResource Include="Cqrs\Templates\CommandDispatcherExtensions.sbn" />
     <EmbeddedResource Include="Model\CyrusModel.sbn" />
-    <EmbeddedResource Include="Templates\EventConsumers.cs" />
-    <EmbeddedResource Include="Templates\HttpContextCqrsFactory.cs" />
+    <EmbeddedResource Include="MassTransit\EventConsumers.sbn" />
+    <EmbeddedResource Include="WebApi\Templates\HttpContextCqrsFactory.sbn" />
     <EmbeddedResource Include="Cqrs\Templates\QueryProcessorExtensions.sbn" />
-    <EmbeddedResource Include="Templates\RegisterSignalRHubs.cs" />
-    <EmbeddedResource Include="Templates\RegisterEndpointGroups.cs" />
+    <EmbeddedResource Include="SignalR\Templates\RegisterSignalRHubs.sbn" />
+    <EmbeddedResource Include="WebApi\Templates\RegisterEndpointGroups.sbn" />
     <EmbeddedResource Include="Cqrs\Templates\CqrsServiceCollectionExtensions.sbn" />
-    <EmbeddedResource Include="Templates\SignalRHub.cs" />
+    <EmbeddedResource Include="SignalR\Templates\SignalRHub.sbn" />
   </ItemGroup>
 
   <ItemGroup>

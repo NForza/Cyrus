@@ -47,7 +47,7 @@ public class GuidIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
     {
         var model = new
         {
-          Name = item.Name,
+            item.Name,
           Namespace = item.ContainingNamespace.ToDisplayString(),
           UnderlyingType = GetUnderlyingTypeOfTypedId(item),
           Default = "Guid.Empty"

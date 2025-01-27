@@ -37,7 +37,7 @@ public class StringIdTypeConverterGenerator : TypedIdGeneratorBase, IIncremental
         string fullyQualifiedNamespace = item.ContainingNamespace.ToDisplayString();
         var model = new 
         {
-            Name = item.Name,
+            item.Name,
             Namespace = fullyQualifiedNamespace
         };
         var resolvedSource = ScribanEngine.Render("StringIdTypeConverter", model);

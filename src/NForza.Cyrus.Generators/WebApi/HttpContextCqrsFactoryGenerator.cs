@@ -96,9 +96,9 @@ public class HttpContextCqrsFactoryGenerator : CyrusGeneratorBase, IIncrementalG
             source.Append($@"    objectFactories.Add(typeof({queryTypeName}), (ctx) => {GetConstructionExpression(query)}");
         }
         
-        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("HttpContextCqrsFactory.cs", new Dictionary<string, string>
-        {
-            ["QueryFactoryMethod"] = source.ToString()
+        var resolvedSource = ScribanEngine.Render("HttpContextCqrsFactory", new 
+        {                                     
+            QueryFactoryMethod = source.ToString()
         });
 
         return resolvedSource;

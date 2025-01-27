@@ -37,7 +37,7 @@ public class IntIdTypeConverterGenerator : TypedIdGeneratorBase, IIncrementalGen
     {
         var model = new 
         {
-            Name = item.Name,
+            item.Name,
             Namespace = item.ContainingNamespace.ToDisplayString()
         };
 

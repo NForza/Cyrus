@@ -12,7 +12,6 @@ namespace NForza.Cyrus.Generators
         static ScribanEngine()
         {
             LoadResourceTemplates();
-
         }
 
         public static string Render(string templateName, object model)
