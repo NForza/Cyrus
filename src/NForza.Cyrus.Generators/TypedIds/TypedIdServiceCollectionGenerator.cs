@@ -65,7 +65,7 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
             Imports = imports,
         };
 
-        var source = ScribanEngine.Render("CyrusOptionsJsonConverterExtensions", model);        
+        var source = ScribanEngine.Render("ServiceCollectionJsonConverterExtensions", model);        
         return source;
     }
 }

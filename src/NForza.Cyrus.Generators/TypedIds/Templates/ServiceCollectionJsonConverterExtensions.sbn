@@ -7,7 +7,7 @@ using {{ i }};
 
 namespace NForza.Cyrus.Abstractions;
 
-public static class CyrusOptionsJsonConverterExtensions
+public static class ServiceCollectionJsonConverterExtensions
 {
     public static IServiceCollection AddJsonConverters(this IServiceCollection services)
     {
@@ -22,7 +22,7 @@ public static class CyrusOptionsJsonConverterExtensions
         [typeof({{ t.Name }})] = typeof({{ t.UnderlyingType }})"));
         {{ end }}
     };
-    
+
     public static CyrusOptions AddTypedIdSerializers(this CyrusOptions options)
     {
         options.Services.AddSingleton(sp => new TypedIdDictionary(allTypes));
