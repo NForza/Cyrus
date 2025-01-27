@@ -55,24 +55,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Costura.Fody" Version="6.0.0" />
+    <PackageReference Include="Fody" Version="6.9.1" PrivateAssets="all"/>
     <PackageReference Include="ILRepack.MSBuild.Task" Version="2.0.13" PrivateAssets="All" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.11.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
     <PackageReference Include="Scriban" Version="5.12.1" />
   </ItemGroup>
-
-  <Target Name="ILRepack" AfterTargets="Build" Condition="$(Configuration) != 'Release'"> 
-    <PropertyGroup>
-      <WorkingDirectory>$(MSBuildThisFileDirectory)bin\$(Configuration)\$(TargetFramework)</WorkingDirectory>
-    </PropertyGroup>
-    <ItemGroup>
-      <InputAssemblies Include="Scriban.dll" />
-    </ItemGroup>
-    <ItemGroup>
-      <InternalizeExcludeAssemblies Include="Microsoft.CodeAnalysis.CSharp.dll, Microsoft.CodeAnalysis.dll, Microsoft.CodeAnalysis.Analyzers.dll" />
-    </ItemGroup>
-    <Message Text="MERGING: @(InputAssemblies->'%(Filename)') into $(OutputAssembly)" Importance="High" />
-    <ILRepack OutputType="$(OutputType)" MainAssembly="$(AssemblyName).dll" OutputAssembly="$(AssemblyName).dll" InputAssemblies="@(InputAssemblies)" InternalizeExcludeAssemblies="@(InternalizeExcludeAssemblies)" WorkingDirectory="$(WorkingDirectory)" />
-  </Target>
   
 </Project>
