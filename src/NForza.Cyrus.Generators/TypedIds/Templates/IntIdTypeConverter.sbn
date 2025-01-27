@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 
 #nullable enable
 
-namespace % NamespaceName %;
+namespace {{ Namespace }};
 
-public partial class % TypedIdName %TypeConverter : System.ComponentModel.TypeConverter
+public partial class {{ Name }}TypeConverter : System.ComponentModel.TypeConverter
 {
     public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext? context, System.Type sourceType)
         => sourceType == typeof(string) || sourceType == typeof(Guid) || base.CanConvertFrom(context, sourceType);
@@ -13,14 +13,14 @@ public partial class % TypedIdName %TypeConverter : System.ComponentModel.TypeCo
     {
         return value switch
         {
-            string str => new % TypedIdName % (Guid.Parse(str)),
-            Guid guid => new % TypedIdName % (guid),
+            string str => new {{ Name }} (int.Parse(str)),
+            int x => new {{ Name }} (x),
             _ => base.ConvertFrom(context, culture, value)
         };
     }
 
     public override object? ConvertTo(System.ComponentModel.ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object? value, System.Type destinationType) =>
         destinationType == typeof(string)
-            ? ((% TypedIdName %?)value)?.Value.ToString() ?? string.Empty
+            ? (({{ Name }}?)value)?.Value.ToString() ?? string.Empty
             : base.ConvertTo(context, culture, value, destinationType);
 }

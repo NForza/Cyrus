@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Cqrs.WebApi;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.Cqrs;
+namespace NForza.Cyrus.Generators.Model;
 
 internal class ModelGenerator
 {
@@ -40,7 +40,7 @@ internal class ModelGenerator
                 (bool isEnumerable, ITypeSymbol? collectionType) = m.Type.IsCollection(compilation);
                 if (isEnumerable)
                 {
-                    type = GetTypeAliasOrName(collectionType!);                        
+                    type = GetTypeAliasOrName(collectionType!);
                 }
                 bool isNullable = m.Type.IsNullable(compilation);
                 return $"new ModelPropertyDefinition(\"{name}\", \"{type}\", {isEnumerable.ToString().ToLowerInvariant()}, {isNullable.ToString().ToLowerInvariant()})";
@@ -59,7 +59,7 @@ internal class ModelGenerator
         bool baseTypeNameContainsGlobal = baseTypeName.Contains("global::");
         string typeName = baseTypeName.Replace("global::", "");
 
-        if(!baseTypeNameContainsGlobal)
+        if (!baseTypeNameContainsGlobal)
         {
             return baseTypeName;
         }

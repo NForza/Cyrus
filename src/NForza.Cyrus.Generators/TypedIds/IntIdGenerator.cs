@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
@@ -41,41 +40,33 @@ public class IntIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
 
     private string GenerateIntId(INamedTypeSymbol item)
     {
-        var replacements = new Dictionary<string, string>
+        (int? min, int? max) = GetMinAndMaxFromType(item);
+        var model = new
         {
-            ["ItemName"] = item.Name,
-            ["Namespace"] = item.ContainingNamespace.ToDisplayString(),
-            ["CastOperators"] = GenerateCastOperatorsToUnderlyingType(item),
-            ["IsValid"] = GetIsValidExpression(item)
+            item.Name,
+            Namespace = item.ContainingNamespace.ToDisplayString(),
+            UnderlyingType = GetUnderlyingTypeOfTypedId(item),
+            Minimum = min,
+            HasMinimum = min.HasValue,
+            Maximum = max,
+            HasMaximum = max.HasValue,
+            HasMaximumAndMinumum = min.HasValue && max.HasValue
         };
-
-        var source = TemplateEngine.ReplaceInResourceTemplate("IntId.cs", replacements);
+        var source = ScribanEngine.Render("IntId", model);
 
         return source;
     }
 
-    private string GetIsValidExpression(INamedTypeSymbol item)
+    private (int? min, int? max) GetMinAndMaxFromType(INamedTypeSymbol item)
     {
         var attribute = item.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "IntIdAttribute");
         if (attribute == null)
         {
-            return string.Empty;
+            return (null, null);
         }
         var args = attribute.ConstructorArguments.Select(a => int.Parse(a.Value?.ToString())).ToList();
-        var min = args.Count > 0 ? args[0] : -1;
-        var max = args.Count > 1 ? args[1] : -1;
-        if (min < 0 && max < 0)
-        {
-            return string.Empty;
-        }
-        var minExpression = min < 0 ? string.Empty : $"Value >= {min}";
-        var maxExpression = max < 0 ? string.Empty : $"Value <= {max}";
-        var AndOperator = minExpression.Length > 0 && maxExpression.Length > 0 ? " && " : "";
-
-        return $"public bool IsValid() => {minExpression}{AndOperator}{maxExpression};";
+        int? min = args.Count > 0 ? args[0] : null;
+        int? max = args.Count > 1 ? args[1] : null;
+        return (min, max);
     }
-
-    private string GenerateCastOperatorsToUnderlyingType(INamedTypeSymbol item) =>
-        @$"public static implicit operator {GetUnderlyingTypeOfTypedId(item)}({item.ToDisplayString()} typedId) => typedId.Value;
-    public static explicit operator {item.ToDisplayString()}({GetUnderlyingTypeOfTypedId(item)} value) => new(value);";
 }

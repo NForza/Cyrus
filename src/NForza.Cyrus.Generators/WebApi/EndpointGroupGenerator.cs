@@ -66,9 +66,9 @@ public class EndpointGroupGenerator : CyrusGeneratorBase, IIncrementalGenerator
             sb.AppendLine($"options.Services.AddEndpointGroup<{classSymbol.ToFullName()}>();");
         }
 
-        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("RegisterEndpointGroups.cs", new Dictionary<string, string>
+        var resolvedSource = ScribanEngine.Render("RegisterEndpointGroups", new 
         {
-            ["RegisterEndpointGroups"] = sb.ToString()
+            RegisterEndpointGroups = sb.ToString()
         });
 
         return resolvedSource;

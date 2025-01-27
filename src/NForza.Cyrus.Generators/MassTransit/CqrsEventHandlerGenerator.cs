@@ -6,10 +6,10 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.Cqrs;
+namespace NForza.Cyrus.Generators.MassTransit;
 
 [Generator]
-public class CqrsEventHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public class MassTransitConsumerGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -49,21 +49,12 @@ public class CqrsEventHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerat
     private string GenerateEventConsumers(ImmutableArray<IMethodSymbol> handlers)
     {
         StringBuilder source = new();
-        foreach (var handler in handlers)
+        var model = new
         {
-            var methodSymbol = handler;
-            var eventTypeName = methodSymbol.Parameters[0].Type.Name;
-            var eventTypeFullName = methodSymbol.Parameters[0].Type.ToFullName();
-            source.Append($@"
-public class {eventTypeName}Consumer(EventHandlerDictionary eventHandlerDictionary, IServiceScopeFactory serviceScopeFactory) : EventConsumer<{eventTypeFullName}>(eventHandlerDictionary, serviceScopeFactory)
-{{
-}}");
-        }
+            Consumers = handlers.Select(h => new { h.Parameters[0].Type.Name, FullName = h.Parameters[0].Type.ToFullName() })
+        };
 
-        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("EventConsumers.cs", new Dictionary<string, string>
-        {
-            ["EventConsumers"] = source.ToString()
-        });
+        var resolvedSource = ScribanEngine.Render("EventConsumers", model);
 
         return resolvedSource;
     }

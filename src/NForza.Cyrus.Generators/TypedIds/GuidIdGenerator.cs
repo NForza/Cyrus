@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
@@ -46,16 +45,15 @@ public class GuidIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
 
     private string GenerateGuidId(INamedTypeSymbol item)
     {
-        var replacements = new Dictionary<string, string>
+        var model = new
         {
-            ["ItemName"] = item.Name,
-            ["Namespace"] = item.ContainingNamespace.ToDisplayString(),
-            ["Constructors"] = GenerateConstructors(item),
-            ["CastOperators"] = GenerateCastOperatorsToUnderlyingType(item),
-            ["Default"] = "Guid.Empty"
+            item.Name,
+          Namespace = item.ContainingNamespace.ToDisplayString(),
+          UnderlyingType = GetUnderlyingTypeOfTypedId(item),
+          Default = "Guid.Empty"
         };
 
-        var source = TemplateEngine.ReplaceInResourceTemplate("GuidId.cs", replacements);
+        var source = ScribanEngine.Render("GuidId", model);
 
         return source;
     }

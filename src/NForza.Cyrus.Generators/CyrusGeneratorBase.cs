@@ -147,8 +147,7 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
 
     protected bool IsEvent(SyntaxNode syntaxNode)
     {
-        var classDeclaration = syntaxNode as RecordDeclarationSyntax;
-        if(classDeclaration != null)
+        if (syntaxNode is RecordDeclarationSyntax classDeclaration)
         {
             bool isEvent = classDeclaration.Identifier.Text.EndsWith("Event");
             return isEvent;
@@ -158,8 +157,7 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
 
     protected bool IsQuery(SyntaxNode syntaxNode)
     {
-        var classDeclaration = syntaxNode as RecordDeclarationSyntax;
-        if (classDeclaration != null)
+        if (syntaxNode is RecordDeclarationSyntax classDeclaration)
         {
             bool isEvent = classDeclaration.Identifier.Text.EndsWith("Query");
             return isEvent;
@@ -176,25 +174,16 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
         return baseType?.ToDisplayString() == fullyQualifiedBaseClassName;
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers", Justification = "<Pending>")]
     public string GetPartialModelClass(string assemblyName, string propertyName, string propertyType, IEnumerable<string> propertyValues)
     {
-        var replacements = new Dictionary<string, string>
+        var model = new 
         {
-            ["PropertyName"] = propertyName,
-            ["PropertyType"] = propertyType,
-            ["Properties"] = string.Join(",", propertyValues)
+            AssemblyName = assemblyName,
+            PropertyName = propertyName,
+            PropertyType = propertyType,
+            Properties = propertyValues
         };
-        var source = TemplateEngine.ReplaceInResourceTemplate("CyrusModelProperty.cs", replacements, [""]);
-
-#pragma warning disable RS1035 // Do not use APIs banned for analyzers
-        replacements = new Dictionary<string, string>
-        {
-            ["AssemblyName"] = assemblyName,
-            ["Properties"] = source
-        };
-#pragma warning restore RS1035 // Do not use APIs banned for analyzers
-        source = TemplateEngine.ReplaceInResourceTemplate("CyrusModel.cs", replacements);
+        var source = ScribanEngine.Render("CyrusModel", model);
         return source;
     }
 

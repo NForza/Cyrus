@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.TypedIds.Generator;
@@ -36,13 +35,13 @@ public class GuidIdTypeConverterGenerator : TypedIdGeneratorBase, IIncrementalGe
 
     private string GenerateGuidIdTypeConverter(INamedTypeSymbol item)
     {
-        var replacements = new Dictionary<string, string>
+        var model = new
         {
-            ["TypedIdName"] = item.Name,
-            ["NamespaceName"] = item.ContainingNamespace.ToDisplayString()
+            TypedIdName = item.Name,
+            NamespaceName = item.ContainingNamespace.ToDisplayString()
         };
 
-        string source = TemplateEngine.ReplaceInResourceTemplate("GuidIdTypeConverter.cs", replacements);
+        string source = ScribanEngine.Render("GuidIdTypeConverter", model);
 
         return source;
     }

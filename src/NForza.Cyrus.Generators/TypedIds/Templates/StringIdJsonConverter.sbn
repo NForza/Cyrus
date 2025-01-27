@@ -1,0 +1,19 @@
+﻿using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace {{ Namespace }};
+
+public class {{ Name }}JsonConverter : JsonConverter<{{ Name }}>
+{
+    public override {{ Name }} Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var value = reader.{{ GetMethod }}();  
+        return new {{ Name }}(value);
+    }
+
+    public override void Write(Utf8JsonWriter writer, {{ Name }} value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.Value?.ToString());
+    }
+}

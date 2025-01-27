@@ -1,0 +1,11 @@
+﻿using System;
+using MassTransit;
+using NForza.Cyrus.Cqrs;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace NForza.Cyrus.MassTransit;
+
+{{ for c in Consumers }}
+public class {{ c.Name }}Consumer(EventHandlerDictionary eventHandlerDictionary, IServiceScopeFactory serviceScopeFactory) : EventConsumer<{{ c.FullName }}>(eventHandlerDictionary, serviceScopeFactory)
+{ }
+{{ end }}

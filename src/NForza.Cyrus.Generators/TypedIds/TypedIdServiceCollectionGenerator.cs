@@ -7,7 +7,6 @@ using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
-using NForza.Cyrus.Generators.TypedIds;
 
 namespace NForza.Cyrus.TypedIds.Generator;
 
@@ -55,20 +54,18 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
     {
         var converters = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<JsonConverter, {t.Name}JsonConverter>();"));
 
-        var namespaces = string.Join(Environment.NewLine, typedIds.Select(t => t.ContainingNamespace.ToDisplayString()).Distinct().Select(ns => $"using {ns};"));
+        var imports = typedIds.Select(t => t.ContainingNamespace.ToDisplayString()).Distinct();
 
-        var types = string.Join(",", typedIds.Select(t => $"[typeof({t.ToFullName()})] = typeof({GetUnderlyingTypeOfTypedId(t)})"));
+        var types = typedIds.Select(t => new { Name = t.ToFullName(), UnderlyingType = GetUnderlyingTypeOfTypedId(t) }).ToList();
         var registrations = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<{t.ToDisplayString()}>();"));
 
-        var replacements = new Dictionary<string, string>()
+        var model = new 
         {
-            ["AllTypes"] = types,
-            ["AllTypedIdRegistrations"] = registrations,
-            ["Namespaces"] = namespaces,
-            ["AddJsonConverters"] = converters
+            TypeIds = typedIds,
+            Imports = imports,
         };
 
-        var source = TemplateEngine.ReplaceInResourceTemplate("CyrusOptionsJsonConverterExtensions.cs", replacements);        
+        var source = ScribanEngine.Render("ServiceCollectionJsonConverterExtensions", model);        
         return source;
     }
 }
