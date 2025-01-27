@@ -33,20 +33,11 @@
     <Compile Remove="Templates\CyrusModelProperty.cs" />
     <Compile Remove="Templates\CyrusOptionsJsonConverterExtensions.cs" />
     <Compile Remove="Templates\EventConsumers.cs" />
-    <Compile Remove="Templates\GuidId.cs" />
-    <Compile Remove="Templates\GuidIdJsonConverter.cs" />
-    <Compile Remove="Templates\GuidIdTypeConverter.cs" />
     <Compile Remove="Templates\HttpContextCqrsFactory.cs" />
-    <Compile Remove="Templates\IntId.cs" />
-    <Compile Remove="Templates\IntIdJsonConverter.cs" />
-    <Compile Remove="Templates\IntIdTypeConverter.cs" />
     <Compile Remove="Templates\QueryProcessorExtensions.cs" />
     <Compile Remove="Templates\RegisterEndpointGroups.cs" />
     <Compile Remove="Templates\RegisterSignalRHubs.cs" />
     <Compile Remove="Templates\SignalRHub.cs" />
-    <Compile Remove="Templates\StringId.cs" />
-    <Compile Remove="Templates\StringIdJsonConverter.cs" />
-    <Compile Remove="Templates\StringIdTypeConverter.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,17 +55,11 @@
     <EmbeddedResource Include="TypedIds\Templates\IntId.sbn" />
     <EmbeddedResource Include="TypedIds\Templates\GuidId.sbn" />
     <EmbeddedResource Include="TypedIds\Templates\GuidIdTypeConverter.sbn" />
-    <EmbeddedResource Include="Templates\CommandDispatcherExtensions.cs" />
+    <EmbeddedResource Include="Cqrs\Templates\CommandDispatcherExtensions.sbn" />
     <EmbeddedResource Include="Templates\CyrusModel.cs" />
     <EmbeddedResource Include="Templates\CyrusModelProperty.cs" />
     <EmbeddedResource Include="Templates\EventConsumers.cs" />
-    <EmbeddedResource Include="Templates\GuidId.cs" />
-    <EmbeddedResource Include="Templates\GuidIdJsonConverter.cs" />
-    <EmbeddedResource Include="Templates\GuidIdTypeConverter.cs" />
     <EmbeddedResource Include="Templates\HttpContextCqrsFactory.cs" />
-    <EmbeddedResource Include="Templates\IntId.cs" />
-    <EmbeddedResource Include="Templates\IntIdJsonConverter.cs" />
-    <EmbeddedResource Include="Templates\IntIdTypeConverter.cs" />
     <EmbeddedResource Include="Templates\CqrsFactory.cs" />
     <EmbeddedResource Include="Templates\QueryProcessorExtensions.cs" />
     <EmbeddedResource Include="Templates\RegisterSignalRHubs.cs" />
@@ -82,9 +67,6 @@
     <EmbeddedResource Include="Templates\CqrsServiceCollectionExtensions.cs" />
     <EmbeddedResource Include="Templates\CyrusOptionsJsonConverterExtensions.cs" />
     <EmbeddedResource Include="Templates\SignalRHub.cs" />
-    <EmbeddedResource Include="Templates\StringId.cs" />
-    <EmbeddedResource Include="Templates\StringIdJsonConverter.cs" />
-    <EmbeddedResource Include="Templates\StringIdTypeConverter.cs" />
   </ItemGroup>
 
   <ItemGroup>

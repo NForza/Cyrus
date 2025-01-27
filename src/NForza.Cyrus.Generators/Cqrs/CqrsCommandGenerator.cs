@@ -70,20 +70,12 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
         if (commandResultSymbol == null || taskSymbol == null)
             return string.Empty;
 
-        StringBuilder source = new();
-        foreach (var handler in handlers)
+        var model = new
         {
-            var methodSymbol = handler;
-            var parameterType = methodSymbol.Parameters[0].Type.ToFullName();
-            source.Append($@"
-    public static Task<CommandResult> Execute(this ICommandDispatcher dispatcher, {parameterType} command, CancellationToken cancellationToken = default) 
-        => dispatcher.ExecuteInternalAsync(command, cancellationToken);");
-        }
+            Types = handlers.Select(h => h.Parameters[0].Type.ToFullName()).ToList()
+        };
 
-        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("CommandDispatcherExtensions.cs", new Dictionary<string, string>
-        {
-            ["ExecuteMethods"] = source.ToString()
-        });
+        var resolvedSource = ScribanEngine.Render("CommandDispatcherExtensions", model);
 
         return resolvedSource.ToString();
     }
