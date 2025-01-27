@@ -61,7 +61,7 @@
     <EmbeddedResource Include="Templates\EventConsumers.cs" />
     <EmbeddedResource Include="Templates\HttpContextCqrsFactory.cs" />
     <EmbeddedResource Include="Templates\CqrsFactory.cs" />
-    <EmbeddedResource Include="Templates\QueryProcessorExtensions.cs" />
+    <EmbeddedResource Include="Cqrs\Templates\QueryProcessorExtensions.sbn" />
     <EmbeddedResource Include="Templates\RegisterSignalRHubs.cs" />
     <EmbeddedResource Include="Templates\RegisterEndpointGroups.cs" />
     <EmbeddedResource Include="Templates\CqrsServiceCollectionExtensions.cs" />

@@ -1,0 +1,13 @@
+﻿using System;
+using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace NForza.Cyrus.Cqrs;
+
+public static class QueryProcessorExtensions
+{
+{{ for q in Queries }}
+    public static Task<{{ q.ReturnType }}> Query(this IQueryProcessor queryProcessor, {{ q.QueryType }} command, CancellationToken cancellationToken = default) 
+        => queryProcessor.QueryInternal<{{ q.QueryType }}, {{ q.ReturnType }}>(command, cancellationToken);
+{{ end }}
+}

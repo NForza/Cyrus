@@ -14,7 +14,7 @@ public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerat
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
         var configProvider = ConfigProvider(context);
 
         var incrementalValuesProvider = context.SyntaxProvider
@@ -51,34 +51,27 @@ public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerat
         {
             return string.Empty;
         }
-        StringBuilder source = new();
-        foreach (var handler in handlers)
-        {
-            var methodSymbol = handler;
-            var parameterType = methodSymbol.Parameters[0].Type.ToFullName();
-            var returnType = (INamedTypeSymbol)methodSymbol.ReturnType;
-            string returnTypeFullName = returnType.ToFullName();
-            var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
 
-            if (isAsync)
-            {
-                var queryType = (INamedTypeSymbol)returnType.TypeArguments[0];
-                source.Append($@"
-    public static {returnTypeFullName} Query(this IQueryProcessor queryProcessor, {parameterType} command, CancellationToken cancellationToken = default) 
-        => queryProcessor.QueryInternal<{parameterType}, {queryType}>(command, cancellationToken);");
-            }
-            else
-            {
-                source.Append($@"
-    public static Task<{returnTypeFullName}> Query(this IQueryProcessor queryProcessor, {parameterType} command, CancellationToken cancellationToken = default) 
-        => queryProcessor.QueryInternal<{parameterType}, {returnTypeFullName}>(command, cancellationToken);");
-            }
-        }
-
-        var resolvedSource = TemplateEngine.ReplaceInResourceTemplate("QueryProcessorExtensions.cs", new Dictionary<string, string>
+        var queries = handlers.Select(h => new
         {
-            ["QueryMethods"] = source.ToString()
-        });
+            Handler = h,
+            QueryType = h.Parameters[0].Type.ToFullName(),
+            ReturnType = (INamedTypeSymbol) h.ReturnType,
+            IsAsync = h.ReturnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default)
+        }).ToList();
+
+        var model = new
+        {
+            Queries = queries.Select(q => new
+            {
+                ReturnTypeOriginal = q.ReturnType,
+                ReturnType = q.IsAsync ? q.ReturnType.TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
+                QueryType = q.QueryType,
+                IsAsync = q.IsAsync
+            }).ToList()
+        };
+
+        var resolvedSource = ScribanEngine.Render("QueryProcessorExtensions", model );
 
         return resolvedSource;
     }
