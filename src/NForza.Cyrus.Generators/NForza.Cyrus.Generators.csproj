@@ -31,7 +31,6 @@
     <Compile Remove="Templates\CqrsServiceCollectionExtensions.cs" />
     <Compile Remove="Templates\CyrusModel.cs" />
     <Compile Remove="Templates\CyrusModelProperty.cs" />
-    <Compile Remove="Templates\CyrusOptionsJsonConverterExtensions.cs" />
     <Compile Remove="Templates\EventConsumers.cs" />
     <Compile Remove="Templates\HttpContextCqrsFactory.cs" />
     <Compile Remove="Templates\QueryProcessorExtensions.cs" />
@@ -56,15 +55,13 @@
     <EmbeddedResource Include="TypedIds\Templates\GuidId.sbn" />
     <EmbeddedResource Include="TypedIds\Templates\GuidIdTypeConverter.sbn" />
     <EmbeddedResource Include="Cqrs\Templates\CommandDispatcherExtensions.sbn" />
-    <EmbeddedResource Include="Templates\CyrusModel.cs" />
-    <EmbeddedResource Include="Templates\CyrusModelProperty.cs" />
+    <EmbeddedResource Include="Model\CyrusModel.sbn" />
     <EmbeddedResource Include="Templates\EventConsumers.cs" />
     <EmbeddedResource Include="Templates\HttpContextCqrsFactory.cs" />
     <EmbeddedResource Include="Cqrs\Templates\QueryProcessorExtensions.sbn" />
     <EmbeddedResource Include="Templates\RegisterSignalRHubs.cs" />
     <EmbeddedResource Include="Templates\RegisterEndpointGroups.cs" />
     <EmbeddedResource Include="Cqrs\Templates\CqrsServiceCollectionExtensions.sbn" />
-    <EmbeddedResource Include="Templates\CyrusOptionsJsonConverterExtensions.cs" />
     <EmbeddedResource Include="Templates\SignalRHub.cs" />
   </ItemGroup>
 

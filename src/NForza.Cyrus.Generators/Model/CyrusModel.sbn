@@ -4,9 +4,9 @@ using System.Text;
 using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Abstractions;
 
-namespace NForza.Cyrus.Models.% AssemblyName %;
+namespace NForza.Cyrus.Models.{{ AssemblyName }};
 
 public partial class CyrusModel : ICyrusModel
 {
-    % Properties %
+	public IEnumerable<{{ PropertyType }}> {{ PropertyName }} => [ {{ Properties.join }} ];
 }
