@@ -95,6 +95,7 @@ internal static class TypeScriptGenerator
 
     private static void GenerateHubs(string outputFolder, CyrusMetadata metadata)
     {
+        GenerateHubQueryReturnTypes(outputFolder, metadata);
         Template template = GetTemplate("hub");
         foreach (var hub in metadata.Hubs)
         {
@@ -102,6 +103,12 @@ internal static class TypeScriptGenerator
             string fileName = Path.ChangeExtension(Path.Combine(outputFolder, hub.Name), ".ts");
             File.WriteAllText(fileName, result);
         }
+    }
+
+    private static void GenerateHubQueryReturnTypes(string outputFolder, CyrusMetadata metadata)
+    {
+        var returnTypes = metadata.Hubs.SelectMany(h => h.Queries).Select(q => q.ReturnType).Distinct(TypeWithPropertiesEqualityComparer.Instance);
+        GenerateTypesWithProperties(returnTypes, outputFolder, metadata);
     }
 
     private static void GenerateGuids(string outputFolder, CyrusMetadata metadata)
@@ -126,10 +133,12 @@ internal static class TypeScriptGenerator
         }
     }
 
-    private static void GenerateCommands(string outputFolder, CyrusMetadata metadata)
+    private static void GenerateCommands(string outputFolder, CyrusMetadata metadata) => GenerateTypesWithProperties(metadata.Commands, outputFolder, metadata);
+
+    private static void GenerateTypesWithProperties(IEnumerable<ITypeWithProperties> typesWithProperties, string outputFolder, CyrusMetadata metadata)
     {
         Template template = GetTemplate("interface");
-        foreach (var command in metadata.Commands)
+        foreach (var command in typesWithProperties)
         {
             var model = new { Imports = GetImportsFor(metadata, command).ToList(), command.Name, command.Properties };
             var result = template.Render(GetContext(model, metadata));
@@ -138,17 +147,7 @@ internal static class TypeScriptGenerator
         }
     }
 
-    private static void GenerateQueries(string outputFolder, CyrusMetadata metadata)
-    {
-        Template template = GetTemplate("interface");
-        foreach (var query in metadata.Queries)
-        {
-            var model = new { Imports = GetImportsFor(metadata, query).ToList(), query.Name, query.Properties };
-            var result = template.Render(GetContext(model, metadata));
-            string fileName = Path.ChangeExtension(Path.Combine(outputFolder, query.Name), ".ts");
-            File.WriteAllText(fileName, result);
-        }
-    }
+    private static void GenerateQueries(string outputFolder, CyrusMetadata metadata) => GenerateTypesWithProperties(metadata.Queries, outputFolder, metadata);
 
     private static void GenerateEvents(string outputFolder, CyrusMetadata metadata)
     {

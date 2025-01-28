@@ -13,10 +13,12 @@ internal class ModelGenerator
         var commands = signalRHub.Commands.Select(c => $"\"{c.Name}\"");
         var commandsAsString = string.Join(",", commands);
 
-        var events = signalRHub.Events.Select(c => $"\"{c.Name}\"");
+        var events = signalRHub.Events.Select(e => $"\"{e.Name}\"");
         var eventsAsString = string.Join(",", events);
 
-        var queries = signalRHub.Queries.Select(c => $"new ModelQueryDefinition(\"{c.Name}\", new(\"{c.ReturnType.Name}\", {c.ReturnType.IsCollection.ToString().ToLower()}, {c.ReturnType.IsNullable.ToString().ToLower()}))");
+        var queryReturnTypes = signalRHub.Queries.Select(q => q.ReturnType.Type).Distinct(SymbolEqualityComparer.IncludeNullability).OfType<INamedTypeSymbol>();
+        var queryReturnTypeProperties = string.Join(",", queryReturnTypes.Select(t => GetPropertiesDeclaration(t, compilation)));
+        var queries = signalRHub.Queries.Select(c => $"new ModelQueryDefinition(\"{c.Name}\", new(\"{c.ReturnType.Type?.Name ?? null}\", {c.ReturnType.IsCollection.ToString().ToLower()}, {c.ReturnType.IsNullable.ToString().ToLower()}, [{queryReturnTypeProperties}]))");
         var queriesAsString = string.Join(",", queries);
 
         return $"new ModelHubDefinition(\"{signalRHub.Name}\", {signalRHub.Path} ,[{commandsAsString}], [{queriesAsString}], [{eventsAsString}])";

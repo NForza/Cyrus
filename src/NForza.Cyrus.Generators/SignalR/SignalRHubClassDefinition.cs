@@ -82,13 +82,14 @@ internal record SignalRHubClassDefinition
             ITypeSymbol returnType = GetReturnTypeOfQuery(symbol) ?? throw new InvalidCastException("Can't find return type for " + symbol.ToFullName());
             (bool isCollection, ITypeSymbol? collectionType) = returnType?.IsCollection(SemanticModel.Compilation) ?? (false, null);
             var isNullable = returnType?.IsNullable(SemanticModel.Compilation);
+            ITypeSymbol? queryReturnType = isCollection ? collectionType : returnType;
             return
                 new SignalRQuery
                 {
                     MethodName = genericArg.GetText().ToString(),
                     Name = symbol.Name,
                     FullTypeName = symbol.ToFullName(),
-                    ReturnType = new( isCollection ? collectionType!.Name : returnType.Name ?? "object", isCollection, isNullable ?? false)
+                    ReturnType = new(queryReturnType, isCollection, isNullable ?? false)
                 };
         });
     }
@@ -98,7 +99,6 @@ internal record SignalRHubClassDefinition
         Compilation compilation = SemanticModel.Compilation;
         foreach (var reference in compilation.References)
         {
-            // Get the assembly symbol for the reference
             var assemblySymbol = compilation.GetAssemblyOrModuleSymbol(reference) as IAssemblySymbol;
             if (assemblySymbol == null)
                 continue;
@@ -125,7 +125,7 @@ internal record SignalRHubClassDefinition
             }
         }
 
-        return null; // No matching method found
+        return null;
     }
 
     private void SetEvents(INamedTypeSymbol symbol, BlockSyntax constructorBody)
@@ -162,28 +162,4 @@ internal record SignalRHubClassDefinition
     public IEnumerable<SignalREvent> Events { get; internal set; } = [];
     public IEnumerable<SignalRQuery> Queries { get; internal set; } = [];
     public string Name => Declaration?.Identifier.Text ?? "";
-}
-
-public static class NamespaceSymbolExtensions
-{
-    public static IEnumerable<INamedTypeSymbol> GetAllTypes(this INamespaceSymbol @namespace)
-    {
-        // Iterate over all members of the namespace
-        foreach (var member in @namespace.GetMembers())
-        {
-            if (member is INamespaceSymbol nestedNamespace)
-            {
-                // Recursively get types from nested namespaces
-                foreach (var nestedType in nestedNamespace.GetAllTypes())
-                {
-                    yield return nestedType;
-                }
-            }
-            else if (member is INamedTypeSymbol namedType)
-            {
-                // Return the named type
-                yield return namedType;
-            }
-        }
-    }
 }

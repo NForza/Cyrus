@@ -142,7 +142,21 @@
           "returnType": {
             "name": "Customer",
             "isCollection": true,
-            "isNullable": false
+            "isNullable": false,
+            "properties": [
+              {
+                "name": "Id",
+                "type": "CustomerId",
+                "isCollection": false,
+                "isNullable": false
+              },
+              {
+                "name": "Name",
+                "type": "Name",
+                "isCollection": false,
+                "isNullable": false
+              }
+            ]
           }
         }
       ],
