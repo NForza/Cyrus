@@ -1,15 +1,17 @@
-﻿namespace NForza.Cyrus.Generators.SignalR;
+﻿using Microsoft.CodeAnalysis;
+
+namespace NForza.Cyrus.Generators.SignalR;
 
 public record SignalRQueryReturnType
 {
-    public SignalRQueryReturnType(string name, bool isCollection, bool isNullable)
+    public SignalRQueryReturnType(ITypeSymbol? type, bool isCollection, bool isNullable)
     {
-        Name = name;
+        Type = type;
         IsCollection = isCollection;
         IsNullable = isNullable;
     }
 
-    public string Name { get; internal set; } = string.Empty;
+    public ITypeSymbol? Type { get; internal set; }
     public bool IsCollection { get; set; }
     public bool IsNullable { get; set; }
 }
