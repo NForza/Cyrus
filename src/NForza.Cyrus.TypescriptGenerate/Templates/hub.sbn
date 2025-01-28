@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
-import { Observable, of, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 {{ for i in Imports }}
 import { {{ i }} } from './{{ i }}';{{ end }}
 
@@ -13,6 +13,9 @@ export class {{ Name }}Service {
 {{ for q in Queries }}
   private _{{ q.Name | camel_case }}Result: Subject<{{ query_return_type q }}> = new Subject<{{ query_return_type q }}>();
 {{ end }}
+{{ for e in Events }}
+  private _{{ e | camel_case }}Subject: Subject<{{ e }}> = new Subject<{{ e }}>();
+{{ end }}
 
   constructor() {
     this.hubConnection = new signalR.HubConnectionBuilder()
@@ -22,6 +25,7 @@ export class {{ Name }}Service {
     {{ for e in Events }}
     this.hubConnection.on('{{ e | camel_case }}', (data: {{e}}) => {
       console.log('Received {{e}}:', data);
+      this._{{ e | camel_case }}Subject.next(data);
     });
     {{ end }}
     {{ for q in Queries }}  
@@ -58,5 +62,16 @@ export class {{ Name }}Service {
     this.hubConnection.invoke('{{ q.Name | camel_case }}', query).catch((err) => {
       console.error('Error sending {{ q.Name | camel_case }}:', err);
     });
-  } {{ end }}
+  }
+
+  public get {{ q.Name | camel_case }}Result(): Observable<{{ query_return_type q }}> {
+    return this._{{ q.Name | camel_case }}Result;
+  }
+  {{ end }}
+
+  {{ for e in Events }}
+  public get on{{ e | strip_postfix }}(): Observable<{{ e }}> {
+    return this._{{ e | camel_case }}Subject;
+  }
+  {{ end }}
 }

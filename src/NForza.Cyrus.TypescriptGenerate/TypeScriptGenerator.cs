@@ -30,6 +30,15 @@ internal static class TypeScriptGenerator
             return CSharpToTypeScriptType(input, (CyrusMetadata)metaData);
         });
 
+        scriptObject.Import("strip_postfix", (string input) =>
+        {
+            if (input.EndsWith("Command")) return input[..^"Command".Length];
+            if (input.EndsWith("Query")) return input[..^"Query".Length];
+            if (input.EndsWith("Event")) return input[..^"Event".Length];
+            return input;
+        });
+
+
         scriptObject.Import("query_return_type", (Func<HubQuery, string>)(rt =>
         {
             var metaData = context.GetValue(metaDataVariable);
