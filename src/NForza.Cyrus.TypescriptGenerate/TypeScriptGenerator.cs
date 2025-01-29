@@ -30,6 +30,25 @@ internal static class TypeScriptGenerator
             return CSharpToTypeScriptType(input, (CyrusMetadata)metaData);
         });
 
+        scriptObject.Import("to_typescript_default", (Func<ITypeDefinition, string>)(p =>
+        {
+            if (p.IsNullable) return "null";
+            if (p.IsCollection) return "[]";
+            var tsType = CSharpToTypeScriptType(p.Type, metadata);
+            if (metadata.Guids.Contains(tsType)) return "''";
+            if (metadata.Integers.Contains(tsType)) return "0";
+            if (metadata.Strings.Contains(tsType)) return "''";
+            if (tsType == "string") return "''";
+            if (tsType == "number") return "0";
+            if (p is ITypeWithProperties twp)
+            {
+                Template defaults = GetTemplate("type-defaults");
+                var model = new { twp.Properties };
+                return defaults.Render(GetContext(model, metadata));
+            }
+            return "{}";
+        }));
+
         scriptObject.Import("strip_postfix", (string input) =>
         {
             if (input.EndsWith("Command")) return input[..^"Command".Length];
@@ -37,7 +56,6 @@ internal static class TypeScriptGenerator
             if (input.EndsWith("Event")) return input[..^"Event".Length];
             return input;
         });
-
 
         scriptObject.Import("query_return_type", (Func<HubQuery, string>)(rt =>
         {
@@ -188,7 +206,7 @@ internal static class TypeScriptGenerator
     private static Template GetTemplate(string templateName)
     {
         var templateContent = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream($"NForza.Cyrus.TypescriptGenerate.Templates.{templateName}.sbn")!).ReadToEnd();
-        var template = Template.Parse(templateContent);
+        var template = Template.Parse(templateContent.Trim());
         return template;
     }
 }

@@ -140,8 +140,8 @@
         {
           "name": "AllCustomersQuery",
           "returnType": {
-            "name": "Customer",
-            "isCollection": true,
+            "type": "Customer",
+            "isCollection": false,
             "isNullable": false,
             "properties": [
               {

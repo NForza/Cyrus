@@ -9,8 +9,8 @@ public class CustomerHub : SignalRHub
     {
         UsePath("/customer-hub");
         QueryMethodFor<AllCustomersQuery>();
-        CommandMethodFor<AddCustomerCommand>(replyToAllClients: true);
-        CommandMethodFor<DeleteCustomerCommand>(replyToAllClients: true);
+        CommandMethodFor<AddCustomerCommand>();
+        CommandMethodFor<DeleteCustomerCommand>();
 
         PublishesEventToCaller<CustomerUpdatedEvent>();
         PublishesEventToAll<CustomerAddedEvent>();

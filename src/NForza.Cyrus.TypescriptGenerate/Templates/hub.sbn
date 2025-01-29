@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 {{ for i in Imports }}
 import { {{ i }} } from './{{ i }}';{{ end }}
 
@@ -11,7 +11,7 @@ export class {{ Name }}Service {
   private hubConnection: signalR.HubConnection;
 
 {{ for q in Queries }}
-  private _{{ q.Name | camel_case }}Result: Subject<{{ query_return_type q }}> = new Subject<{{ query_return_type q }}>();
+  private _{{ q.Name | camel_case }}Result: BehaviorSubject<{{ query_return_type q }}> = new BehaviorSubject<{{ query_return_type q }}>({{ q.ReturnType | to_typescript_default }});
 {{ end }}
 {{ for e in Events }}
   private _{{ e | camel_case }}Subject: Subject<{{ e }}> = new Subject<{{ e }}>();
