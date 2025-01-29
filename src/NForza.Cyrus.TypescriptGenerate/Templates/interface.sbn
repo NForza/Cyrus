@@ -2,8 +2,8 @@
 import { {{ t.Name }} } from './{{ t.Name }}';
 {{ end }}
 
-export class {{ Name }} {
+export interface {{ Name }} {
 {{ for prop in Properties }}
-    public {{ prop.Name }}{{ if prop.IsNullable }}?{{ end }}: {{ prop.Type | to_typescript_type }}{{ if prop.IsCollection }}[]{{ end }};
+    {{ prop.Name }}{{ if prop.IsNullable }}?{{ end }}: {{ prop.Type | to_typescript_type }}{{ if prop.IsCollection }}[]{{ end }};
 {{ end }}
 }
