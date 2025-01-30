@@ -19,27 +19,47 @@ internal class ModelGenerator
 
         var queryReturnTypes = signalRHub.Queries.Select(q => q.ReturnType.Type).Distinct(SymbolEqualityComparer.IncludeNullability).OfType<INamedTypeSymbol>();
         var queryReturnTypeProperties = string.Join(",", queryReturnTypes.Select(t => GetPropertiesDeclaration(t, compilation)));
-        var queryReturnTypeSupportClasses = queryReturnTypes.SelectMany(t => GetSupportClasses(t, compilation));
 
         var queries = signalRHub.Queries.Select(c => $"new ModelQueryDefinition(\"{c.Symbol.Name}\", new(\"{c.ReturnType.Type?.Name ?? null}\", {c.ReturnType.IsCollection.ToString().ToLower()}, {c.ReturnType.IsNullable.ToString().ToLower()}, [{queryReturnTypeProperties}]))");
         var queriesAsString = string.Join(",", queries);
 
-        return $"new ModelHubDefinition(\"{signalRHub.Name}\", {signalRHub.Path} ,[{commandsAsString}], [{queriesAsString}], [{eventsAsString}])";
+        var supportTypes = GetSupportClasses(signalRHub, compilation, queryReturnTypes);
+        var supportTypesAsString = string.Join(",", supportTypes.Select(t => ForNamedType(t, compilation)));
+        return $"new ModelHubDefinition(\"{signalRHub.Name}\", {signalRHub.Path} ,[{commandsAsString}], [{queriesAsString}], [{eventsAsString}], [{supportTypesAsString}])";
     }
 
-    private static IEnumerable<INamedTypeSymbol> GetSupportClasses(INamedTypeSymbol t, Compilation compilation, List<INamedTypeSymbol>? supportClasses = null)
+    private static List<INamedTypeSymbol> GetSupportClasses(SignalRHubClassDefinition signalRHub, Compilation compilation, IEnumerable<INamedTypeSymbol> queryReturnTypes)
     {
-        supportClasses ??= [];
+        var commandSupportClasses = signalRHub.Commands.SelectMany(t => GetSupportClasses(t.Symbol, compilation)).ToList();
+        var eventSupportClasses = signalRHub.Events.SelectMany(t => GetSupportClasses(t.Symbol, compilation)).ToList();
+        var queryReturnTypeSupportClasses = queryReturnTypes.SelectMany(t => GetSupportClasses(t, compilation)).ToList();
+
+        return commandSupportClasses.Concat(eventSupportClasses).Concat(queryReturnTypeSupportClasses).Distinct(SymbolEqualityComparer.IncludeNullability).OfType<INamedTypeSymbol>().ToList();
+    }
+
+    private static List<INamedTypeSymbol> GetSupportClasses(INamedTypeSymbol t, Compilation compilation)
+    {
+        var supportClasses = new List<INamedTypeSymbol>();
         var properties = GetPropertiesForType(t);
         var propertyTypes = properties.Select(p => p.Type).OfType<INamedTypeSymbol>().Where(p => p.TypeKind == TypeKind.Enum);
-        supportClasses.AddRange(propertyTypes.SelectMany(t => GetSupportClasses(t, compilation, supportClasses)));
+        supportClasses.AddRange(propertyTypes);
+
+        var nestedSupportClasses = properties.Select(p => p.Type).OfType<INamedTypeSymbol>().Where(p => p.TypeKind == TypeKind.Class).ToList();
+        supportClasses.AddRange(nestedSupportClasses);
+
         return supportClasses;
     }
 
     internal static string ForNamedType(INamedTypeSymbol namedType, Compilation compilation)
     {
-        string properties = GetPropertiesDeclaration(namedType, compilation);
-        return $"new ModelTypeDefinition(\"{namedType.Name}\", [{properties}])";
+        switch(namedType.TypeKind)
+        {
+            case TypeKind.Enum:
+                return $"new ModelTypeDefinition(\"{namedType.Name}\", [], [{string.Join(",", namedType.GetMembers().OfType<IFieldSymbol>().Select(f => $"\"{f.Name}\""))}])";
+            default:
+                string properties = GetPropertiesDeclaration(namedType, compilation);
+                return $"new ModelTypeDefinition(\"{namedType.Name}\", [{properties}], [])";
+        }
     }
 
     private static string GetPropertiesDeclaration(INamedTypeSymbol namedType, Compilation compilation)
