@@ -9,5 +9,4 @@ public class CyrusMetadata
     public string[] Integers { get; set; } = [];
     public string[] Strings { get; set; } = [];
     public Hub[] Hubs { get; set; } = [];
-    public SupportType[] SupportTypes { get; set; } = [];
 }

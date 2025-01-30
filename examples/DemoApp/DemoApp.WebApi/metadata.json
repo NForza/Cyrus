@@ -31,9 +31,6 @@
           "isCollection": false,
           "isNullable": false
         }
-      ],
-      "values": [
-
       ]
     },
     {
@@ -45,9 +42,6 @@
           "isCollection": false,
           "isNullable": false
         }
-      ],
-      "values": [
-
       ]
     }
   ],
@@ -74,8 +68,14 @@
           "isNullable": false
         }
       ],
-      "values": [
-
+      "supportTypes": [
+        {
+          "name": "CustomerType",
+          "values": [
+            "Private",
+            "Company"
+          ]
+        }
       ]
     },
     {
@@ -87,9 +87,6 @@
           "isCollection": false,
           "isNullable": false
         }
-      ],
-      "values": [
-
       ]
     },
     {
@@ -113,9 +110,6 @@
           "isCollection": false,
           "isNullable": false
         }
-      ],
-      "values": [
-
       ]
     }
   ],
@@ -135,9 +129,6 @@
           "isCollection": false,
           "isNullable": false
         }
-      ],
-      "values": [
-
       ]
     },
     {
@@ -149,9 +140,6 @@
           "isCollection": false,
           "isNullable": false
         }
-      ],
-      "values": [
-
       ]
     }
   ],
@@ -190,18 +178,6 @@
       "events": [
         "CustomerUpdatedEvent",
         "CustomerAddedEvent"
-      ],
-      "supportTypes": [
-        {
-          "name": "CustomerType",
-          "properties": [
-
-          ],
-          "values": [
-            "Private",
-            "Company"
-          ]
-        }
       ]
     }
   ]
