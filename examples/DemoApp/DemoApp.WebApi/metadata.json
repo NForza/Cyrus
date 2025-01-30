@@ -31,6 +31,9 @@
           "isCollection": false,
           "isNullable": false
         }
+      ],
+      "values": [
+
       ]
     },
     {
@@ -42,6 +45,9 @@
           "isCollection": false,
           "isNullable": false
         }
+      ],
+      "values": [
+
       ]
     }
   ],
@@ -60,7 +66,16 @@
           "type": "Address",
           "isCollection": false,
           "isNullable": false
+        },
+        {
+          "name": "customerType",
+          "type": "CustomerType",
+          "isCollection": false,
+          "isNullable": false
         }
+      ],
+      "values": [
+
       ]
     },
     {
@@ -72,6 +87,9 @@
           "isCollection": false,
           "isNullable": false
         }
+      ],
+      "values": [
+
       ]
     },
     {
@@ -95,6 +113,9 @@
           "isCollection": false,
           "isNullable": false
         }
+      ],
+      "values": [
+
       ]
     }
   ],
@@ -114,6 +135,9 @@
           "isCollection": false,
           "isNullable": false
         }
+      ],
+      "values": [
+
       ]
     },
     {
@@ -125,6 +149,9 @@
           "isCollection": false,
           "isNullable": false
         }
+      ],
+      "values": [
+
       ]
     }
   ],
@@ -141,7 +168,7 @@
           "name": "AllCustomersQuery",
           "returnType": {
             "type": "Customer",
-            "isCollection": false,
+            "isCollection": true,
             "isNullable": false,
             "properties": [
               {
@@ -163,6 +190,18 @@
       "events": [
         "CustomerUpdatedEvent",
         "CustomerAddedEvent"
+      ],
+      "supportTypes": [
+        {
+          "name": "CustomerType",
+          "properties": [
+
+          ],
+          "values": [
+            "Private",
+            "Company"
+          ]
+        }
       ]
     }
   ]

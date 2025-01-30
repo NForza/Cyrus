@@ -19,8 +19,10 @@ internal class ModelGenerator
 
         var queryReturnTypes = signalRHub.Queries.Select(q => q.ReturnType.Type).Distinct(SymbolEqualityComparer.IncludeNullability).OfType<INamedTypeSymbol>();
         var queryReturnTypeProperties = string.Join(",", queryReturnTypes.Select(t => GetPropertiesDeclaration(t, compilation)));
+        var queryReturnTypeSupportTypes = queryReturnTypes.SelectMany(t => GetSupportClasses(t, compilation)).Distinct(SymbolEqualityComparer.IncludeNullability).OfType<INamedTypeSymbol>();
+        var queryReturnTypeSupportTypesAsString = string.Join(",", queryReturnTypeSupportTypes.Select(t => ForNamedType(t, compilation)));
 
-        var queries = signalRHub.Queries.Select(c => $"new ModelQueryDefinition(\"{c.Symbol.Name}\", new(\"{c.ReturnType.Type?.Name ?? null}\", {c.ReturnType.IsCollection.ToString().ToLower()}, {c.ReturnType.IsNullable.ToString().ToLower()}, [{queryReturnTypeProperties}]))");
+        var queries = signalRHub.Queries.Select(c => $"new ModelQueryDefinition(\"{c.Symbol.Name}\", new(\"{c.ReturnType.Type?.Name ?? null}\", {c.ReturnType.IsCollection.ToString().ToLower()}, {c.ReturnType.IsNullable.ToString().ToLower()}, [{queryReturnTypeProperties}], [{queryReturnTypeSupportTypesAsString}]))");
         var queriesAsString = string.Join(",", queries);
 
         var supportTypes = GetSupportClasses(signalRHub, compilation, queryReturnTypes);
@@ -30,11 +32,8 @@ internal class ModelGenerator
 
     private static List<INamedTypeSymbol> GetSupportClasses(SignalRHubClassDefinition signalRHub, Compilation compilation, IEnumerable<INamedTypeSymbol> queryReturnTypes)
     {
-        var commandSupportClasses = signalRHub.Commands.SelectMany(t => GetSupportClasses(t.Symbol, compilation)).ToList();
-        var eventSupportClasses = signalRHub.Events.SelectMany(t => GetSupportClasses(t.Symbol, compilation)).ToList();
         var queryReturnTypeSupportClasses = queryReturnTypes.SelectMany(t => GetSupportClasses(t, compilation)).ToList();
-
-        return commandSupportClasses.Concat(eventSupportClasses).Concat(queryReturnTypeSupportClasses).Distinct(SymbolEqualityComparer.IncludeNullability).OfType<INamedTypeSymbol>().ToList();
+        return queryReturnTypeSupportClasses.Distinct(SymbolEqualityComparer.IncludeNullability).OfType<INamedTypeSymbol>().ToList();
     }
 
     private static List<INamedTypeSymbol> GetSupportClasses(INamedTypeSymbol t, Compilation compilation)
@@ -44,7 +43,7 @@ internal class ModelGenerator
         var propertyTypes = properties.Select(p => p.Type).OfType<INamedTypeSymbol>().Where(p => p.TypeKind == TypeKind.Enum);
         supportClasses.AddRange(propertyTypes);
 
-        var nestedSupportClasses = properties.Select(p => p.Type).OfType<INamedTypeSymbol>().Where(p => p.TypeKind == TypeKind.Class).ToList();
+        var nestedSupportClasses = properties.OfType<INamedTypeSymbol>().SelectMany(p => GetSupportClasses(p, compilation));
         supportClasses.AddRange(nestedSupportClasses);
 
         return supportClasses;
@@ -52,13 +51,15 @@ internal class ModelGenerator
 
     internal static string ForNamedType(INamedTypeSymbol namedType, Compilation compilation)
     {
-        switch(namedType.TypeKind)
+        switch (namedType.TypeKind)
         {
             case TypeKind.Enum:
-                return $"new ModelTypeDefinition(\"{namedType.Name}\", [], [{string.Join(",", namedType.GetMembers().OfType<IFieldSymbol>().Select(f => $"\"{f.Name}\""))}])";
+                return $"new ModelTypeDefinition(\"{namedType.Name}\", [], [{string.Join(",", namedType.GetMembers().OfType<IFieldSymbol>().Select(f => $"\"{f.Name}\""))}], [])";
             default:
                 string properties = GetPropertiesDeclaration(namedType, compilation);
-                return $"new ModelTypeDefinition(\"{namedType.Name}\", [{properties}], [])";
+                var supportClasses = GetSupportClasses(namedType, compilation);
+                var supportClassesAsString = string.Join(",", supportClasses.Select(t => ForNamedType(t, compilation)));
+                return $"new ModelTypeDefinition(\"{namedType.Name}\", [{properties}], [], [{supportClassesAsString}])";
         }
     }
 
