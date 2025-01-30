@@ -25,7 +25,7 @@ public class CustomerTests(ITestOutputHelper testOutput)
     [InlineData("/customers")]
     public async Task Posting_Add_Customer_Command_Should_Succeed(string url)
     {
-        var command = new AddCustomerCommand(new Name("Thomas"), new Address("The Netherlands"));
+        var command = new AddCustomerCommand(new Name("Thomas"), new Address("The Netherlands"), CustomerType.Private);
         var response = await client.PostAsJsonAsync(url, command);
         response.Should().NotBeNull();
         response.StatusCode.Should().Be(HttpStatusCode.Accepted);
