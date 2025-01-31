@@ -5,11 +5,9 @@ namespace NForza.Cyrus.Model;
 
 public static class CyrusModelExtensions
 {
-    static JsonSerializerOptions options = new JsonSerializerOptions() { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-
     public static string AsJson(this ICyrusModel model)
     {
-        return JsonSerializer.Serialize(model, options);
+        return JsonSerializer.Serialize(model, ModelSerializerOptions.Default);
     }
 
     public static ICyrusModel Combine(this ICyrusModel model, params ICyrusModel[] models)

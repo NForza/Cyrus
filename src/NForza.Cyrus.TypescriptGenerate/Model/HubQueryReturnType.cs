@@ -7,4 +7,5 @@ public class HubQueryReturnType : ITypeWithProperties, ITypeDefinition
     public bool IsCollection { get; set; }
     public bool IsNullable { get; set; }
     public Property[] Properties { get; set ; } = [];
+    public SupportType[] SupportTypes { get; set; } = [];
 }

@@ -60,6 +60,21 @@
           "type": "Address",
           "isCollection": false,
           "isNullable": false
+        },
+        {
+          "name": "customerType",
+          "type": "CustomerType",
+          "isCollection": false,
+          "isNullable": false
+        }
+      ],
+      "supportTypes": [
+        {
+          "name": "CustomerType",
+          "values": [
+            "Private",
+            "Company"
+          ]
         }
       ]
     },
@@ -141,7 +156,7 @@
           "name": "AllCustomersQuery",
           "returnType": {
             "type": "Customer",
-            "isCollection": false,
+            "isCollection": true,
             "isNullable": false,
             "properties": [
               {

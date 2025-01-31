@@ -118,6 +118,23 @@ internal static class TypeScriptGenerator
         GenerateQueries(outputFolder, metadata);
         GenerateEvents(outputFolder, metadata);
         GenerateHubs(outputFolder, metadata);
+        GenerateSupportTypes(outputFolder, metadata);
+    }
+
+    private static void GenerateSupportTypes(string outputFolder, CyrusMetadata metadata)
+    {
+        var allSupportTypes = metadata.Commands.SelectMany(c => c.SupportTypes)
+                              .Concat(metadata.Queries.SelectMany(q => q.SupportTypes))
+                              .Concat(metadata.Events.SelectMany(q => q.SupportTypes))
+                              .Distinct(TypeWithPropertiesEqualityComparer.Instance);
+
+        foreach (var type in allSupportTypes)
+        {
+            Template template = GetTemplate("enum");
+            var result = template.Render(GetContext(type, metadata));
+            string fileName = Path.ChangeExtension(Path.Combine(outputFolder, type.Name), ".ts");
+            File.WriteAllText(fileName, result);
+        }
     }
 
     private static void GenerateHubs(string outputFolder, CyrusMetadata metadata)

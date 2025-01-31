@@ -125,7 +125,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
         foreach (var command in signalRCommands)
         {
             sb.AppendLine(
-    @$"public async Task {command.MethodName}({command.FullTypeName} command) 
+    @$"public async Task {command.MethodName}({command.Symbol.ToFullName()} command) 
     {{
         var result = await commandDispatcher.Execute(command);
         if (result.Succeeded)
@@ -143,7 +143,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
         foreach (var query in signalRQueries)
         {
             sb.AppendLine(
-    @$"public async Task {query.MethodName}({query.FullTypeName} query) 
+    @$"public async Task {query.MethodName}({query.Symbol.ToFullName()} query) 
     {{
         var result = await queryProcessor.Query(query);
         await SendQueryResultReply(""{query.MethodName}"", result);

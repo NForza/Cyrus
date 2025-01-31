@@ -1,3 +1,10 @@
-﻿namespace NForza.Cyrus.Abstractions.Model;
+﻿using System.Text.Json.Serialization;
 
-public record ModelHubDefinition(string Name, string Path, IEnumerable<string> Commands, IEnumerable<ModelQueryDefinition> Queries, IEnumerable<string> Events) : INamedModelType;
+namespace NForza.Cyrus.Abstractions.Model;
+
+public record ModelHubDefinition(
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] string Name, 
+    string Path,
+    IEnumerable<string> Commands, 
+    IEnumerable<ModelQueryDefinition> Queries, 
+    IEnumerable<string> Events, IEnumerable<ModelTypeDefinition> SupportTypes) : INamedModelType;
