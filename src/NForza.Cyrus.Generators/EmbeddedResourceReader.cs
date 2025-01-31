@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace NForza.Generators;
+namespace NForza.Cyrus.Generators;
 
 public class EmbeddedResourceReader
 {

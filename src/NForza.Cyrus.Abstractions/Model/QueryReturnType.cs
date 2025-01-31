@@ -1,8 +1,18 @@
-﻿namespace NForza.Cyrus.Abstractions.Model;
+﻿namespace NForza.Cyrus.Abstractions.Model
+{
+    public class QueryReturnType
+    {
+        public QueryReturnType(string type, bool isCollection, bool isNullable, ModelPropertyDefinition[] properties)
+        {
+            Type = type;
+            IsCollection = isCollection;
+            IsNullable = isNullable;
+            Properties = properties;
+        }
 
-public record QueryReturnType(
-    string Type, 
-    bool IsCollection, 
-    bool IsNullable,
-    ModelPropertyDefinition[] Properties, 
-    ModelTypeDefinition[] SupportTypes);
+        public string Type { get; }
+        public bool IsCollection { get; }
+        public bool IsNullable { get; }
+        public ModelPropertyDefinition[] Properties { get; }
+    }
+}

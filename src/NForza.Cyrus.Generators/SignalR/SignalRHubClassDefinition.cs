@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NForza.Cyrus.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.Cqrs.WebApi;
+namespace NForza.Cyrus.Generators.SignalR;
 
 internal record SignalRHubClassDefinition
 {
@@ -65,7 +66,7 @@ internal record SignalRHubClassDefinition
         Commands = commands.Select(genericArg =>
         {
             var symbol = SemanticModel.GetSymbolInfo(genericArg).Symbol!;
-            return new SignalRCommand { MethodName = genericArg.GetText().ToString(), Symbol = (INamedTypeSymbol) symbol };
+            return new SignalRCommand { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, FullTypeName = symbol.ToFullName() };
         });
     }
 
@@ -78,7 +79,7 @@ internal record SignalRHubClassDefinition
 
         Queries = queries.Select(genericArg =>
         {
-            var symbol = (INamedTypeSymbol)SemanticModel.GetSymbolInfo(genericArg).Symbol!;
+            var symbol = (ITypeSymbol)SemanticModel.GetSymbolInfo(genericArg).Symbol!;
             ITypeSymbol returnType = GetReturnTypeOfQuery(symbol) ?? throw new InvalidCastException("Can't find return type for " + symbol.ToFullName());
             (bool isCollection, ITypeSymbol? collectionType) = returnType?.IsCollection(SemanticModel.Compilation) ?? (false, null);
             var isNullable = returnType?.IsNullable(SemanticModel.Compilation);
@@ -87,7 +88,8 @@ internal record SignalRHubClassDefinition
                 new SignalRQuery
                 {
                     MethodName = genericArg.GetText().ToString(),
-                    Symbol = symbol,
+                    Name = symbol.Name,
+                    FullTypeName = symbol.ToFullName(),
                     ReturnType = new(queryReturnType, isCollection, isNullable ?? false)
                 };
         });
@@ -135,8 +137,8 @@ internal record SignalRHubClassDefinition
         var callerEventTypes = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());
         var callerEvents = callerEventTypes.Select(genericArg =>
         {
-            var symbol = (INamedTypeSymbol) SemanticModel.GetSymbolInfo(genericArg).Symbol!;
-            return new SignalREvent { MethodName = genericArg.GetText().ToString(), Symbol = symbol, IsBroadcast = false };
+            var symbol = SemanticModel.GetSymbolInfo(genericArg).Symbol!;
+            return new SignalREvent { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, FullTypeName = symbol.ToFullName(), IsBroadcast = false };
         });
 
         memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "PublishesEventToAll")
@@ -145,8 +147,8 @@ internal record SignalRHubClassDefinition
         var broadcastEventTypes = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());
         var broadcastEvents = broadcastEventTypes.Select(genericArg =>
         {
-            var symbol = (INamedTypeSymbol) SemanticModel.GetSymbolInfo(genericArg).Symbol!;
-            return new SignalREvent { MethodName = genericArg.GetText().ToString(), Symbol = symbol, IsBroadcast = true };
+            var symbol = SemanticModel.GetSymbolInfo(genericArg).Symbol!;
+            return new SignalREvent { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, FullTypeName = symbol.ToFullName(), IsBroadcast = true };
         });
 
         Events = callerEvents.Concat(broadcastEvents);

@@ -3,7 +3,7 @@ using FluentValidation;
 using MassTransit;
 using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.WebApi;
-using SimpleCyrusWebApi;
+using SimpleCyrusWebApi.Model;
 using SimpleCyrusWebApi.Storage;
 
 var builder = WebApplication.CreateBuilder(args);

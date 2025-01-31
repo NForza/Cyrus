@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Generators;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.TypedIds.Generator;
+namespace NForza.Cyrus.Generators.TypedIds;
 
 [Generator]
 public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncrementalGenerator
@@ -59,13 +58,13 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
         var types = typedIds.Select(t => new { Name = t.ToFullName(), UnderlyingType = GetUnderlyingTypeOfTypedId(t) }).ToList();
         var registrations = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<{t.ToDisplayString()}>();"));
 
-        var model = new 
+        var model = new
         {
             TypeIds = typedIds,
             Imports = imports,
         };
 
-        var source = ScribanEngine.Render("ServiceCollectionJsonConverterExtensions", model);        
+        var source = ScribanEngine.Render("ServiceCollectionJsonConverterExtensions", model);
         return source;
     }
 }

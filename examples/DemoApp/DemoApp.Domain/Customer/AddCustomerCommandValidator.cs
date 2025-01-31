@@ -1,6 +1,7 @@
-﻿using FluentValidation;
+﻿using DemoApp.Contracts.Customers;
+using FluentValidation;
 
-namespace DemoApp.Contracts.Customers;
+namespace DemoApp.Domain.Customer;
 
 public class AddCustomerCommandValidator : AbstractValidator<AddCustomerCommand>
 {

@@ -1,4 +1,6 @@
-﻿namespace NForza.Cyrus.TypescriptGenerate.Model;
+﻿using System.Collections.Generic;
+
+namespace NForza.Cyrus.TypescriptGenerate.Model;
 
 public class HubQueryReturnType : ITypeWithProperties, ITypeDefinition
 {

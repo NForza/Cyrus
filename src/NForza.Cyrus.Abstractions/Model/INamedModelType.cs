@@ -1,6 +1,7 @@
-﻿namespace NForza.Cyrus.Abstractions.Model;
-
-public interface INamedModelType
+﻿namespace NForza.Cyrus.Abstractions.Model
 {
-    string Name { get; }
+    public interface INamedModelType
+    {
+        string Name { get; }
+    }
 }

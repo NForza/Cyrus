@@ -1,6 +1,6 @@
 ﻿using NForza.Cyrus.Abstractions;
 
-namespace SimpleCyrusWebApi;
+namespace DemoApp.Contracts;
 
 public class CyrusConfiguration : CyrusConfig
 {

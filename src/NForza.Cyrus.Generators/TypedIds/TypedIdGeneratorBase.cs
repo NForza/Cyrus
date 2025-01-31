@@ -1,9 +1,8 @@
 ﻿using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NForza.Cyrus.Generators;
 
-namespace NForza.Cyrus.TypedIds.Generator;
+namespace NForza.Cyrus.Generators.TypedIds;
 
 public abstract class TypedIdGeneratorBase : CyrusGeneratorBase
 {

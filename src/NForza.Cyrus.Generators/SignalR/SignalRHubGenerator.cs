@@ -9,7 +9,7 @@ using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.Cqrs.WebApi;
+namespace NForza.Cyrus.Generators.SignalR;
 
 [Generator]
 public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
@@ -77,7 +77,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
     private string GenerateSignalRHubRegistration(System.Collections.Immutable.ImmutableArray<SignalRHubClassDefinition> signalRDefinitions)
     {
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
-        string usings = string.Join(Environment.NewLine, signalRDefinitions.Select( cm => $"using {cm.Symbol.ContainingNamespace.ToFullName()};").Distinct());
+        string usings = string.Join(Environment.NewLine, signalRDefinitions.Select(cm => $"using {cm.Symbol.ContainingNamespace.ToFullName()};").Distinct());
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
 
         var sb = new StringBuilder();
@@ -106,7 +106,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
         string commands = GenerateCommands(classDefinition.Commands);
         string queries = GenerateQueries(classDefinition.Queries);
 
-        var replacements = new 
+        var replacements = new
         {
             classDefinition.Symbol.Name,
             Namespace = classDefinition.Symbol.ContainingNamespace.ToDisplayString(),
@@ -125,7 +125,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
         foreach (var command in signalRCommands)
         {
             sb.AppendLine(
-    @$"public async Task {command.MethodName}({command.Symbol.ToFullName()} command) 
+    @$"public async Task {command.MethodName}({command.FullTypeName} command) 
     {{
         var result = await commandDispatcher.Execute(command);
         if (result.Succeeded)
@@ -143,7 +143,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
         foreach (var query in signalRQueries)
         {
             sb.AppendLine(
-    @$"public async Task {query.MethodName}({query.Symbol.ToFullName()} query) 
+    @$"public async Task {query.MethodName}({query.FullTypeName} query) 
     {{
         var result = await queryProcessor.Query(query);
         await SendQueryResultReply(""{query.MethodName}"", result);
