@@ -1,6 +1,9 @@
-﻿namespace NForza.Cyrus.Abstractions;
+﻿using System;
 
-[AttributeUsage(AttributeTargets.Struct)]
-public class GuidIdAttribute : Attribute
+namespace NForza.Cyrus.Abstractions
 {
+    [AttributeUsage(AttributeTargets.Struct)]
+    public class GuidIdAttribute : Attribute
+    {
+    }
 }

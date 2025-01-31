@@ -6,8 +6,8 @@ using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.WebApi;
 using NForza.Cyrus.SignalR;
 using NForza.Cyrus.Abstractions;
-using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Model;
+using NForza.Cyrus.Abstractions.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,6 +1,6 @@
 ﻿namespace NForza.Cyrus.Abstractions.Model
 {
-    public class ModelPropertyDefinition : INamedModelType
+    public class ModelPropertyDefinition
     {
         public ModelPropertyDefinition(string name, string type, bool isCollection, bool isNullable)
         {

@@ -36,8 +36,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleCyrusWebApi", "exampl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoApp.Contracts", "examples\DemoApp\DemoApp.Contracts\DemoApp.Contracts.csproj", "{F226A20A-3ED9-8DED-646B-3F02A3D018F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.Model", "src\NForza.Cyrus.Model\NForza.Cyrus.Model.csproj", "{08E4ADFA-D22A-4D6C-AB40-4E5CA57B13CF}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,12 +103,6 @@ Global
 		{F226A20A-3ED9-8DED-646B-3F02A3D018F3}.DebugGenerator|Any CPU.Build.0 = DebugGenerator|Any CPU
 		{F226A20A-3ED9-8DED-646B-3F02A3D018F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F226A20A-3ED9-8DED-646B-3F02A3D018F3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{08E4ADFA-D22A-4D6C-AB40-4E5CA57B13CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{08E4ADFA-D22A-4D6C-AB40-4E5CA57B13CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{08E4ADFA-D22A-4D6C-AB40-4E5CA57B13CF}.DebugGenerator|Any CPU.ActiveCfg = Debug|Any CPU
-		{08E4ADFA-D22A-4D6C-AB40-4E5CA57B13CF}.DebugGenerator|Any CPU.Build.0 = Debug|Any CPU
-		{08E4ADFA-D22A-4D6C-AB40-4E5CA57B13CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{08E4ADFA-D22A-4D6C-AB40-4E5CA57B13CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

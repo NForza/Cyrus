@@ -1,12 +1,15 @@
-﻿namespace NForza.Cyrus.TypescriptGenerate.Model;
+﻿using System.Collections.Generic;
+using NForza.Cyrus.Abstractions.Model;
 
-public class CyrusMetadata
+namespace NForza.Cyrus.TypescriptGenerate.Model;
+
+public class CyrusMetadata: ICyrusModel
 {
-    public Command[] Commands { get; set; } = [];
-    public Event[] Events { get; set; } = [];
-    public Query[] Queries { get; set; } = [];
-    public string[] Guids { get; set; } = [];
-    public string[] Integers { get; set; } = [];
-    public string[] Strings { get; set; } = [];
-    public Hub[] Hubs { get; set; } = [];
+    public IEnumerable<string> Guids { get; } = [];
+    public IEnumerable<string> Integers { get; } = [];
+    public IEnumerable<string> Strings { get; } = [];
+    public IEnumerable<ModelTypeDefinition> Events { get; } = [];
+    public IEnumerable<ModelTypeDefinition> Commands { get; } = [];
+    public IEnumerable<ModelTypeDefinition> Queries { get; } = [];
+    public IEnumerable<ModelHubDefinition> Hubs { get; } = [];
 }

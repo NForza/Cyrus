@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.TypescriptGenerate.Model;
 using Scriban;
 using Scriban.Runtime;
@@ -40,7 +41,7 @@ internal static class TypeScriptGenerator
             if (metadata.Strings.Contains(tsType)) return "''";
             if (tsType == "string") return "''";
             if (tsType == "number") return "0";
-            if (p is ITypeWithProperties twp)
+            if (p is ModelTypeDefinition twp)
             {
                 Template defaults = GetTemplate("type-defaults");
                 var model = new { twp.Properties };
@@ -123,10 +124,10 @@ internal static class TypeScriptGenerator
 
     private static void GenerateSupportTypes(string outputFolder, CyrusMetadata metadata)
     {
-        var allSupportTypes = metadata.Commands.SelectMany(c => c.SupportTypes)
-                              .Concat(metadata.Queries.SelectMany(q => q.SupportTypes))
-                              .Concat(metadata.Events.SelectMany(q => q.SupportTypes))
-                              .Distinct(TypeWithPropertiesEqualityComparer.Instance);
+        var commandSupportTypes = metadata.Commands.SelectMany(c => c.SupportTypes);
+        var querySupportTypes = metadata.Queries.SelectMany(q => q.SupportTypes);
+        var eventSupportTypes = metadata.Events.SelectMany(q => q.SupportTypes);
+        var allSupportTypes = commandSupportTypes.Concat(querySupportTypes).Concat(eventSupportTypes).Distinct(TypeWithPropertiesEqualityComparer.Instance);
 
         foreach (var type in allSupportTypes)
         {
@@ -179,7 +180,7 @@ internal static class TypeScriptGenerator
 
     private static void GenerateCommands(string outputFolder, CyrusMetadata metadata) => GenerateTypesWithProperties(metadata.Commands, outputFolder, metadata);
 
-    private static void GenerateTypesWithProperties(IEnumerable<ITypeWithProperties> typesWithProperties, string outputFolder, CyrusMetadata metadata)
+    private static void GenerateTypesWithProperties(IEnumerable<ModelTypeDefinition> typesWithProperties, string outputFolder, CyrusMetadata metadata)
     {
         Template template = GetTemplate("interface");
         foreach (var command in typesWithProperties)
@@ -205,7 +206,7 @@ internal static class TypeScriptGenerator
         }
     }
 
-    private static IEnumerable<Import> GetImportsFor(CyrusMetadata metadata, ITypeWithProperties obj)
+    private static IEnumerable<Import> GetImportsFor(CyrusMetadata metadata, ModelTypeDefinition obj)
     {
         foreach (var p in obj.Properties)
         {

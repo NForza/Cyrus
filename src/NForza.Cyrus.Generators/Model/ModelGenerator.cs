@@ -18,7 +18,7 @@ internal class ModelGenerator
 
         var queryReturnTypes = signalRHub.Queries.Select(q => q.ReturnType.Type).Distinct(SymbolEqualityComparer.IncludeNullability).OfType<INamedTypeSymbol>();
         var queryReturnTypeProperties = string.Join(",", queryReturnTypes.Select(t => GetPropertiesDeclaration(t, compilation)));
-        var queries = signalRHub.Queries.Select(c => $"new ModelQueryDefinition(\"{c.Name}\", new(\"{c.ReturnType.Type?.Name ?? null}\", {c.ReturnType.IsCollection.ToString().ToLower()}, {c.ReturnType.IsNullable.ToString().ToLower()}, [{queryReturnTypeProperties}]))");
+        var queries = signalRHub.Queries.Select(c => $"new ModelQueryDefinition(\"{c.Name}\", new ModelTypeDefinition(\"{c.ReturnType.Type?.Name ?? null}\", [{queryReturnTypeProperties}], {c.ReturnType.Type?.IsCollection(compilation).IsMatch.ToString().ToLower()?? "false"}, {c.ReturnType.Type?.IsNullable(compilation).ToString().ToLower() ?? "false"}, []))");
         var queriesAsString = string.Join(",", queries);
 
         return $"new ModelHubDefinition(\"{signalRHub.Name}\", {signalRHub.Path} ,[{commandsAsString}], [{queriesAsString}], [{eventsAsString}])";
@@ -27,7 +27,7 @@ internal class ModelGenerator
     internal static string ForNamedType(INamedTypeSymbol namedType, Compilation compilation)
     {
         string properties = GetPropertiesDeclaration(namedType, compilation);
-        return $"new ModelTypeDefinition(\"{namedType.Name}\", [{properties}])";
+        return $"new ModelTypeDefinition(\"{namedType.Name}\", [{properties}], {namedType.IsCollection(compilation).IsMatch.ToString().ToLower()}, {namedType.IsNullable(compilation).ToString().ToLower()}, [])";
     }
 
     private static string GetPropertiesDeclaration(INamedTypeSymbol namedType, Compilation compilation)

@@ -11,7 +11,6 @@ namespace NForza.Cyrus.Model;
 [JsonSerializable(typeof(ModelPropertyDefinition))]
 [JsonSerializable(typeof(ModelQueryDefinition))]
 [JsonSerializable(typeof(ModelTypeDefinition))]
-[JsonSerializable(typeof(QueryReturnType))]
 [JsonSourceGenerationOptions(DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
 public partial class SerializationContext : JsonSerializerContext;
 

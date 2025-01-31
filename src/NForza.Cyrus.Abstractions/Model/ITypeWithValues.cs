@@ -1,4 +1,4 @@
-﻿namespace NForza.Cyrus.TypescriptGenerate.Model
+﻿namespace NForza.Cyrus.Abstractions.Model
 {
     internal interface ITypeWithValues
     {

@@ -2,16 +2,11 @@
 
 namespace NForza.Cyrus.Model;
 
-public static class NamedTypeEqualityComparer
+public class NamedTypeEqualityComparer : IEqualityComparer<ModelTypeDefinition>
 {
-    public static NamedTypeEqualityComparer<TModel> Instance<TModel>() where TModel : INamedModelType => new NamedTypeEqualityComparer<TModel>();
-}
+    public static NamedTypeEqualityComparer Instance => new NamedTypeEqualityComparer();
 
-public class NamedTypeEqualityComparer<T> : IEqualityComparer<T>
-    where T : INamedModelType
-{
-
-    public bool Equals(T? x, T? y)
+    public bool Equals(ModelTypeDefinition? x, ModelTypeDefinition? y)
     {
         if (ReferenceEquals(x, y))
         {
@@ -24,7 +19,7 @@ public class NamedTypeEqualityComparer<T> : IEqualityComparer<T>
         return x.Name == y.Name;
     }
 
-    public int GetHashCode(T obj)
+    public int GetHashCode(ModelTypeDefinition obj)
     {
         return obj.Name.GetHashCode();
     }

@@ -1,15 +1,24 @@
-﻿namespace NForza.Cyrus.Abstractions;
+﻿using System;
 
-[AttributeUsage(AttributeTargets.Struct)]
-public class IntIdAttribute(int minimum, int maximum) : Attribute
+namespace NForza.Cyrus.Abstractions
 {
-    public IntIdAttribute() : this(int.MinValue, int.MaxValue)
+    [AttributeUsage(AttributeTargets.Struct)]
+    public class IntIdAttribute : Attribute
     {
-    }
-    public IntIdAttribute(int minimum) : this(minimum, int.MaxValue)
-    {
-    }
+        public IntIdAttribute(int minimum, int maximum)
+        {
+            Minimum = minimum;
+            Maximum = maximum;
+        }
 
-    public int Minimum { get; } = minimum;
-    public int Maximum { get; } = maximum;
+        public IntIdAttribute() : this(int.MinValue, int.MaxValue)
+        {
+        }
+        public IntIdAttribute(int minimum) : this(minimum, int.MaxValue)
+        {
+        }
+
+        public int Minimum { get; }
+        public int Maximum { get; }
+    }
 }

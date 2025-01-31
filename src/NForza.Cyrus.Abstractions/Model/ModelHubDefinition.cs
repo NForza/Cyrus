@@ -1,6 +1,8 @@
-﻿namespace NForza.Cyrus.Abstractions.Model
+﻿using System.Collections.Generic;
+
+namespace NForza.Cyrus.Abstractions.Model
 {
-    public class ModelHubDefinition : INamedModelType
+    public class ModelHubDefinition 
     {
         public ModelHubDefinition(string name, string path, IEnumerable<string> commands, IEnumerable<ModelQueryDefinition> queries, IEnumerable<string> events)
         {

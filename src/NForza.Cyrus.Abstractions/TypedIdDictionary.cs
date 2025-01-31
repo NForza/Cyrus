@@ -1,5 +1,12 @@
-﻿namespace NForza.Cyrus.Abstractions;
+﻿using System;
+using System.Collections.Generic;
 
-public class TypedIdDictionary(Dictionary<Type, Type> values) : Dictionary<Type, Type>(values)
+namespace NForza.Cyrus.Abstractions
 {
+    public class TypedIdDictionary : Dictionary<Type, Type>
+    {
+        public TypedIdDictionary(Dictionary<Type, Type> values) : base(values)
+        {
+        }
+    }
 }
