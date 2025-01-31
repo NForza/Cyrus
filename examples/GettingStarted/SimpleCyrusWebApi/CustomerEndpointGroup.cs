@@ -1,5 +1,6 @@
 ﻿using NForza.Cyrus.WebApi;
 using NForza.Cyrus.WebApi.Policies;
+using SimpleCyrusWebApi.CustomerById;
 using SimpleCyrusWebApi.NewCustomer;
 
 namespace SimpleCyrusWebApi;

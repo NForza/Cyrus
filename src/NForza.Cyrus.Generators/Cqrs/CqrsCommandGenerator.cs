@@ -60,8 +60,6 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
         });
     }
 
-
-
     private string GenerateCommandDispatcherExtensionMethods(Compilation compilation, ImmutableArray<IMethodSymbol> handlers)
     {
         INamedTypeSymbol? taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1")!;

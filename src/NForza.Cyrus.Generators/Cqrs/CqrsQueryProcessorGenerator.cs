@@ -3,17 +3,16 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Generators;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Cqrs.Generator;
+namespace NForza.Cyrus.Generators.Cqrs;
 
 [Generator]
 public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);;
+        DebugThisGenerator(false); ;
         var configProvider = ConfigProvider(context);
 
         var incrementalValuesProvider = context.SyntaxProvider
@@ -55,7 +54,7 @@ public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerat
         {
             Handler = h,
             QueryType = h.Parameters[0].Type.ToFullName(),
-            ReturnType = (INamedTypeSymbol) h.ReturnType,
+            ReturnType = (INamedTypeSymbol)h.ReturnType,
             IsAsync = h.ReturnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default)
         }).ToList();
 
@@ -70,7 +69,7 @@ public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerat
             }).ToList()
         };
 
-        var resolvedSource = ScribanEngine.Render("QueryProcessorExtensions", model );
+        var resolvedSource = ScribanEngine.Render("QueryProcessorExtensions", model);
 
         return resolvedSource;
     }

@@ -1,9 +1,8 @@
 ﻿using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Generators;
 
-namespace NForza.Cyrus.TypedIds.Generator;
+namespace NForza.Cyrus.Generators.TypedIds;
 
 [Generator]
 public class StringIdTypeConverterGenerator : TypedIdGeneratorBase, IIncrementalGenerator
@@ -35,7 +34,7 @@ public class StringIdTypeConverterGenerator : TypedIdGeneratorBase, IIncremental
     private string GenerateStringIdTypeConverter(INamedTypeSymbol item)
     {
         string fullyQualifiedNamespace = item.ContainingNamespace.ToDisplayString();
-        var model = new 
+        var model = new
         {
             item.Name,
             Namespace = fullyQualifiedNamespace

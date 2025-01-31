@@ -1,4 +1,5 @@
 ﻿using NForza.Cyrus.Cqrs;
+using SimpleCyrusWebApi.Model;
 using SimpleCyrusWebApi.Storage;
 
 namespace SimpleCyrusWebApi.NewCustomer;

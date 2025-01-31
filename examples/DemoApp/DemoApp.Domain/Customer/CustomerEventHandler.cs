@@ -1,6 +1,6 @@
 ﻿using DemoApp.Contracts.Customers;
 
-namespace DemoApp.WebApi;
+namespace DemoApp.Domain.Customer;
 
 public class CustomerEventHandler
 {

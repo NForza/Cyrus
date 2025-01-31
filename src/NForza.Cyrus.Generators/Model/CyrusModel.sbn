@@ -6,7 +6,7 @@ using NForza.Cyrus.Abstractions;
 
 namespace NForza.Cyrus.Models.{{ AssemblyName }};
 
-public partial class CyrusModel : ICyrusModel
+public partial class CyrusModel : CyrusModelBase
 {
-	public IEnumerable<{{ PropertyType }}> {{ PropertyName }} => [ {{ Properties }} ];
+	public override IEnumerable<{{ PropertyType }}> {{ PropertyName }} => [ {{ Properties }} ];
 }

@@ -1,6 +1,7 @@
-﻿namespace NForza.Cyrus.Abstractions;
-
-public interface ITypedId
+﻿namespace NForza.Cyrus.Abstractions
 {
-    bool IsValid() => true;
+    public interface ITypedId
+    {
+        bool IsValid { get; }
+    }
 }

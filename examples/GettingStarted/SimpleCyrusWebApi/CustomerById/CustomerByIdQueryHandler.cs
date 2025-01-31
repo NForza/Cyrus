@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SimpleCyrusWebApi.Model;
 using SimpleCyrusWebApi.Storage;
 
-namespace SimpleCyrusWebApi;
+namespace SimpleCyrusWebApi.CustomerById;
 
 // Handles requests for getting a customer by Id
 public class CustomerByIdQueryHandler(DemoContext context)

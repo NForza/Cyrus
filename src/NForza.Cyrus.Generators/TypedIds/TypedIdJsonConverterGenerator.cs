@@ -3,9 +3,8 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Generators;
 
-namespace NForza.Cyrus.TypedIds.Generator;
+namespace NForza.Cyrus.Generators.TypedIds;
 
 [Generator]
 public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, IIncrementalGenerator
@@ -53,7 +52,7 @@ public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, IIncrementalG
             _ => throw new NotSupportedException($"Underlying type {underlyingTypeName} is not supported.")
         };
 
-        var model = new 
+        var model = new
         {
             item.Name,
             Namespace = fullyQualifiedNamespace,

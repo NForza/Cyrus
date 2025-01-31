@@ -2,7 +2,6 @@
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.TypedIds.Generator;
 
 namespace NForza.Cyrus.Generators.TypedIds;
 
@@ -50,7 +49,8 @@ public class IntIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
             HasMinimum = min.HasValue,
             Maximum = max,
             HasMaximum = max.HasValue,
-            HasMaximumAndMinumum = min.HasValue && max.HasValue
+            HasMaximumAndMinumum = min.HasValue && max.HasValue,
+            HasMaximumOrMinumum = min.HasValue || max.HasValue
         };
         var source = ScribanEngine.Render("IntId", model);
 

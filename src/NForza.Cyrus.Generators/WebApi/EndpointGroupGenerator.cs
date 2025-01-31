@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.Cqrs.WebApi;
+namespace NForza.Cyrus.Generators.WebApi;
 
 [Generator]
 public class EndpointGroupGenerator : CyrusGeneratorBase, IIncrementalGenerator
@@ -32,7 +32,7 @@ public class EndpointGroupGenerator : CyrusGeneratorBase, IIncrementalGenerator
                 var semanticModel = compilation.GetSemanticModel(classDeclaration.SyntaxTree);
                 var classSymbol = (INamedTypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration)!;
 
-                return (classSymbol);
+                return classSymbol;
             })
             .Where(classSymbol =>
             {
@@ -66,7 +66,7 @@ public class EndpointGroupGenerator : CyrusGeneratorBase, IIncrementalGenerator
             sb.AppendLine($"options.Services.AddEndpointGroup<{classSymbol.ToFullName()}>();");
         }
 
-        var resolvedSource = ScribanEngine.Render("RegisterEndpointGroups", new 
+        var resolvedSource = ScribanEngine.Render("RegisterEndpointGroups", new
         {
             RegisterEndpointGroups = sb.ToString()
         });

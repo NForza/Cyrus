@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SimpleCyrusWebApi.Model;
 
 namespace SimpleCyrusWebApi.Storage;
 

@@ -27,4 +27,8 @@
     <PackageReference Include="Scriban" Version="5.12.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj" />
+  </ItemGroup>
+
 </Project>

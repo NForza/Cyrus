@@ -2,7 +2,6 @@
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.TypedIds.Generator;
 
 namespace NForza.Cyrus.Generators.TypedIds;
 

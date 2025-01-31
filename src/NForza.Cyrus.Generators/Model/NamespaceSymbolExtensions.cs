@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace NForza.Cyrus.Generators.Cqrs.WebApi;
+namespace NForza.Cyrus.Generators.Model;
 
 public static class NamespaceSymbolExtensions
 {

@@ -1,9 +1,8 @@
 ﻿using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Generators;
 
-namespace NForza.Cyrus.TypedIds.Generator;
+namespace NForza.Cyrus.Generators.TypedIds;
 
 [Generator]
 public class IntIdTypeConverterGenerator : TypedIdGeneratorBase, IIncrementalGenerator
@@ -35,7 +34,7 @@ public class IntIdTypeConverterGenerator : TypedIdGeneratorBase, IIncrementalGen
 
     private string GenerateGuidIdTypeConverter(INamedTypeSymbol item)
     {
-        var model = new 
+        var model = new
         {
             item.Name,
             Namespace = item.ContainingNamespace.ToDisplayString()
