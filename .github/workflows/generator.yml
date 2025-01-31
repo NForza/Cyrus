@@ -1,6 +1,7 @@
-name: Build NForza.Cyrus
+name: Build NForza.Cyrus.TypescriptGenerate
 
 on:
+  workflow_dispatch:
   pull_request:
     branches: [ "main" ]
 
