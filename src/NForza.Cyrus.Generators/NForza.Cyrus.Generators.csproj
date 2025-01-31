@@ -33,6 +33,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Model\model-type.sbn" />
+    <EmbeddedResource Include="Model\model-property.sbn" />
     <EmbeddedResource Include="TypedIds\Templates\ServiceCollectionJsonConverterExtensions.sbn" />
     <EmbeddedResource Include="TypedIds\Templates\GuidIdJsonConverter.sbn" />
     <EmbeddedResource Include="TypedIds\Templates\IntIdJsonConverter.sbn" />
@@ -55,8 +57,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Costura.Fody" Version="6.0.0" PrivateAssets='All'/>
-    <PackageReference Include="Fody" Version="6.9.1" PrivateAssets="all"/>
+    <PackageReference Include="Costura.Fody" Version="6.0.0" PrivateAssets="All" />
+    <PackageReference Include="Fody" Version="6.9.1" PrivateAssets="all" />
     <PackageReference Include="ILRepack.MSBuild.Task" Version="2.0.13" PrivateAssets="All" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.11.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />

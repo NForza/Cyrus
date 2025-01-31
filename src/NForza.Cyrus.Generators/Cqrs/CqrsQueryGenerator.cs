@@ -36,7 +36,7 @@ public class CqrsQueryGenerator : CyrusGeneratorBase, IIncrementalGenerator
                     assemblyName,
                     "Queries",
                     "ModelTypeDefinition",
-                    events.Select(qh => ModelGenerator.ForNamedType(qh, compilation)));
+                    events.Select(ModelGenerator.ForNamedType));
                 spc.AddSource($"model-queries.g.cs", SourceText.From(eventModels, Encoding.UTF8));
             }
         });

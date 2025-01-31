@@ -1,32 +1,24 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using System.Linq;
+using Microsoft.CodeAnalysis;
 
 namespace NForza.Cyrus.Generators.Roslyn;
 
 internal static class ITypeSymbolExtensions
 {
-    public static (bool IsMatch, ITypeSymbol? ElementType) IsCollection(this ITypeSymbol typeSymbol, Compilation compilation)
+    private static string[] enumerableTypes = ["System.Collections.Generic.IEnumerable<T>", "System.Collections.Generic.List<T>"];
+
+    public static (bool IsMatch, ITypeSymbol? ElementType) IsCollection(this ITypeSymbol typeSymbol)
     {
         if (typeSymbol is IArrayTypeSymbol arrayTypeSymbol)
         {
             return (true, arrayTypeSymbol.ElementType);
         }
 
-        var enumerableSymbol = compilation.GetTypeByMetadataName("System.Collections.Generic.IEnumerable`1");
-        var listSymbol = compilation.GetTypeByMetadataName("System.Collections.Generic.List`1");
-
-        if (enumerableSymbol == null || listSymbol == null)
-        {
-            return (false, null); 
-        }
-
         if (typeSymbol is INamedTypeSymbol namedTypeSymbol)
         {
-            if (namedTypeSymbol.OriginalDefinition.Equals(enumerableSymbol, SymbolEqualityComparer.Default))
-            {
-                return (true, namedTypeSymbol.TypeArguments[0]);
-            }
-
-            if (namedTypeSymbol.OriginalDefinition.Equals(listSymbol, SymbolEqualityComparer.Default))
+            string constructedFrom = namedTypeSymbol.ConstructedFrom.ToDisplayString();
+            if (enumerableTypes.Contains(constructedFrom))
             {
                 return (true, namedTypeSymbol.TypeArguments[0]);
             }
@@ -35,7 +27,7 @@ internal static class ITypeSymbolExtensions
         return (false, null);
     }
 
-    public static bool IsNullable(this ITypeSymbol typeSymbol, Compilation compilation)
+    public static bool IsNullable(this ITypeSymbol typeSymbol)
     {
         if (typeSymbol.NullableAnnotation == NullableAnnotation.Annotated)
         {
@@ -44,10 +36,33 @@ internal static class ITypeSymbolExtensions
 
         if (typeSymbol is INamedTypeSymbol namedType && namedType.IsValueType)
         {
-            var nullableSymbol = compilation.GetTypeByMetadataName("System.Nullable`1");
-            return namedType.OriginalDefinition.Equals(nullableSymbol, SymbolEqualityComparer.Default);
+            return namedType.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T;
         }
 
         return false;
+    }
+
+    public static string GetTypeAliasOrName(this ITypeSymbol typeSymbol)
+    {
+        if (typeSymbol == null)
+            throw new ArgumentNullException(nameof(typeSymbol));
+
+        string alias = typeSymbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
+
+        string baseTypeName = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        bool baseTypeNameContainsGlobal = baseTypeName.Contains("global::");
+        string typeName = baseTypeName.Replace("global::", "");
+
+        if (!baseTypeNameContainsGlobal)
+        {
+            return baseTypeName;
+        }
+
+        if (alias != typeName)
+        {
+            return alias;
+        }
+
+        return typeSymbol.Name;
     }
 }

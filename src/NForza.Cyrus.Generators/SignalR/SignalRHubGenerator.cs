@@ -67,7 +67,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
                 if (signalRModels.Any())
                 {
                     string assemblyName = signalRModels.First().Symbol.ContainingAssembly.Name;
-                    var commandModels = GetPartialModelClass(assemblyName, "Hubs", "ModelHubDefinition", signalRModels.Select(c => ModelGenerator.ForHub(c, compilation)));
+                    var commandModels = GetPartialModelClass(assemblyName, "Hubs", "ModelHubDefinition", signalRModels.Select(ModelGenerator.ForHub));
                     spc.AddSource($"model-hubs.g.cs", SourceText.From(commandModels, Encoding.UTF8));
                 }
             }
