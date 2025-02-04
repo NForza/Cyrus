@@ -6,8 +6,8 @@ namespace NForza.Cyrus.Cqrs;
 
 public static class CommandDispatcherExtensions
 {
-{{ for t in Types }}
+{% for t in Types %}
        public static Task<CommandResult> Execute(this ICommandDispatcher dispatcher, {{ t }} command, CancellationToken cancellationToken = default) 
         => dispatcher.ExecuteInternalAsync(command, cancellationToken);
-{{ end }}
+{% endfor %}
 }

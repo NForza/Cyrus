@@ -14,7 +14,7 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
 
         var typedIdsCollectionProvider = context.SyntaxProvider
                     .CreateSyntaxProvider(
@@ -58,13 +58,24 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
         var types = typedIds.Select(t => new { Name = t.ToFullName(), UnderlyingType = GetUnderlyingTypeOfTypedId(t) }).ToList();
         var registrations = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<{t.ToDisplayString()}>();"));
 
-        var model = new
+        //var model = new
+        //{
+        //    TypeIds = typedIds,
+        //    Imports = imports,
+        //};
+
+        var model = new Dictionary<string, object>
         {
-            TypeIds = typedIds,
-            Imports = imports,
+            ["Types"] = typedIds.Select(t => new Dictionary<string, object>
+            {
+                ["Name"] = t.ToFullName(),
+                ["UnderlyingType"] = GetUnderlyingTypeOfTypedId(t)
+            }).ToList(),
+
+            ["Imports"] = imports.ToList()
         };
 
-        var source = ScribanEngine.Render("ServiceCollectionJsonConverterExtensions", model);
+        var source = LiquidEngine.Render(model, "ServiceCollectionJsonConverterExtensions");
         return source;
     }
 }

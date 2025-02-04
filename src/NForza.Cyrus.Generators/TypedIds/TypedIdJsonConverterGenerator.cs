@@ -58,7 +58,7 @@ public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, IIncrementalG
             Namespace = fullyQualifiedNamespace,
             GetMethod = getMethodName
         };
-        var source = ScribanEngine.Render(templateName, model);
+        var source = LiquidEngine.Render(model, templateName);
         return source;
     }
 }

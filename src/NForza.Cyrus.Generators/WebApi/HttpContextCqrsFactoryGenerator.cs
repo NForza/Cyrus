@@ -78,7 +78,7 @@ public class HttpContextCqrsFactoryGenerator : CyrusGeneratorBase, IIncrementalG
             return [];
         }
 
-        var types = namespaceSymbol.GetTypeMembers();
+        var types = namespaceSymbol!.GetTypeMembers();
         foreach (var subNamespace in namespaceSymbol.GetNamespaceMembers())
         {
             types = types.AddRange(GetAllTypesRecursively(subNamespace));
@@ -96,10 +96,10 @@ public class HttpContextCqrsFactoryGenerator : CyrusGeneratorBase, IIncrementalG
             source.Append($@"    objectFactories.Add(typeof({queryTypeName}), (ctx) => {GetConstructionExpression(query)}");
         }
         
-        var resolvedSource = ScribanEngine.Render("HttpContextCqrsFactory", new 
+        var resolvedSource = LiquidEngine.Render(new 
         {                                     
             QueryFactoryMethod = source.ToString()
-        });
+        }, "HttpContextCqrsFactory");
 
         return resolvedSource;
     }

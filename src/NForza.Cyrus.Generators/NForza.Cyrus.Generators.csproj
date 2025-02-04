@@ -25,44 +25,58 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs/" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Remove="bin\Debug\netstandard2.0\NForza.Cyrus.Generators.dll" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Model\model-type.sbn" />
-    <EmbeddedResource Include="Model\model-property.sbn" />
-    <EmbeddedResource Include="TypedIds\Templates\ServiceCollectionJsonConverterExtensions.sbn" />
-    <EmbeddedResource Include="TypedIds\Templates\GuidIdJsonConverter.sbn" />
-    <EmbeddedResource Include="TypedIds\Templates\IntIdJsonConverter.sbn" />
-    <EmbeddedResource Include="TypedIds\Templates\StringIdJsonConverter.sbn" />
-    <EmbeddedResource Include="TypedIds\Templates\StringIdTypeConverter.sbn" />
-    <EmbeddedResource Include="TypedIds\Templates\StringId.sbn" />
-    <EmbeddedResource Include="TypedIds\Templates\IntIdTypeConverter.sbn" />
-    <EmbeddedResource Include="TypedIds\Templates\IntId.sbn" />
-    <EmbeddedResource Include="TypedIds\Templates\GuidId.sbn" />
-    <EmbeddedResource Include="TypedIds\Templates\GuidIdTypeConverter.sbn" />
-    <EmbeddedResource Include="Cqrs\Templates\CommandDispatcherExtensions.sbn" />
-    <EmbeddedResource Include="Model\CyrusModel.sbn" />
-    <EmbeddedResource Include="MassTransit\EventConsumers.sbn" />
-    <EmbeddedResource Include="WebApi\Templates\HttpContextCqrsFactory.sbn" />
-    <EmbeddedResource Include="Cqrs\Templates\QueryProcessorExtensions.sbn" />
-    <EmbeddedResource Include="SignalR\Templates\RegisterSignalRHubs.sbn" />
-    <EmbeddedResource Include="WebApi\Templates\RegisterEndpointGroups.sbn" />
-    <EmbeddedResource Include="Cqrs\Templates\CqrsServiceCollectionExtensions.sbn" />
-    <EmbeddedResource Include="SignalR\Templates\SignalRHub.sbn" />
+    <Content Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Model\model-hubquery.liquid" />
+    <EmbeddedResource Include="Model\model-hub.liquid" />
+    <EmbeddedResource Include="Model\model-type.liquid" />
+    <EmbeddedResource Include="Model\model-property.liquid" />
+    <EmbeddedResource Include="TypedIds\Templates\ServiceCollectionJsonConverterExtensions.liquid" />
+    <EmbeddedResource Include="TypedIds\Templates\GuidIdJsonConverter.liquid" />
+    <EmbeddedResource Include="TypedIds\Templates\IntIdJsonConverter.liquid" />
+    <EmbeddedResource Include="TypedIds\Templates\StringIdJsonConverter.liquid" />
+    <EmbeddedResource Include="TypedIds\Templates\StringIdTypeConverter.liquid" />
+    <EmbeddedResource Include="TypedIds\Templates\StringId.liquid" />
+    <EmbeddedResource Include="TypedIds\Templates\IntIdTypeConverter.liquid" />
+    <EmbeddedResource Include="TypedIds\Templates\IntId.liquid" />
+    <EmbeddedResource Include="TypedIds\Templates\GuidId.liquid" />
+    <EmbeddedResource Include="TypedIds\Templates\GuidIdTypeConverter.liquid" />
+    <EmbeddedResource Include="Cqrs\Templates\CommandDispatcherExtensions.liquid" />
+    <EmbeddedResource Include="Model\CyrusModel.liquid" />
+    <EmbeddedResource Include="MassTransit\EventConsumers.liquid" />
+    <EmbeddedResource Include="WebApi\Templates\HttpContextCqrsFactory.liquid" />
+    <EmbeddedResource Include="Cqrs\Templates\QueryProcessorExtensions.liquid" />
+    <EmbeddedResource Include="SignalR\Templates\RegisterSignalRHubs.liquid" />
+    <EmbeddedResource Include="WebApi\Templates\RegisterEndpointGroups.liquid" />
+    <EmbeddedResource Include="Cqrs\Templates\CqrsServiceCollectionExtensions.liquid" />
+    <EmbeddedResource Include="SignalR\Templates\SignalRHub.liquid" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Costura.Fody" Version="6.0.0" PrivateAssets="All" />
     <PackageReference Include="Fody" Version="6.9.1" PrivateAssets="all" />
-    <PackageReference Include="ILRepack.MSBuild.Task" Version="2.0.13" PrivateAssets="All" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.11.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
-    <PackageReference Include="Scriban" Version="5.12.1" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.1" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <ProjectReference Include="..\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj" />
+    <ProjectReference Include="..\NForza.Cyrus.Templating\NForza.Cyrus.Templating.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\dev\Cyrus\src\NForza.Cyrus.Generators\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\dev\Cyrus\src\NForza.Cyrus.Generators\.editorconfig" />
+  </ItemGroup>
+    
 </Project>

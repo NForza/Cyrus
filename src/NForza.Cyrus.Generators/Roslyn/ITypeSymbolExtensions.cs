@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using NForza.Cyrus.Abstractions.Model;
 
 namespace NForza.Cyrus.Generators.Roslyn;
 
@@ -64,5 +66,26 @@ internal static class ITypeSymbolExtensions
         }
 
         return typeSymbol.Name;
+    }
+
+    public static ModelPropertyDefinition[] GetPropertyModels(this ITypeSymbol typeSymbol)
+    {
+        var propertyDeclarations = typeSymbol.GetMembers()
+            .Where(m => !m.IsStatic && m.DeclaredAccessibility == Accessibility.Public && m is IPropertySymbol property)
+            .OfType<IPropertySymbol>()
+            .Select(m =>
+            {
+                string type = m.Type.GetTypeAliasOrName();
+                string name = m.Name;
+                (bool isEnumerable, ITypeSymbol? collectionType) = m.Type.IsCollection();
+                if (isEnumerable)
+                {
+                    type = collectionType!.GetTypeAliasOrName();
+                }
+                bool isNullable = m.Type.IsNullable();
+                var model = new ModelPropertyDefinition(name, type, isEnumerable, isNullable);
+                return model;
+            });
+        return propertyDeclarations.ToArray();
     }
 }

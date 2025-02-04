@@ -40,7 +40,7 @@ public class GuidIdTypeConverterGenerator : TypedIdGeneratorBase, IIncrementalGe
             NamespaceName = item.ContainingNamespace.ToDisplayString()
         };
 
-        string source = ScribanEngine.Render("GuidIdTypeConverter", model);
+        string source = LiquidEngine.Render(model, "GuidIdTypeConverter");
 
         return source;
     }

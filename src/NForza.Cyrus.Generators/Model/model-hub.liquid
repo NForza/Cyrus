@@ -1,0 +1,4 @@
+﻿{{ qry.ReturnType.Name }}
+{% for qry in Queries %}
+	{% include "model-type", type: qry.ReturnType %}
+{% endfor %}

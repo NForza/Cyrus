@@ -40,7 +40,7 @@ public class IntIdTypeConverterGenerator : TypedIdGeneratorBase, IIncrementalGen
             Namespace = item.ContainingNamespace.ToDisplayString()
         };
 
-        string source = ScribanEngine.Render("IntIdTypeConverter", model);
+        string source = LiquidEngine.Render(model, "IntIdTypeConverter");
 
         return source;
     }

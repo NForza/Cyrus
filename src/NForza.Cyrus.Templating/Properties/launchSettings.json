@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "liquid.test": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

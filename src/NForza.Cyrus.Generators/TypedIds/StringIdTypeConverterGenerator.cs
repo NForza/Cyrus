@@ -39,7 +39,7 @@ public class StringIdTypeConverterGenerator : TypedIdGeneratorBase, IIncremental
             item.Name,
             Namespace = fullyQualifiedNamespace
         };
-        var resolvedSource = ScribanEngine.Render("StringIdTypeConverter", model);
+        var resolvedSource = LiquidEngine.Render(model, "StringIdTypeConverter");
         return resolvedSource;
     }
 }

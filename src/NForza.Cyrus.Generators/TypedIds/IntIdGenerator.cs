@@ -52,7 +52,7 @@ public class IntIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
             HasMaximumAndMinumum = min.HasValue && max.HasValue,
             HasMaximumOrMinumum = min.HasValue || max.HasValue
         };
-        var source = ScribanEngine.Render("IntId", model);
+        var source = LiquidEngine.Render(model, "IntId");
 
         return source;
     }

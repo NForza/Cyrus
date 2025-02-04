@@ -2,8 +2,13 @@
 <Weavers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FodyWeavers.xsd">
   <Costura>
     <IncludeAssemblies>
-      Scriban
+      NForza.Cyrus.Templating
+      Fluid
+      Microsoft.Extensions.FileProviders.Abstractions
+      Microsoft.Extensions.Primitives
+      System.Text.Encodings.Web
+      Parlot
+      NForza.Cyrus.Abstractions
     </IncludeAssemblies>
-    <DisableCompression>true</DisableCompression>
   </Costura>
 </Weavers>

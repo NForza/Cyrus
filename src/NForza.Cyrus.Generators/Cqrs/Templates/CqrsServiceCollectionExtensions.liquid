@@ -4,9 +4,9 @@ using Microsoft.Extensions.DependencyModel;
 using NForza.Cyrus.WebApi.Policies;
 using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Abstractions.Model;
-{{ for i in Imports }}
+{% for i in Imports %}
 using {{ i }};
-{{ end }}
+{% endfor %}
 
 namespace NForza.Cyrus.Cqrs;
 

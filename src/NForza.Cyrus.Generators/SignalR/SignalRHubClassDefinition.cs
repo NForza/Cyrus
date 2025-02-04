@@ -84,13 +84,14 @@ internal record SignalRHubClassDefinition
             (bool isCollection, ITypeSymbol? collectionType) = returnType?.IsCollection() ?? (false, null);
             var isNullable = returnType?.IsNullable();
             ITypeSymbol? queryReturnType = isCollection ? collectionType : returnType;
+            var propertyModelsOfReturnType = queryReturnType!.GetPropertyModels();
             return
                 new SignalRQuery
                 {
                     MethodName = genericArg.GetText().ToString(),
                     Name = symbol.Name,
                     FullTypeName = symbol.ToFullName(),
-                    ReturnType = new(queryReturnType, isCollection, isNullable ?? false)
+                    ReturnType = new(queryReturnType!.Name, propertyModelsOfReturnType, isCollection, isNullable ?? false, [])
                 };
         });
     }

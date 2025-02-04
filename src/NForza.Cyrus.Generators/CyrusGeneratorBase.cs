@@ -3,14 +3,26 @@
 using System.Diagnostics;
 #endif
 using System.Linq;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NForza.Cyrus.Generators.Config;
+using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators;
 
 public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
 {
+    private LiquidEngine? liquidEngine = null;  
+    protected LiquidEngine LiquidEngine 
+    { 
+        get
+        {
+            liquidEngine ??= new LiquidEngine(Assembly.GetExecutingAssembly());
+            return liquidEngine;
+        }
+    } 
+
     protected IncrementalValueProvider<GenerationConfig> ConfigProvider(IncrementalGeneratorInitializationContext context)
     {
         var configProvider = context.SyntaxProvider
@@ -183,7 +195,7 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
             PropertyType = propertyType,
             Properties = string.Join(",", propertyValues)
         };
-        var source = ScribanEngine.Render("CyrusModel", model);
+        var source = LiquidEngine.Render(model, "CyrusModel");
         return source;
     }
 

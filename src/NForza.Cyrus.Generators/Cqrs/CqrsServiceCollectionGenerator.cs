@@ -71,7 +71,7 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
             RegisterEventBus = eventBusRegistration,
         };
 
-        var resolvedSource = ScribanEngine.Render("CqrsServiceCollectionExtensions", model);
+        var resolvedSource = LiquidEngine.Render(model, "CqrsServiceCollectionExtensions");
         return resolvedSource;
     }
 

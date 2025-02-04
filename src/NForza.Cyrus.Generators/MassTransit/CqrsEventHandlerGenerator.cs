@@ -53,7 +53,7 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase, IIncrementalGene
             Consumers = handlers.Select(h => new { h.Parameters[0].Type.Name, FullName = h.Parameters[0].Type.ToFullName() })
         };
 
-        var resolvedSource = ScribanEngine.Render("EventConsumers", model);
+        var resolvedSource = LiquidEngine.Render(model, "EventConsumers");
 
         return resolvedSource;
     }
