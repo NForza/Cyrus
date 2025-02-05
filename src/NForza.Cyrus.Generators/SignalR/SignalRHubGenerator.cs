@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
+using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.SignalR;
 
@@ -61,13 +62,13 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
 
                 foreach (var signalRModel in signalRModels)
                 {
-                    var sourceText = GenerateSignalRHub(signalRModel);
+                    var sourceText = GenerateSignalRHub(signalRModel, LiquidEngine);
                     spc.AddSource($"{signalRModel.Symbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
                 }
                 if (signalRModels.Any())
                 {
                     string assemblyName = signalRModels.First().Symbol.ContainingAssembly.Name;
-                    var commandModels = GetPartialModelClass(assemblyName, "Hubs", "ModelHubDefinition", signalRModels.Select(c => ModelGenerator.ForHub(c, compilation)));
+                    var commandModels = GetPartialModelClass(assemblyName, "Hubs", "ModelHubDefinition", signalRModels.Select(e => ModelGenerator.ForHub(e, LiquidEngine)));
                     spc.AddSource($"model-hubs.g.cs", SourceText.From(commandModels, Encoding.UTF8));
                 }
             }
@@ -94,19 +95,19 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
             QueryMethods = ""
         };
 
-        var source = ScribanEngine.Render("RegisterSignalRHubs", model);
+        var source = LiquidEngine.Render(model, "RegisterSignalRHubs");
 
         return source;
     }
 
-    private string GenerateSignalRHub(SignalRHubClassDefinition classDefinition)
+    private string GenerateSignalRHub(SignalRHubClassDefinition classDefinition, LiquidEngine liquidEngine)
     {
 
         //this needs to be moved to the template
         string commands = GenerateCommands(classDefinition.Commands);
         string queries = GenerateQueries(classDefinition.Queries);
 
-        var replacements = new
+        var model = new
         {
             classDefinition.Symbol.Name,
             Namespace = classDefinition.Symbol.ContainingNamespace.ToDisplayString(),
@@ -114,7 +115,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
             QueryMethods = queries,
         };
 
-        var source = ScribanEngine.Render("SignalRHub", replacements);
+        var source = liquidEngine.Render(model, "SignalRHub");
 
         return source;
     }

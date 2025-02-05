@@ -14,7 +14,7 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
 
         var configProvider = ConfigProvider(context);
 
@@ -54,7 +54,7 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
                 }
 
                 string assemblyName = recordSymbols.First().ContainingAssembly.Name;
-                var commandModels = GetPartialModelClass(assemblyName, "Commands", "ModelTypeDefinition", recordSymbols.Select(cm => ModelGenerator.ForNamedType((INamedTypeSymbol)cm.Parameters[0].Type, compilation)));
+                var commandModels = GetPartialModelClass(assemblyName, "Commands", "ModelTypeDefinition", recordSymbols.Select(cm => ModelGenerator.ForNamedType((INamedTypeSymbol)cm.Parameters[0].Type, LiquidEngine)));
                 spc.AddSource($"model-commands.g.cs", SourceText.From(commandModels, Encoding.UTF8));
             }
         });
@@ -73,7 +73,7 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
             Types = handlers.Select(h => h.Parameters[0].Type.ToFullName()).ToList()
         };
 
-        var resolvedSource = ScribanEngine.Render("CommandDispatcherExtensions", model);
+        var resolvedSource = LiquidEngine.Render(model, "CommandDispatcherExtensions");
 
         return resolvedSource.ToString();
     }

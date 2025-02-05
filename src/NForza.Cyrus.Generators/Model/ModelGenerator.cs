@@ -1,76 +1,36 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Generators.SignalR;
+using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.Model;
 
 internal class ModelGenerator
 {
-    internal static string ForHub(SignalRHubClassDefinition signalRHub, Compilation compilation)
+    internal static string ForHub(SignalRHubClassDefinition signalRHub, LiquidEngine liquidEngine)
     {
-        var commands = signalRHub.Commands.Select(c => $"\"{c.Name}\"");
-        var commandsAsString = string.Join(",", commands);
+        var model = new
+        {
+            signalRHub.Name,
+            signalRHub.Path,
+            signalRHub.Commands,
+            signalRHub.Queries,
+            signalRHub.Events
+        };
 
-        var events = signalRHub.Events.Select(e => $"\"{e.Name}\"");
-        var eventsAsString = string.Join(",", events);
-
-        var queryReturnTypes = signalRHub.Queries.Select(q => q.ReturnType.Type).Distinct(SymbolEqualityComparer.IncludeNullability).OfType<INamedTypeSymbol>();
-        var queryReturnTypeProperties = string.Join(",", queryReturnTypes.Select(t => GetPropertiesDeclaration(t, compilation)));
-        var queries = signalRHub.Queries.Select(c => $"new ModelQueryDefinition(\"{c.Name}\", new ModelTypeDefinition(\"{c.ReturnType.Type?.Name ?? null}\", [{queryReturnTypeProperties}], {c.ReturnType.Type?.IsCollection(compilation).IsMatch.ToString().ToLower()?? "false"}, {c.ReturnType.Type?.IsNullable(compilation).ToString().ToLower() ?? "false"}, []))");
-        var queriesAsString = string.Join(",", queries);
-
-        return $"new ModelHubDefinition(\"{signalRHub.Name}\", {signalRHub.Path} ,[{commandsAsString}], [{queriesAsString}], [{eventsAsString}])";
+        return liquidEngine.Render(model, "model-hub");
     }
 
-    internal static string ForNamedType(INamedTypeSymbol namedType, Compilation compilation)
+    internal static string ForNamedType(INamedTypeSymbol namedType, LiquidEngine liquidEngine)
     {
-        string properties = GetPropertiesDeclaration(namedType, compilation);
-        return $"new ModelTypeDefinition(\"{namedType.Name}\", [{properties}], {namedType.IsCollection(compilation).IsMatch.ToString().ToLower()}, {namedType.IsNullable(compilation).ToString().ToLower()}, [])";
+        string properties = GetPropertiesDeclaration(namedType, liquidEngine);
+        return $"new ModelTypeDefinition(\"{namedType.Name}\", [{properties}], {namedType.IsCollection().IsMatch.ToString().ToLower()}, {namedType.IsNullable().ToString().ToLower()}, [])";
     }
 
-    private static string GetPropertiesDeclaration(INamedTypeSymbol namedType, Compilation compilation)
+    private static string GetPropertiesDeclaration(INamedTypeSymbol namedType, LiquidEngine liquidEngine)
     {
-        var propertyDeclarations = namedType.GetMembers()
-            .Where(m => !m.IsStatic && m.DeclaredAccessibility == Accessibility.Public && m is IPropertySymbol property)
-            .OfType<IPropertySymbol>()
-            .Select(m =>
-            {
-                string type = GetTypeAliasOrName(m.Type);
-                string name = m.Name;
-                (bool isEnumerable, ITypeSymbol? collectionType) = m.Type.IsCollection(compilation);
-                if (isEnumerable)
-                {
-                    type = GetTypeAliasOrName(collectionType!);
-                }
-                bool isNullable = m.Type.IsNullable(compilation);
-                return $"new ModelPropertyDefinition(\"{name}\", \"{type}\", {isEnumerable.ToString().ToLowerInvariant()}, {isNullable.ToString().ToLowerInvariant()})";
-            });
+        var propertyDeclarations = namedType.GetPropertyModels().Select(m => liquidEngine.Render(new { property = m }, "model-property"));
         return string.Join(",", propertyDeclarations);
-    }
-
-    public static string GetTypeAliasOrName(ITypeSymbol typeSymbol)
-    {
-        if (typeSymbol == null)
-            throw new ArgumentNullException(nameof(typeSymbol));
-
-        string alias = typeSymbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
-
-        string baseTypeName = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-        bool baseTypeNameContainsGlobal = baseTypeName.Contains("global::");
-        string typeName = baseTypeName.Replace("global::", "");
-
-        if (!baseTypeNameContainsGlobal)
-        {
-            return baseTypeName;
-        }
-
-        if (alias != typeName)
-        {
-            return alias;
-        }
-
-        return typeSymbol.Name;
     }
 }

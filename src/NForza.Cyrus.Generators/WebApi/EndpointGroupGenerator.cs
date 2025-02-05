@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
+using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.WebApi;
 
@@ -66,10 +67,10 @@ public class EndpointGroupGenerator : CyrusGeneratorBase, IIncrementalGenerator
             sb.AppendLine($"options.Services.AddEndpointGroup<{classSymbol.ToFullName()}>();");
         }
 
-        var resolvedSource = ScribanEngine.Render("RegisterEndpointGroups", new
+        var resolvedSource = LiquidEngine.Render(new
         {
             RegisterEndpointGroups = sb.ToString()
-        });
+        }, "RegisterEndpointGroups");
 
         return resolvedSource;
     }

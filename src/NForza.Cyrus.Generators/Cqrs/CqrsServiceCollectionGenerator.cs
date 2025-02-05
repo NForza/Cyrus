@@ -71,7 +71,7 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
             RegisterEventBus = eventBusRegistration,
         };
 
-        var resolvedSource = ScribanEngine.Render("CqrsServiceCollectionExtensions", model);
+        var resolvedSource = LiquidEngine.Render(model, "CqrsServiceCollectionExtensions");
         return resolvedSource;
     }
 
@@ -139,11 +139,11 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
             var returnType = (INamedTypeSymbol)handler.ReturnType;
             var returnTypeFullName = returnType?.ToFullName();
             var handlerName = $"{typeSymbol.Name}.{handler.Name}({handler.Parameters[0].Type.Name})";
-            var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
+            var isAsync = returnType?.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default) ?? false;
             if (isAsync)
             {
-                returnType = returnType.TypeArguments[0] as INamedTypeSymbol;
-                returnTypeFullName = returnType?.ToFullName();
+                var realReturnType = returnType!.TypeArguments[0];
+                returnTypeFullName = realReturnType?.ToFullName();
                 if (handler.IsStatic)
                 {
                     source.Append($@"

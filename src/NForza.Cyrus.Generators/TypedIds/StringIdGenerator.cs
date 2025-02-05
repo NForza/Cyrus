@@ -51,7 +51,7 @@ public class StringIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
             HasMaximumAndMinumum = min.HasValue && max.HasValue
         };
 
-        var resolvedSource = ScribanEngine.Render("StringId", model);
+        var resolvedSource = LiquidEngine.Render(model, "StringId");
 
         return resolvedSource;
     }

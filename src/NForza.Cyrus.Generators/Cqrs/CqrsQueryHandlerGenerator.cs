@@ -69,7 +69,7 @@ public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerat
             }).ToList()
         };
 
-        var resolvedSource = ScribanEngine.Render("QueryProcessorExtensions", model);
+        var resolvedSource = LiquidEngine.Render(model, "QueryProcessorExtensions");
 
         return resolvedSource;
     }

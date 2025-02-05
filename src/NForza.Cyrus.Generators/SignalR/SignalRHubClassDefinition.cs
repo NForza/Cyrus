@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NForza.Cyrus.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Generators.SignalR;
@@ -81,16 +80,17 @@ internal record SignalRHubClassDefinition
         {
             var symbol = (ITypeSymbol)SemanticModel.GetSymbolInfo(genericArg).Symbol!;
             ITypeSymbol returnType = GetReturnTypeOfQuery(symbol) ?? throw new InvalidCastException("Can't find return type for " + symbol.ToFullName());
-            (bool isCollection, ITypeSymbol? collectionType) = returnType?.IsCollection(SemanticModel.Compilation) ?? (false, null);
-            var isNullable = returnType?.IsNullable(SemanticModel.Compilation);
+            (bool isCollection, ITypeSymbol? collectionType) = returnType?.IsCollection() ?? (false, null);
+            var isNullable = returnType?.IsNullable();
             ITypeSymbol? queryReturnType = isCollection ? collectionType : returnType;
+            var propertyModelsOfReturnType = queryReturnType!.GetPropertyModels();
             return
                 new SignalRQuery
                 {
                     MethodName = genericArg.GetText().ToString(),
                     Name = symbol.Name,
                     FullTypeName = symbol.ToFullName(),
-                    ReturnType = new(queryReturnType, isCollection, isNullable ?? false)
+                    ReturnType = new(queryReturnType!.Name, propertyModelsOfReturnType, isCollection, isNullable ?? false, [])
                 };
         });
     }

@@ -2,6 +2,7 @@
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.TypedIds;
 
@@ -52,16 +53,8 @@ public class GuidIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
           Default = "Guid.Empty"
         };
 
-        var source = ScribanEngine.Render("GuidId", model);
+        var source = LiquidEngine.Render(model, "GuidId");
 
         return source;
     }
-
-    private string GenerateCastOperatorsToUnderlyingType(INamedTypeSymbol item) =>
-        @$"public static implicit operator {GetUnderlyingTypeOfTypedId(item)}({item.ToDisplayString()} typedId) => typedId.Value;
-    public static explicit operator {item.ToDisplayString()}({GetUnderlyingTypeOfTypedId(item)} value) => new(value);";
-
-    string GenerateConstructors(INamedTypeSymbol item) =>
-        $@"public {item.Name}(): this(Guid.NewGuid()) {{}}
-    public {item.Name}(string guid): this(Guid.Parse(guid)) {{}}";
 }

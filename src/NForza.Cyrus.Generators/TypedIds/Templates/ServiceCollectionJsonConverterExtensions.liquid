@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NForza.Cyrus.Cqrs;
 using System.Text.Json.Serialization;
-{{for i in imports }} 
+{% for i in Imports %} 
 using {{ i }};
-{{end}}
+{% endfor %}
 
 namespace NForza.Cyrus.Abstractions;
 
@@ -11,16 +11,16 @@ public static class ServiceCollectionJsonConverterExtensions
 {
     public static IServiceCollection AddJsonConverters(this IServiceCollection services)
     {
-{{ for t in Types }}        
+{% for t in Types %}        
   services.AddTransient<JsonConverter, {{ t.Name }}JsonConverter>();
-{{ end }}
+{% endfor %}
         return services;
     }
 
     private static Dictionary<Type, Type> allTypes = new() {
-        {{ for t in Types }}        
-        [typeof({{ t.Name }})] = typeof({{ t.UnderlyingType }})"));
-        {{ end }}
+        {% for t in Types %}        
+        [typeof({{ t.Name }})] = typeof({{ t.UnderlyingType }}){% unless forloop.last %}, {% endunless -%}
+        {% endfor %}
     };
 
     public static CyrusOptions AddTypedIdSerializers(this CyrusOptions options)
