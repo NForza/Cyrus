@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace NForza.Cyrus.Generators.Model;
+namespace NForza.Cyrus.Generators.Roslyn;
 
 public static class NamespaceSymbolExtensions
 {

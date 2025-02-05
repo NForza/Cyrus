@@ -1,4 +1,17 @@
-﻿{{ qry.ReturnType.Name }}
-{% for qry in Queries %}
-	{% include "model-type", type: qry.ReturnType %}
-{% endfor %}
+﻿new ModelHubDefinition("{{ Name }}", {{ Path }}, 
+  [
+	{%- for c in Commands -%}
+	  "{{ c.Name }}"{% unless forloop.last %}, {% endunless -%}
+	{%- endfor -%}
+  ],
+  [
+  	{% for q in Queries -%}
+	  {% include "model-hubquery", query: q %}{% unless forloop.last %}, {% endunless -%}
+	{%- endfor %}
+  ],
+  [
+  	{%- for e in Events -%}
+	  "{{ e.Name }}"{% unless forloop.last %}, {% endunless -%}
+	{%- endfor -%}
+	]
+  )

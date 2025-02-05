@@ -30,7 +30,7 @@ internal class ModelGenerator
 
     private static string GetPropertiesDeclaration(INamedTypeSymbol namedType, LiquidEngine liquidEngine)
     {
-        var propertyDeclarations = namedType.GetPropertyModels().Select(m => liquidEngine.Render(m, "model-property"));
+        var propertyDeclarations = namedType.GetPropertyModels().Select(m => liquidEngine.Render(new { property = m }, "model-property"));
         return string.Join(",", propertyDeclarations);
     }
 }
