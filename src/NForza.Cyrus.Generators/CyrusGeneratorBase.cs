@@ -7,13 +7,14 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NForza.Cyrus.Generators.Config;
+using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators;
 
 public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
 {
-    private LiquidEngine? liquidEngine = null;  
+    private static LiquidEngine? liquidEngine = null;  
     protected LiquidEngine LiquidEngine 
     { 
         get
@@ -28,78 +29,10 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
         var configProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: (syntaxNode, _) => syntaxNode is ClassDeclarationSyntax classDeclaration && classDeclaration.Identifier.Text == "CyrusConfiguration",
-                transform: (context, _) => GetConfigFromClass((ClassDeclarationSyntax)context.Node))
+                transform: (context, _) => ((ClassDeclarationSyntax)context.Node).GetConfigFromClass())
             .Collect()
-            .Select((cfgs, _) =>
-            {
-                var cfg = cfgs.FirstOrDefault() ?? new GenerationConfig();
-                if (!cfg.GenerationTarget.Any())
-                    cfg.GenerationTarget.AddRange([GenerationTarget.Domain, GenerationTarget.WebApi, GenerationTarget.Contracts]);
-                return cfg;
-            });
+            .Select((cfgs, _) => cfgs.First());
         return configProvider;
-    }
-
-    private GenerationConfig GetConfigFromClass(ClassDeclarationSyntax classDeclarationSyntax)
-    {
-        var result = new GenerationConfig();
-
-        var constructorSyntax = classDeclarationSyntax.DescendantNodes()
-            .OfType<ConstructorDeclarationSyntax>()
-            .Where(constructorDeclarationSyntax => constructorDeclarationSyntax.Body != null)
-            .FirstOrDefault();
-
-        if (constructorSyntax != null)
-        {
-            var methodCalls = constructorSyntax.Body!.DescendantNodes().OfType<InvocationExpressionSyntax>();
-
-            foreach (var methodCall in methodCalls)
-            {
-                var methodName = methodCall.Expression.ToString();
-
-                switch (methodName)
-                {
-                    case "UseMassTransit":
-                        result.EventBus = "MassTransit";
-                        break;
-                    case "GenerateContracts":
-                        result.GenerationTarget.Add(GenerationTarget.Contracts);
-                        break;
-                    case "GenerateDomain":
-                        result.GenerationTarget.Add(GenerationTarget.Domain);
-                        break;
-                    case "GenerateWebApi":
-                        result.GenerationTarget.Add(GenerationTarget.WebApi);
-                        break;
-                    case "UseContractsFromAssembliesContaining":
-                        result.Contracts =
-                                [.. methodCall.ArgumentList.Arguments
-                                    .Select(argument => argument.Expression as LiteralExpressionSyntax)
-                                    .Where(literal => literal != null)
-                                    .Select(literal => literal!.Token.ValueText)];
-                        break;
-                }
-            }
-        }
-        return result;
-    }
-
-    protected IEnumerable<INamedTypeSymbol> GetAllTypes(INamespaceSymbol namespaceSymbol)
-    {
-        foreach (var member in namespaceSymbol.GetMembers())
-        {
-            if (member is INamespaceSymbol nestedNamespace)
-            {
-                foreach (var nestedType in GetAllTypes(nestedNamespace))
-                {
-                    yield return nestedType;
-                }
-            }
-            else if (member is INamedTypeSymbol namedType)
-            {
-                yield return namedType;
-            }
-        }
     }
 
     public virtual void Initialize(IncrementalGeneratorInitializationContext context) { }
