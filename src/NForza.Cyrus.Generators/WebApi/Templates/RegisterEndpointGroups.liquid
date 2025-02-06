@@ -20,6 +20,6 @@ public static class AddEndpointGroupExtensions
         {% for epg in EndpointGroupNames %}
             options.Services.AddEndpointGroup<{{ epg }}>();
         {% endfor %}
-        return options.AddCqrsEndpoints();
+        return options.AddMessagingServices().AddCqrsEndpoints();
     }
 }
