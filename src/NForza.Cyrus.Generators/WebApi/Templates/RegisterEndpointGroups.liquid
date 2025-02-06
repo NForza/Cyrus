@@ -17,9 +17,9 @@ public static class AddEndpointGroupExtensions
 
     public static CyrusOptions AddEndpointGroups(this CyrusOptions options)
     {
-        {{ RegisterEndpointGroups }}
-        options.AddMessagingServices().AddTypedIdSerializers();
-
-        return options.AddCqrsEndpoints();
+        {% for epg in EndpointGroupNames %}
+            options.Services.AddEndpointGroup<{{ epg }}>();
+        {% endfor %}
+        return options.AddMessagingServices().AddCqrsEndpoints();
     }
 }

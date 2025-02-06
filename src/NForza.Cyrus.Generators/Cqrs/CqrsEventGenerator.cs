@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Model;
+using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Generators.Cqrs;
 
@@ -16,8 +17,8 @@ public class CqrsEventGenerator : CyrusGeneratorBase, IIncrementalGenerator
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => IsEvent(syntaxNode),
-                transform: (context, _) => GetRecordSymbolFromContext(context));
+                predicate: (syntaxNode, _) => syntaxNode.IsEvent(),
+                transform: (context, _) => context.GetRecordSymbolFromContext());
 
         var allEventsProvider = incrementalValuesProvider.Combine(configProvider)
             .Where(x => x.Left is not null)

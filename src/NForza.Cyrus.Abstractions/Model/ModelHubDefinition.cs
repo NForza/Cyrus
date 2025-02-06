@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace NForza.Cyrus.Abstractions.Model
 {
@@ -17,5 +18,6 @@ namespace NForza.Cyrus.Abstractions.Model
         public IEnumerable<string> Commands { get; }
         public IEnumerable<ModelQueryDefinition> Queries { get; }
         public IEnumerable<string> Events { get; }
+        public IEnumerable<ModelTypeDefinition> SupportTypes => Queries.SelectMany(q => q.ReturnType.SupportTypes);
     }
 }

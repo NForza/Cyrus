@@ -1,5 +1,8 @@
-﻿namespace SimpleCyrusWebApi.NewCustomer;
+﻿using NForza.Cyrus.Abstractions;
 
+namespace SimpleCyrusWebApi.NewCustomer;
+
+[Command]
 public record struct NewCustomerCommand
 {
     public CustomerId Id { get; set; }

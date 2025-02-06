@@ -15,28 +15,23 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase, IIncrementalGene
         DebugThisGenerator(false);
         var configProvider = ConfigProvider(context);
 
-        var incrementalValuesProvider = context.SyntaxProvider
+        var eventHandlersProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => CouldBeEventHandler(syntaxNode),
-                transform: (context, _) => GetMethodSymbolFromContext(context));
+                predicate: (syntaxNode, _) => syntaxNode.IsEventHandler(),
+                transform: (context, _) => context.GetMethodSymbolFromContext());
 
-        var allEventHandlersProvider = incrementalValuesProvider.Combine(configProvider)
-            .Where(x =>
-            {
-                var (methodNode, config) = x;
-                return IsEventHandler(methodNode, config.Events.HandlerName, config.Events.Suffix);
-            })
+        var eentHandlersWithConfigProvider = eventHandlersProvider.Combine(configProvider)
             .Select((x, _) => x.Left!)
             .Collect();
 
-        var combinedProvider = allEventHandlersProvider.Combine(context.CompilationProvider).Combine(configProvider);
+        var combinedProvider = eentHandlersWithConfigProvider.Combine(context.CompilationProvider).Combine(configProvider);
 
         context.RegisterSourceOutput(combinedProvider, (spc, eventHandlersWithCompilation) =>
         {
             var ((queryHandlers, compilation), config) = eventHandlersWithCompilation;
             if (queryHandlers.Any())
             {
-                if (config.Events.Bus == "MassTransit")
+                if (config.EventBus == "MassTransit")
                 {
                     var sourceText = GenerateEventConsumers(queryHandlers);
                     spc.AddSource($"EventConsumers.g.cs", SourceText.From(sourceText, Encoding.UTF8));
