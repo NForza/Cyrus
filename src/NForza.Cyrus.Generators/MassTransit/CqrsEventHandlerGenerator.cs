@@ -15,16 +15,16 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase, IIncrementalGene
         DebugThisGenerator(false);
         var configProvider = ConfigProvider(context);
 
-        var incrementalValuesProvider = context.SyntaxProvider
+        var eventHandlersProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: (syntaxNode, _) => syntaxNode.IsEventHandler(),
-                transform: (context, _) => GetMethodSymbolFromContext(context));
+                transform: (context, _) => context.GetMethodSymbolFromContext());
 
-        var allEventHandlersProvider = incrementalValuesProvider.Combine(configProvider)
+        var eentHandlersWithConfigProvider = eventHandlersProvider.Combine(configProvider)
             .Select((x, _) => x.Left!)
             .Collect();
 
-        var combinedProvider = allEventHandlersProvider.Combine(context.CompilationProvider).Combine(configProvider);
+        var combinedProvider = eentHandlersWithConfigProvider.Combine(context.CompilationProvider).Combine(configProvider);
 
         context.RegisterSourceOutput(combinedProvider, (spc, eventHandlersWithCompilation) =>
         {

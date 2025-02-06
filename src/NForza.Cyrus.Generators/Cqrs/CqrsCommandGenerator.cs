@@ -19,7 +19,7 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
         var commandHandlerProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: (syntaxNode, _) => syntaxNode.IsCommandHandler(),
-                transform: (context, _) => GetMethodSymbolFromContext(context));
+                transform: (context, _) => context.GetMethodSymbolFromContext());
 
         var configProvider = ConfigProvider(context);
         var recordStructsWithAttribute = commandHandlerProvider.Combine(configProvider)

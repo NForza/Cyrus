@@ -48,43 +48,6 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
         };
     }
 
-    protected IMethodSymbol? GetMethodSymbolFromContext(GeneratorSyntaxContext context)
-    {
-        var recordStruct = (MethodDeclarationSyntax)context.Node;
-        var model = context.SemanticModel;
-
-        var symbol = model.GetDeclaredSymbol(recordStruct) as IMethodSymbol;
-        return symbol;
-    }
-
-    protected INamedTypeSymbol? GetClassSymbolFromContext(GeneratorSyntaxContext context)
-    {
-        var classDeclarationSyntax = (ClassDeclarationSyntax)context.Node;
-        var model = context.SemanticModel;
-
-        var symbol = model.GetDeclaredSymbol(classDeclarationSyntax) as INamedTypeSymbol;
-        return symbol;
-    }
-
-    protected INamedTypeSymbol? GetRecordSymbolFromContext(GeneratorSyntaxContext context)
-    {
-        var classDeclarationSyntax = (RecordDeclarationSyntax)context.Node;
-        var model = context.SemanticModel;
-
-        var symbol = model.GetDeclaredSymbol(classDeclarationSyntax) as INamedTypeSymbol;
-        return symbol;
-    }
-
-
-    protected static bool IsDirectlyDerivedFrom(
-        INamedTypeSymbol classSymbol,
-        string fullyQualifiedBaseClassName)
-    {
-        var baseType = classSymbol.BaseType;
-
-        return baseType?.ToDisplayString() == fullyQualifiedBaseClassName;
-    }
-
     public string GetPartialModelClass(string assemblyName, string propertyName, string propertyType, IEnumerable<string> propertyValues)
     {
         var model = new 

@@ -17,7 +17,7 @@ public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerat
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: (syntaxNode, _) => syntaxNode.IsQueryHandler(),
-                transform: (context, _) => GetMethodSymbolFromContext(context));
+                transform: (context, _) => context.GetMethodSymbolFromContext());
 
         var allQueryHandlersProvider = incrementalValuesProvider
             .Where(x => x is not null)

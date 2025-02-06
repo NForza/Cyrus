@@ -35,12 +35,7 @@ public class EndpointGroupGenerator : CyrusGeneratorBase, IIncrementalGenerator
 
                 return classSymbol;
             })
-            .Where(classSymbol =>
-            {
-                return classSymbol is not null
-                       &&
-                       IsDirectlyDerivedFrom(classSymbol, "NForza.Cyrus.WebApi.EndpointGroup");
-            })
+            .Where(classSymbol => classSymbol.IsDirectlyDerivedFrom("NForza.Cyrus.WebApi.EndpointGroup"))
             .Collect();
 
         var endpointGroupModelsAndConfigurationProvider = endpointGroupModelProvider.Combine(configurationProvider);
@@ -61,15 +56,9 @@ public class EndpointGroupGenerator : CyrusGeneratorBase, IIncrementalGenerator
 
     private string GenerateEndpointGroupDeclarations(IEnumerable<INamedTypeSymbol> classSymbols)
     {
-        var sb = new StringBuilder();
-        foreach (var classSymbol in classSymbols)
-        {
-            sb.AppendLine($"options.Services.AddEndpointGroup<{classSymbol.ToFullName()}>();");
-        }
-
         var resolvedSource = LiquidEngine.Render(new
         {
-            RegisterEndpointGroups = sb.ToString()
+            EndpointGroupNames = classSymbols.Select(x => x.ToFullName()),
         }, "RegisterEndpointGroups");
 
         return resolvedSource;

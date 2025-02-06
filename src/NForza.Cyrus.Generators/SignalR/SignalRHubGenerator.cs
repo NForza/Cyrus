@@ -38,12 +38,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
                 SignalRHubClassDefinition definition = new SignalRHubClassDefinition(classDeclaration, classSymbol, semanticModel);
                 return definition;
             })
-            .Where(signalRHubClassDefinition =>
-            {
-                return signalRHubClassDefinition.Symbol is not null
-                       &&
-                       IsDirectlyDerivedFrom(signalRHubClassDefinition.Symbol, "NForza.Cyrus.SignalR.SignalRHub");
-            })
+            .Where(signalRHubClassDefinition => signalRHubClassDefinition.Symbol.IsDirectlyDerivedFrom("NForza.Cyrus.SignalR.SignalRHub"))
             .Select((signalRHubClassDefinition, _) => signalRHubClassDefinition.Initialize())
             .Collect();
 

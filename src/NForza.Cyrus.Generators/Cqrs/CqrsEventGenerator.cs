@@ -18,7 +18,7 @@ public class CqrsEventGenerator : CyrusGeneratorBase, IIncrementalGenerator
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: (syntaxNode, _) => syntaxNode.IsEvent(),
-                transform: (context, _) => GetRecordSymbolFromContext(context));
+                transform: (context, _) => context.GetRecordSymbolFromContext());
 
         var allEventsProvider = incrementalValuesProvider.Combine(configProvider)
             .Where(x => x.Left is not null)
