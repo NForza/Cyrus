@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Model;
+using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Generators.Cqrs;
 
@@ -11,32 +12,31 @@ public class CqrsQueryGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
-        var configProvider = ConfigProvider(context);
+        DebugThisGenerator(true);
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => IsQuery(syntaxNode),
+                predicate: (syntaxNode, _) => syntaxNode.IsQuery(),
                 transform: (context, _) => GetRecordSymbolFromContext(context));
 
-        var allEventsProvider = incrementalValuesProvider.Combine(configProvider)
-            .Where(x => x.Left is not null)
-            .Select((x, _) => x.Left!)
+        var allQueriesProvider = incrementalValuesProvider
+            .Where(x => x is not null)
+            .Select((x, _) => x!)
             .Collect();
 
-        var combinedProvider = allEventsProvider.Combine(context.CompilationProvider);
+        var combinedProvider = allQueriesProvider.Combine(context.CompilationProvider);
 
         context.RegisterSourceOutput(combinedProvider, (spc, eventsWithCompilation) =>
         {
-            var (events, compilation) = eventsWithCompilation;
-            if (events.Any())
+            var (queries, compilation) = eventsWithCompilation;
+            if (queries.Any())
             {
-                string assemblyName = events.First().ContainingAssembly.Name;
+                string assemblyName = queries.First().ContainingAssembly.Name;
                 var eventModels = GetPartialModelClass(
                     assemblyName,
                     "Queries",
                     "ModelTypeDefinition",
-                    events.Select(e => ModelGenerator.ForNamedType(e, LiquidEngine)));
+                    queries.Select(e => ModelGenerator.ForNamedType(e, LiquidEngine)));
                 spc.AddSource($"model-queries.g.cs", SourceText.From(eventModels, Encoding.UTF8));
             }
         });

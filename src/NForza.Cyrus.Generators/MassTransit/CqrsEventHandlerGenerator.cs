@@ -17,15 +17,10 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase, IIncrementalGene
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => CouldBeEventHandler(syntaxNode),
+                predicate: (syntaxNode, _) => syntaxNode.IsEventHandler(),
                 transform: (context, _) => GetMethodSymbolFromContext(context));
 
         var allEventHandlersProvider = incrementalValuesProvider.Combine(configProvider)
-            .Where(x =>
-            {
-                var (methodNode, config) = x;
-                return IsEventHandler(methodNode, config.Events.HandlerName, config.Events.Suffix);
-            })
             .Select((x, _) => x.Left!)
             .Collect();
 
@@ -36,7 +31,7 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase, IIncrementalGene
             var ((queryHandlers, compilation), config) = eventHandlersWithCompilation;
             if (queryHandlers.Any())
             {
-                if (config.Events.Bus == "MassTransit")
+                if (config.EventBus == "MassTransit")
                 {
                     var sourceText = GenerateEventConsumers(queryHandlers);
                     spc.AddSource($"EventConsumers.g.cs", SourceText.From(sourceText, Encoding.UTF8));

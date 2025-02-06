@@ -20,18 +20,12 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => CouldBeCommandHandler(syntaxNode) || CouldBeQueryHandler(syntaxNode) || CouldBeEventHandler(syntaxNode),
+                predicate: (syntaxNode, _) => syntaxNode.IsCommandHandler() || syntaxNode.IsQueryHandler() || syntaxNode.IsEventHandler(),
                 transform: (context, _) => GetMethodSymbolFromContext(context));
 
-        var allHandlersProvider = incrementalValuesProvider.Combine(configProvider)
-            .Where(x =>
-            {
-                var (handler, config) = x;
-                return IsCommandHandler(handler, config.Commands.HandlerName, config.Commands.Suffix)
-                    || IsQueryHandler(handler, config.Queries.HandlerName, config.Queries.Suffix)
-                    || IsEventHandler(handler, config.Events.HandlerName, config.Events.Suffix);
-            })
-            .Select((x, _) => x.Left!)
+        var allHandlersProvider = incrementalValuesProvider
+            .Where(handler => handler != null)
+            .Select((x, _) => x!)
             .Collect();
 
         var combinedProvider = context.CompilationProvider.Combine(allHandlersProvider).Combine(configProvider);
@@ -51,10 +45,10 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
     private string GenerateServiceCollectionExtensions(ImmutableArray<IMethodSymbol> handlers, GenerationConfig configuration, Compilation compilation)
     {
         string handlerTypeRegistrations = CreateRegisterTypes(handlers);
-        string queryHandlerRegistrations = CreateRegisterQueryHandler(handlers.Where(x => IsQueryHandler(x, configuration.Queries.HandlerName, configuration.Queries.Suffix)), compilation);
-        string commandHandlerRegistrations = CreateRegisterCommandHandler(handlers.Where(x => IsCommandHandler(x, configuration.Commands.HandlerName, configuration.Commands.Suffix)), compilation);
-        string eventHandlerRegistrations = CreateEventHandlerRegistrations(handlers.Where(x => IsEventHandler(x, configuration.Events.HandlerName, configuration.Events.Suffix)), compilation); 
-        string eventBusRegistration = $@"services.AddSingleton<IEventBus, {configuration.Events.Bus}EventBus>();";
+        string queryHandlerRegistrations = CreateRegisterQueryHandler(handlers.Where(x => x.IsQueryHandler()), compilation);
+        string commandHandlerRegistrations = CreateRegisterCommandHandler(handlers.Where(x => x.IsCommandHandler()), compilation);
+        string eventHandlerRegistrations = CreateEventHandlerRegistrations(handlers.Where(x => x.IsEventHandler()), compilation); 
+        string eventBusRegistration = $@"services.AddSingleton<IEventBus, {configuration.EventBus}EventBus>();";
 
         if (string.IsNullOrEmpty(handlerTypeRegistrations) && string.IsNullOrEmpty(queryHandlerRegistrations) && string.IsNullOrEmpty(commandHandlerRegistrations))
         {
@@ -63,7 +57,7 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
 
         var model = new
         {
-            Imports = configuration.Events.Bus == "MassTransit" ? ["NForza.Cyrus.MassTransit"] : new List<string>(),
+            Imports = configuration.EventBus == "MassTransit" ? ["NForza.Cyrus.MassTransit"] : new List<string>(),
             RegisterHandlerTypes = handlerTypeRegistrations,
             RegisterCommandHandlers = commandHandlerRegistrations,
             RegisterQueryHandlers = queryHandlerRegistrations,

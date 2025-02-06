@@ -16,20 +16,19 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
     {
         DebugThisGenerator(false);
 
-        var configProvider = ConfigProvider(context);
-
         var commandHandlerProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => CouldBeCommandHandler(syntaxNode),
+                predicate: (syntaxNode, _) => syntaxNode.IsCommandHandler(),
                 transform: (context, _) => GetMethodSymbolFromContext(context));
 
+        var configProvider = ConfigProvider(context);
         var recordStructsWithAttribute = commandHandlerProvider.Combine(configProvider)
             .Where(x =>
             {
                 var (methodNode, config) = x;
                 if (config == null || !config.GenerationTarget.Contains(GenerationTarget.Domain))
                     return false;
-                return IsCommandHandler(methodNode, config.Commands.HandlerName, config.Commands.Suffix);
+                return true;
             })
             .Where(x => x.Left != null)
             .Select((x, _) => x.Left!)

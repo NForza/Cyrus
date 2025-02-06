@@ -12,21 +12,16 @@ public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerat
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false); ;
-        var configProvider = ConfigProvider(context);
+        DebugThisGenerator(true);
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => CouldBeQueryHandler(syntaxNode),
+                predicate: (syntaxNode, _) => syntaxNode.IsQueryHandler(),
                 transform: (context, _) => GetMethodSymbolFromContext(context));
 
-        var allQueryHandlersProvider = incrementalValuesProvider.Combine(configProvider)
-            .Where(x =>
-            {
-                var (methodNode, config) = x;
-                return IsQueryHandler(methodNode, config.Queries.HandlerName, config.Queries.Suffix);
-            })
-            .Select((x, _) => x.Left!)
+        var allQueryHandlersProvider = incrementalValuesProvider
+            .Where(x => x is not null)
+            .Select((x, _) => x!)
             .Collect();
 
         var combinedProvider = allQueryHandlersProvider.Combine(context.CompilationProvider);
