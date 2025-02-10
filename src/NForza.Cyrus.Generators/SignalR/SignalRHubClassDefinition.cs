@@ -108,7 +108,7 @@ internal record SignalRHubClassDefinition
             {
                 foreach (var method in type.GetMembers().OfType<IMethodSymbol>())
                 {
-                    if (method.Parameters.Length == 1 && method.Name == "Query" &&
+                    if (method.Parameters.Length == 1 && method.IsQueryHandler() &&
                         SymbolEqualityComparer.Default.Equals(method.Parameters[0].Type, symbol))
                     {
                         var returnType = method.ReturnType;
