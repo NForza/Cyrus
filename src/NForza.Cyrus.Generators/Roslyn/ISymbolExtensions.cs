@@ -35,5 +35,4 @@ public static class ISymbolExtensions
     {
         return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "EventHandlerAttribute");
     }
-
 }

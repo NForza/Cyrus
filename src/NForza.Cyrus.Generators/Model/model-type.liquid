@@ -6,9 +6,11 @@
 		{% endfor %}
 	],
 	{{ type.IsCollection }}, 
-	{{ type.IsNullable }},
-	[
-		{% for st in type.SupportTypes %}
-			{% include "model-type", type: st %}{% unless forloop.last %}, {% endunless %}
-		{% endfor %}
-	])
+	{{ type.IsNullable }}
+//	,
+//	[
+//		{% for st in type.SupportTypes %}
+//			{% include "model-type", type: st %}{% unless forloop.last %}, {% endunless %}
+//		{% endfor %}
+//	]
+)

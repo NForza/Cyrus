@@ -90,7 +90,7 @@ internal record SignalRHubClassDefinition
                     MethodName = genericArg.GetText().ToString(),
                     Name = symbol.Name,
                     FullTypeName = symbol.ToFullName(),
-                    ReturnType = new(queryReturnType!.Name, propertyModelsOfReturnType, isCollection, isNullable ?? false, [])
+                    ReturnType = new(queryReturnType!.Name, propertyModelsOfReturnType, isCollection, isNullable ?? false) //, [])
                 };
         });
     }
