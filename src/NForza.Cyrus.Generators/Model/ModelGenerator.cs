@@ -25,7 +25,7 @@ internal class ModelGenerator
     internal static string ForNamedType(INamedTypeSymbol namedType, LiquidEngine liquidEngine)
     {
         string properties = GetPropertiesDeclaration(namedType, liquidEngine);
-        return $"new ModelTypeDefinition(\"{namedType.Name}\", [{properties}], {namedType.IsCollection().IsMatch.ToString().ToLower()}, {namedType.IsNullable().ToString().ToLower()})"; //', [])";        
+        return $"new ModelTypeDefinition(\"{namedType.Name}\", [{properties}], [], {namedType.IsCollection().IsMatch.ToString().ToLower()}, {namedType.IsNullable().ToString().ToLower()})";
     }
 
     private static string GetPropertiesDeclaration(INamedTypeSymbol namedType, LiquidEngine liquidEngine)

@@ -58,12 +58,6 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
         var types = typedIds.Select(t => new { Name = t.ToFullName(), UnderlyingType = GetUnderlyingTypeOfTypedId(t) }).ToList();
         var registrations = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<{t.ToDisplayString()}>();"));
 
-        //var model = new
-        //{
-        //    TypeIds = typedIds,
-        //    Imports = imports,
-        //};
-
         var model = new Dictionary<string, object>
         {
             ["Types"] = typedIds.Select(t => new Dictionary<string, object>

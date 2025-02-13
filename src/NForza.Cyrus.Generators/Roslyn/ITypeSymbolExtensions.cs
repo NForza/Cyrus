@@ -88,4 +88,58 @@ internal static class ITypeSymbolExtensions
             });
         return propertyDeclarations.ToArray();
     }
+
+    public static HashSet<ITypeSymbol> GetReferencedTypes(this ITypeSymbol typeSymbol)
+    {
+        var visited = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
+        var result = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
+        var frameworkAssemblies = typeSymbol.GetFrameworkAssemblies();
+
+        typeSymbol.CollectReferencedTypesFromPublicProperties(visited, result, frameworkAssemblies, isRoot: true);
+
+        return result;
+    }
+
+    private static void CollectReferencedTypesFromPublicProperties(
+        this ITypeSymbol typeSymbol,
+        HashSet<ITypeSymbol> visited,
+        HashSet<ITypeSymbol> result,
+        HashSet<IAssemblySymbol> frameworkAssemblies,
+        bool isRoot)
+    {
+        if (typeSymbol == null || visited.Contains(typeSymbol))
+            return;
+
+        visited.Add(typeSymbol);
+
+        if (!isRoot && !typeSymbol.IsFrameworkOrBuiltInType(frameworkAssemblies))
+            result.Add(typeSymbol);
+
+        foreach (var property in typeSymbol.GetMembers().OfType<IPropertySymbol>())
+        {
+            if (property.DeclaredAccessibility == Accessibility.Public)
+            {
+                property.Type.CollectReferencedTypesFromPublicProperties(visited, result, frameworkAssemblies, isRoot: false);
+            }
+        }
+    }
+
+    private static bool IsFrameworkOrBuiltInType(this ITypeSymbol typeSymbol, HashSet<IAssemblySymbol> frameworkAssemblies)
+    {
+        return typeSymbol.SpecialType != SpecialType.None || frameworkAssemblies.Contains(typeSymbol.ContainingAssembly);
+    }
+
+    private static HashSet<IAssemblySymbol> GetFrameworkAssemblies(this ITypeSymbol typeSymbol)
+    {
+        var assembly = typeSymbol.ContainingAssembly;
+        if (assembly == null)
+            return [];
+
+        var referencedAssemblies = assembly.Modules
+            .SelectMany(m => m.ReferencedAssemblySymbols)
+            .Where(asm => asm.Name.StartsWith("System.", StringComparison.OrdinalIgnoreCase) ||
+                          asm.Name.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase));
+
+        return new HashSet<IAssemblySymbol>(referencedAssemblies, SymbolEqualityComparer.Default);
+    }
 }
