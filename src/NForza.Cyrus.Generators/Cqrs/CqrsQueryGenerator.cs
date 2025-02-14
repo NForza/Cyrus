@@ -12,7 +12,7 @@ public class CqrsQueryGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
 
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(

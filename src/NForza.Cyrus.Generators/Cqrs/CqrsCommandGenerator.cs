@@ -14,7 +14,7 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
 
         var commandHandlerProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -59,7 +59,7 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
                 spc.AddSource($"model-commands.g.cs", SourceText.From(commandModels, Encoding.UTF8));
 
                 var referencedTypes = commandSymbols.SelectMany(cs => cs.GetReferencedTypes());
-                var referencedTypeModels = GetPartialModelClass(assemblyName, "Models", "ModelTypeDefinition", commandSymbols.Select(cm => ModelGenerator.ForNamedType(cm, LiquidEngine)));
+                var referencedTypeModels = GetPartialModelClass(assemblyName, "Models", "ModelTypeDefinition", referencedTypes.Select(cm => ModelGenerator.ForNamedType(cm, LiquidEngine)));
                 spc.AddSource($"model-command-types.g.cs", SourceText.From(referencedTypeModels, Encoding.UTF8));
             }
         });

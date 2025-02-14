@@ -89,22 +89,20 @@ internal static class ITypeSymbolExtensions
         return propertyDeclarations.ToArray();
     }
 
-    public static HashSet<ITypeSymbol> GetReferencedTypes(this ITypeSymbol typeSymbol)
+    public static IEnumerable<INamedTypeSymbol> GetReferencedTypes(this ITypeSymbol typeSymbol)
     {
         var visited = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
         var result = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
-        var frameworkAssemblies = typeSymbol.GetFrameworkAssemblies();
 
-        typeSymbol.CollectReferencedTypesFromPublicProperties(visited, result, frameworkAssemblies, isRoot: true);
+        typeSymbol.CollectReferencedTypesFromPublicProperties(visited, result, isRoot: true);
 
-        return result;
+        return result.OfType<INamedTypeSymbol>();
     }
 
     private static void CollectReferencedTypesFromPublicProperties(
         this ITypeSymbol typeSymbol,
         HashSet<ITypeSymbol> visited,
         HashSet<ITypeSymbol> result,
-        HashSet<IAssemblySymbol> frameworkAssemblies,
         bool isRoot)
     {
         if (typeSymbol == null || visited.Contains(typeSymbol))
@@ -112,34 +110,29 @@ internal static class ITypeSymbolExtensions
 
         visited.Add(typeSymbol);
 
-        if (!isRoot && !typeSymbol.IsFrameworkOrBuiltInType(frameworkAssemblies))
+        if (!isRoot && !typeSymbol.ContainingAssembly.IsFrameworkAssembly() && !typeSymbol.IsKnownType())
             result.Add(typeSymbol);
 
-        foreach (var property in typeSymbol.GetMembers().OfType<IPropertySymbol>())
+        foreach (var property in typeSymbol.GetMembers().OfType<IPropertySymbol>().Where(p => p.DeclaredAccessibility == Accessibility.Public))
         {
-            if (property.DeclaredAccessibility == Accessibility.Public)
-            {
-                property.Type.CollectReferencedTypesFromPublicProperties(visited, result, frameworkAssemblies, isRoot: false);
-            }
+           property.Type.CollectReferencedTypesFromPublicProperties(visited, result, isRoot: false);
         }
     }
 
-    private static bool IsFrameworkOrBuiltInType(this ITypeSymbol typeSymbol, HashSet<IAssemblySymbol> frameworkAssemblies)
+    private static bool IsKnownType(this ITypeSymbol typeSymbol)
     {
-        return typeSymbol.SpecialType != SpecialType.None || frameworkAssemblies.Contains(typeSymbol.ContainingAssembly);
+        return typeSymbol.IsQuery() || typeSymbol.IsCommand() || typeSymbol.IsEvent() || typeSymbol.IsTypedId();
     }
 
-    private static HashSet<IAssemblySymbol> GetFrameworkAssemblies(this ITypeSymbol typeSymbol)
+    private static string[] typedIdAttributes = ["StringIdAttribute", "GuidIdAttribute", "IntIdAttribute"];
+
+    public static bool IsTypedId(this ITypeSymbol symbol)
     {
-        var assembly = typeSymbol.ContainingAssembly;
-        if (assembly == null)
-            return [];
-
-        var referencedAssemblies = assembly.Modules
-            .SelectMany(m => m.ReferencedAssemblySymbols)
-            .Where(asm => asm.Name.StartsWith("System.", StringComparison.OrdinalIgnoreCase) ||
-                          asm.Name.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase));
-
-        return new HashSet<IAssemblySymbol>(referencedAssemblies, SymbolEqualityComparer.Default);
+        if (symbol != null)
+            if (symbol.IsValueType)
+                if (symbol.TypeKind == TypeKind.Struct)
+                    if (symbol.GetAttributes().Any(a => typedIdAttributes.Contains(a.AttributeClass?.Name)))
+                        return true;
+        return false;
     }
 }
