@@ -30,7 +30,7 @@ public class StringIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
             };
             if (recordSymbols.Any())
             {
-                var stringModels = GetPartialModelClass(recordSymbols.First().ContainingAssembly.Name, "Strings", "string", recordSymbols.Select(s => $"\"{s.Name}\""));
+                var stringModels = GetPartialModelClass(recordSymbols.First().ContainingAssembly.Name, "TypedIds", "Strings", "string", recordSymbols.Select(s => $"\"{s.Name}\""));
                 spc.AddSource($"model-strings.g.cs", SourceText.From(stringModels, Encoding.UTF8));
             }
         });
@@ -39,7 +39,7 @@ public class StringIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
     private string GenerateCodeForRecordStruct(INamedTypeSymbol item)
     {
         (int? min, int? max) = GetMinAndMaxFromType(item);
-        var model = new 
+        var model = new
         {
             item.Name,
             Namespace = item.ContainingNamespace.ToDisplayString(),

@@ -33,7 +33,8 @@ public class GuidIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
             if (recordSymbols.Any())
             {
                 var guidModels = GetPartialModelClass(
-                    recordSymbols.First().ContainingAssembly.Name, 
+                    recordSymbols.First().ContainingAssembly.Name,
+                    "TypedIds",
                     "Guids", 
                     "string", 
                     recordSymbols.Select(guid => $"\"{guid.Name}\""));

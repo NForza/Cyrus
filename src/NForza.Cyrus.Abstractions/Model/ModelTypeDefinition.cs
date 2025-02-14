@@ -10,6 +10,7 @@ namespace NForza.Cyrus.Abstractions.Model
             Properties = properties;
             IsCollection = isCollection;
             IsNullable = isNullable;
+            Values = values;
         }
         public string Name { get; }= string.Empty;
         public bool IsCollection { get; } = false;

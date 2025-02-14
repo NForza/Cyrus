@@ -31,7 +31,7 @@ public class IntIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
 
             if (recordSymbols.Any())
             {
-                var intModels = GetPartialModelClass(recordSymbols.First().ContainingAssembly.Name, "Integers", "string", recordSymbols.Select(im => $"\"{im.Name}\""));
+                var intModels = GetPartialModelClass(recordSymbols.First().ContainingAssembly.Name, "TypedIds","Integers", "string", recordSymbols.Select(im => $"\"{im.Name}\""));
                 spc.AddSource($"model-ints.g.cs", SourceText.From(intModels, Encoding.UTF8));
             }
         });

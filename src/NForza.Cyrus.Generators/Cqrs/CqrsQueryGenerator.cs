@@ -35,9 +35,14 @@ public class CqrsQueryGenerator : CyrusGeneratorBase, IIncrementalGenerator
                 var eventModels = GetPartialModelClass(
                     assemblyName,
                     "Queries",
+                    "Queries",
                     "ModelTypeDefinition",
                     queries.Select(e => ModelGenerator.ForNamedType(e, LiquidEngine)));
                 spc.AddSource($"model-queries.g.cs", SourceText.From(eventModels, Encoding.UTF8));
+
+                var referencedTypes = queries.SelectMany(cs => cs.GetReferencedTypes());
+                var referencedTypeModels = GetPartialModelClass(assemblyName,"Queries", "Models", "ModelTypeDefinition", referencedTypes.Select(cm => ModelGenerator.ForNamedType(cm, LiquidEngine)));
+                spc.AddSource($"model-event-types.g.cs", SourceText.From(referencedTypeModels, Encoding.UTF8));
             }
         });
     }
