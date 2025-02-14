@@ -8,23 +8,23 @@ namespace NForza.Cyrus.Generators.Roslyn
         public static bool IsCommandHandler(this SyntaxNode syntaxNode)
          => syntaxNode is MethodDeclarationSyntax methodDeclarationSyntax
             &&
-            methodDeclarationSyntax.HasAttribute("CommandHandler");
+            methodDeclarationSyntax.HasCommandHandlerAttribute();
 
         public static bool IsQueryHandler(this SyntaxNode syntaxNode)
             => syntaxNode is MethodDeclarationSyntax methodDeclarationSyntax
                &&
-               methodDeclarationSyntax.HasAttribute("QueryHandler");
+               methodDeclarationSyntax.HasQueryHandlerAttribute();
 
         public static bool IsEventHandler(this SyntaxNode syntaxNode)
         => syntaxNode is MethodDeclarationSyntax methodDeclarationSyntax
             &&
-            methodDeclarationSyntax.HasAttribute("EventHandler");
+            methodDeclarationSyntax.HasEventHandlerAttribute();
 
         public static bool IsEvent(this SyntaxNode syntaxNode)
         {
             if (syntaxNode is RecordDeclarationSyntax classDeclaration)
             {
-                bool isEvent = classDeclaration.Identifier.Text.EndsWith("Event");
+                bool isEvent = classDeclaration.HasEventAttribute();
                 return isEvent;
             };
             return false;
@@ -34,7 +34,7 @@ namespace NForza.Cyrus.Generators.Roslyn
         {
             if (syntaxNode is RecordDeclarationSyntax classDeclaration)
             {
-                bool isEvent = classDeclaration.HasAttribute("Query");
+                bool isEvent = classDeclaration.HasQueryAttribute();
                 return isEvent;
             };
             return false;

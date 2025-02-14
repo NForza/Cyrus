@@ -17,8 +17,8 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore "./src/NForza.Cyrus.TypescriptGenerate/NForza.Cyrus.TypescriptGenerate.sln"
+      run: dotnet restore "./src/NForza.Cyrus.TypescriptGenerate/NForza.Cyrus.TypescriptGenerate.csproj"
     - name: Build
-      run: dotnet build --no-restore "./src/NForza.Cyrus.TypescriptGenerate/NForza.Cyrus.TypescriptGenerate.sln"
+      run: dotnet build --no-restore "./src/NForza.Cyrus.TypescriptGenerate/NForza.Cyrus.TypescriptGenerate.csproj"
     - name: Test
-      run: dotnet test --no-build --verbosity normal "./src/NForza.Cyrus.TypescriptGenerate/NForza.Cyrus.TypescriptGenerate.sln"
+      run: dotnet test --no-build --verbosity normal "./src/NForza.Cyrus.TypescriptGenerate/NForza.Cyrus.TypescriptGenerate.csproj"

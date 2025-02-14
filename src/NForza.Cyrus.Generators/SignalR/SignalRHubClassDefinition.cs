@@ -90,7 +90,7 @@ internal record SignalRHubClassDefinition
                     MethodName = genericArg.GetText().ToString(),
                     Name = symbol.Name,
                     FullTypeName = symbol.ToFullName(),
-                    ReturnType = new(queryReturnType!.Name, propertyModelsOfReturnType, isCollection, isNullable ?? false, [])
+                    ReturnType = new(queryReturnType!.Name, propertyModelsOfReturnType, [], isCollection, isNullable ?? false) //, [])
                 };
         });
     }
@@ -108,7 +108,7 @@ internal record SignalRHubClassDefinition
             {
                 foreach (var method in type.GetMembers().OfType<IMethodSymbol>())
                 {
-                    if (method.Parameters.Length == 1 && method.Name == "Query" &&
+                    if (method.Parameters.Length == 1 && method.IsQueryHandler() &&
                         SymbolEqualityComparer.Default.Equals(method.Parameters[0].Type, symbol))
                     {
                         var returnType = method.ReturnType;

@@ -123,13 +123,8 @@ internal static class TypeScriptGenerator
     }
 
     private static void GenerateSupportTypes(string outputFolder, CyrusMetadata metadata)
-    {
-        var commandSupportTypes = metadata.Commands.SelectMany(c => c.SupportTypes);
-        var querySupportTypes = metadata.Queries.SelectMany(q => q.SupportTypes);
-        var eventSupportTypes = metadata.Events.SelectMany(q => q.SupportTypes);
-        var allSupportTypes = commandSupportTypes.Concat(querySupportTypes).Concat(eventSupportTypes).Distinct(TypeWithPropertiesEqualityComparer.Instance);
-
-        foreach (var type in allSupportTypes)
+    {        
+        foreach (var type in metadata.Models)
         {
             Template template = GetTemplate("enum");
             var result = template.Render(GetContext(type, metadata));

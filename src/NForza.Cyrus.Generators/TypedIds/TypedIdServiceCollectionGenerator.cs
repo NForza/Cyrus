@@ -14,7 +14,7 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
 
         var typedIdsCollectionProvider = context.SyntaxProvider
                     .CreateSyntaxProvider(
@@ -57,12 +57,6 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
 
         var types = typedIds.Select(t => new { Name = t.ToFullName(), UnderlyingType = GetUnderlyingTypeOfTypedId(t) }).ToList();
         var registrations = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<{t.ToDisplayString()}>();"));
-
-        //var model = new
-        //{
-        //    TypeIds = typedIds,
-        //    Imports = imports,
-        //};
 
         var model = new Dictionary<string, object>
         {

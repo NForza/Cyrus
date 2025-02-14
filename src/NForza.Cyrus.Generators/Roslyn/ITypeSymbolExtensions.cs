@@ -88,4 +88,51 @@ internal static class ITypeSymbolExtensions
             });
         return propertyDeclarations.ToArray();
     }
+
+    public static IEnumerable<INamedTypeSymbol> GetReferencedTypes(this ITypeSymbol typeSymbol)
+    {
+        var visited = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
+        var result = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
+
+        typeSymbol.CollectReferencedTypesFromPublicProperties(visited, result, isRoot: true);
+
+        return result.OfType<INamedTypeSymbol>();
+    }
+
+    private static void CollectReferencedTypesFromPublicProperties(
+        this ITypeSymbol typeSymbol,
+        HashSet<ITypeSymbol> visited,
+        HashSet<ITypeSymbol> result,
+        bool isRoot)
+    {
+        if (typeSymbol == null || visited.Contains(typeSymbol))
+            return;
+
+        visited.Add(typeSymbol);
+
+        if (!isRoot && !typeSymbol.ContainingAssembly.IsFrameworkAssembly() && !typeSymbol.IsKnownType())
+            result.Add(typeSymbol);
+
+        foreach (var property in typeSymbol.GetMembers().OfType<IPropertySymbol>().Where(p => p.DeclaredAccessibility == Accessibility.Public))
+        {
+           property.Type.CollectReferencedTypesFromPublicProperties(visited, result, isRoot: false);
+        }
+    }
+
+    private static bool IsKnownType(this ITypeSymbol typeSymbol)
+    {
+        return typeSymbol.IsQuery() || typeSymbol.IsCommand() || typeSymbol.IsEvent() || typeSymbol.IsTypedId();
+    }
+
+    private static string[] typedIdAttributes = ["StringIdAttribute", "GuidIdAttribute", "IntIdAttribute"];
+
+    public static bool IsTypedId(this ITypeSymbol symbol)
+    {
+        if (symbol != null)
+            if (symbol.IsValueType)
+                if (symbol.TypeKind == TypeKind.Struct)
+                    if (symbol.GetAttributes().Any(a => typedIdAttributes.Contains(a.AttributeClass?.Name)))
+                        return true;
+        return false;
+    }
 }

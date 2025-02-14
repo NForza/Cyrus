@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Generators.SignalR;
@@ -25,7 +26,16 @@ internal class ModelGenerator
     internal static string ForNamedType(INamedTypeSymbol namedType, LiquidEngine liquidEngine)
     {
         string properties = GetPropertiesDeclaration(namedType, liquidEngine);
-        return $"new ModelTypeDefinition(\"{namedType.Name}\", [{properties}], {namedType.IsCollection().IsMatch.ToString().ToLower()}, {namedType.IsNullable().ToString().ToLower()}, [])";
+        string values = GetValuesDeclaration(namedType);
+        return $"new ModelTypeDefinition(\"{namedType.Name}\", [{properties}], [{values}], {namedType.IsCollection().IsMatch.ToString().ToLower()}, {namedType.IsNullable().ToString().ToLower()})";
+    }
+
+    private static string GetValuesDeclaration(INamedTypeSymbol namedType)
+    {
+        return namedType.TypeKind == TypeKind.Enum ? string.Join(",", namedType.GetMembers()
+                .OfType<IFieldSymbol>()
+                .Where(f => f.HasConstantValue)
+                .Select(f => $"\"{f.Name}\"")) : string.Empty;
     }
 
     private static string GetPropertiesDeclaration(INamedTypeSymbol namedType, LiquidEngine liquidEngine)

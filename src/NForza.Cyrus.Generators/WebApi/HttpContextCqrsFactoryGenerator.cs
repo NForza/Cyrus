@@ -56,7 +56,7 @@ public class HttpContextCqrsFactoryGenerator : CyrusGeneratorBase, IIncrementalG
     private bool IsQuery(INamedTypeSymbol symbol)
     {
         Debug.WriteLine(symbol.Name);
-        bool hasQueryName = symbol.Name.EndsWith("Query");
+        bool hasQueryName = symbol.IsQuery();
         bool isFrameworkAssembly = symbol.ContainingAssembly.IsFrameworkAssembly();
         return hasQueryName && !isFrameworkAssembly;
     }
@@ -64,7 +64,7 @@ public class HttpContextCqrsFactoryGenerator : CyrusGeneratorBase, IIncrementalG
     private bool IsCommand(INamedTypeSymbol symbol)
     {
         Debug.WriteLine(symbol.Name);
-        bool hasCommandName = symbol.Name.EndsWith("Command");
+        bool hasCommandName = symbol.IsCommand();
         bool isFrameworkAssembly = symbol.ContainingAssembly.IsFrameworkAssembly();
         return hasCommandName && !isFrameworkAssembly;
     }

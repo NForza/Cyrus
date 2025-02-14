@@ -48,11 +48,11 @@ public abstract class CyrusGeneratorBase : IncrementalGeneratorBase
         };
     }
 
-    public string GetPartialModelClass(string assemblyName, string propertyName, string propertyType, IEnumerable<string> propertyValues)
+    public string GetPartialModelClass(string assemblyName, string subNamespace, string propertyName, string propertyType, IEnumerable<string> propertyValues)
     {
         var model = new 
         {
-            AssemblyName = assemblyName,
+            AssemblyName = assemblyName + "." + subNamespace,
             PropertyName = propertyName,
             PropertyType = propertyType,
             Properties = string.Join(",", propertyValues)
