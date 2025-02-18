@@ -23,10 +23,10 @@ var host = Host.CreateDefaultBuilder(args)
 ICommandDispatcher commandDispatcher = host.Services.GetRequiredService<ICommandDispatcher>();
 IQueryProcessor queryProcessor = host.Services.GetRequiredService<IQueryProcessor>();
 
-CommandResult addResult = await commandDispatcher.Execute(new AddCustomerCommand(new("John Doe"), new("123 Main St"), CustomerType.Private));
+CommandResult addResult = await commandDispatcher.Execute(new AddCustomerCommand(new("John Doe"), new(new("Main St"), new(123)), CustomerType.Private));
 var customerId = addResult.Events.OfType<CustomerAddedEvent>().First().Id;
 
-CommandResult updateResult = await commandDispatcher.Execute(new UpdateCustomerCommand(customerId, new("John Doe"), new("123 Main St")));
+CommandResult updateResult = await commandDispatcher.Execute(new UpdateCustomerCommand(customerId, new("John Doe"), new(new("Main St"), new(12))));
 CommandResult deleteResult = await commandDispatcher.Execute(new DeleteCustomerCommand(customerId));
 
 var customer = await queryProcessor.Query(new CustomerByIdQuery(customerId));

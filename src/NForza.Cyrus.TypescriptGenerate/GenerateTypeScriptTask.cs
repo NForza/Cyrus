@@ -1,11 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.Reflection;
-using System.Text.Json;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using NForza.Cyrus.TypescriptGenerate.Model;
-using Scriban;
 
 namespace NForza.Cyrus.TypescriptGenerate;
 

@@ -4,73 +4,69 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using Fluid.Values;
 using NForza.Cyrus.Abstractions.Model;
+using NForza.Cyrus.Templating;
 using NForza.Cyrus.TypescriptGenerate.Model;
-using Scriban;
-using Scriban.Runtime;
-using Scriban.Syntax;
+
 
 namespace NForza.Cyrus.TypescriptGenerate;
 
 internal static class TypeScriptGenerator
 {
-    private static TemplateContext GetContext(object model, CyrusMetadata metadata)
+    private static LiquidEngine liquidEngine = new LiquidEngine(Assembly.GetExecutingAssembly(), options =>
     {
-        var context = new TemplateContext();
-        ScriptVariable metaDataVariable = ScriptVariable.Create("metadata", ScriptVariableScope.Global);
-        var scriptObject = new ScriptObject();
-        scriptObject.Import("camel_case", (string input) =>
+        options.Filters.AddFilter("camel_case", (input, arguments, context) =>
         {
-            if (string.IsNullOrEmpty(input)) return input;
-            return char.ToLowerInvariant(input[0]) + input.Substring(1);
+            string value = input.ToStringValue();
+            if (string.IsNullOrEmpty(value)) return new StringValue(value);
+            return new StringValue(char.ToLowerInvariant(value[0]) + value[1..]);
         });
 
-        scriptObject.Import("to_typescript_type", (string input) =>
+        options.Filters.AddFilter("to_typescript_type", (input, arguments, context) =>
         {
-            var metaData = context.GetValue(metaDataVariable);
-            return CSharpToTypeScriptType(input, (CyrusMetadata)metaData);
+            string value = input.ToStringValue();
+            return new StringValue(CSharpToTypeScriptType(value, metadata));
         });
 
-        scriptObject.Import("to_typescript_default", (Func<ITypeDefinition, string>)(p =>
+        options.Filters.AddFilter("to_typescript_default", (input, arguments, context) =>
         {
-            if (p.IsNullable) return "null";
-            if (p.IsCollection) return "[]";
-            var tsType = CSharpToTypeScriptType(p.Type, metadata);
-            if (metadata.Guids.Contains(tsType)) return "''";
-            if (metadata.Integers.Contains(tsType)) return "0";
-            if (metadata.Strings.Contains(tsType)) return "''";
-            if (tsType == "string") return "''";
-            if (tsType == "number") return "0";
-            if (p is ModelTypeDefinition twp)
+            ModelTypeDefinition value = input.ToObjectValue() as ModelTypeDefinition;
+            return new StringValue(GetString(value));
+
+            static string GetString(ModelTypeDefinition p)
             {
-                Template defaults = GetTemplate("type-defaults");
-                var model = new { twp.Properties };
-                return defaults.Render(GetContext(model, metadata));
+                if (p.IsNullable) return "null";
+                if (p.IsCollection) return "[]";
+                var tsType = CSharpToTypeScriptType(p.Name, metadata);
+                if (metadata.Guids.Contains(tsType)) return "''";
+                if (metadata.Integers.Contains(tsType)) return "0";
+                if (metadata.Strings.Contains(tsType)) return "''";
+                if (tsType == "string") return "''";
+                if (tsType == "number") return "0";
+                var model = new { p.Properties };
+                return liquidEngine.Render(model, "type-defaults");
             }
-            return "{}";
-        }));
+        });
 
-        scriptObject.Import("strip_postfix", (string input) =>
+        options.Filters.AddFilter("strip_postfix", (input, arguments, context) =>
         {
-            if (input.EndsWith("Command")) return input[..^"Command".Length];
-            if (input.EndsWith("Query")) return input[..^"Query".Length];
-            if (input.EndsWith("Event")) return input[..^"Event".Length];
+            string value = input.ToStringValue();
+            if (value.EndsWith("Command")) return new StringValue(value[..^"Command".Length]);
+            if (value.EndsWith("Query")) return new StringValue(value[..^"Query".Length]);
+            if (value.EndsWith("Event")) return new StringValue(value[..^"Event".Length]);
             return input;
         });
 
-        scriptObject.Import("query_return_type", (Func<HubQuery, string>)(rt =>
+        options.Filters.AddFilter("query_return_type", (input, arguments, context) =>
         {
-            var metaData = context.GetValue(metaDataVariable);
-            var tsType = CSharpToTypeScriptType(rt.ReturnType.Name, metadata);
-            return rt.ReturnType.Name + (rt.ReturnType.IsNullable ? "?" : "") + (rt.ReturnType.IsCollection ? "[]" : "");
-        }));
+            ModelQueryDefinition value = input.ToObjectValue() as ModelQueryDefinition;
+            var tsType = CSharpToTypeScriptType(value.ReturnType.Name, metadata);
+            return new StringValue(value.ReturnType.Name + (value.ReturnType.IsNullable ? "?" : "") + (value.ReturnType.IsCollection ? "[]" : ""));
+        });
+    });
 
-        scriptObject.Import(model, null, member => member?.Name ?? "");
-        context.MemberRenamer = member => member?.Name ?? "";
-        context.PushGlobal(scriptObject);
-        context.SetValue(metaDataVariable, metadata);
-        return context;
-    }
+    private static CyrusMetadata metadata;
 
     private static string CSharpToTypeScriptType(string input, CyrusMetadata metadata)
     {
@@ -103,6 +99,7 @@ internal static class TypeScriptGenerator
             _ when metadata.Commands.Any(c => c.Name == input) => input,
             _ when metadata.Queries.Any(c => c.Name == input) => input,
             _ when metadata.Events.Any(c => c.Name == input) => input,
+            _ when metadata.Models.Any(c => c.Name == input) => input,
             _ => "any"
         };
         return typeScriptType;
@@ -111,23 +108,33 @@ internal static class TypeScriptGenerator
     public static void Generate(string metadataFile, string outputFolder)
     {
         var json = File.ReadAllText(metadataFile);
-        var metadata = JsonSerializer.Deserialize<CyrusMetadata>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web)) ?? throw new InvalidOperationException("Can't read metadata");
+        metadata = JsonSerializer.Deserialize<CyrusMetadata>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web)) ?? throw new InvalidOperationException("Can't read metadata");
 
         GenerateGuids(outputFolder, metadata);
         GenerateStrings(outputFolder, metadata);
+        GenerateIntegers(outputFolder, metadata);
         GenerateCommands(outputFolder, metadata);
         GenerateQueries(outputFolder, metadata);
         GenerateEvents(outputFolder, metadata);
         GenerateHubs(outputFolder, metadata);
-        GenerateSupportTypes(outputFolder, metadata);
+        GenerateModels(outputFolder, metadata);
     }
 
-    private static void GenerateSupportTypes(string outputFolder, CyrusMetadata metadata)
-    {        
+    private static void GenerateModels(string outputFolder, CyrusMetadata metadata)
+    {
         foreach (var type in metadata.Models)
         {
-            Template template = GetTemplate("enum");
-            var result = template.Render(GetContext(type, metadata));
+            string result = "";
+            bool hasValues = type.Values?.Any() ?? false;
+            if (hasValues)
+            {
+                result = liquidEngine.Render(type, "enum");
+            }
+            else
+            {
+                var model = new { Imports = GetImportsFor(metadata, type).ToList(), type.Name, type.Properties };
+                result = liquidEngine.Render(model, "interface");
+            }
             string fileName = Path.ChangeExtension(Path.Combine(outputFolder, type.Name), ".ts");
             File.WriteAllText(fileName, result);
         }
@@ -136,10 +143,9 @@ internal static class TypeScriptGenerator
     private static void GenerateHubs(string outputFolder, CyrusMetadata metadata)
     {
         GenerateHubQueryReturnTypes(outputFolder, metadata);
-        Template template = GetTemplate("hub");
         foreach (var hub in metadata.Hubs)
         {
-            var result = template.Render(GetContext(hub, metadata));
+            var result = liquidEngine.Render(hub, "hub");
             string fileName = Path.ChangeExtension(Path.Combine(outputFolder, hub.Name), ".ts");
             File.WriteAllText(fileName, result);
         }
@@ -153,10 +159,9 @@ internal static class TypeScriptGenerator
 
     private static void GenerateGuids(string outputFolder, CyrusMetadata metadata)
     {
-        Template template = GetTemplate("guid");
         foreach (var guid in metadata.Guids)
         {
-            var result = template.Render(GetContext(new { Name = guid }, metadata));
+            var result = liquidEngine.Render(new { Name = guid }, "guid");
             string fileName = Path.ChangeExtension(Path.Combine(outputFolder, guid), ".ts");
             File.WriteAllText(fileName, result);
         }
@@ -164,10 +169,9 @@ internal static class TypeScriptGenerator
 
     private static void GenerateStrings(string outputFolder, CyrusMetadata metadata)
     {
-        Template template = GetTemplate("string");
         foreach (var stringType in metadata.Strings)
         {
-            var result = template.Render(GetContext(new { Name = stringType }, metadata));
+            var result = liquidEngine.Render(new { Name = stringType }, "string");
             string fileName = Path.ChangeExtension(Path.Combine(outputFolder, stringType), ".ts");
             File.WriteAllText(fileName, result);
         }
@@ -177,25 +181,31 @@ internal static class TypeScriptGenerator
 
     private static void GenerateTypesWithProperties(IEnumerable<ModelTypeDefinition> typesWithProperties, string outputFolder, CyrusMetadata metadata)
     {
-        Template template = GetTemplate("interface");
         foreach (var command in typesWithProperties)
         {
             var model = new { Imports = GetImportsFor(metadata, command).ToList(), command.Name, command.Properties };
-            var result = template.Render(GetContext(model, metadata));
+            var result = liquidEngine.Render(model, "interface");
             string fileName = Path.ChangeExtension(Path.Combine(outputFolder, command.Name), ".ts");
             File.WriteAllText(fileName, result);
         }
     }
 
     private static void GenerateQueries(string outputFolder, CyrusMetadata metadata) => GenerateTypesWithProperties(metadata.Queries, outputFolder, metadata);
-
+    private static void GenerateIntegers(string outputFolder, CyrusMetadata metadata)
+    {
+        foreach (var integerType in metadata.Integers)
+        {
+            var result = liquidEngine.Render(new { Name = integerType }, "integer");
+            string fileName = Path.ChangeExtension(Path.Combine(outputFolder, integerType), ".ts");
+            File.WriteAllText(fileName, result);
+        }
+    }
     private static void GenerateEvents(string outputFolder, CyrusMetadata metadata)
     {
-        Template template = GetTemplate("interface");
         foreach (var @event in metadata.Events)
         {
             var model = new { Imports = GetImportsFor(metadata, @event).ToList(), @event.Name, @event.Properties };
-            var result = template.Render(GetContext(model, metadata));
+            var result = liquidEngine.Render(model, "interface");
             string fileName = Path.ChangeExtension(Path.Combine(outputFolder, @event.Name), ".ts");
             File.WriteAllText(fileName, result);
         }
@@ -213,13 +223,14 @@ internal static class TypeScriptGenerator
             {
                 yield return new Import { Name = p.Type };
             }
+            if (metadata.Integers.Contains(p.Type))
+            {
+                yield return new Import { Name = p.Type };
+            }
+            if (metadata.Models.Any(m => m.Name == p.Type))
+            {
+                yield return new Import { Name = p.Type };
+            }
         }
-    }
-
-    private static Template GetTemplate(string templateName)
-    {
-        var templateContent = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream($"NForza.Cyrus.TypescriptGenerate.Templates.{templateName}.sbn")!).ReadToEnd();
-        var template = Template.Parse(templateContent.Trim());
-        return template;
     }
 }

@@ -5,12 +5,12 @@ namespace NForza.Cyrus.TypescriptGenerate.Model;
 
 public class CyrusMetadata: ICyrusModel
 {
-    public IEnumerable<string> Guids { get; } = [];
-    public IEnumerable<string> Integers { get; } = [];
-    public IEnumerable<string> Strings { get; } = [];
-    public IEnumerable<ModelTypeDefinition> Models { get; } = [];
-    public IEnumerable<ModelTypeDefinition> Events { get; } = [];
-    public IEnumerable<ModelTypeDefinition> Commands { get; } = [];
-    public IEnumerable<ModelTypeDefinition> Queries { get; } = [];
-    public IEnumerable<ModelHubDefinition> Hubs { get; } = [];
+    public IEnumerable<string> Guids { get; set; } = [];
+    public IEnumerable<string> Integers { get; set; } = [];
+    public IEnumerable<string> Strings { get; set; } = [];
+    public IEnumerable<ModelTypeDefinition> Models { get; set; } = [];
+    public IEnumerable<ModelTypeDefinition> Events { get; set; } = [];
+    public IEnumerable<ModelTypeDefinition> Commands { get; set; } = [];
+    public IEnumerable<ModelTypeDefinition> Queries { get; set; } = [];
+    public IEnumerable<ModelHubDefinition> Hubs { get; set; } = [];
 }

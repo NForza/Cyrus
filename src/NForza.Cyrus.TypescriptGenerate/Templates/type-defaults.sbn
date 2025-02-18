@@ -1,1 +1,0 @@
-﻿{ {{ for prop in Properties }}{{ prop.Name }}{{ if prop.IsNullable }}?{{ end }}: {{ prop | to_typescript_default }}{{ if prop.IsCollection }}[]{{ end }}{{ if! for.last}}, {{ end }}{{ end }} }
