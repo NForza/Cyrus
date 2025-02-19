@@ -8,7 +8,7 @@ public class {{ Name }}JsonConverter : JsonConverter<{{ Name }}>
 {
     public override {{ Name }} Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var value = reader.{{ GetMethod }}();  
+        var value = reader.GetGuid();  
         return new {{ Name }}(value);
     }
 

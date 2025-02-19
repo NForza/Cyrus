@@ -29,8 +29,19 @@ public static partial class EndpointCommandMappingExtensions
     internal static RouteHandlerBuilder MapCommand(IEndpointRouteBuilder endpoints, ICommandEndpointDefinition endpointDefinition)
         => endpoints.MapMethods(endpointDefinition.Path, [endpointDefinition.Method], async (HttpContext ctx, [FromServices] ICommandDispatcher commandDispatcher) =>
                 {
-                    var commandObject = await CreateCommandObject(endpointDefinition, ctx);
-
+                    object? commandObject = null;
+                    try
+                    {
+                        commandObject = await CreateCommandObject(endpointDefinition, ctx);
+                    }
+                    catch(JsonException jsonException)
+                    {
+                        return Results.BadRequest(jsonException.Message);
+                    }
+                    catch(Exception ex)
+                    {
+                        return Results.BadRequest(ex.Message);
+                    }
                     foreach (var policy in endpointDefinition.AugmentInputPolicies)
                     {
                         AugmentationResult augmentationResult = await policy.AugmentAsync(commandObject, ctx);
@@ -39,8 +50,6 @@ public static partial class EndpointCommandMappingExtensions
                         commandObject = augmentationResult.AugmentedObject;
                     }
 
-                    if (commandObject == null)
-                        return Results.BadRequest("Invalid command object.");
 
                     if (!ValidateObject(endpointDefinition.EndpointType, commandObject, ctx.RequestServices, out var problem))
                         return Results.BadRequest(problem);
@@ -87,6 +96,6 @@ public static partial class EndpointCommandMappingExtensions
     {
         var inputMappingPolicy = endpointDefinition.InputMappingPolicyType != null ?
             (InputMappingPolicy)ctx.RequestServices.GetRequiredService(endpointDefinition.InputMappingPolicyType) : ctx.RequestServices.GetRequiredService<DefaultCommandInputMappingPolicy>();
-        return await inputMappingPolicy.MapInputAsync(endpointDefinition.EndpointType);
+            return await inputMappingPolicy.MapInputAsync(endpointDefinition.EndpointType);
     }
 }

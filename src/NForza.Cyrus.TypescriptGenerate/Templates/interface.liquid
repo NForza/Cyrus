@@ -1,0 +1,9 @@
+{% for t in Imports -%}
+import { {{ t.Name }} } from './{{ t.Name }}';
+{% endfor -%}
+
+export interface {{ Name }} {
+{%- for prop in Properties %}
+    {{ prop.Name }}{% if prop.IsNullable %}?{% endif %}: {{ prop.Type | to_typescript_type }}{% if prop.IsCollection %}[]{% endif %};
+{%- endfor %}
+}

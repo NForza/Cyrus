@@ -36,14 +36,6 @@ public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, IIncrementalG
         string fullyQualifiedNamespace = item.ContainingNamespace.ToDisplayString();
         var underlyingTypeName = GetUnderlyingTypeOfTypedId(item);
 
-        string? getMethodName = underlyingTypeName switch
-        {
-            "System.Guid" => "GetGuid",
-            "string" => "GetString",
-            "int" => "GetInt32",
-            _ => throw new NotSupportedException($"Underlying type {underlyingTypeName} is not supported.")
-        };
-
         string? templateName = underlyingTypeName switch
         {
             "System.Guid" => "GuidIdJsonConverter",
@@ -56,7 +48,6 @@ public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, IIncrementalG
         {
             item.Name,
             Namespace = fullyQualifiedNamespace,
-            GetMethod = getMethodName
         };
         var source = LiquidEngine.Render(model, templateName);
         return source;

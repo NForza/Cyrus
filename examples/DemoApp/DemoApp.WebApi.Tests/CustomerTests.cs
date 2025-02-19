@@ -25,7 +25,7 @@ public class CustomerTests(ITestOutputHelper testOutput)
     [InlineData("/customers")]
     public async Task Posting_Add_Customer_Command_Should_Succeed(string url)
     {
-        var command = new AddCustomerCommand(new Name("Thomas"), new Address("The Netherlands"), CustomerType.Private);
+        var command = new AddCustomerCommand(new Name("Thomas"), new Address(new Street("Main Street"), new StreetNumber(12)), CustomerType.Private);
         var response = await client.PostAsJsonAsync(url, command);
         response.Should().NotBeNull();
         response.StatusCode.Should().Be(HttpStatusCode.Accepted);
@@ -47,7 +47,7 @@ public class CustomerTests(ITestOutputHelper testOutput)
     [InlineData("/customers")]
     public async Task Putting_Update_Customer_Command_Should_Succeed(string url)
     {
-        var command = new UpdateCustomerCommand(new CustomerId(), new Name("Thomas"), new Address("The Netherlands"));
+        var command = new UpdateCustomerCommand(new CustomerId(), new Name("Thomas"), new Address(new Street("Main Street"), new StreetNumber(12)));
         var response = await client.PutAsJsonAsync(url, command);
         response.Should().NotBeNull();
         var content = await response.Content.ReadAsStringAsync();

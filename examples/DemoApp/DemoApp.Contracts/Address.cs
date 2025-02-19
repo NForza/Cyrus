@@ -1,6 +1,3 @@
-﻿using NForza.Cyrus.Abstractions;
+﻿namespace DemoApp.Contracts;
 
-namespace DemoApp.Contracts;
-
-[StringId(3, 200)]
-public partial record struct Address;
+public record struct Address(Street Street, StreetNumber StreetNumber);

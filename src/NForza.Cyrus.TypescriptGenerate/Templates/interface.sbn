@@ -1,9 +1,0 @@
-{{ for t in Imports }}
-import { {{ t.Name }} } from './{{ t.Name }}';
-{{ end }}
-
-export interface {{ Name }} {
-{{ for prop in Properties }}
-    {{ prop.Name }}{{ if prop.IsNullable }}?{{ end }}: {{ prop.Type | to_typescript_type }}{{ if prop.IsCollection }}[]{{ end }};
-{{ end }}
-}

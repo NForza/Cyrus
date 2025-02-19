@@ -9,12 +9,13 @@ namespace NForza.Cyrus.Templating
         TemplateResourceFileProvider fileProvider;
         private TemplateOptions options;
 
-        public LiquidEngine(Assembly assembly)
+        public LiquidEngine(Assembly assembly, Action<TemplateOptions> configure = null)
         {
             fileProvider = new TemplateResourceFileProvider(assembly);
             options = new TemplateOptions();
             options.FileProvider = fileProvider;
             options.MemberAccessStrategy = UnsafeMemberAccessStrategy.Instance;
+            configure?.Invoke(options);
         }
 
         private TemplateContext GetContext(object model)

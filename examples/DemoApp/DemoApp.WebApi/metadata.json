@@ -3,15 +3,48 @@
     "CustomerId"
   ],
   "integers": [
-    "Amount"
+    "Amount",
+    "StreetNumber"
   ],
   "strings": [
-    "Address",
-    "Name"
+    "Name",
+    "Street"
+  ],
+  "models": [
+    {
+      "name": "Address",
+      "isCollection": false,
+      "isNullable": false,
+      "properties": [
+        {
+          "name": "Street",
+          "type": "Street",
+          "isCollection": false,
+          "isNullable": false
+        },
+        {
+          "name": "StreetNumber",
+          "type": "StreetNumber",
+          "isCollection": false,
+          "isNullable": false
+        }
+      ]
+    },
+    {
+      "name": "CustomerType",
+      "isCollection": false,
+      "isNullable": false,
+      "values": [
+        "Private",
+        "Company"
+      ]
+    }
   ],
   "events": [
     {
       "name": "CustomerAddedEvent",
+      "isCollection": false,
+      "isNullable": false,
       "properties": [
         {
           "name": "Id",
@@ -35,6 +68,8 @@
     },
     {
       "name": "CustomerUpdatedEvent",
+      "isCollection": false,
+      "isNullable": false,
       "properties": [
         {
           "name": "Id",
@@ -48,6 +83,8 @@
   "commands": [
     {
       "name": "AddCustomerCommand",
+      "isCollection": false,
+      "isNullable": false,
       "properties": [
         {
           "name": "Name",
@@ -62,24 +99,17 @@
           "isNullable": false
         },
         {
-          "name": "customerType",
+          "name": "CustomerType",
           "type": "CustomerType",
           "isCollection": false,
           "isNullable": false
-        }
-      ],
-      "supportTypes": [
-        {
-          "name": "CustomerType",
-          "values": [
-            "Private",
-            "Company"
-          ]
         }
       ]
     },
     {
       "name": "DeleteCustomerCommand",
+      "isCollection": false,
+      "isNullable": false,
       "properties": [
         {
           "name": "Id",
@@ -91,6 +121,8 @@
     },
     {
       "name": "UpdateCustomerCommand",
+      "isCollection": false,
+      "isNullable": false,
       "properties": [
         {
           "name": "CustomerId",
@@ -106,7 +138,7 @@
         },
         {
           "name": "Address",
-          "type": "string",
+          "type": "Address",
           "isCollection": false,
           "isNullable": false
         }
@@ -116,6 +148,8 @@
   "queries": [
     {
       "name": "AllCustomersQuery",
+      "isCollection": false,
+      "isNullable": false,
       "properties": [
         {
           "name": "page",
@@ -133,6 +167,8 @@
     },
     {
       "name": "CustomerByIdQuery",
+      "isCollection": false,
+      "isNullable": false,
       "properties": [
         {
           "name": "Id",
@@ -155,7 +191,7 @@
         {
           "name": "AllCustomersQuery",
           "returnType": {
-            "type": "Customer",
+            "name": "Customer",
             "isCollection": true,
             "isNullable": false,
             "properties": [

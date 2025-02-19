@@ -9,26 +9,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Templates\interface.sbn" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Templates\enum.sbn" />
-    <EmbeddedResource Include="Templates\type-defaults.sbn" />
-    <EmbeddedResource Include="Templates\guid.sbn" />
-    <EmbeddedResource Include="Templates\hub.sbn" />
-    <EmbeddedResource Include="Templates\string.sbn" />
-    <EmbeddedResource Include="Templates\interface.sbn" />
+    <EmbeddedResource Include="Templates\enum.liquid" />
+    <EmbeddedResource Include="Templates\integer.liquid" />
+    <EmbeddedResource Include="Templates\type-defaults.liquid" />
+    <EmbeddedResource Include="Templates\guid.liquid" />
+    <EmbeddedResource Include="Templates\hub.liquid" />
+    <EmbeddedResource Include="Templates\string.liquid" />
+    <EmbeddedResource Include="Templates\interface.liquid" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework" Version="17.12.6" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.12.6" />
-    <PackageReference Include="Scriban" Version="5.12.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj" />
+    <ProjectReference Include="..\NForza.Cyrus.Templating\NForza.Cyrus.Templating.csproj" />
   </ItemGroup>
 
 </Project>

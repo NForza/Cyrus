@@ -1,4 +1,0 @@
-export enum {{ Name }} {
-   {{ for value in Values }}{{ value }}{{ if !for.last }},
-   {{ end }}{{ end }}
-}
