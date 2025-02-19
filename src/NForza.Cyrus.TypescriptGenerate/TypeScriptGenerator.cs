@@ -132,7 +132,7 @@ internal static class TypeScriptGenerator
             }
             else
             {
-                var model = new { Imports = GetImportsFor(metadata, type).ToList(), type.Name, type.Properties };
+                var model = new { Imports = GetImportsFor(type, false, metadata).ToList(), type.Name, type.Properties };
                 result = liquidEngine.Render(model, "interface");
             }
             string fileName = Path.ChangeExtension(Path.Combine(outputFolder, type.Name), ".ts");
@@ -145,7 +145,15 @@ internal static class TypeScriptGenerator
         GenerateHubQueryReturnTypes(outputFolder, metadata);
         foreach (var hub in metadata.Hubs)
         {
-            var result = liquidEngine.Render(hub, "hub");
+            var queries = hub.Queries.Select(q => metadata.Queries.First(m => m.Name == q.Name));
+            var commands = hub.Commands.Select(c => metadata.Commands.First(m => m.Name == c));
+            var events = hub.Events.Select(c => metadata.Events.First(m => m.Name == c));
+            var queryReturnTypes = hub.Queries.Select(q => q.ReturnType);
+            var allTypes = queries.Concat(commands).Concat(queryReturnTypes).Concat(events).Distinct(TypeWithPropertiesEqualityComparer.Instance);
+
+            var imports = allTypes.Select(g => g.Name).ToList();
+
+            var result = liquidEngine.Render(new { Imports = imports, hub.Queries, hub.Commands, hub.Events, hub.Path, hub.Name }, "hub");
             string fileName = Path.ChangeExtension(Path.Combine(outputFolder, hub.Name), ".ts");
             File.WriteAllText(fileName, result);
         }
@@ -183,7 +191,7 @@ internal static class TypeScriptGenerator
     {
         foreach (var command in typesWithProperties)
         {
-            var model = new { Imports = GetImportsFor(metadata, command).ToList(), command.Name, command.Properties };
+            var model = new { Imports = GetImportsFor(command, false, metadata).ToList(), command.Name, command.Properties };
             var result = liquidEngine.Render(model, "interface");
             string fileName = Path.ChangeExtension(Path.Combine(outputFolder, command.Name), ".ts");
             File.WriteAllText(fileName, result);
@@ -204,16 +212,20 @@ internal static class TypeScriptGenerator
     {
         foreach (var @event in metadata.Events)
         {
-            var model = new { Imports = GetImportsFor(metadata, @event).ToList(), @event.Name, @event.Properties };
+            var model = new { Imports = GetImportsFor(@event, false, metadata).ToList(), @event.Name, @event.Properties };
             var result = liquidEngine.Render(model, "interface");
             string fileName = Path.ChangeExtension(Path.Combine(outputFolder, @event.Name), ".ts");
             File.WriteAllText(fileName, result);
         }
     }
 
-    private static IEnumerable<Import> GetImportsFor(CyrusMetadata metadata, ModelTypeDefinition obj)
+    private static IEnumerable<Import> GetImportsFor(ModelTypeDefinition type, bool includeTypeItself, CyrusMetadata metadata)
     {
-        foreach (var p in obj.Properties)
+        if (includeTypeItself)
+        {
+            yield return new Import { Name = type.Name };
+        }
+        foreach (var p in type.Properties)
         {
             if (metadata.Guids.Contains(p.Type))
             {
