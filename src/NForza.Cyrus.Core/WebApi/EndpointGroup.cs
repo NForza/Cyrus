@@ -23,16 +23,4 @@ public class EndpointGroup(string tag, string path)
         endpointDefinition.GroupPath = path;
         return new CommandEndpointBuilder<T>(endpointDefinition);
     }
-
-    public QueryEndpointBuilder<T> QueryEndpoint<T>()
-    {
-        IQueryEndpointDefinition endpointDefinition = new QueryEndpointDefinition<T>();
-        if (!endpoints.TryAdd(typeof(T), endpointDefinition))
-        {
-            throw new InvalidOperationException($"Endpoint for {typeof(T).Name} already exists.");
-        }
-        endpointDefinition.Tags = Tags;
-        endpointDefinition.GroupPath = path;
-        return new QueryEndpointBuilder<T>(endpointDefinition);
-    }
 }
