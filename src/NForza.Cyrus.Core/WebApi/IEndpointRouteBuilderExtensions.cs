@@ -18,35 +18,7 @@ public static class IEndpointRouteBuilderExtensions
 {
     public static IEndpointRouteBuilder MapCyrus(this IEndpointRouteBuilder endpoints)
     {
-        LogCyrusConfiguration(endpoints.ServiceProvider);
         return endpoints.MapQueries().MapCommands().MapModel().MapSignalR();
-    }
-
-    private static void LogCyrusConfiguration(IServiceProvider serviceProvider)
-    {
-        var sb = new StringBuilder();
-        var logger = serviceProvider.GetRequiredService<ILogger<CyrusConfig>>();
-        var queryHandlers = serviceProvider.GetRequiredService<QueryHandlerDictionary>();
-        sb.AppendLine("Queries handled:");
-        foreach (var queryHandler in queryHandlers)
-        {
-            sb.AppendLine($"- {queryHandler.Value.HandlerName}");
-        }
-
-        var commandHandlers = serviceProvider.GetRequiredService<CommandHandlerDictionary>();
-        sb.AppendLine("Commands handled:");
-        foreach (var commandHandler in commandHandlers)
-        {
-            sb.AppendLine($"- {commandHandler.Value.HandlerName}");
-        }
-
-        var eventHandlers = serviceProvider.GetRequiredService<EventHandlerDictionary>();
-        sb.AppendLine("Events handled:");
-        foreach (var handler in eventHandlers.SelectMany(ev => ev.Value))
-        {
-            sb.AppendLine($"- {handler.HandlerName}");
-        }
-        logger.LogInformation(sb.ToString());
     }
 
     public static IEndpointRouteBuilder MapQueries(this IEndpointRouteBuilder endpoints)
@@ -59,9 +31,24 @@ public static class IEndpointRouteBuilderExtensions
             var resultType = queryHandlerDictionary.GetQueryReturnType(queryEndpoint.QueryType);
             MapQuery(endpoints, queryEndpoint, resultType);
         }
+
+        foreach (var (queryType, queryHandler) in queryHandlerDictionary)
+        {
+            endpoints
+                .MapGet(queryHandler.Route, async (HttpContext ctx, IServiceProvider serviceProvider, IHttpContextAccessor httpContextAccessor, ICqrsFactory cqrsFactory, IQueryProcessor queryProcessor) =>
+                    {
+                        var queryObject = await new DefaultQueryInputMappingPolicy(httpContextAccessor, cqrsFactory).MapInputAsync(queryType);
+
+                        if (!EndpointCommandMappingExtensions.ValidateObject(queryType, queryObject, ctx.RequestServices, out var problem))
+                            return Results.BadRequest(problem);
+
+                        var queryResult = await queryProcessor.QueryInternal(queryObject, queryType, CancellationToken.None);
+                        return DefaultQueryPolicy(queryResult);
+                    })
+                 .WithSwaggerParameters(queryHandler.Route);
+        }
         return endpoints;
     }
-
     public static IEndpointRouteBuilder MapModel(this IEndpointRouteBuilder endpoints)
     {
         ICyrusModel model = CyrusModel.Aggregate(endpoints.ServiceProvider);

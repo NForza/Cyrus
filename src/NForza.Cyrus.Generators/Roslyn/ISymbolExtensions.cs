@@ -17,6 +17,19 @@ public static class ISymbolExtensions
         return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "QueryAttribute");
     }
 
+    public static string GetQueryRoute(this ISymbol methodSymbol)
+    {
+        var attr = methodSymbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "QueryAttribute");
+        if (attr != null)
+        {
+            if (attr.NamedArguments.Length > 0)
+            {
+                return attr.NamedArguments[0].Value.Value?.ToString() ?? "";
+            }
+        }
+        return string.Empty;
+    }
+
     public static bool IsCommandHandler(this ISymbol methodSymbol)
     {
         return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "CommandHandlerAttribute");

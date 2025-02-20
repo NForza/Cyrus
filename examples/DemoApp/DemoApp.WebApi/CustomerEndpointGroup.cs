@@ -34,11 +34,5 @@ public class CustomerEndpointGroup : EndpointGroup
             .Delete("{Id}")
             .AcceptedWhenSucceeded()
             .OtherwiseFail();
-
-        QueryEndpoint<AllCustomersQuery>()
-            .Get("");
-
-        QueryEndpoint<CustomerByIdQuery>()
-            .Get("{Id}");
     }
 }

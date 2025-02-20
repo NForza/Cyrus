@@ -13,9 +13,9 @@ public class CustomerEndpointGroup : EndpointGroup
     // "/customers" is the base URL for the endpoint group
     public CustomerEndpointGroup() : base("Customers", "/customers")
     {
-        //endpoint URL will be GET /customers/{Id}
-        QueryEndpoint<CustomerByIdQuery>()
-            .Get("{Id:guid}");
+        ////endpoint URL will be GET /customers/{Id}
+        //QueryEndpoint<CustomerByIdQuery>()
+        //    .Get("{Id:guid}");
 
 
         //endpoint URL will be POST /customers

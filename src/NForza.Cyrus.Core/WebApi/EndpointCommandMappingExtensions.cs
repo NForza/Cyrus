@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
 using System.Text.Json;
 using FluentValidation;
@@ -70,8 +71,13 @@ public static partial class EndpointCommandMappingExtensions
             .Accepts(endpointDefinition.EndpointType, MediaTypeNames.Application.Json)
             .WithTags(endpointDefinition.Tags);
 
-    internal static bool ValidateObject(Type objectType, object queryObject, IServiceProvider serviceProvider, out object? problem)
+    internal static bool ValidateObject(Type objectType, [NotNull] object? queryObject, IServiceProvider serviceProvider, out object? problem)
     {
+        if (objectType == null)
+        {
+            problem = "Can't create Query object of Type " + objectType?.Name;
+            return false;
+        }
         var validatorType = typeof(IValidator<>).MakeGenericType(objectType);
         if (serviceProvider.GetService(validatorType) is not IValidator validator)
         {

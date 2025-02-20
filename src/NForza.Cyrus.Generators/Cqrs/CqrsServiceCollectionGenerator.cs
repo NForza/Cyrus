@@ -14,7 +14,7 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
 
         var configProvider = ConfigProvider(context);
 
@@ -128,6 +128,7 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
         StringBuilder source = new();
         foreach (var handler in queryHandlers)
         {
+            var route = handler.Parameters[0].Type.GetQueryRoute();
             var queryType = handler.Parameters[0].Type.ToFullName();
             var typeSymbol = handler.ContainingType;
             var returnType = (INamedTypeSymbol)handler.ReturnType;
@@ -141,28 +142,25 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
                 if (handler.IsStatic)
                 {
                     source.Append($@"
-        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""static async {handlerName}"", async (_, query, token) => await {typeSymbol}.Query(({queryType})query));");
+        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""{route}"", async (_, query, token) => await {typeSymbol}.Query(({queryType})query));");
                 }
                 else
                 {
                     source.Append($@"
-        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""async {handlerName}"", async (services, query, token) => await services.GetRequiredService<{typeSymbol}>().Query(({queryType})query));");
-
+        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""{route}"", async (services, query, token) => await services.GetRequiredService<{typeSymbol}>().Query(({queryType})query));");
                 }
-
             }
             else
             {
                 if (handler.IsStatic)
                 {
                     source.Append($@"
-        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""static {handlerName}"", (_, query, token) => Task.FromResult<object>({typeSymbol}.Query(({queryType})query)));");
+        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""{route}"", (_, query, token) => Task.FromResult<object>({typeSymbol}.Query(({queryType})query)));");
                 }
                 else
                 {
                     source.Append($@"
-        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""{handlerName}"", (services, query, token) => Task.FromResult<object>(services.GetRequiredService<{typeSymbol}>().Query(({queryType})query)));");
-
+        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""{route}"", (services, query, token) => Task.FromResult<object>(services.GetRequiredService<{typeSymbol}>().Query(({queryType})query)));");
                 }
             }
         }
