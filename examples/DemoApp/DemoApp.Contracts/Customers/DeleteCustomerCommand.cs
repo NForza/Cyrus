@@ -2,5 +2,5 @@
 
 namespace DemoApp.Contracts.Customers;
 
-[Command]
+[Command(Verb = HttpVerb.Delete, Route = "{Id}")]
 public partial record DeleteCustomerCommand(CustomerId Id);

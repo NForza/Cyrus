@@ -5,8 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.SignalR;
-using NForza.Cyrus.WebApi.Policies;
 using NForza.Cyrus.Model;
+using NForza.Cyrus.WebApi.Policies;
 
 namespace NForza.Cyrus.WebApi;
 

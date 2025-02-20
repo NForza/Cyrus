@@ -18,22 +18,22 @@ public static partial class EndpointCommandMappingExtensions
 {
     public static IEndpointRouteBuilder MapCommands(this IEndpointRouteBuilder endpoints)
     {
-        var commandEndpoints = endpoints.ServiceProvider.GetServices<ICommandEndpointDefinition>();
+        var commands = endpoints.ServiceProvider.GetRequiredService<CommandHandlerDictionary>();
 
-        foreach (var commandEndpoint in commandEndpoints)
+        foreach (var command in commands)
         {
-            MapCommand(endpoints, commandEndpoint);
+            MapCommand(endpoints, command.Key, command.Value);
         }
         return endpoints;
     }
 
-    internal static RouteHandlerBuilder MapCommand(IEndpointRouteBuilder endpoints, ICommandEndpointDefinition endpointDefinition)
-        => endpoints.MapMethods(endpointDefinition.Path, [endpointDefinition.Method], async (HttpContext ctx, [FromServices] ICommandDispatcher commandDispatcher) =>
+    internal static RouteHandlerBuilder MapCommand(IEndpointRouteBuilder endpoints, Type commandType, CommandHandlerDefinition commandHandlerDefinition)
+        => endpoints.MapMethods(commandHandlerDefinition.Route, [commandHandlerDefinition.Verb.ToString()], async (HttpContext ctx, [FromServices] ICommandDispatcher commandDispatcher) =>
                 {
                     object? commandObject = null;
                     try
                     {
-                        commandObject = await CreateCommandObject(endpointDefinition, ctx);
+                        commandObject = ctx.RequestServices.GetRequiredService<DefaultCommandInputMappingPolicy>().MapInputAsync(commandType);
                     }
                     catch(JsonException jsonException)
                     {
@@ -43,35 +43,18 @@ public static partial class EndpointCommandMappingExtensions
                     {
                         return Results.BadRequest(ex.Message);
                     }
-                    foreach (var policy in endpointDefinition.AugmentInputPolicies)
-                    {
-                        AugmentationResult augmentationResult = await policy.AugmentAsync(commandObject, ctx);
-                        if (augmentationResult.Result != null)
-                            return augmentationResult.Result;
-                        commandObject = augmentationResult.AugmentedObject;
-                    }
-
-
-                    if (!ValidateObject(endpointDefinition.EndpointType, commandObject, ctx.RequestServices, out var problem))
+           
+                    if (!ValidateObject(commandType, commandObject, ctx.RequestServices, out var problem))
                         return Results.BadRequest(problem);
 
                     var commandResult = await commandDispatcher.ExecuteInternalAsync(commandObject, CancellationToken.None);
 
-                    var commandResultAttributes = endpointDefinition.CommandResultPolicies;
-                    foreach (var policy in commandResultAttributes)
-                    {
-                        var result = policy.FromCommandResult(commandResult);
-                        if (result != null)
-                            return result;
-                    }
-
                     return commandResult.Succeeded ? Results.Ok(commandResult) : Results.Problem(JsonSerializer.Serialize(commandResult.Errors));
                 })
-            .WithSwaggerParameters(endpointDefinition.Path)
-            .Accepts(endpointDefinition.EndpointType, MediaTypeNames.Application.Json)
-            .WithTags(endpointDefinition.Tags);
+            .WithSwaggerParameters(commandHandlerDefinition.Route)
+            .Accepts(commandType, MediaTypeNames.Application.Json);
 
-    internal static bool ValidateObject(Type objectType, [NotNull] object? queryObject, IServiceProvider serviceProvider, out object? problem)
+    internal static bool ValidateObject(Type objectType, object? queryObject, IServiceProvider serviceProvider, out object? problem)
     {
         if (objectType == null)
         {
@@ -96,12 +79,5 @@ public static partial class EndpointCommandMappingExtensions
         }
         problem = validationResult.Errors.Select(e => new { e.PropertyName, e.ErrorMessage });
         return false;
-    }
-
-    private static async Task<object?> CreateCommandObject(ICommandEndpointDefinition endpointDefinition, HttpContext ctx)
-    {
-        var inputMappingPolicy = endpointDefinition.InputMappingPolicyType != null ?
-            (InputMappingPolicy)ctx.RequestServices.GetRequiredService(endpointDefinition.InputMappingPolicyType) : ctx.RequestServices.GetRequiredService<DefaultCommandInputMappingPolicy>();
-            return await inputMappingPolicy.MapInputAsync(endpointDefinition.EndpointType);
     }
 }

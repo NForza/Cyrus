@@ -2,5 +2,5 @@
 
 namespace DemoApp.Contracts.Customers;
 
-[Command]
+[Command(Route = "", Verb = HttpVerb.Post)]
 public record struct AddCustomerCommand(Name Name, Address Address, CustomerType CustomerType);

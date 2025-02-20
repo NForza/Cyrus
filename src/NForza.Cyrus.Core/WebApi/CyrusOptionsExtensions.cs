@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NForza.Cyrus.Cqrs;
-using NForza.Cyrus.WebApi.Policies;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace NForza.Cyrus.WebApi;

@@ -30,6 +30,40 @@ public static class ISymbolExtensions
         return string.Empty;
     }
 
+    public static string GetCommandRoute(this ISymbol methodSymbol)
+    {
+        var attr = methodSymbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "CommandAttribute");
+        if (attr != null)
+        {
+            if (attr.NamedArguments.Length > 0)
+            {
+                return attr.NamedArguments.FirstOrDefault( kvp => kvp.Key == "Route").Value.Value?.ToString() ?? "";
+            }
+        }
+        return string.Empty;
+    }
+
+    public static string GetCommandVerb(this ISymbol methodSymbol)
+    {
+        var attr = methodSymbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "CommandAttribute");
+        if (attr != null)
+        {
+            if (attr.NamedArguments.Length > 0)
+            {
+                TypedConstant argument = attr.NamedArguments.FirstOrDefault(kvp => kvp.Key == "Verb").Value;
+                if (argument.IsNull)
+                {
+                    return "HttpVerb.Get";
+                }
+                var member = argument.Type!.GetMembers()
+                     .First(m => m is IFieldSymbol field && field.HasConstantValue && Equals(field.ConstantValue, argument.Value));
+
+                return argument.IsNull ? "global::NForza.Cyrus.Abstractions.HttpVerb.Get" : $"{argument.Type.ToFullName()}.{member.Name}";
+            }
+        }
+        return "global::NForza.Cyrus.Abstractions.HttpVerb.Get";
+    }
+
     public static bool IsCommandHandler(this ISymbol methodSymbol)
     {
         return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "CommandHandlerAttribute");

@@ -1,5 +1,5 @@
-﻿namespace NForza.Cyrus.Cqrs;
+﻿using NForza.Cyrus.Abstractions;
 
-public record CommandHandlerDefinition(string HandlerName, Func<IServiceProvider, object, Task<CommandResult>> Handler)
-{
-}
+namespace NForza.Cyrus.Cqrs;
+
+public record CommandHandlerDefinition(string Route, HttpVerb Verb, Func<IServiceProvider, object, Task<CommandResult>> Handler);

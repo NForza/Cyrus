@@ -196,6 +196,8 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
         StringBuilder source = new();
         foreach (var handler in handlers)
         {
+            var route = handler.Parameters[0].Type.GetCommandRoute();
+            var verb = handler.Parameters[0].Type.GetCommandVerb();
             var commandType = handler.Parameters[0].Type.ToFullName();
             var typeSymbol = handler.ContainingType.ToFullName();
             var returnType = handler.ReturnType;
@@ -207,12 +209,12 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
                 if (handler.IsStatic)
                 {
                     source.Append($@"
-        handlers.AddHandler<{commandType}>(""static async {handlerName}"", (_, command) => {typeSymbol}.Execute(({commandType})command));");
+        handlers.AddHandler<{commandType}>(""{route}"", {verb}, (_, command) => {typeSymbol}.Execute(({commandType})command));");
                 }
                 else
                 {
                     source.Append($@"
-        handlers.AddHandler<{commandType}>(""async {handlerName}"", (services, command) => services.GetRequiredService<{typeSymbol}>().Execute(({commandType})command));");
+        handlers.AddHandler<{commandType}>(""{route}"", {verb}, (services, command) => services.GetRequiredService<{typeSymbol}>().Execute(({commandType})command));");
                 }
             }
             else
@@ -220,12 +222,12 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
                 if (handler.IsStatic)
                 {
                     source.Append($@"
-        handlers.AddHandler<{commandType}>(""static {handlerName}"", (_, command) => Task.FromResult({typeSymbol}.Execute(({commandType})command)));");
+        handlers.AddHandler<{commandType}>(""{route}"", {verb}, (_, command) => Task.FromResult({typeSymbol}.Execute(({commandType})command)));");
                 }
                 else
                 {
                     source.Append($@"
-            handlers.AddHandler<{commandType}>(""{handlerName}"", (services, command) => Task.FromResult(services.GetRequiredService<{typeSymbol}>().Execute(({commandType})command)));");
+            handlers.AddHandler<{commandType}>(""{route}"", {verb}, (services, command) => Task.FromResult(services.GetRequiredService<{typeSymbol}>().Execute(({commandType})command)));");
                 }
             }
         }
