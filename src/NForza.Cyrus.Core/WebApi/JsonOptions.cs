@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Options;
 
-namespace NForza.Cyrus.WebApi;
+namespace NForza.Cyrus.Cqrs;
 
 public class JsonOptionsConfigurator(IEnumerable<JsonConverter> jsonConverters) : IConfigureOptions<JsonOptions>
 {

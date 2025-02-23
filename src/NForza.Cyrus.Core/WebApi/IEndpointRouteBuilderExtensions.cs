@@ -6,9 +6,9 @@ using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.SignalR;
 using NForza.Cyrus.Model;
-using NForza.Cyrus.WebApi.Policies;
+using NForza.Cyrus.Cqrs.Policies;
 
-namespace NForza.Cyrus.WebApi;
+namespace NForza.Cyrus.Cqrs;
 
 public static class IEndpointRouteBuilderExtensions
 {

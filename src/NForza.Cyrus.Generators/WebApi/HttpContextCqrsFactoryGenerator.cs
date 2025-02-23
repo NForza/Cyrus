@@ -12,7 +12,7 @@ using NForza.Cyrus.Generators.Roslyn;
 namespace NForza.Cyrus.Generators.WebApi;
 
 [Generator]
-public class HttpContextCqrsFactoryGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public class WebCqrsFactoryDictionaryGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -48,7 +48,7 @@ public class HttpContextCqrsFactoryGenerator : CyrusGeneratorBase, IIncrementalG
             if (config.GenerationTarget.Contains(GenerationTarget.WebApi))
             {
                 var sourceText = GenerateQueryFactoryExtensionMethods(queryHandlers);
-                spc.AddSource($"HttpContextObjectFactory.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                spc.AddSource($"WebCqrsFactoryDictionary.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }
         });
     }
@@ -93,13 +93,13 @@ public class HttpContextCqrsFactoryGenerator : CyrusGeneratorBase, IIncrementalG
         {
             var queryTypeName = query.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-            source.Append($@"    objectFactories.Add(typeof({queryTypeName}), (ctx) => {GetConstructionExpression(query)}");
+            source.Append($@"    Register<{queryTypeName}>(ctx => {GetConstructionExpression(query)}");
         }
         
         var resolvedSource = LiquidEngine.Render(new 
         {                                     
             QueryFactoryMethod = source.ToString()
-        }, "HttpContextCqrsFactory");
+        }, "WebCqrsFactoryDictionary");
 
         return resolvedSource;
     }

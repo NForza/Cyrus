@@ -50,7 +50,7 @@
     <EmbeddedResource Include="Cqrs\Templates\CommandDispatcherExtensions.liquid" />
     <EmbeddedResource Include="Model\CyrusModel.liquid" />
     <EmbeddedResource Include="MassTransit\EventConsumers.liquid" />
-    <EmbeddedResource Include="WebApi\Templates\HttpContextCqrsFactory.liquid" />
+    <EmbeddedResource Include="WebApi\Templates\WebCqrsFactoryDictionary.liquid" />
     <EmbeddedResource Include="Cqrs\Templates\QueryProcessorExtensions.liquid" />
     <EmbeddedResource Include="SignalR\Templates\RegisterSignalRHubs.liquid" />
     <EmbeddedResource Include="WebApi\Templates\RegisterEndpointGroups.liquid" />

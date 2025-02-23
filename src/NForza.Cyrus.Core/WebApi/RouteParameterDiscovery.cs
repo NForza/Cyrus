@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace NForza.Cyrus.WebApi;
+namespace NForza.Cyrus.Cqrs;
 
 public static partial class RouteParameterDiscovery
 {

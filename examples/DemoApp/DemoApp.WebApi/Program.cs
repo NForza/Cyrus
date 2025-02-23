@@ -5,7 +5,7 @@ using MassTransit;
 using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.SignalR;
-using NForza.Cyrus.WebApi;
+using NForza.Cyrus.Cqrs;
 
 var builder = WebApplication.CreateBuilder(args);
 

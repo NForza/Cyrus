@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 
-namespace NForza.Cyrus.WebApi.Policies;
+namespace NForza.Cyrus.Cqrs.Policies;
 
 public class DefaultCommandInputMappingPolicy(IHttpContextAccessor httpContextAccessor, ICqrsFactory cqrsFactory) 
 {

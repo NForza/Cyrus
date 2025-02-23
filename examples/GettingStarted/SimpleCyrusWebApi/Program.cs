@@ -1,7 +1,7 @@
 using System.Reflection;
 using FluentValidation;
 using MassTransit;
-using NForza.Cyrus.WebApi;
+using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.Abstractions;
 using SimpleCyrusWebApi.Model;

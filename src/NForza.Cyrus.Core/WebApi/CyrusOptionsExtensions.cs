@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using NForza.Cyrus.Cqrs;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace NForza.Cyrus.WebApi;
+namespace NForza.Cyrus.Cqrs;
 
 public static class CyrusOptionsExtensions
 {

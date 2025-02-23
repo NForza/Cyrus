@@ -4,7 +4,7 @@ using Microsoft.OpenApi.Models;
 using NForza.Cyrus.Abstractions;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace NForza.Cyrus.WebApi;
+namespace NForza.Cyrus.Cqrs;
 
 public class ConfigureSwaggerOptions(TypedIdDictionary typedIds) : IConfigureOptions<SwaggerGenOptions>
 {

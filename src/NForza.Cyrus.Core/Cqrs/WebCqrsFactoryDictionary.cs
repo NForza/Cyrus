@@ -1,20 +1,15 @@
-﻿using System;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.ComponentModel;
 using Microsoft.AspNetCore.Http;
 
-namespace NForza.Cyrus.WebApi;
+namespace NForza.Cyrus.Cqrs;
 
-#nullable enable
-
-public class HttpContextCqrsFactory : ICqrsFactory
+public class WebCqrsFactoryDictionary
 {
     Dictionary<Type, Func<HttpContext, object>> objectFactories = new();
 
-    public HttpContextCqrsFactory()
+    public void Register<T>(Func<HttpContext, T> factory)
     {
-        {{ QueryFactoryMethod }}
+        objectFactories[typeof(T)] = ctx => factory(ctx);
     }
 
     public object CreateFromHttpContext(Type queryType, HttpContext ctx)
@@ -23,7 +18,7 @@ public class HttpContextCqrsFactory : ICqrsFactory
         return func(ctx);
     }
 
-    private object? GetPropertyValue(string propertyName, HttpContext ctx, Type targetType)
+    public object? GetPropertyValue(string propertyName, HttpContext ctx, Type targetType)
     {
         object? value = null;
 
@@ -33,7 +28,7 @@ public class HttpContextCqrsFactory : ICqrsFactory
         }
         else if (ctx.Request.Query.TryGetValue(propertyName, out var queryValue))
         {
-            value = queryValue.ToString(); 
+            value = queryValue.ToString();
         }
 
         if (value != null)

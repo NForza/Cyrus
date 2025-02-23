@@ -10,9 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using NForza.Cyrus.Cqrs;
-using NForza.Cyrus.WebApi.Policies;
+using NForza.Cyrus.Cqrs.Policies;
 
-namespace NForza.Cyrus.WebApi;
+namespace NForza.Cyrus.Cqrs;
 
 public static partial class EndpointCommandMappingExtensions
 {
