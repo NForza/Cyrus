@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace NForza.Cyrus.Cqrs;
+namespace NForza.Cyrus.WebApi;
 
 public interface ICqrsFactory
 {

@@ -2,9 +2,9 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 
-namespace NForza.Cyrus.Cqrs.Policies;
+namespace NForza.Cyrus.WebApi.Policies;
 
-public class DefaultCommandInputMappingPolicy(IHttpContextAccessor httpContextAccessor, ICqrsFactory cqrsFactory) 
+public class DefaultCommandInputMappingPolicy(IHttpContextAccessor httpContextAccessor, ICqrsFactory cqrsFactory)
 {
     private static readonly JsonSerializerOptions serializerOptions = new(JsonSerializerDefaults.Web);
     public async Task<object?> MapInputAsync(Type typeToCreate)

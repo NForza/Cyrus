@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace NForza.Cyrus.Cqrs.Policies;
+namespace NForza.Cyrus.WebApi.Policies;
 
-public class DefaultQueryInputMappingPolicy(IHttpContextAccessor contextAccessor, ICqrsFactory queryFactory) 
+public class DefaultQueryInputMappingPolicy(IHttpContextAccessor contextAccessor, ICqrsFactory queryFactory)
 {
     public Task<object?> MapInputAsync(Type typeToCreate)
     {

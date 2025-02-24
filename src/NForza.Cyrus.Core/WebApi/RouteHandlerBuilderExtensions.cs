@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.OpenApi.Models;
+using NForza.Cyrus.Cqrs;
 
-namespace NForza.Cyrus.Cqrs;
+namespace NForza.Cyrus.WebApi;
 
 public static class RouteHandlerBuilderExtensions
 {

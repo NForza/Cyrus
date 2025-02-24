@@ -1,4 +1,4 @@
-﻿namespace NForza.Cyrus.Cqrs;
+﻿namespace NForza.Cyrus.WebApi;
 
 public class SwaggerGenOptionsExtensions
 {

@@ -10,9 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using NForza.Cyrus.Cqrs;
-using NForza.Cyrus.Cqrs.Policies;
+using NForza.Cyrus.WebApi.Policies;
 
-namespace NForza.Cyrus.Cqrs;
+namespace NForza.Cyrus.WebApi;
 
 public static partial class EndpointCommandMappingExtensions
 {
@@ -35,15 +35,15 @@ public static partial class EndpointCommandMappingExtensions
                     {
                         commandObject = ctx.RequestServices.GetRequiredService<DefaultCommandInputMappingPolicy>().MapInputAsync(commandType);
                     }
-                    catch(JsonException jsonException)
+                    catch (JsonException jsonException)
                     {
                         return Results.BadRequest(jsonException.Message);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         return Results.BadRequest(ex.Message);
                     }
-           
+
                     if (!ValidateObject(commandType, commandObject, ctx.RequestServices, out var problem))
                         return Results.BadRequest(problem);
 

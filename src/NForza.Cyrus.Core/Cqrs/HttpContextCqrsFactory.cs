@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Http;
-using NForza.Cyrus.Cqrs;
+using NForza.Cyrus.WebApi;
 
 namespace NForza.Cyrus.Cqrs;
 

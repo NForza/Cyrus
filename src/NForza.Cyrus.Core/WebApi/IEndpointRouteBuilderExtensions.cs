@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using NForza.Cyrus.Abstractions.Model;
-using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.SignalR;
 using NForza.Cyrus.Model;
-using NForza.Cyrus.Cqrs.Policies;
+using NForza.Cyrus.WebApi.Policies;
+using NForza.Cyrus.Cqrs;
 
-namespace NForza.Cyrus.Cqrs;
+namespace NForza.Cyrus.WebApi;
 
 public static class IEndpointRouteBuilderExtensions
 {

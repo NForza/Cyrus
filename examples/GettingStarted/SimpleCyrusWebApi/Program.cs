@@ -1,7 +1,8 @@
 using System.Reflection;
 using FluentValidation;
 using MassTransit;
-using NForza.Cyrus.Cqrs;
+using NForza.Cyrus;
+using NForza.Cyrus.WebApi;
 using SimpleCyrusWebApi.Model;
 using SimpleCyrusWebApi.Storage;
 
@@ -38,6 +39,5 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//Exposes all endpoints in all EndpointGroups
 app.MapCyrus();
 app.Run();

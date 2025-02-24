@@ -62,7 +62,7 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
             if (config != null && config.GenerationTarget.Contains(GenerationTarget.Domain))
             {
                 var sourceText = GenerateServiceCollectionExtensions(handlers, typesFromReferencedAssemblies, config, compilation);
-                sourceProductionContext.AddSource($"ServiceCollection.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+//                sourceProductionContext.AddSource($"ServiceCollection.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }
         });
     }
