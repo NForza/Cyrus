@@ -2,8 +2,6 @@ using System.Reflection;
 using FluentValidation;
 using MassTransit;
 using NForza.Cyrus.Cqrs;
-using NForza.Cyrus.Cqrs;
-using NForza.Cyrus.Abstractions;
 using SimpleCyrusWebApi.Model;
 using SimpleCyrusWebApi.Storage;
 
@@ -30,8 +28,7 @@ builder.Services.AddMassTransit(cfg =>
 
 builder.Services.AddValidatorsFromAssemblies([Assembly.GetExecutingAssembly(), typeof(Customer).Assembly]);
 
-//Adds all Cyrus services
-builder.Services.AddCyrus(options => options.AddTypedIdSerializers());
+builder.Services.AddCyrus();
 
 var app = builder.Build();
 

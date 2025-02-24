@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
@@ -28,27 +29,52 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
             .Select((x, _) => x!)
             .Collect();
 
-        var combinedProvider = context.CompilationProvider.Combine(allHandlersProvider).Combine(configProvider);
+        var assemblyReferences = context.CompilationProvider;
 
-        context.RegisterSourceOutput(combinedProvider, (sourceProductionContext, source) =>
+        var typesFromReferencedAssemblyProvider = assemblyReferences
+            .SelectMany((compilation, _) =>
+            {
+                var typesFromAssemblies = compilation.References
+                    .Select(ca => compilation.GetAssemblyOrModuleSymbol(ca) as IAssemblySymbol)
+                    .SelectMany(ass => ass != null ? GetAllTypesRecursively(ass.GlobalNamespace) : [])
+                    .Where(t => IsQuery(t) || IsCommand(t))
+                    .ToList();
+
+                var csharpCompilation = (CSharpCompilation)compilation;
+                var typesInCompilation = GetAllTypesRecursively(csharpCompilation.GlobalNamespace)
+                    .Where(IsQuery)
+                    .ToList();
+
+                return typesFromAssemblies.Union(typesInCompilation, SymbolEqualityComparer.Default).OfType<INamedTypeSymbol>();
+            })
+           .Collect();
+
+        var serviceCollectionCombinedProvider = context
+            .CompilationProvider
+            .Combine(allHandlersProvider)
+            .Combine(typesFromReferencedAssemblyProvider)
+            .Combine(configProvider)            ;
+
+        context.RegisterSourceOutput(serviceCollectionCombinedProvider, (sourceProductionContext, source) =>
         {
-            var ((compilation, handlers), config) = source;
+            var (((compilation, handlers), typesFromReferencedAssemblies), config) = source;
 
             if (config != null && config.GenerationTarget.Contains(GenerationTarget.Domain))
             {
-                var sourceText = GenerateServiceCollectionExtensions(handlers, config, compilation);
+                var sourceText = GenerateServiceCollectionExtensions(handlers, typesFromReferencedAssemblies, config, compilation);
                 sourceProductionContext.AddSource($"ServiceCollection.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }
         });
     }
 
-    private string GenerateServiceCollectionExtensions(ImmutableArray<IMethodSymbol> handlers, GenerationConfig configuration, Compilation compilation)
+    private string GenerateServiceCollectionExtensions(ImmutableArray<IMethodSymbol> handlers, ImmutableArray<INamedTypeSymbol> typesFromReferencedAssemblies, GenerationConfig configuration, Compilation compilation)
     {
         string handlerTypeRegistrations = CreateRegisterTypes(handlers);
         string queryHandlerRegistrations = CreateRegisterQueryHandler(handlers.Where(x => x.IsQueryHandler()), compilation);
         string commandHandlerRegistrations = CreateRegisterCommandHandler(handlers.Where(x => x.IsCommandHandler()), compilation);
-        string eventHandlerRegistrations = CreateEventHandlerRegistrations(handlers.Where(x => x.IsEventHandler()), compilation); 
+        string eventHandlerRegistrations = CreateEventHandlerRegistrations(handlers.Where(x => x.IsEventHandler()), compilation);
         string eventBusRegistration = $@"services.AddSingleton<IEventBus, {configuration.EventBus}EventBus>();";
+        string queryFactoryRegistrations = GenerateQueryFactoryExtensionMethods(typesFromReferencedAssemblies);
 
         if (string.IsNullOrEmpty(handlerTypeRegistrations) && string.IsNullOrEmpty(queryHandlerRegistrations) && string.IsNullOrEmpty(commandHandlerRegistrations))
         {
@@ -63,6 +89,7 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
             RegisterQueryHandlers = queryHandlerRegistrations,
             RegisterEventHandlers = eventHandlerRegistrations,
             RegisterEventBus = eventBusRegistration,
+            RegisterQueryFactory = queryFactoryRegistrations
         };
 
         var resolvedSource = LiquidEngine.Render(model, "CqrsServiceCollectionExtensions");
@@ -181,6 +208,20 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
         return source.ToString();
     }
 
+    private bool IsQuery(INamedTypeSymbol symbol)
+    {
+        bool hasQueryAttribute = symbol.IsQuery();
+        bool isFrameworkAssembly = symbol.ContainingAssembly.IsFrameworkAssembly();
+        return hasQueryAttribute && !isFrameworkAssembly;
+    }
+
+    private bool IsCommand(INamedTypeSymbol symbol)
+    {
+        bool hasCommandAttribute = symbol.IsCommand();
+        bool isFrameworkAssembly = symbol.ContainingAssembly.IsFrameworkAssembly();
+        return hasCommandAttribute && !isFrameworkAssembly;
+    }
+
     private static string CreateRegisterCommandHandler(IEnumerable<IMethodSymbol> handlers, Compilation compilation)
     {
         INamedTypeSymbol? taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
@@ -233,4 +274,91 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
         }
         return source.ToString();
     }
+
+    private static string[] assembliesToSkip = ["System", "Microsoft", "mscorlib", "netstandard", "WindowsBase", "Swashbuckle", "RabbitMQ", "MassTransit"];
+    private IEnumerable<INamedTypeSymbol> GetAllTypesRecursively(INamespaceSymbol namespaceSymbol)
+    {
+        var assemblyName = namespaceSymbol?.ContainingAssembly?.Name;
+        if (assemblyName != null && assembliesToSkip.Any(n => assemblyName.StartsWith(n)))
+        {
+            return [];
+        }
+
+        var types = namespaceSymbol!.GetTypeMembers();
+        foreach (var subNamespace in namespaceSymbol.GetNamespaceMembers())
+        {
+            types = types.AddRange(GetAllTypesRecursively(subNamespace));
+        }
+        return types;
+    }
+
+    private string GenerateQueryFactoryExtensionMethods(ImmutableArray<INamedTypeSymbol> queries)
+    {
+        StringBuilder source = new();
+        foreach (var query in queries)
+        {
+            var queryTypeName = query.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+            source.Append($@"    x.Register<{queryTypeName}>(ctx => {GetConstructionExpression(query)}");
+        }
+
+        return source.ToString();
+    }
+
+    private string GetConstructionExpression(INamedTypeSymbol query)
+    {
+        static IEnumerable<IPropertySymbol> GetPublicProperties(INamedTypeSymbol namedTypeSymbol)
+        {
+            return namedTypeSymbol
+                .GetMembers()
+                .OfType<IPropertySymbol>()
+                .Where(p => p.DeclaredAccessibility == Accessibility.Public);
+        }
+
+        var queryTypeName = query.ToFullName();
+        var ctor = new StringBuilder(@$"new {queryTypeName}");
+        var constructorProperties = GenerateConstructorParameters(query, ctor);
+        var propertiesToInitialize = GetPublicProperties(query).Where(p => !constructorProperties.Contains(p.Name)).ToList();
+        if (propertiesToInitialize.Count > 0)
+        {
+            ctor.Append("{");
+            var propertyInitializer = new List<string>();
+            foreach (var prop in propertiesToInitialize)
+            {
+                propertyInitializer.Add(@$"{prop.Name} = ({prop.Type.ToFullName()})x.GetPropertyValue(""{prop.Name}"", ctx, typeof({prop.Type}))");
+            }
+            ctor.Append(string.Join(", ", propertyInitializer));
+            ctor.Append("}");
+        }
+        ctor.AppendLine(");");
+        return ctor.ToString();
+    }
+
+    private List<string> GenerateConstructorParameters(INamedTypeSymbol query, StringBuilder ctor)
+    {
+        var constructorWithLeastParameters = query.Constructors
+                .Where(c => c.DeclaredAccessibility == Accessibility.Public)
+                .OrderBy(c => c.Parameters.Length)
+                .FirstOrDefault();
+        if (constructorWithLeastParameters == null)
+        {
+            return [];
+        }
+        ctor.Append("(");
+
+        var result = new List<string>();
+        var firstParam = constructorWithLeastParameters.Parameters.FirstOrDefault();
+        foreach (var param in constructorWithLeastParameters.Parameters)
+        {
+            if (!param.Equals(firstParam, SymbolEqualityComparer.Default))
+            {
+                ctor.Append(", ");
+            }
+            ctor.Append($"({param.Type.ToFullName()})x.GetPropertyValue(\"{param.Name}\", ctx, typeof({param.Type.ToFullName()}))");
+            result.Add(param.Name);
+        }
+        ctor.Append(")");
+        return result;
+    }
+
 }

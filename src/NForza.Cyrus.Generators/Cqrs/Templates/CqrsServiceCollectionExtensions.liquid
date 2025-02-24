@@ -35,6 +35,7 @@ public static class CyrusServiceCollectionExtensions
         services.AddSingleton(BuildCommandHandlerDictionary());
         services.AddSingleton(BuildQueryHandlerDictionary());
         services.AddSingleton(BuildEventHandlerDictionary());
+        services.AddSingleton(BuildQueryFactoryDictionary());
         {{ RegisterHandlerTypes }}
         return services;
     }
@@ -59,4 +60,11 @@ public static class CyrusServiceCollectionExtensions
         {{ RegisterEventHandlers }}
         return handlers;
     }
+
+    public static WebCqrsFactoryDictionary BuildQueryFactoryDictionary()
+    {
+        var x = new WebCqrsFactoryDictionary();
+        {{ RegisterQueryFactory }}
+        return x;
+    }    
 }
