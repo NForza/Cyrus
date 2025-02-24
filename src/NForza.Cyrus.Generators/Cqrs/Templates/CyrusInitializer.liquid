@@ -1,0 +1,13 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace NForza.Cyrus.Cqrs;
+
+#nullable enable
+
+public class {{ Name }} : ICyrusInitializer
+{
+    public void RegisterServices(IServiceCollection services)
+    {
+        {{ Initializer }}
+    }
+}

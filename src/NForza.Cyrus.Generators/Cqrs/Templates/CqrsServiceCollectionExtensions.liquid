@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyModel;
 using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Abstractions.Model;
-using NForza.Cyrus.WebApi.Policies;
+using NForza.Cyrus.Cqrs.Policies;
 
 {% for i in Imports %}
 using {{ i }};
@@ -15,15 +15,15 @@ namespace NForza.Cyrus.Cqrs;
 
 public static class CyrusServiceCollectionExtensions
 {
-    public static IServiceCollection AddCyrus(this IServiceCollection services)
+    public static IServiceCollection AddCyrus(this IServiceCollection services, Action<CyrusOptions>? options = null)
     {
+        options?.Invoke(new CyrusOptions(services));
         services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
         services.AddScoped<ICqrsFactory, HttpContextCqrsFactory>();
         services.AddSingleton<IQueryProcessor, QueryProcessor>();
         services.AddSingleton<ICommandBus, LocalCommandBus>();
         services.AddSingleton<DefaultCommandInputMappingPolicy>();
         services.AddHttpContextAccessor();
-
 
 
         services.Scan(scan => scan

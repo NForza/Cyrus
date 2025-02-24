@@ -13,7 +13,7 @@ public static class ServiceCollectionExtensions
         foreach (var type in registrarTypes)
         {
             var registrar = (ICyrusInitializer)Activator.CreateInstance(type)!;
-            registrar.Initialize(services);
+            registrar.RegisterServices(services);
         }
         return services;
     }

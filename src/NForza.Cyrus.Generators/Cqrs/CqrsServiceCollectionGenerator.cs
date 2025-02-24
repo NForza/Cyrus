@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
@@ -61,40 +62,82 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
 
             if (config != null && config.GenerationTarget.Contains(GenerationTarget.Domain))
             {
-                var sourceText = GenerateServiceCollectionExtensions(handlers, typesFromReferencedAssemblies, config, compilation);
-//                sourceProductionContext.AddSource($"ServiceCollection.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                AddTypeRegistrations(sourceProductionContext, handlers);
+                AddQueryHandlerRegistrations(sourceProductionContext, handlers.Where(x => x.IsQueryHandler()), compilation);
+                AddCommandHandlerRegistrations(sourceProductionContext, handlers.Where(x => x.IsCommandHandler()), compilation);
+                AddQueryFactoryMethodsRegistrations(sourceProductionContext, typesFromReferencedAssemblies, compilation);
             }
         });
     }
 
-    private string GenerateServiceCollectionExtensions(ImmutableArray<IMethodSymbol> handlers, ImmutableArray<INamedTypeSymbol> typesFromReferencedAssemblies, GenerationConfig configuration, Compilation compilation)
+    private void AddQueryFactoryMethodsRegistrations(SourceProductionContext sourceProductionContext, ImmutableArray<INamedTypeSymbol> typesFromReferencedAssemblies, Compilation compilation)
     {
-        string handlerTypeRegistrations = CreateRegisterTypes(handlers);
-        string queryHandlerRegistrations = CreateRegisterQueryHandler(handlers.Where(x => x.IsQueryHandler()), compilation);
-        string commandHandlerRegistrations = CreateRegisterCommandHandler(handlers.Where(x => x.IsCommandHandler()), compilation);
-        string eventHandlerRegistrations = CreateEventHandlerRegistrations(handlers.Where(x => x.IsEventHandler()), compilation);
-        string eventBusRegistration = $@"services.AddSingleton<IEventBus, {configuration.EventBus}EventBus>();";
         string queryFactoryRegistrations = GenerateQueryFactoryExtensionMethods(typesFromReferencedAssemblies);
 
-        if (string.IsNullOrEmpty(handlerTypeRegistrations) && string.IsNullOrEmpty(queryHandlerRegistrations) && string.IsNullOrEmpty(commandHandlerRegistrations))
-        {
-            return string.Empty;
-        }
-
-        var model = new
-        {
-            Imports = configuration.EventBus == "MassTransit" ? ["NForza.Cyrus.MassTransit"] : new List<string>(),
-            RegisterHandlerTypes = handlerTypeRegistrations,
-            RegisterCommandHandlers = commandHandlerRegistrations,
-            RegisterQueryHandlers = queryHandlerRegistrations,
-            RegisterEventHandlers = eventHandlerRegistrations,
-            RegisterEventBus = eventBusRegistration,
-            RegisterQueryFactory = queryFactoryRegistrations
-        };
-
-        var resolvedSource = LiquidEngine.Render(model, "CqrsServiceCollectionExtensions");
-        return resolvedSource;
+        queryFactoryRegistrations = $@"WebCqrsFactoryDictionary x = new WebCqrsFactoryDictionary();
+             {queryFactoryRegistrations}
+             services.AddSingleton(x);";
+        var source = LiquidEngine.Render(new { Name = "QueryFactoryMethods", Initializer = queryFactoryRegistrations }, "CyrusInitializer");
+        sourceProductionContext.AddSource($"QueryFactoryMethodRegistrations.g.cs", SourceText.From(source, Encoding.UTF8));
     }
+
+    private void AddCommandHandlerRegistrations(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers, Compilation compilation)
+    {
+        string commandHandlerRegistrations = CreateRegisterCommandHandler(handlers, compilation);
+
+        commandHandlerRegistrations = $@"CommandHandlerDictionary handlers = new CommandHandlerDictionary();
+             {commandHandlerRegistrations}
+             services.AddSingleton(handlers);";
+
+        var source = LiquidEngine.Render(new { Name = "CommandHandlerRegistrations", Initializer = commandHandlerRegistrations }, "CyrusInitializer");
+        sourceProductionContext.AddSource($"CommandHandlerRegistrations.g.cs", SourceText.From(source, Encoding.UTF8));
+    }
+
+    private void AddQueryHandlerRegistrations(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers, Compilation compilation)
+    {
+        string queryHandlerRegistrations = CreateRegisterQueryHandler(handlers, compilation);
+        
+        queryHandlerRegistrations = $@"QueryHandlerDictionary handlers = new QueryHandlerDictionary();
+             {queryHandlerRegistrations}
+             services.AddSingleton(handlers);";
+
+        var source = LiquidEngine.Render(new { Name = "QueryHandlerRegistrations", Initializer = queryHandlerRegistrations }, "CyrusInitializer");
+        sourceProductionContext.AddSource($"QueryHandlerRegistrations.g.cs", SourceText.From(source, Encoding.UTF8));
+    }
+
+    private void AddTypeRegistrations(SourceProductionContext sourceProductionContext, ImmutableArray<IMethodSymbol> handlers)
+    {
+        string handlerTypeRegistrations = CreateRegisterTypes(handlers);
+        var source = LiquidEngine.Render(new { Name = "TypeRegistrations", Initializer = handlerTypeRegistrations }, "CyrusInitializer" );
+        sourceProductionContext.AddSource($"TypeRegistrations.g.cs", SourceText.From(source, Encoding.UTF8));
+    }
+
+    //private string GenerateServiceCollectionExtensions(ImmutableArray<IMethodSymbol> handlers, ImmutableArray<INamedTypeSymbol> typesFromReferencedAssemblies, GenerationConfig configuration, Compilation compilation)
+    //{
+    //    string eventHandlerRegistrations = CreateEventHandlerRegistrations(handlers.Where(x => x.IsEventHandler()), compilation);
+    //    string eventBusRegistration = $@"services.AddSingleton<IEventBus, {configuration.EventBus}EventBus>();";
+
+    //    if (string.IsNullOrEmpty(handlerTypeRegistrations) && string.IsNullOrEmpty(queryHandlerRegistrations) && string.IsNullOrEmpty(commandHandlerRegistrations))
+    //    {
+    //        return string.Empty;
+    //    }
+
+        
+
+    //    var model = new
+    //    {
+    //        Imports = configuration.EventBus == "MassTransit" ? ["NForza.Cyrus.MassTransit"] : new List<string>(),
+    //        RegisterHandlerTypes = handlerTypeRegistrations,
+    //        RegisterCommandHandlers = commandHandlerRegistrations,
+    //        RegisterQueryHandlers = queryHandlerRegistrations,
+    //        RegisterEventHandlers = eventHandlerRegistrations,
+    //        RegisterEventBus = eventBusRegistration,
+    //        RegisterQueryFactory = queryFactoryRegistrations
+    //    };
+
+    //    var resolvedSource = LiquidEngine.Render(model, "CqrsServiceCollectionExtensions");
+    //    return resolvedSource;
+    //}
 
     private string CreateEventHandlerRegistrations(IEnumerable<IMethodSymbol> eventHandlers, Compilation compilation)
     {

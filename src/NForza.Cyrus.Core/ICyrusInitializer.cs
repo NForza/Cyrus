@@ -2,8 +2,8 @@
 
 namespace NForza.Cyrus
 {
-    internal interface ICyrusInitializer
+    public interface ICyrusInitializer
     {
-        void Initialize(IServiceCollection services);
+        void RegisterServices(IServiceCollection services);
     }
 }
