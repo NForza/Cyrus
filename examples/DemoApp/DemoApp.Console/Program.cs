@@ -1,6 +1,8 @@
-﻿using System.Reflection;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using DemoApp.Contracts.Customers;
 using DemoApp.Domain.Customer;
+using FluentValidation;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,3 +37,5 @@ if (customer != null)
 {
     Console.WriteLine(customer.Name);
 }
+
+new ValidationContext<AddCustomerCommand>(new());

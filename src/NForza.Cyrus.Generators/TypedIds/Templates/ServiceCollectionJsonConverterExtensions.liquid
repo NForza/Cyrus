@@ -1,32 +1,27 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NForza.Cyrus.Cqrs;
+using NForza.Cyrus.Abstractions;
 using System.Text.Json.Serialization;
 {% for i in Imports %} 
 using {{ i }};
 {% endfor %}
 
-namespace NForza.Cyrus.Abstractions;
+namespace NForza.Cyrus.WebApi;
 
-public static class ServiceCollectionJsonConverterExtensions
+public class ServiceCollectionJsonConverterExtensions: ICyrusInitializer
 {
-    public static IServiceCollection AddJsonConverters(this IServiceCollection services)
+    public void RegisterServices(IServiceCollection services)
     {
-{% for t in Types %}        
-  services.AddTransient<JsonConverter, {{ t.Name }}JsonConverter>();
-{% endfor %}
-        return services;
+        services.AddSingleton(sp => new TypedIdDictionary(allTypes));
+        {% for t in Types %}        
+          services.AddTransient<JsonConverter, {{ t.Name }}JsonConverter>();
+        {% endfor %}
     }
 
     private static Dictionary<Type, Type> allTypes = new() {
-        {% for t in Types %}        
+    {%- for t in Types %}        
         [typeof({{ t.Name }})] = typeof({{ t.UnderlyingType }}){% unless forloop.last %}, {% endunless -%}
-        {% endfor %}
+    {% endfor -%}
     };
 
-    public static CyrusOptions AddTypedIdSerializers(this CyrusOptions options)
-    {
-        options.Services.AddSingleton(sp => new TypedIdDictionary(allTypes));
-        options.Services.AddJsonConverters();
-        return options;
-    }
 }

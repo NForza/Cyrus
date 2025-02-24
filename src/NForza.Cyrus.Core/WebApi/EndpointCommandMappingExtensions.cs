@@ -33,7 +33,7 @@ public static partial class EndpointCommandMappingExtensions
                     object? commandObject = null;
                     try
                     {
-                        commandObject = ctx.RequestServices.GetRequiredService<DefaultCommandInputMappingPolicy>().MapInputAsync(commandType);
+                        commandObject = await ctx.RequestServices.GetRequiredService<DefaultCommandInputMappingPolicy>().MapInputAsync(commandType);
                     }
                     catch (JsonException jsonException)
                     {
