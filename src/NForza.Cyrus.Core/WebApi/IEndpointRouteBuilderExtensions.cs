@@ -41,11 +41,13 @@ public static class IEndpointRouteBuilderExtensions
     public static IEndpointRouteBuilder MapModel(this IEndpointRouteBuilder endpoints)
     {
         ICyrusModel model = CyrusModel.Aggregate(endpoints.ServiceProvider);
-        endpoints.MapGet("/model", () =>
-        {
-            string json = model.AsJson();
-            return Results.Content(json, "application/json");
-        });
+        endpoints
+            .MapGet("/model", () =>
+            {
+                string json = model.AsJson();
+                return Results.Content(json, "application/json");
+            })
+            .ExcludeFromDescription();
         return endpoints;
     }
 

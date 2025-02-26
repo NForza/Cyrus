@@ -2,5 +2,5 @@
 
 namespace DemoApp.Contracts.Customers;
 
-[Query(Route = "{Id:guid}")]
+[Query(Route = "customers/{Id:guid}")]
 public record struct CustomerByIdQuery(CustomerId Id);

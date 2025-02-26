@@ -10,6 +10,6 @@ public class AddCustomerCommandValidator : AbstractValidator<AddCustomerCommand>
         RuleFor(x => x.Name).NotNull().NotEmpty().WithMessage("Name can't be empty");
         RuleFor(x => x.Address).NotNull().NotEmpty().WithMessage("Address can't be empty");
         RuleFor(x => x.CustomerType).NotNull().WithMessage("CustomerType can't be empty");
-        RuleFor(x => x.Address.StreetNumber).Must(x => x.Value > 0).WithMessage("StreetNumber must be greater than 0"); ;
+        RuleFor(x => x.Address.StreetNumber).Must(x => x > 0).WithMessage("Street number must be greater than 0");
     }
 }

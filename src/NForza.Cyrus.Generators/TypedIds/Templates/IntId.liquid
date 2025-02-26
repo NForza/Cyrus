@@ -10,8 +10,15 @@ namespace {{ Namespace }};
 [JsonConverter(typeof({{ Name }}JsonConverter))]
 [TypeConverter(typeof({{ Name }}TypeConverter))]
 [DebuggerDisplay("{Value}")]
-public partial record struct {{ Name }}(int Value): ITypedId
+public partial record struct {{ Name }}(int Value): ITypedId, IComparable, IComparable<{{ Name }}>, IEquatable<{{ Name }}>
 {
+    public int CompareTo(object other) => other is {{ Name }} ? Value.CompareTo((({{Name}})other).Value) : -1;
+    public int CompareTo({{ Name }} other) => Value.CompareTo(other.Value);
+    public static bool operator <({{ Name }} left, {{ Name }} right) => left.CompareTo(right) < 0;
+    public static bool operator <=({{ Name }} left, {{ Name }} right) => left.CompareTo(right) <= 0;
+    public static bool operator >({{ Name }} left, {{ Name }} right) => left.CompareTo(right) > 0;
+    public static bool operator >=({{ Name }} left, {{ Name }} right) => left.CompareTo(right) >= 0;
+
     public static implicit operator {{ UnderlyingType }}({{ Name }} typedId) => typedId.Value;
     public static explicit operator {{ Name }}({{ UnderlyingType }} value) => new(value);
     public bool IsValid => 
