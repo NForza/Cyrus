@@ -73,9 +73,14 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
         if (commandResultSymbol == null || taskSymbol == null)
             return string.Empty;
 
+        var taskOfCommandResultSymbol = taskSymbol.Construct(commandResultSymbol);
         var model = new
         {
-            Types = handlers.Select(h => h.Parameters[0].Type.ToFullName()).ToList()
+            Types = handlers
+                .Where(h => h.ReturnType.Equals(taskOfCommandResultSymbol, SymbolEqualityComparer.Default) 
+                            ||
+                            h.ReturnType.Equals(commandResultSymbol, SymbolEqualityComparer.Default))
+                .Select(h => h.Parameters[0].Type.ToFullName()).ToList()
         };
 
         var resolvedSource = LiquidEngine.Render(model, "CommandDispatcherExtensions");
