@@ -1,8 +1,11 @@
 using System.Reflection;
+using DemoApp.Contracts.Customers;
 using DemoApp.Domain.Customer;
 using FluentValidation;
 using MassTransit;
+using Microsoft.AspNetCore.Mvc;
 using NForza.Cyrus;
+using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -2,7 +2,8 @@
 
 namespace NForza.Cyrus.WebApi;
 
-public interface ICqrsFactory
+public interface IHttpContextObjectFactory
 {
-    public object CreateFromHttpContext(Type queryType, HttpContext ctx);
+    public T CreateFromHttpContext<T>(HttpContext ctx);
+    public object CreateFromHttpContext(Type t, HttpContext ctx);
 }

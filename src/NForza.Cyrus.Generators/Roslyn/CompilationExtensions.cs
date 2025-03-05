@@ -5,13 +5,13 @@ using NForza.Cyrus.Generators.Roslyn;
 
 public static class CompilationExtensions
 {
-    public static IEnumerable<INamedTypeSymbol> GetAllTypesFromCompilationAndReferencedAssemblies(this Compilation compilation, params string[] assemblySuffixes)
+    public static IEnumerable<INamedTypeSymbol> GetAllTypesFromCyrusAssemblies(this Compilation compilation, params string[] assemblySuffixes)
     {
         var compilationTypes = GetTypesFromCompilation(compilation);
 
         var referencedAssemblyTypes = GetTypesFromReferencedAssemblies(compilation, assemblySuffixes);
 
-        return compilationTypes.Concat(referencedAssemblyTypes);
+        return compilationTypes.Concat(referencedAssemblyTypes).ToList();
     }
 
     private static IEnumerable<INamedTypeSymbol> GetTypesFromCompilation(Compilation compilation)
@@ -41,7 +41,7 @@ public static class CompilationExtensions
         foreach (var reference in compilation.References)
         {
             var assemblySymbol = compilation.GetAssemblyOrModuleSymbol(reference) as IAssemblySymbol;
-            if (assemblySymbol != null && !assemblySymbol.IsFrameworkAssembly() && visitedAssemblies.Add(assemblySymbol))
+            if (assemblySymbol != null && assemblySymbol.ReferencesCyrusAbstractions() && visitedAssemblies.Add(assemblySymbol))
             {
                 assembliesToVisit.Push(assemblySymbol);
             }
@@ -51,7 +51,7 @@ public static class CompilationExtensions
         {
             var currentAssembly = assembliesToVisit.Pop();
 
-            if (assemblySuffixes.Any(currentAssembly.Name.EndsWith))
+            if (assemblySuffixes.Length == 0 || assemblySuffixes.Any(currentAssembly.Name.EndsWith))
             {
                 foreach (var type in GetAllTypesFromAssembly(currentAssembly))
                 {

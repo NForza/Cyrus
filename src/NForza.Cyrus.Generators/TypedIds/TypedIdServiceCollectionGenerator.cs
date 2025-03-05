@@ -10,7 +10,7 @@ using NForza.Cyrus.Generators.Roslyn;
 namespace NForza.Cyrus.Generators.TypedIds;
 
 [Generator]
-public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncrementalGenerator
+public class TypedIdInitializerGenerator : TypedIdGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -38,13 +38,13 @@ public class TypedIdServiceCollectionGenerator : TypedIdGeneratorBase, IIncremen
             if (!config.GenerationTarget.Contains(GenerationTarget.WebApi))
                 return;
 
-            var referencedTypedIds = compilation.GetAllTypesFromCompilationAndReferencedAssemblies(config.Contracts)
+            var referencedTypedIds = compilation.GetAllTypesFromCyrusAssemblies(config.Contracts)
                 .Where(nts => nts.IsTypedId());
 
             var allTypedIds = typedIds.Concat(referencedTypedIds).ToArray();
 
             var sourceText = GenerateServiceCollectionExtensionMethod(allTypedIds);
-            spc.AddSource("CqrsServiceCollectionExtensions.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            spc.AddSource("TypedIdInitializer.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         });
     }
 

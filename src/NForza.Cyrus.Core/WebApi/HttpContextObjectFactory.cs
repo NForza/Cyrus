@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using Microsoft.AspNetCore.Http;
 
-namespace NForza.Cyrus.Cqrs;
+namespace NForza.Cyrus.WebApi;
 
-public class WebCqrsFactoryDictionary
+public class HttpContextObjectFactory : IHttpContextObjectFactory
 {
     Dictionary<Type, Func<HttpContext, object>> objectFactories = new();
 
@@ -12,11 +12,18 @@ public class WebCqrsFactoryDictionary
         objectFactories[typeof(T)] = ctx => factory(ctx);
     }
 
-    public object CreateFromHttpContext(Type queryType, HttpContext ctx)
+    public T CreateFromHttpContext<T>(HttpContext ctx)
     {
-        var func = objectFactories[queryType];
+        var func = objectFactories[typeof(T)];
+        return (T)func(ctx);
+    }
+
+    public object CreateFromHttpContext(Type t, HttpContext ctx)
+    {
+        var func = objectFactories[t];
         return func(ctx);
     }
+
 
     public object? GetPropertyValue(string propertyName, HttpContext ctx, Type targetType)
     {

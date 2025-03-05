@@ -1,0 +1,16 @@
+﻿{% for t in Usings -%}
+using {{ t }};
+{% endfor -%}
+
+using NForza.Cyrus.Cqrs;
+using NForza.Cyrus.WebApi;
+
+namespace {{ Namespace }};
+
+public class {{ Name }}CyrusStartup : ICyrusWebStartup
+{
+	public void AddStartup(WebApplication app)
+	{
+		{{ StartupCommands }}
+	}
+}

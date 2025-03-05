@@ -1,0 +1,9 @@
+﻿    app.Map{{ Verb }}("{{ Path }}", {% if IsAsync %}async {% endif %}([FromBody] {{ Command }} command, [FromServices] IEventBus eventBus) =>
+    {
+        using var scope = app.Services.CreateScope();
+        var services = scope.ServiceProvider;
+        if (!ObjectValidation.Validate<{{ Command }}>(command, services, out var problem))
+            return Results.BadRequest(problem);
+        {% if HasReturnType %}var commandResult = {% endif %}{% if IsAsync %}await {% endif %}{{ CommandInvocation }};
+        return new CommandResultAdapter(eventBus).{{ AdapterMethod }}({% if HasReturnType %}commandResult{% endif %});
+    });

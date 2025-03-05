@@ -14,7 +14,7 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
 
         var commandHandlerProvider = context.SyntaxProvider
             .CreateSyntaxProvider(

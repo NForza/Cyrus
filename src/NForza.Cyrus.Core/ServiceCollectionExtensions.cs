@@ -7,6 +7,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddCyrus(this IServiceCollection services)
     {
         var registrarTypes = AppDomain.CurrentDomain.GetAssemblies()
+            .Where(a => !a.IsFrameworkAssembly())
             .SelectMany(a => a.GetTypes())
             .Where(t => typeof(ICyrusInitializer).IsAssignableFrom(t) && t.IsClass && !t.IsAbstract);
 

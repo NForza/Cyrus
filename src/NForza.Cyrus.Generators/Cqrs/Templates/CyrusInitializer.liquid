@@ -1,6 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using NForza.Cyrus;
+{% for t in Usings -%}
+using {{ t }};
+{% endfor -%}
 
-namespace NForza.Cyrus.Cqrs;
+namespace NForza.Cyrus.{{ Namespace }};
 
 #nullable enable
 

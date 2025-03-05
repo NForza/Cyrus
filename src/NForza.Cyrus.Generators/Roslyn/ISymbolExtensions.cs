@@ -53,15 +53,15 @@ public static class ISymbolExtensions
                 TypedConstant argument = attr.NamedArguments.FirstOrDefault(kvp => kvp.Key == "Verb").Value;
                 if (argument.IsNull)
                 {
-                    return "HttpVerb.Get";
+                    return "Get";
                 }
                 var member = argument.Type!.GetMembers()
                      .First(m => m is IFieldSymbol field && field.HasConstantValue && Equals(field.ConstantValue, argument.Value));
 
-                return argument.IsNull ? "global::NForza.Cyrus.Abstractions.HttpVerb.Get" : $"{argument.Type.ToFullName()}.{member.Name}";
+                return argument.IsNull ? "Get" : member.Name;
             }
         }
-        return "global::NForza.Cyrus.Abstractions.HttpVerb.Get";
+        return "Get";
     }
 
     public static bool IsCommandHandler(this ISymbol methodSymbol)

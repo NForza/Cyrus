@@ -14,7 +14,6 @@ public class DefaultCyrusServices : ICyrusInitializer
     public void RegisterServices(IServiceCollection services)
     {
         services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
-        services.AddSingleton<ICqrsFactory, HttpContextCqrsFactory>();
         services.AddSingleton<IQueryProcessor, QueryProcessor>();
         services.AddSingleton<ICommandBus, LocalCommandBus>();
         services.AddSingleton<DefaultCommandInputMappingPolicy>();

@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35309.182
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp.Console", "examples\DemoApp\DemoApp.Console\DemoApp.Console.csproj", "{BBF816AC-7EE4-4CE1-BC21-DC7AECA63D4B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp.Domain", "examples\DemoApp\DemoApp.Domain\DemoApp.Domain.csproj", "{B677268D-4663-427F-901B-79F1EB3D8C32}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cyrus.Abstractions", "src\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj", "{958260C7-CCD4-41A8-8A11-E6EEF486FDDD}"
@@ -32,8 +30,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DemoApp", "DemoApp", "{02EA
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GettingStarted", "GettingStarted", "{EA70C04C-2226-48BB-8ED1-246C5BFE64D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleCyrusWebApi", "examples\GettingStarted\SimpleCyrusWebApi\SimpleCyrusWebApi.csproj", "{1A9C74B0-70AD-43CC-856A-CA74FB689054}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoApp.Contracts", "examples\DemoApp\DemoApp.Contracts\DemoApp.Contracts.csproj", "{F226A20A-3ED9-8DED-646B-3F02A3D018F3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.Templating", "src\NForza.Cyrus.Templating\NForza.Cyrus.Templating.csproj", "{0D5FC394-E7FF-464D-62F8-0A84E9C970D7}"
@@ -45,12 +41,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BBF816AC-7EE4-4CE1-BC21-DC7AECA63D4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BBF816AC-7EE4-4CE1-BC21-DC7AECA63D4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BBF816AC-7EE4-4CE1-BC21-DC7AECA63D4B}.DebugGenerator|Any CPU.ActiveCfg = DebugGenerator|Any CPU
-		{BBF816AC-7EE4-4CE1-BC21-DC7AECA63D4B}.DebugGenerator|Any CPU.Build.0 = DebugGenerator|Any CPU
-		{BBF816AC-7EE4-4CE1-BC21-DC7AECA63D4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BBF816AC-7EE4-4CE1-BC21-DC7AECA63D4B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B677268D-4663-427F-901B-79F1EB3D8C32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B677268D-4663-427F-901B-79F1EB3D8C32}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B677268D-4663-427F-901B-79F1EB3D8C32}.DebugGenerator|Any CPU.ActiveCfg = DebugGenerator|Any CPU
@@ -93,12 +83,6 @@ Global
 		{67445A91-EC9C-41D8-860C-3B7C003B776D}.DebugGenerator|Any CPU.Build.0 = Debug|Any CPU
 		{67445A91-EC9C-41D8-860C-3B7C003B776D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67445A91-EC9C-41D8-860C-3B7C003B776D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1A9C74B0-70AD-43CC-856A-CA74FB689054}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1A9C74B0-70AD-43CC-856A-CA74FB689054}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1A9C74B0-70AD-43CC-856A-CA74FB689054}.DebugGenerator|Any CPU.ActiveCfg = Debug|Any CPU
-		{1A9C74B0-70AD-43CC-856A-CA74FB689054}.DebugGenerator|Any CPU.Build.0 = Debug|Any CPU
-		{1A9C74B0-70AD-43CC-856A-CA74FB689054}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1A9C74B0-70AD-43CC-856A-CA74FB689054}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F226A20A-3ED9-8DED-646B-3F02A3D018F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F226A20A-3ED9-8DED-646B-3F02A3D018F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F226A20A-3ED9-8DED-646B-3F02A3D018F3}.DebugGenerator|Any CPU.ActiveCfg = DebugGenerator|Any CPU
@@ -116,11 +100,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{BBF816AC-7EE4-4CE1-BC21-DC7AECA63D4B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{B677268D-4663-427F-901B-79F1EB3D8C32} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{239395A0-21EF-4967-BBFB-371BCB9CE1CF} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{4EFD0A43-5F57-4EDC-8860-F0BBC590C545} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{1A9C74B0-70AD-43CC-856A-CA74FB689054} = {EA70C04C-2226-48BB-8ED1-246C5BFE64D7}
 		{F226A20A-3ED9-8DED-646B-3F02A3D018F3} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

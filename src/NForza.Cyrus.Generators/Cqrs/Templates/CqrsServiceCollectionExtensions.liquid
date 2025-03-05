@@ -19,12 +19,10 @@ public static class CyrusServiceCollectionExtensions
     {
         options?.Invoke(new CyrusOptions(services));
         services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
-        services.AddScoped<ICqrsFactory, HttpContextCqrsFactory>();
         services.AddSingleton<IQueryProcessor, QueryProcessor>();
         services.AddSingleton<ICommandBus, LocalCommandBus>();
         services.AddSingleton<DefaultCommandInputMappingPolicy>();
         services.AddHttpContextAccessor();
-
 
         services.Scan(scan => scan
             .FromDependencyContext(DependencyContext.Default!)
@@ -62,9 +60,9 @@ public static class CyrusServiceCollectionExtensions
         return handlers;
     }
 
-    public static WebCqrsFactoryDictionary BuildQueryFactoryDictionary()
+    public static IHttpContextObjectFactory BuildQueryFactoryDictionary()
     {
-        var x = new WebCqrsFactoryDictionary();
+        var x = new HttpContextCqrsFactory();
         {{ RegisterQueryFactory }}
         return x;
     }    
