@@ -61,18 +61,7 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
 //                AddQueryFactoryMethodsRegistrations(sourceProductionContext, typesFromReferencedAssemblies, compilation);
             }
         });
-    }
-
-    //private void AddQueryFactoryMethodsRegistrations(SourceProductionContext sourceProductionContext, ImmutableArray<INamedTypeSymbol> typesFromReferencedAssemblies, Compilation compilation)
-    //{
-    //    string queryFactoryRegistrations = GenerateQueryFactoryExtensionMethods(typesFromReferencedAssemblies);
-
-    //    queryFactoryRegistrations = $@"HttpContextObjectFactory x = new HttpContextObjectFactory();
-    //         {queryFactoryRegistrations}
-    //         services.AddSingleton<IHttpContextObjectFactory>(x);";
-    //    var source = LiquidEngine.Render(new { Namespace = "WebApi", Name = "QueryFactoryMethods", Initializer = queryFactoryRegistrations }, "CyrusInitializer");
-    //    sourceProductionContext.AddSource($"QueryFactoryMethodRegistrations.g.cs", SourceText.From(source, Encoding.UTF8));
-    //}
+    }    
 
     private void AddCommandHandlerRegistrations(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers, Compilation compilation)
     {

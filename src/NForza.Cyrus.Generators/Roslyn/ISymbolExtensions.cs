@@ -8,7 +8,7 @@ public static class ISymbolExtensions
     public static string ToFullName(this ISymbol symbol)
         => symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-    public static bool IsQueryHandler(this ISymbol methodSymbol)
+    public static bool IsQueryHandler(this IMethodSymbol methodSymbol)
     {
         return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "QueryHandlerAttribute");
     }
@@ -64,7 +64,7 @@ public static class ISymbolExtensions
         return "Get";
     }
 
-    public static bool IsCommandHandler(this ISymbol methodSymbol)
+    public static bool IsCommandHandler(this IMethodSymbol methodSymbol)
     {
         return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "CommandHandlerAttribute");
     }
@@ -78,7 +78,7 @@ public static class ISymbolExtensions
         return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "EventAttribute");
     }
 
-    public static bool IsEventHandler(this ISymbol methodSymbol)
+    public static bool IsEventHandler(this IMethodSymbol methodSymbol)
     {
         return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "EventHandlerAttribute");
     }

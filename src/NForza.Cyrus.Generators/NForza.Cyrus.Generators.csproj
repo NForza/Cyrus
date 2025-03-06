@@ -51,6 +51,7 @@
     <EmbeddedResource Include="SignalR\Templates\RegisterSignalRHubs.liquid" />
     <EmbeddedResource Include="Cqrs\Templates\CqrsServiceCollectionExtensions.liquid" />
     <EmbeddedResource Include="SignalR\Templates\SignalRHub.liquid" />
+    <EmbeddedResource Include="WebApi\Templates\EventHandlerDictionary.liquid" />
     <EmbeddedResource Include="WebApi\Templates\MapQuery.liquid" />
     <EmbeddedResource Include="WebApi\Templates\MapCommand.liquid" />
     <EmbeddedResource Include="WebApi\Templates\CyrusWebStartup.liquid" />
