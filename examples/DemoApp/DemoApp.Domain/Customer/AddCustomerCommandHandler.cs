@@ -10,8 +10,8 @@ public class AddCustomerCommandHandler
     [CommandHandler]
     public (IResult Result, IEnumerable<object> Events) Handle(AddCustomerCommand command)
     {
-        Console.WriteLine($"Customer created: {command.Name}, {command.Address}");
         CustomerId id = new CustomerId();
-        return (Results.AcceptedAtRoute("/customers/"+id), [new CustomerAddedEvent(id, command.Name, command.Address)]);
+        Console.WriteLine($"Customer created: {id} {command.Name}, {command.Address}");
+        return (Results.Accepted("/customers/" + id), [new CustomerAddedEvent(id, command.Name, command.Address)]);
     }
 }
