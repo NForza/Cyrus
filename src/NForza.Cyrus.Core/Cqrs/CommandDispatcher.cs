@@ -4,23 +4,7 @@ namespace NForza.Cyrus.Cqrs;
 
 public class CommandDispatcher(IEnumerable<IEventBus> eventBuses, ICommandBus commandBus) : ICommandDispatcher
 {
-    public async Task<CommandResult> ExecuteInternalAsync(object command, CancellationToken cancellationToken)
-    {
-        CommandResult result = await commandBus.Execute(command, cancellationToken);
-        if (result.Succeeded)
-            await DispatchEvents(result.Events);
-        return result;
-    }
-
-    public CommandResult ExecuteInternalSync(object command)
-    {
-        CommandResult result = commandBus.Execute(command, CancellationToken.None).Result;
-        if (result.Succeeded)
-            DispatchEvents(result.Events).Wait();
-        return result;
-    }
-
-    private Task DispatchEvents(IEnumerable events)
+    public Task DispatchEvents(IEnumerable events)
     {
         Parallel.ForEach(eventBuses, async eventBus =>
         {

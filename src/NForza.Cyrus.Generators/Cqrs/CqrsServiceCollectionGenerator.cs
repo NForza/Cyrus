@@ -194,12 +194,12 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
                 if (handler.IsStatic)
                 {
                     source.Append($@"
-        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""{route}"", async (_, query, token) => await {typeSymbol}.Query(({queryType})query));");
+        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""{route}"", async (_, query, token) => await {typeSymbol}.{handler.Name}(({queryType})query));");
                 }
                 else
                 {
                     source.Append($@"
-        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""{route}"", async (services, query, token) => await services.GetRequiredService<{typeSymbol}>().Query(({queryType})query));");
+        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""{route}"", async (services, query, token) => await services.GetRequiredService<{typeSymbol}>().{handler.Name}(({queryType})query));");
                 }
             }
             else
@@ -207,12 +207,12 @@ public class CqrsServiceCollectionGenerator : CyrusGeneratorBase, IIncrementalGe
                 if (handler.IsStatic)
                 {
                     source.Append($@"
-        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""{route}"", (_, query, token) => Task.FromResult<object>({typeSymbol}.Query(({queryType})query)));");
+        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""{route}"", (_, query, token) => Task.FromResult<object>({typeSymbol}.{handler.Name}(({queryType})query)));");
                 }
                 else
                 {
                     source.Append($@"
-        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""{route}"", (services, query, token) => Task.FromResult<object>(services.GetRequiredService<{typeSymbol}>().Query(({queryType})query)));");
+        handlers.AddHandler<{queryType}, {returnTypeFullName}>(""{route}"", (services, query, token) => Task.FromResult<object>(services.GetRequiredService<{typeSymbol}>().{handler.Name}(({queryType})query)));");
                 }
             }
         }

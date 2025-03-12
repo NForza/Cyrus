@@ -49,6 +49,7 @@ public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerat
         {
             Handler = h,
             QueryType = h.Parameters[0].Type.ToFullName(),
+            Name = h.Name,
             ReturnType = (INamedTypeSymbol)h.ReturnType,
             IsAsync = h.ReturnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default)
         }).ToList();
@@ -59,6 +60,8 @@ public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerat
             {
                 ReturnTypeOriginal = q.ReturnType,
                 ReturnType = q.IsAsync ? q.ReturnType.TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
+                Invocation = q.Handler.GetQueryInvocation(serviceProviderVariable: "queryProcessor.ServiceProvider"),
+                Name = q.Name,
                 q.QueryType,
                 q.IsAsync
             }).ToList()

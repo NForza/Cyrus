@@ -52,7 +52,7 @@ public class QueryEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
 
             if (config != null && config.GenerationTarget.Contains(GenerationTarget.WebApi))
             {
-                var contents = AddQueryHandlerRegistrations(spc, queriesAndHandlers.OfType<IMethodSymbol>());
+                var contents = AddQueryHandlerMappings(spc, queriesAndHandlers.OfType<IMethodSymbol>());
 
                 if (!string.IsNullOrWhiteSpace(contents))
                 {
@@ -148,7 +148,7 @@ public class QueryEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
     //    return constructorWithLeastParameters.Parameters.Select(p => p.Name).ToList();
     //}
 
-    private string AddQueryHandlerRegistrations(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers)
+    private string AddQueryHandlerMappings(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers)
     {
         StringBuilder sb = new StringBuilder();
         foreach (var handler in handlers)

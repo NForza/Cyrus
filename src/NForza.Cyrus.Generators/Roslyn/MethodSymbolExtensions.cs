@@ -35,7 +35,7 @@ namespace NForza.Cyrus.Generators.Roslyn
             return isAsync;
         }
 
-        public static string GetCommandInvocation(this IMethodSymbol handler)
+        public static string GetCommandInvocation(this IMethodSymbol handler, string  serviceProviderVariable = "services")
         {
             var commandType = handler.Parameters[0].Type.ToFullName();
             var typeSymbol = handler.ContainingType.ToFullName();
@@ -46,17 +46,17 @@ namespace NForza.Cyrus.Generators.Roslyn
             {
                 return handler.IsStatic
                     ? $"{typeSymbol}.{handler.Name}(command)"
-                    : $"services.GetRequiredService<{typeSymbol}>().{handler.Name}(command)";
+                    : $"{serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}(command)";
             }
             else
             {
                 return handler.IsStatic
                     ? $"{typeSymbol}.{handler.Name}(command)"
-                    : $"services.GetRequiredService<{typeSymbol}>().{handler.Name}(command)";
+                    : $"{serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}(command)";
             }
         }
 
-        public static string GetQueryInvocation(this IMethodSymbol handler)
+        public static string GetQueryInvocation(this IMethodSymbol handler, string serviceProviderVariable = "services")
         {
             var handlerClass = handler.ContainingType.ToFullName();
             var queryType = handler.Parameters[0].Type.ToFullName();
@@ -68,13 +68,13 @@ namespace NForza.Cyrus.Generators.Roslyn
             {
                 return handler.IsStatic
                     ? $"{handlerClass}.{handler.Name}(query)"
-                    : $"services.GetRequiredService<{handlerClass}>().{handler.Name}(query)";
+                    : $"{serviceProviderVariable}.GetRequiredService<{handlerClass}>().{handler.Name}(query)";
             }
             else
             {
                 return handler.IsStatic
                     ? $"{handlerClass}.{handler.Name}(query)"
-                    : $"services.GetRequiredService<{handlerClass}>().{handler.Name}(query)";
+                    : $"{serviceProviderVariable}.GetRequiredService<{handlerClass}>().{handler.Name}(query)";
             }
         }
 

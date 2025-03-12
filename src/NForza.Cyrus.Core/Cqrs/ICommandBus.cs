@@ -2,5 +2,5 @@
 
 public interface ICommandBus
 {
-    Task<CommandResult> Execute(object command, CancellationToken cancellationToken);
+    Task Execute(object command, CancellationToken cancellationToken);
 }
