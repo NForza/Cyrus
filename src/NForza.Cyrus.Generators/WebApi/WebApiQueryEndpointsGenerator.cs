@@ -84,83 +84,69 @@ public class QueryEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
 
     private void AddQueryFactoryMethodsRegistrations(SourceProductionContext sourceProductionContext, IEnumerable<INamedTypeSymbol> queries)
     {
-        string queryFactoryRegistrations = GenerateQueryFactoryExtensionMethods(queries);
+        var model = new 
+        { 
+            Queries = queries.Select( q => 
+                new 
+                { 
+                    TypeName = q.ToFullName(),
+                    Properties = q.GetPublicProperties().Select(p => new { Name = p.Name, Type = p.Type.ToFullName() })
+                }) };
+        var httpContextObjectFactoryInitialization = LiquidEngine.Render(model, "HttpContextObjectFactory");
 
-        queryFactoryRegistrations = $@"HttpContextObjectFactory x = new HttpContextObjectFactory();
-             {queryFactoryRegistrations}
-             services.AddSingleton<IHttpContextObjectFactory>(x);";
-        var source = LiquidEngine.Render(new { Namespace = "WebApi", Name = "QueryFactoryRegistration", Initializer = queryFactoryRegistrations }, "CyrusInitializer");
-        sourceProductionContext.AddSource($"QueryFactoryMethodRegistrations.g.cs", SourceText.From(source, Encoding.UTF8));
+        var initModel = new { Namespace = "WebApi", Name = "HttpContextObjectFactoryInitializer", Initializer = httpContextObjectFactoryInitialization };
+        var source = LiquidEngine.Render(initModel, "CyrusInitializer");
+        sourceProductionContext.AddSource($"HttpContextObjectFactory.g.cs", SourceText.From(source, Encoding.UTF8));
     }
 
-    private string GenerateQueryFactoryExtensionMethods(IEnumerable<INamedTypeSymbol> queries)
-    {
-        StringBuilder source = new();
-        foreach (var query in queries)
-        {
-            var queryTypeName = query.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+    //private string GenerateQueryFactoryExtensionMethods(IEnumerable<INamedTypeSymbol> queries)
+    //{
+    //    StringBuilder source = new();
+    //    foreach (var query in queries)
+    //    {
+    //        var queryTypeName = query.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-            source.Append($@"    x.Register<{queryTypeName}>(ctx => {GetConstructionExpression(query)}");
-        }
+    //        source.Append($$"""    x.Register<{{queryTypeName}}>((ctx,obj) => { {{GetConstructionExpression(query)}} });""");
+    //    }
 
-        return source.ToString();
-    }
+    //    return source.ToString();
+    //}
 
-    private string GetConstructionExpression(INamedTypeSymbol query)
-    {
-        static IEnumerable<IPropertySymbol> GetPublicProperties(INamedTypeSymbol namedTypeSymbol)
-        {
-            return namedTypeSymbol
-                .GetMembers()
-                .OfType<IPropertySymbol>()
-                .Where(p => p.DeclaredAccessibility == Accessibility.Public);
-        }
+    //private string GetConstructionExpression(INamedTypeSymbol query)
+    //{
 
-        var queryTypeName = query.ToFullName();
-        var ctor = new StringBuilder(@$"new {queryTypeName}");
-        var constructorProperties = GenerateConstructorParameters(query, ctor);
-        var propertiesToInitialize = GetPublicProperties(query).Where(p => !constructorProperties.Contains(p.Name)).ToList();
-        if (propertiesToInitialize.Count > 0)
-        {
-            ctor.Append("{");
-            var propertyInitializer = new List<string>();
-            foreach (var prop in propertiesToInitialize)
-            {
-                propertyInitializer.Add(@$"{prop.Name} = ({prop.Type.ToFullName()})x.GetPropertyValue(""{prop.Name}"", ctx, typeof({prop.Type}))");
-            }
-            ctor.Append(string.Join(", ", propertyInitializer));
-            ctor.Append("}");
-        }
-        ctor.AppendLine(");");
-        return ctor.ToString();
-    }
+    //    var queryTypeName = query.ToFullName();
+    //    var ctor = new StringBuilder(@$"obj ??= new {queryTypeName}");
+    //    var constructorProperties = GenerateConstructorParameters(query, ctor);
+    //    var propertiesToInitialize = GetPublicProperties(query).Where(p => !constructorProperties.Contains(p.Name)).ToList();
+    //    if (propertiesToInitialize.Count > 0)
+    //    {
+    //        ctor.Append("{");
+    //        var propertyInitializer = new List<string>();
+    //        foreach (var prop in propertiesToInitialize)
+    //        {
+    //            propertyInitializer.Add(@$"{prop.Name} = ({prop.Type.ToFullName()})x.GetPropertyValue(""{prop.Name}"", ctx, typeof({prop.Type}))");
+    //        }
+    //        ctor.Append(string.Join(", ", propertyInitializer));
+    //        ctor.Append("}");
+    //    }
+    //    ctor.AppendLine(";");
+    //    ctor.AppendLine("return obj;");
+    //    return ctor.ToString();
+    //}
 
-    private List<string> GenerateConstructorParameters(INamedTypeSymbol query, StringBuilder ctor)
-    {
-        var constructorWithLeastParameters = query.Constructors
-                .Where(c => c.DeclaredAccessibility == Accessibility.Public)
-                .OrderBy(c => c.Parameters.Length)
-                .FirstOrDefault();
-        if (constructorWithLeastParameters == null)
-        {
-            return [];
-        }
-        ctor.Append("(");
-
-        var result = new List<string>();
-        var firstParam = constructorWithLeastParameters.Parameters.FirstOrDefault();
-        foreach (var param in constructorWithLeastParameters.Parameters)
-        {
-            if (!param.Equals(firstParam, SymbolEqualityComparer.Default))
-            {
-                ctor.Append(", ");
-            }
-            ctor.Append($"({param.Type.ToFullName()})x.GetPropertyValue(\"{param.Name}\", ctx, typeof({param.Type.ToFullName()}))");
-            result.Add(param.Name);
-        }
-        ctor.Append(")");
-        return result;
-    }
+    //private List<string> GenerateConstructorParameters(INamedTypeSymbol query, StringBuilder ctor)
+    //{
+    //    var constructorWithLeastParameters = query.Constructors
+    //            .Where(c => c.DeclaredAccessibility == Accessibility.Public)
+    //            .OrderBy(c => c.Parameters.Length)
+    //            .FirstOrDefault();
+    //    if (constructorWithLeastParameters == null)
+    //    {
+    //        return [];
+    //        }
+    //    return constructorWithLeastParameters.Parameters.Select(p => p.Name).ToList();
+    //}
 
     private string AddQueryHandlerRegistrations(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers)
     {
@@ -174,7 +160,6 @@ public class QueryEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
                 IsAsync = handler.IsAsync(),
                 QueryInvocation = handler.GetQueryInvocation()
             };
-            
             sb.AppendLine(LiquidEngine.Render(query, "MapQuery"));
         }
         return sb.ToString().Trim();

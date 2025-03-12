@@ -1,0 +1,15 @@
+﻿    HttpContextObjectFactory factory = new HttpContextObjectFactory();
+    {% for query in Queries %}
+    factory.Register<{{query.TypeName}}>((ctx,obj) => 
+    { 
+        var query = obj is {{query.TypeName}} q ? q : new {{query.TypeName}}();
+        {% for prop in query.Properties %}
+        if (factory.HasRouteOrQueryValueFor("{{ prop.Name }}", ctx, typeof({{ prop.Type}}), out var {{ prop.Name }}Value))
+        {
+          query.{{ prop.Name }} = ({{prop.Type}}){{ prop.Name}}Value;
+        }
+        {% endfor %}
+        return query;
+    });
+    {% endfor %}
+    services.AddSingleton<IHttpContextObjectFactory>(factory);

@@ -5,30 +5,22 @@ namespace NForza.Cyrus.WebApi;
 
 public class HttpContextObjectFactory : IHttpContextObjectFactory
 {
-    Dictionary<Type, Func<HttpContext, object>> objectFactories = new();
+    Dictionary<Type, Func<HttpContext, object?, object>> objectFactories = new();
 
-    public void Register<T>(Func<HttpContext, T> factory)
+    public void Register<T>(Func<HttpContext, object?, T> factory)
     {
-        objectFactories[typeof(T)] = ctx => factory(ctx);
+        objectFactories[typeof(T)] = (ctx, o) => factory(ctx, o is T q ? q : null);
     }
 
-    public T CreateFromHttpContext<T>(HttpContext ctx)
+    public T CreateFromHttpContextWithBodyAndRouteParameters<T>(HttpContext ctx, T body)
     {
         var func = objectFactories[typeof(T)];
-        return (T)func(ctx);
+        return (T)func(ctx, body);
     }
 
-    public object CreateFromHttpContext(Type t, HttpContext ctx)
+    public bool HasRouteOrQueryValueFor(string propertyName, HttpContext ctx, Type targetType, out object? value)
     {
-        var func = objectFactories[t];
-        return func(ctx);
-    }
-
-
-    public object? GetPropertyValue(string propertyName, HttpContext ctx, Type targetType)
-    {
-        object? value = null;
-
+        value = null;
         if (ctx.Request.RouteValues.TryGetValue(propertyName, out var routeValue))
         {
             value = routeValue;
@@ -41,9 +33,16 @@ public class HttpContextObjectFactory : IHttpContextObjectFactory
         if (value != null)
         {
             var converter = TypeDescriptor.GetConverter(targetType);
-            return converter.ConvertFrom(value);
+            value = converter.ConvertFrom(value);
+            return true;
         }
 
-        return null;
+        return false;
+    }
+
+    public T CreateFromHttpContextWithRouteParameters<T>(HttpContext ctx)
+    {
+        var func = objectFactories[typeof(T)];
+        return (T)func(ctx, null);
     }
 }

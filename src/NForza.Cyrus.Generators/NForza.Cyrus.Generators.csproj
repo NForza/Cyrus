@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="WebApi\Templates\HttpContextObjectFactory.liquid" />
     <EmbeddedResource Include="Cqrs\Templates\CyrusInitializer.liquid" />
     <EmbeddedResource Include="Model\model-hubquery.liquid" />
     <EmbeddedResource Include="Model\model-hub.liquid" />

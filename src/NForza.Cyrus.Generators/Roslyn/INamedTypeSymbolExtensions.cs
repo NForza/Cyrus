@@ -28,4 +28,12 @@ public static class INamedTypeSymbolExtensions
         }
         return types;
     }
+
+    public static IEnumerable<IPropertySymbol> GetPublicProperties(this INamedTypeSymbol namedTypeSymbol)
+    {
+        return namedTypeSymbol
+            .GetMembers()
+            .OfType<IPropertySymbol>()
+            .Where(p => p.DeclaredAccessibility == Accessibility.Public);
+    }
 }

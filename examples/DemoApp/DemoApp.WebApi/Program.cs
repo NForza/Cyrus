@@ -10,6 +10,8 @@ using NForza.Cyrus.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
 builder.Services.AddMassTransit(cfg =>
 {
     cfg.AddConsumers(Assembly.GetExecutingAssembly(), typeof(Customer).Assembly);

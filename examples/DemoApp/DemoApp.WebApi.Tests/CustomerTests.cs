@@ -13,7 +13,7 @@ public class CustomerTests(ITestOutputHelper testOutput)
     private readonly HttpClient client = new DemoAppTestClient(testOutput).CreateClient();
 
     [Theory]
-    [InlineData("/customers?page=1&pageSize=10")]
+    [InlineData("/customers/1/10")]
     public async Task Getting_Customers_Should_Succeed(string url)
     {
         var response = await client.GetAsync(url);

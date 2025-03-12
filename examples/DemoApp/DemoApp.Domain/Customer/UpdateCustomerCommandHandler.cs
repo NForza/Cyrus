@@ -11,6 +11,6 @@ public class UpdateCustomerCommandHandler
     public static (IResult result, object[] events) Execute(UpdateCustomerCommand command)
     {
         Console.WriteLine($"Customer updated: {command.CustomerId}, {command.Name}, {command.Address}");
-        return (Results.Ok(), [new CustomerUpdatedEvent(command.CustomerId)]);
+        return (Results.Accepted("/customers/" + command.CustomerId), [new CustomerUpdatedEvent(command.CustomerId)]);
     }
 }

@@ -6,6 +6,7 @@ public class DefaultQueryInputMappingPolicy(IHttpContextAccessor contextAccessor
 {
     public Task<object?> MapInputAsync(Type typeToCreate)
     {
-        return Task.FromResult(queryFactory.CreateFromHttpContext(typeToCreate, contextAccessor.HttpContext!))!;
+        return Task.FromResult<object?>(null);
+        //return Task.FromResult(queryFactory.CreateFromHttpContext(typeToCreate, contextAccessor.HttpContext!, null))!;
     }
 }
