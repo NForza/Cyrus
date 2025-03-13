@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -31,6 +32,23 @@ public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerat
             var (queryHandlers, compilation) = queryHandlersWithCompilation;
             if (queryHandlers.Any())
             {
+#pragma warning disable RS1035 // Do not use APIs banned for analyzers
+                var queryHandlerRegistrations = string.Join(Environment.NewLine, queryHandlers
+                    .Select(x => x.ContainingType)
+                    .Where(x => x != null)
+                    .Distinct(SymbolEqualityComparer.Default)
+                    .Select(qht => $" services.AddTransient<{qht.ToFullName()}>();"));
+#pragma warning restore RS1035 // Do not use APIs banned for analyzers
+                var ctx = new
+                {
+                    Usings = new string[] { "NForza.Cyrus.Cqrs" },
+                    Namespace = "QueryHandlers",
+                    Name = "QueryHandlersRegistration",
+                    Initializer = queryHandlerRegistrations
+                };
+                var fileContents = LiquidEngine.Render(ctx, "CyrusInitializer");
+                spc.AddSource("QueryHandlerRegistration.g.cs", SourceText.From(fileContents, Encoding.UTF8));
+
                 var sourceText = GenerateQueryProcessorExtensionMethods(queryHandlers, compilation);
                 spc.AddSource($"QueryProcessor.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }

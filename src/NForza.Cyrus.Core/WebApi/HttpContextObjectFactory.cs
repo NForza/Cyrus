@@ -1,13 +1,23 @@
 ﻿using System.ComponentModel;
+using System.Reflection;
 using Microsoft.AspNetCore.Http;
 
 namespace NForza.Cyrus.WebApi;
 
 public class HttpContextObjectFactory : IHttpContextObjectFactory
 {
+    private MethodInfo registerMethod = typeof(HttpContextObjectFactory).GetMethod(nameof(Register), BindingFlags.NonPublic | BindingFlags.Instance)!;
+    public HttpContextObjectFactory(IEnumerable<ObjectFactoryRegistration> objectFactoryRegistrations)
+    {
+        foreach(var registration in objectFactoryRegistrations)
+        {
+            registerMethod.MakeGenericMethod(registration.Type).Invoke(this, [registration.FactoryMethod]);
+        }   
+    }
+
     Dictionary<Type, Func<HttpContext, object?, object>> objectFactories = new();
 
-    public void Register<T>(Func<HttpContext, object?, T> factory)
+    private void Register<T>(Func<HttpContext, object?, object> factory)
     {
         objectFactories[typeof(T)] = (ctx, o) => factory(ctx, o is T q ? q : null);
     }
@@ -16,28 +26,6 @@ public class HttpContextObjectFactory : IHttpContextObjectFactory
     {
         var func = objectFactories[typeof(T)];
         return (T)func(ctx, body);
-    }
-
-    public bool HasRouteOrQueryValueFor(string propertyName, HttpContext ctx, Type targetType, out object? value)
-    {
-        value = null;
-        if (ctx.Request.RouteValues.TryGetValue(propertyName, out var routeValue))
-        {
-            value = routeValue;
-        }
-        else if (ctx.Request.Query.TryGetValue(propertyName, out var queryValue))
-        {
-            value = queryValue.ToString();
-        }
-
-        if (value != null)
-        {
-            var converter = TypeDescriptor.GetConverter(targetType);
-            value = converter.ConvertFrom(value);
-            return true;
-        }
-
-        return false;
     }
 
     public T CreateFromHttpContextWithRouteParameters<T>(HttpContext ctx)
