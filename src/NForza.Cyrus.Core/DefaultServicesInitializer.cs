@@ -15,7 +15,6 @@ public class DefaultCyrusServices : ICyrusInitializer
     {
         services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
         services.AddSingleton<IQueryProcessor, QueryProcessor>();
-        services.AddSingleton<ICommandBus, LocalCommandBus>();
         services.AddSingleton<DefaultCommandInputMappingPolicy>();
         services.AddHttpContextAccessor();
         services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();

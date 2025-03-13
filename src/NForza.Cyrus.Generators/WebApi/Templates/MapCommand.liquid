@@ -1,7 +1,8 @@
-﻿    app.Map{{ Verb }}("{{ Path }}", {% if IsAsync %}async {% endif %}([FromBody] {{ Command }} command, [FromServices] IEventBus eventBus) =>
+﻿    app.Map{{ Verb }}("{{ Path }}", {% if IsAsync %}async {% endif %}([FromBody] {{ Command }} command, [FromServices] IEventBus eventBus, [FromServices] IHttpContextObjectFactory objectFactory, [FromServices] IHttpContextAccessor ctx) =>
     {
         using var scope = app.Services.CreateScope();
         var services = scope.ServiceProvider;
+        command = objectFactory.CreateFromHttpContextWithBodyAndRouteParameters<{{ Command }}>(ctx.HttpContext, command);
         if (!ObjectValidation.Validate<{{ Command }}>(command, services, out var problem))
             return Results.BadRequest(problem);
         {% if HasReturnType %}var commandResult = {% endif %}{% if IsAsync %}await {% endif %}{{ CommandInvocation }};

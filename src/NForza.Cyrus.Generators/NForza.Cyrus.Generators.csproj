@@ -50,7 +50,6 @@
     <EmbeddedResource Include="MassTransit\EventConsumers.liquid" />
     <EmbeddedResource Include="Cqrs\Templates\QueryProcessorExtensions.liquid" />
     <EmbeddedResource Include="SignalR\Templates\RegisterSignalRHubs.liquid" />
-    <EmbeddedResource Include="Cqrs\Templates\CqrsServiceCollectionExtensions.liquid" />
     <EmbeddedResource Include="SignalR\Templates\SignalRHub.liquid" />
     <EmbeddedResource Include="WebApi\Templates\EventHandlerDictionary.liquid" />
     <EmbeddedResource Include="WebApi\Templates\MapQuery.liquid" />

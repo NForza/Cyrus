@@ -2,4 +2,5 @@
 
 public interface ICommandDispatcher
 {
+    IServiceProvider ServiceProvider { get; }
 }

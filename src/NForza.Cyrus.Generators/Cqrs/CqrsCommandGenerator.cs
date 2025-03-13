@@ -46,7 +46,7 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
 
             if (config != null && commandHandlerSymbols.Any())
             {
-                var sourceText = GenerateCommandDispatcherExtensionMethods(compilation, commandHandlerSymbols);
+                var sourceText = GenerateCommandDispatcherExtensionMethods(commandHandlerSymbols, compilation);
                 if (!string.IsNullOrEmpty(sourceText))
                 {
                     spc.AddSource($"CommandDispatcher.g.cs", SourceText.From(sourceText, Encoding.UTF8));
@@ -65,26 +65,40 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
         });
     }
 
-    private string GenerateCommandDispatcherExtensionMethods(Compilation compilation, ImmutableArray<IMethodSymbol> handlers)
+    private string GenerateCommandDispatcherExtensionMethods(ImmutableArray<IMethodSymbol> handlers, Compilation compilation)
     {
-        INamedTypeSymbol? taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1")!;
-        INamedTypeSymbol? commandResultSymbol = compilation.GetTypeByMetadataName("NForza.Cyrus.Cqrs.CommandResult");
-
-        if (commandResultSymbol == null || taskSymbol == null)
+        INamedTypeSymbol? taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
+        if (taskSymbol == null)
+        {
             return string.Empty;
+        }
 
-        var taskOfCommandResultSymbol = taskSymbol.Construct(commandResultSymbol);
+        var commands = handlers.Select(h => new
+        {
+            Handler = h,
+            CommandType = h.Parameters[0].Type.ToFullName(),
+            Name = h.Name,
+            ReturnsVoid = h.ReturnsVoid,
+            ReturnType = (INamedTypeSymbol)h.ReturnType,
+            IsAsync = h.ReturnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default)
+        }).ToList();
+
         var model = new
         {
-            Types = handlers
-                .Where(h => h.ReturnType.Equals(taskOfCommandResultSymbol, SymbolEqualityComparer.Default) 
-                            ||
-                            h.ReturnType.Equals(commandResultSymbol, SymbolEqualityComparer.Default))
-                .Select(h => h.Parameters[0].Type.ToFullName()).ToList()
+            Commands = commands.Select(q => new
+            {
+                ReturnTypeOriginal = q.ReturnType,
+                ReturnType = q.IsAsync ? q.ReturnType.TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
+                Invocation = q.Handler.GetCommandInvocation(serviceProviderVariable: "commandDispatcher.ServiceProvider"),
+                Name = q.Name,
+                q.ReturnsVoid,
+                q.CommandType,
+                q.IsAsync
+            }).ToList()
         };
 
         var resolvedSource = LiquidEngine.Render(model, "CommandDispatcherExtensions");
 
-        return resolvedSource.ToString();
+        return resolvedSource;
     }
 }

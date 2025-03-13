@@ -47,7 +47,6 @@ public class BusRegistrationGenerator : CyrusGeneratorBase, IIncrementalGenerato
 
     private string AddBusRegistrations(GenerationConfig generationConfig)
     {
-        return @$"services.AddTransient<IEventBus, {generationConfig.EventBus}EventBus>();
-            services.AddTransient<ICommandBus, LocalCommandBus>();";
+        return @$"services.AddTransient<IEventBus, {generationConfig.EventBus}EventBus>();";
     }
 }

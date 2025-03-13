@@ -2,8 +2,10 @@ using System.Collections;
 
 namespace NForza.Cyrus.Cqrs;
 
-public class CommandDispatcher(IEnumerable<IEventBus> eventBuses, ICommandBus commandBus) : ICommandDispatcher
+public class CommandDispatcher(IEnumerable<IEventBus> eventBuses, IServiceProvider serviceProvider) : ICommandDispatcher
 {
+    public IServiceProvider ServiceProvider => serviceProvider;
+
     public Task DispatchEvents(IEnumerable events)
     {
         Parallel.ForEach(eventBuses, async eventBus =>
