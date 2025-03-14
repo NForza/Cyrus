@@ -11,7 +11,7 @@ public static class CompilationExtensions
 
         var referencedAssemblyTypes = GetTypesFromReferencedAssemblies(compilation, assemblySuffixes);
 
-        return compilationTypes.Concat(referencedAssemblyTypes).ToList();
+        return compilationTypes.Concat(referencedAssemblyTypes).Distinct(SymbolEqualityComparer.Default).OfType<INamedTypeSymbol>().ToList();
     }
 
     private static IEnumerable<INamedTypeSymbol> GetTypesFromCompilation(Compilation compilation)

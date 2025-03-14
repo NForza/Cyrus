@@ -1,7 +1,6 @@
 ﻿using DemoApp.Contracts.Customers;
 using Microsoft.AspNetCore.Http;
 using NForza.Cyrus.Abstractions;
-using NForza.Cyrus.Cqrs;
 
 namespace DemoApp.Domain.Customer;
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -77,12 +74,12 @@ public class QueryEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
                     .Where(q => q.IsQuery())
                     .OfType<INamedTypeSymbol>();
 
-                AddQueryFactoryMethodsRegistrations(spc, queries);
+                AddHttpContextObjectFactoryMethodsRegistrations(spc, queries);
             }
         });
     }
 
-    private void AddQueryFactoryMethodsRegistrations(SourceProductionContext sourceProductionContext, IEnumerable<INamedTypeSymbol> queries)
+    private void AddHttpContextObjectFactoryMethodsRegistrations(SourceProductionContext sourceProductionContext, IEnumerable<INamedTypeSymbol> queries)
     {
         var model = new 
         { 
@@ -92,61 +89,12 @@ public class QueryEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
                     TypeName = q.ToFullName(),
                     Properties = q.GetPublicProperties().Select(p => new { Name = p.Name, Type = p.Type.ToFullName() })
                 }) };
-        var httpContextObjectFactoryInitialization = LiquidEngine.Render(model, "HttpContextObjectFactory");
+        var httpContextObjectFactoryInitialization = LiquidEngine.Render(model, "HttpContextObjectFactoryQuery");
 
-        var initModel = new { Namespace = "WebApi", Name = "HttpContextObjectFactoryInitializer", Initializer = httpContextObjectFactoryInitialization };
+        var initModel = new { Namespace = "WebApi", Name = "HttpContextObjectFactoryQueryInitializer", Initializer = httpContextObjectFactoryInitialization };
         var source = LiquidEngine.Render(initModel, "CyrusInitializer");
-        sourceProductionContext.AddSource($"HttpContextObjectFactory.g.cs", SourceText.From(source, Encoding.UTF8));
+        sourceProductionContext.AddSource($"HttpContextObjectFactoryQueries.g.cs", SourceText.From(source, Encoding.UTF8));
     }
-
-    //private string GenerateQueryFactoryExtensionMethods(IEnumerable<INamedTypeSymbol> queries)
-    //{
-    //    StringBuilder source = new();
-    //    foreach (var query in queries)
-    //    {
-    //        var queryTypeName = query.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
-    //        source.Append($$"""    x.Register<{{queryTypeName}}>((ctx,obj) => { {{GetConstructionExpression(query)}} });""");
-    //    }
-
-    //    return source.ToString();
-    //}
-
-    //private string GetConstructionExpression(INamedTypeSymbol query)
-    //{
-
-    //    var queryTypeName = query.ToFullName();
-    //    var ctor = new StringBuilder(@$"obj ??= new {queryTypeName}");
-    //    var constructorProperties = GenerateConstructorParameters(query, ctor);
-    //    var propertiesToInitialize = GetPublicProperties(query).Where(p => !constructorProperties.Contains(p.Name)).ToList();
-    //    if (propertiesToInitialize.Count > 0)
-    //    {
-    //        ctor.Append("{");
-    //        var propertyInitializer = new List<string>();
-    //        foreach (var prop in propertiesToInitialize)
-    //        {
-    //            propertyInitializer.Add(@$"{prop.Name} = ({prop.Type.ToFullName()})x.GetPropertyValue(""{prop.Name}"", ctx, typeof({prop.Type}))");
-    //        }
-    //        ctor.Append(string.Join(", ", propertyInitializer));
-    //        ctor.Append("}");
-    //    }
-    //    ctor.AppendLine(";");
-    //    ctor.AppendLine("return obj;");
-    //    return ctor.ToString();
-    //}
-
-    //private List<string> GenerateConstructorParameters(INamedTypeSymbol query, StringBuilder ctor)
-    //{
-    //    var constructorWithLeastParameters = query.Constructors
-    //            .Where(c => c.DeclaredAccessibility == Accessibility.Public)
-    //            .OrderBy(c => c.Parameters.Length)
-    //            .FirstOrDefault();
-    //    if (constructorWithLeastParameters == null)
-    //    {
-    //        return [];
-    //        }
-    //    return constructorWithLeastParameters.Parameters.Select(p => p.Name).ToList();
-    //}
 
     private string AddQueryHandlerMappings(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers)
     {

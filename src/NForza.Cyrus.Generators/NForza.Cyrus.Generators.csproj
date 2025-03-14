@@ -29,7 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="WebApi\Templates\HttpContextObjectFactory.liquid" />
+    <EmbeddedResource Include="WebApi\Templates\HttpContextObjectFactoryCommand.liquid" />
+    <EmbeddedResource Include="WebApi\Templates\HttpContextObjectFactoryQuery.liquid" />
     <EmbeddedResource Include="Cqrs\Templates\CyrusInitializer.liquid" />
     <EmbeddedResource Include="Model\model-hubquery.liquid" />
     <EmbeddedResource Include="Model\model-hub.liquid" />
@@ -52,6 +53,7 @@
     <EmbeddedResource Include="SignalR\Templates\RegisterSignalRHubs.liquid" />
     <EmbeddedResource Include="SignalR\Templates\SignalRHub.liquid" />
     <EmbeddedResource Include="WebApi\Templates\EventHandlerDictionary.liquid" />
+    <EmbeddedResource Include="WebApi\Templates\WebApiContract.liquid" />
     <EmbeddedResource Include="WebApi\Templates\MapQuery.liquid" />
     <EmbeddedResource Include="WebApi\Templates\MapCommand.liquid" />
     <EmbeddedResource Include="WebApi\Templates\CyrusWebStartup.liquid" />

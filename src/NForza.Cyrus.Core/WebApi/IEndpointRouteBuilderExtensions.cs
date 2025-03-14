@@ -1,13 +1,5 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
-using NForza.Cyrus.Abstractions.Model;
-using NForza.Cyrus.SignalR;
-using NForza.Cyrus.Model;
-using NForza.Cyrus.WebApi.Policies;
-using NForza.Cyrus.Cqrs;
-using System.Collections.Generic;
 
 namespace NForza.Cyrus.WebApi;
 

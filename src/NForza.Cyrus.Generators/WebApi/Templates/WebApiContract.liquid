@@ -1,0 +1,18 @@
+﻿namespace {{ Namespace }};
+
+public class {{ Name }}Contract
+{
+{%- for prop in Properties %}
+	public {{ prop.Type }}{% if prop.IsNullable == false %}?{% endif %} {{ prop.Name }} { get; set; }
+{% endfor -%}
+
+	public static implicit operator {{ FullName }}({{ Name }}Contract contract)
+	{
+		return new {{ FullName }}()
+		{
+			{%- for prop in Properties %}
+			{{ prop.Name }} = contract.{{ prop.Name }}{% unless forloop.last %},{% endunless %}
+			{% endfor -%}
+		};
+	}
+ }

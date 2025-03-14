@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -62,7 +60,10 @@ public class CommandEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerat
 
             if (config != null && config.GenerationTarget.Contains(GenerationTarget.WebApi))
             {
-                var contents = AddCommandHandlerRegistrations(sourceProductionContext, typesFromReferencedAssemblies.OfType<IMethodSymbol>(), compilation);
+                IEnumerable<IMethodSymbol> handlers = typesFromReferencedAssemblies.OfType<IMethodSymbol>().ToList();
+                IEnumerable<INamedTypeSymbol> commands = typesFromReferencedAssemblies.OfType<INamedTypeSymbol>().ToList();
+
+                var contents = AddCommandHandlerMappings(sourceProductionContext, handlers, compilation);
 
                 if (!string.IsNullOrWhiteSpace(contents))
                 {
@@ -82,11 +83,31 @@ public class CommandEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerat
                        "CommandHandlerMapping.g.cs",
                        SourceText.From(fileContents, Encoding.UTF8));
                 }
+                AddHttpContextObjectFactoryMethodsRegistrations(sourceProductionContext, commands);
             }
         });
     }
 
-    private string AddCommandHandlerRegistrations(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers, Compilation compilation)
+    private void AddHttpContextObjectFactoryMethodsRegistrations(SourceProductionContext sourceProductionContext, IEnumerable<INamedTypeSymbol> queries)
+    {
+        var model = new
+        {
+            Commands = queries.Select(cmd =>
+                new
+                {
+                    TypeName = cmd.ToFullName(),
+                    Properties = cmd.GetPublicProperties().Select(p => new { Name = p.Name, Type = p.Type.ToFullName() })
+                })
+        };
+        var httpContextObjectFactoryInitialization = LiquidEngine.Render(model, "HttpContextObjectFactoryCommand");
+
+        var initModel = new { Namespace = "WebApi", Name = "HttpContextObjectFactoryCommandInitializer", Initializer = httpContextObjectFactoryInitialization };
+        var source = LiquidEngine.Render(initModel, "CyrusInitializer");
+        sourceProductionContext.AddSource($"HttpContextObjectFactoryCommands.g.cs", SourceText.From(source, Encoding.UTF8));
+    }
+
+
+    private string AddCommandHandlerMappings(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers, Compilation compilation)
     {
         StringBuilder sb = new StringBuilder();
         foreach (var handler in handlers)
@@ -114,7 +135,6 @@ public class CommandEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerat
             return "FromVoid";
         if (returnType.IsTupleType)
         {
-            //verify types for IResult and IEnumerable<object>
             return "FromIResultAndEvents";
         }
         return "FromObjects";
