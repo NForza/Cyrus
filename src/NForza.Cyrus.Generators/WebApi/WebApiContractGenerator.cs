@@ -48,7 +48,7 @@ public class WebApiContractGenerator : CyrusGeneratorBase, IIncrementalGenerator
                     IEnumerable<IPropertySymbol> properties = contract.GetPublicProperties();
                     var model = new 
                     { 
-                        Namespace = "WebApi", 
+                        Namespace = contract.ContainingNamespace, 
                         Name = contract.Name,
                         FullName = contract.ToFullName(),
                         Properties = properties.Select(p => new { Name = p.Name, Type = p.Type.ToFullName(), IsNullable = p.Type.IsNullable() }).ToList()

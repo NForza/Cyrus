@@ -2,7 +2,9 @@
     services.AddSingleton(new ObjectFactoryRegistration(typeof({{query.TypeName}}), 
         (ctx,obj) => 
         { 
-            var query = obj is {{query.TypeName}} q ? q : new {{query.TypeName}}();
+            var queryContract = obj is {{query.TypeName}}Contract q ? q : new {{query.TypeName}}Contract();
+            var query = queryContract;
+
             {% for prop in query.Properties %}
             if (ctx.HasRouteOrQueryValueFor("{{ prop.Name }}", typeof({{ prop.Type}}), out var {{ prop.Name }}Value))
             {
