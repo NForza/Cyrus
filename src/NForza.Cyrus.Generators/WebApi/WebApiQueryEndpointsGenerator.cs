@@ -74,7 +74,8 @@ public class QueryEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
                     .Where(q => q.IsQuery())
                     .OfType<INamedTypeSymbol>();
 
-                AddHttpContextObjectFactoryMethodsRegistrations(spc, queries);
+                AddHttpContextObjectFactoryMethodsRegistrations(spc, queries);          
+                WebApiContractGenerator.GenerateContracts(queries, spc, LiquidEngine);
             }
         });
     }

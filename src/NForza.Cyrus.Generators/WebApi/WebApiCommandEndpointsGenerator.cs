@@ -14,7 +14,7 @@ public class CommandEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerat
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
 
         var configProvider = ConfigProvider(context);
 
@@ -84,6 +84,9 @@ public class CommandEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerat
                        SourceText.From(fileContents, Encoding.UTF8));
                 }
                 AddHttpContextObjectFactoryMethodsRegistrations(sourceProductionContext, commands);
+
+                WebApiContractGenerator.GenerateContracts(commands, sourceProductionContext, LiquidEngine);
+
             }
         });
     }

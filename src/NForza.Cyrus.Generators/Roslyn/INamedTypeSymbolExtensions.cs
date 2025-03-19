@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace NForza.Cyrus.Generators.Roslyn;
 
@@ -35,5 +36,32 @@ public static class INamedTypeSymbolExtensions
             .GetMembers()
             .OfType<IPropertySymbol>()
             .Where(p => p.DeclaredAccessibility == Accessibility.Public);
+    }
+
+    public static IEnumerable<(string Name, ITypeSymbol Type)> GetConstructorArguments(this INamedTypeSymbol namedTypeSymbol)
+    {
+        var constructor = namedTypeSymbol.InstanceConstructors
+            .Where(c => !c.IsStatic)
+            .OrderByDescending(c => c.Parameters.Length)
+            .FirstOrDefault();
+
+        if (constructor == null)
+            return []; 
+
+        return constructor.Parameters
+            .Select(p => (p.Name, p.Type))
+            .ToList();
+    }
+
+    public static bool IsRecordType(this INamedTypeSymbol typeSymbol)
+    {
+        if (typeSymbol.IsRecord) return true; 
+
+        bool hasEqualityOperators = typeSymbol.GetMembers()
+            .OfType<IMethodSymbol>()
+            .Where(m => m.MethodKind == MethodKind.UserDefinedOperator)
+            .Any(m => m.Name == "op_Equality" || m.Name == "op_Inequality");
+
+        return hasEqualityOperators;
     }
 }

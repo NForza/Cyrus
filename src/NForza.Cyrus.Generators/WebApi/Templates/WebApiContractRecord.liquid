@@ -8,11 +8,10 @@ public class {{ Name }}Contract
 
 	public static implicit operator {{ FullName }}({{ Name }}Contract contract)
 	{
-		return new {{ FullName }}()
-		{
-			{%- for prop in Properties %}
-			{{ prop.Name }} = contract.{{ prop.Name }}.Value{% unless forloop.last %},{% endunless %}
+		return new {{ FullName }}(
+			{%- for prop in ConstructorArguments %}
+			contract.{{ prop.Name }}.Value{% unless forloop.last %},{% endunless %}
 			{% endfor -%}
-		};
+		);
 	}
  }

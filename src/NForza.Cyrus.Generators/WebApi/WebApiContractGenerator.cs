@@ -6,61 +6,46 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
+using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.WebApi;
 
-[Generator]
-public class WebApiContractGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public static class WebApiContractGenerator
 {
-    public override void Initialize(IncrementalGeneratorInitializationContext context)
+    public static void GenerateContracts(IEnumerable<INamedTypeSymbol> contracts, SourceProductionContext sourceProductionContext, LiquidEngine liquidEngine)
     {
-        DebugThisGenerator(false);
-
-        var configProvider = ConfigProvider(context);
-
-        var compilationProvider = context.CompilationProvider;
-
-        var typesFromReferencedAssemblyProvider = compilationProvider
-            .SelectMany((compilation, _) =>
-            {
-                var typesFromAssemblies = compilation.GetAllTypesFromCyrusAssemblies();
-
-                var contractsFromAssemblies = typesFromAssemblies
-                    .Where(t => t.IsCommand() || t.IsQuery());
-                
-                return contractsFromAssemblies;
-            })
-           .Collect();
-
-        var serviceCollectionCombinedProvider = context
-            .CompilationProvider
-            .Combine(typesFromReferencedAssemblyProvider)
-            .Combine(configProvider);
-
-        context.RegisterSourceOutput(serviceCollectionCombinedProvider, (sourceProductionContext, source) =>
+        foreach (var contract in contracts)
         {
-            var ((compilation, typesFromReferencedAssemblies), config) = source;
-
-            if (config != null && config.GenerationTarget.Contains(GenerationTarget.WebApi))
+            if (contract.IsRecordType())
             {
-                foreach (var contract in typesFromReferencedAssemblies)
+                var constructorArguments = contract.GetConstructorArguments();
+                var model = new
                 {
-                    IEnumerable<IPropertySymbol> properties = contract.GetPublicProperties();
-                    var model = new 
-                    { 
-                        Namespace = contract.ContainingNamespace, 
-                        Name = contract.Name,
-                        FullName = contract.ToFullName(),
-                        Properties = properties.Select(p => new { Name = p.Name, Type = p.Type.ToFullName(), IsNullable = p.Type.IsNullable() }).ToList()
-                    };
+                    Namespace = contract.ContainingNamespace,
+                    Name = contract.Name,
+                    FullName = contract.ToFullName(),
+                    ConstructorArguments = constructorArguments.Select(p =>
+                        new
+                        {
+                            Name = p.Name,
+                            Type = p.Type.ToFullName(),
+                            IsNullable = p.Type.IsNullable()
+                        }).ToList(),
+                    Properties = contract.GetPublicProperties().Select(p =>
+                        new
+                        {
+                            Name = p.Name,
+                            Type = p.Type.ToFullName(),
+                            IsNullable = p.Type.IsNullable()
+                        }).ToList()
+                };
 
-                    var fileContents = LiquidEngine.Render(model, "WebApiContract");
+                var fileContents = liquidEngine.Render(model, "WebApiContractRecord");
 
-                    sourceProductionContext.AddSource(
-                       $"{contract.Name}Contract.g.cs",
-                       SourceText.From(fileContents, Encoding.UTF8));
-                }
+                sourceProductionContext.AddSource(
+                   $"{contract.Name}Contract.g.cs",
+                   SourceText.From(fileContents, Encoding.UTF8));
             }
-        });
+        }
     }
 }
