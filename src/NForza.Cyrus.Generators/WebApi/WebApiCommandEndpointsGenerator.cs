@@ -98,6 +98,7 @@ public class CommandEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerat
             Commands = queries.Select(cmd =>
                 new
                 {
+                    Name = cmd.Name,
                     TypeName = cmd.ToFullName(),
                     Properties = cmd.GetPublicProperties().Select(p => new { Name = p.Name, Type = p.Type.ToFullName() })
                 })

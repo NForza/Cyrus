@@ -87,6 +87,7 @@ public class QueryEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
             Queries = queries.Select( q => 
                 new 
                 { 
+                    Name = q.Name,
                     TypeName = q.ToFullName(),
                     Properties = q.GetPublicProperties().Select(p => new { Name = p.Name, Type = p.Type.ToFullName() })
                 }) };

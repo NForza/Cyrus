@@ -6,11 +6,11 @@ public class {{ Name }}Contract
 	public {{ prop.Type }}{% if prop.IsNullable == false %}?{% endif %} {{ prop.Name }} { get; set; }
 {% endfor -%}
 
-	public static implicit operator {{ FullName }}({{ Name }}Contract contract)
+	public {{ FullName }} As{{ Name }}()
 	{
 		return new {{ FullName }}(
 			{%- for prop in ConstructorArguments %}
-			contract.{{ prop.Name }}.Value{% unless forloop.last %},{% endunless %}
+			this.{{ prop.Name }}.Value{% unless forloop.last %},{% endunless %}
 			{% endfor -%}
 		);
 	}

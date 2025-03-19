@@ -7,4 +7,5 @@
             return Results.BadRequest(problem);
         {% if HasReturnType %}var commandResult = {% endif %}{% if IsAsync %}await {% endif %}{{ CommandInvocation }};
         return new CommandResultAdapter(eventBus).{{ AdapterMethod }}({% if HasReturnType %}commandResult{% endif %});
-    });
+    })
+    .WithSwaggerParameters("{{Path}}");
