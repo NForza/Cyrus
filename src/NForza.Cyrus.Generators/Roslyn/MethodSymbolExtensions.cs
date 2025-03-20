@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Linq;
+using Microsoft.CodeAnalysis;
 
 namespace NForza.Cyrus.Generators.Roslyn
 {
@@ -30,7 +31,7 @@ namespace NForza.Cyrus.Generators.Roslyn
             return isAsync;
         }
 
-        public static string GetCommandInvocation(this IMethodSymbol handler, string  serviceProviderVariable = "services")
+        public static string GetCommandInvocation(this IMethodSymbol handler, string variableName, string serviceProviderVariable = "services")
         {
             var commandType = handler.Parameters[0].Type.ToFullName();
             var typeSymbol = handler.ContainingType.ToFullName();
@@ -40,14 +41,14 @@ namespace NForza.Cyrus.Generators.Roslyn
             if (isAsync)
             {
                 return handler.IsStatic
-                    ? $"{typeSymbol}.{handler.Name}(command)"
-                    : $"{serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}(command)";
+                    ? $"{typeSymbol}.{handler.Name}({variableName})"
+                    : $"{serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}({variableName})";
             }
             else
             {
                 return handler.IsStatic
-                    ? $"{typeSymbol}.{handler.Name}(command)"
-                    : $"{serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}(command)";
+                    ? $"{typeSymbol}.{handler.Name}({variableName})"
+                    : $"{serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}({variableName})";
             }
         }
 
@@ -89,6 +90,19 @@ namespace NForza.Cyrus.Generators.Roslyn
         {
             var firstParam = methodSymbol.Parameters[0].Type;
             return firstParam.GetCommandVerb();
+        }
+
+        public static INamedTypeSymbol GetCommandType(this IMethodSymbol methodSymbol)
+        {
+            var firstParam = methodSymbol.Parameters[0].Type;
+            return (INamedTypeSymbol)firstParam;
+        }
+
+        public static bool HasCommandBody(this IMethodSymbol methodSymbol)
+        {
+            var command = methodSymbol.GetCommandType();
+            var routeParameters = RouteParameterDiscovery.FindAllParametersInRoute(command.GetCommandRoute()).Select(p => p.Name);
+            return command.GetPublicProperties().Where(p => !routeParameters.Contains(p.Name)).Any();
         }
     }
 }

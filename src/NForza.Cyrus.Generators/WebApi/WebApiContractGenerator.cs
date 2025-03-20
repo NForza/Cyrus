@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -14,38 +15,60 @@ public static class WebApiContractGenerator
 {
     public static void GenerateContracts(IEnumerable<INamedTypeSymbol> contracts, SourceProductionContext sourceProductionContext, LiquidEngine liquidEngine)
     {
-        foreach (var contract in contracts)
+        contracts.ToList().ForEach(contract => GenerateContract(contract, [], sourceProductionContext, liquidEngine));
+    }
+
+    public static void GenerateCommandContracts(IEnumerable<IMethodSymbol> commandHandlers, SourceProductionContext sourceProductionContext, LiquidEngine liquidEngine)
+    {
+        commandHandlers.ToList().ForEach(contract =>
         {
-            if (contract.IsRecordType())
+            var command = contract.GetCommandType();
+            var route = contract.GetCommandHandlerRoute();
+            var propertiesFromRoute = GetRouteProperties(route, command);
+            GenerateContract(command, propertiesFromRoute, sourceProductionContext, liquidEngine);
+        });
+    }
+
+    private static IEnumerable<string> GetRouteProperties(string route, INamedTypeSymbol command)
+    {
+        var routeProperties = RouteParameterDiscovery.FindAllParametersInRoute(route);
+        var publicPropertiesOfCommand = command.GetPublicProperties().Select(p => p.Name).ToList();
+        return routeProperties.Select(p => p.Name).Where(p => publicPropertiesOfCommand.Contains(p)).ToList();
+    }
+
+    public static void GenerateContract(INamedTypeSymbol contract, IEnumerable<string> propertiesFromRoute, SourceProductionContext sourceProductionContext, LiquidEngine liquidEngine)
+    {
+        if (contract.IsRecordType())
+        {
+            var constructorArguments = contract.GetConstructorArguments();
+            var model = new
             {
-                var constructorArguments = contract.GetConstructorArguments();
-                var model = new
-                {
-                    Namespace = contract.ContainingNamespace,
-                    Name = contract.Name,
-                    FullName = contract.ToFullName(),
-                    ConstructorArguments = constructorArguments.Select(p =>
-                        new
-                        {
-                            Name = p.Name,
-                            Type = p.Type.ToFullName(),
-                            IsNullable = p.Type.IsNullable()
-                        }).ToList(),
-                    Properties = contract.GetPublicProperties().Select(p =>
-                        new
-                        {
-                            Name = p.Name,
-                            Type = p.Type.ToFullName(),
-                            IsNullable = p.Type.IsNullable()
-                        }).ToList()
-                };
+                Namespace = contract.ContainingNamespace,
+                Name = contract.Name,
+                FullName = contract.ToFullName(),
+                ConstructorArguments = constructorArguments.Select(p =>
+                    new
+                    {
+                        Name = p.Name,
+                        Type = p.Type.ToFullName(),
+                        IsNullable = p.Type.IsNullable()
+                    }).ToList(),
+                Properties = contract.GetPublicProperties().Select(p =>
+                    new
+                    {
+                        Name = p.Name,
+                        Internal = propertiesFromRoute.Contains(p.Name),
+                        Type = p.Type.ToFullName(),
+                        IsNullable = p.Type.IsNullable()
+                    })
+                    .ToList()
+            };
 
-                var fileContents = liquidEngine.Render(model, "WebApiContractRecord");
+            var fileContents = liquidEngine.Render(model, "WebApiContractRecord");
 
-                sourceProductionContext.AddSource(
-                   $"{contract.Name}Contract.g.cs",
-                   SourceText.From(fileContents, Encoding.UTF8));
-            }
+            sourceProductionContext.AddSource(
+               $"{contract.Name}Contract.g.cs",
+               SourceText.From(fileContents, Encoding.UTF8));
         }
     }
 }

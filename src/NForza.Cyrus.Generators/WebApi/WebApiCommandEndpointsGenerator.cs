@@ -85,8 +85,7 @@ public class CommandEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerat
                 }
                 AddHttpContextObjectFactoryMethodsRegistrations(sourceProductionContext, commands);
 
-                WebApiContractGenerator.GenerateContracts(commands, sourceProductionContext, LiquidEngine);
-
+                WebApiContractGenerator.GenerateCommandContracts(handlers, sourceProductionContext, LiquidEngine);
             }
         });
     }
@@ -120,11 +119,13 @@ public class CommandEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerat
             {
                 Path = handler.GetCommandHandlerRoute(),
                 Verb = handler.GetCommandHandlerVerb(),
-                Command = handler.Parameters[0].Type.ToFullName(),
+                HasBody = handler.HasCommandBody(),
+                CommandType = handler.Parameters[0].Type.ToFullName(),
+                CommandName = handler.Parameters[0].Type.Name,
                 AdapterMethod = GetAdapterMethodName(handler),
                 IsAsync = handler.IsAsync(),
                 HasReturnType = handler.ReturnType.SpecialType != SpecialType.System_Void,
-                CommandInvocation = handler.GetCommandInvocation()
+                CommandInvocation = handler.GetCommandInvocation(variableName: "cmd")
             };
             
             sb.AppendLine(LiquidEngine.Render(command, "MapCommand"));

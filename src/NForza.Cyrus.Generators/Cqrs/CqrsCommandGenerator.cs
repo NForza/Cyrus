@@ -109,7 +109,7 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
             {
                 ReturnTypeOriginal = q.ReturnType,
                 ReturnType = q.IsAsync ? q.ReturnType.TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
-                Invocation = q.Handler.GetCommandInvocation(serviceProviderVariable: "commandDispatcher.ServiceProvider"),
+                Invocation = q.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "commandDispatcher.ServiceProvider"),
                 Name = q.Name,
                 q.ReturnsVoid,
                 q.CommandType,

@@ -3,7 +3,7 @@
 public class {{ Name }}Contract
 {
 {%- for prop in Properties %}
-	public {{ prop.Type }}{% if prop.IsNullable == false %}?{% endif %} {{ prop.Name }} { get; set; }
+	{% if prop.Internal == true %}internal{% else %}public{% endif %} {{ prop.Type }}{% if prop.IsNullable == false %}?{% endif %} {{ prop.Name }} { get; set; }
 {% endfor -%}
 
 	public {{ FullName }} As{{ Name }}()
