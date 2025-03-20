@@ -21,15 +21,15 @@ public class HttpContextObjectFactory : IHttpContextObjectFactory
         objectFactories[typeof(T)] = (ctx, o) => factory(ctx, o is T q ? q : null);
     }
 
-    public T CreateFromHttpContextWithBodyAndRouteParameters<T>(HttpContext ctx, T body)
+    public T CreateFromHttpContextWithBodyAndRouteParameters<TContract, T>(HttpContext ctx, TContract body)
     {
-        var func = objectFactories[typeof(T)];
+        var func = objectFactories[typeof(TContract)];
         return (T)func(ctx, body);
     }
 
-    public T CreateFromHttpContextWithRouteParameters<T>(HttpContext ctx)
+    public T CreateFromHttpContextWithRouteParameters<TContract, T>(HttpContext ctx)
     {
-        var func = objectFactories[typeof(T)];
+        var func = objectFactories[typeof(TContract)];
         return (T)func(ctx, null);
     }
 }

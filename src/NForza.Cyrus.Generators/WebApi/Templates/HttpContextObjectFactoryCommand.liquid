@@ -1,5 +1,5 @@
 ﻿    {% for cmd in Commands %}
-    services.AddSingleton(new ObjectFactoryRegistration(typeof({{cmd.TypeName}}), 
+    services.AddSingleton(new ObjectFactoryRegistration(typeof({{cmd.TypeName}}Contract), 
         (ctx,obj) => 
         { 
             var cmdContract = obj is {{cmd.TypeName}}Contract c ? c : new {{cmd.TypeName}}Contract();

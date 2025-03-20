@@ -1,4 +1,5 @@
 using System.Reflection;
+using DemoApp.Contracts.Customers;
 using DemoApp.Domain.Customer;
 using FluentValidation;
 using MassTransit;
@@ -15,6 +16,8 @@ builder.Services.AddMassTransit(cfg =>
         cfg.ConfigureEndpoints(context);
     });
 });
+
+var vc = new ValidationContext<AddCustomerCommand>(new AddCustomerCommand());
 
 builder.Services.AddCors(options =>
 {

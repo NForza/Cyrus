@@ -1,5 +1,5 @@
 ﻿    {% for query in Queries %}
-    services.AddSingleton(new ObjectFactoryRegistration(typeof({{query.TypeName}}), 
+    services.AddSingleton(new ObjectFactoryRegistration(typeof({{query.TypeName}}Contract), 
         (ctx,obj) => 
         { 
             var queryContract = obj is {{query.TypeName}}Contract q ? q : new {{query.TypeName}}Contract();

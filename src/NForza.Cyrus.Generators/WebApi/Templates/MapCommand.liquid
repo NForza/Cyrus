@@ -4,9 +4,8 @@
         using var scope = app.Services.CreateScope();
         var services = scope.ServiceProvider;
         var cmd = objectFactory
-            .CreateFromHttpContextWithBodyAndRouteParameters<{{ CommandType }}Contract>(ctx.HttpContext, command)
-            .As{{ CommandName }}();
-        if (!ObjectValidation.Validate<{{ CommandType }}>(command, services, out var problem))
+            .CreateFromHttpContextWithBodyAndRouteParameters<{{ CommandType }}Contract, {{ CommandType }}>(ctx.HttpContext, command);
+        if (!ObjectValidation.Validate<{{ CommandType }}>(cmd, services, out var problem))
             return Results.BadRequest(problem);
         {% if HasReturnType %}var commandResult = {% endif %}{% if IsAsync %}await {% endif %}{{ CommandInvocation }};
         return new CommandResultAdapter(eventBus).{{ AdapterMethod }}({% if HasReturnType %}commandResult{% endif %});

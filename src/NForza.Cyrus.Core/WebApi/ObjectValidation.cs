@@ -10,7 +10,7 @@ namespace NForza.Cyrus.WebApi
             Type objectType = typeof(T);
             if (objectType == null)
             {
-                problem = "Can't create Query object of Type " + objectType?.Name;
+                problem = "Can't create object of Type " + objectType?.Name;
                 return false;
             }
             var validatorType = typeof(IValidator<>).MakeGenericType(objectType);
