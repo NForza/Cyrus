@@ -1,6 +1,6 @@
 ﻿namespace {{ Namespace }};
 
-public class {{ Name }}Contract
+public class {{ Name | as-contract }}
 {
 {%- for prop in Properties %}
 	{% if prop.Internal == true %}internal{% else %}public{% endif %} {{ prop.Type }}{% if prop.IsNullable == false %}?{% endif %} {{ prop.Name }} { get; set; }

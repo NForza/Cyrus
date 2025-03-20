@@ -2,7 +2,7 @@
     services.AddSingleton(new ObjectFactoryRegistration(typeof({{ cmd.TypeName | as-contract }}), 
         (ctx,obj) => 
         { 
-            var cmdContract = obj is {{cmd.TypeName}}Contract c ? c : new {{cmd.TypeName | as-contract }}();
+            var cmdContract = obj is {{cmd.TypeName | as-contract }} c ? c : new {{cmd.TypeName | as-contract }}();
             {% for prop in cmd.Properties %}
             if (ctx.HasRouteOrQueryValueFor("{{ prop.Name }}", typeof({{ prop.Type}}), out var {{ prop.Name }}Value))
             {

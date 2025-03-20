@@ -1,8 +1,8 @@
 ﻿    {% for query in Queries %}
-    services.AddSingleton(new ObjectFactoryRegistration(typeof({{query.TypeName}}Contract), 
+    services.AddSingleton(new ObjectFactoryRegistration(typeof({{query.TypeName | as-contract }}), 
         (ctx,obj) => 
         { 
-            var queryContract = obj is {{query.TypeName}}Contract q ? q : new {{query.TypeName}}Contract();
+            var queryContract = obj is {{query.TypeName | as-contract}} q ? q : new {{query.TypeName | as-contract}}();
 
             {%- for prop in query.Properties %}
             if (ctx.HasRouteOrQueryValueFor("{{ prop.Name }}", typeof({{ prop.Type}}), out var {{ prop.Name }}Value))
