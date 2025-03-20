@@ -1,10 +1,9 @@
-﻿    app.Map{{ Verb }}("{{ Path }}", {% if IsAsync %}async {% endif %}({% if HasBody %}[FromBody] {{ CommandType }}Contract command, {% endif -%} [FromServices] IEventBus eventBus, [FromServices] IHttpContextObjectFactory objectFactory, [FromServices] IHttpContextAccessor ctx) =>
-    {
-        {% if HasBody == false %}{{ CommandType }}Contract command = new();{% endif %}
+﻿    app.Map{{ Verb }}("{{ Path }}", {% if IsAsync %}async {% endif %}({% if HasBody %}[FromBody] {{ CommandType | as-contract }} command, {% endif -%} [FromServices] IEventBus eventBus, [FromServices] IHttpContextObjectFactory objectFactory, [FromServices] IHttpContextAccessor ctx) =>    {
+        {% if HasBody == false %}{{ CommandType | as-contract }} command = new();{% endif %}
         using var scope = app.Services.CreateScope();
         var services = scope.ServiceProvider;
         var cmd = objectFactory
-            .CreateFromHttpContextWithBodyAndRouteParameters<{{ CommandType }}Contract, {{ CommandType }}>(ctx.HttpContext, command);
+            .CreateFromHttpContextWithBodyAndRouteParameters<{{ CommandType | as-contract }}, {{ CommandType }}>(ctx.HttpContext, command);
         if (!ObjectValidation.Validate<{{ CommandType }}>(cmd, services, out var problem))
             return Results.BadRequest(problem);
         {% if HasReturnType %}var commandResult = {% endif %}{% if IsAsync %}await {% endif %}{{ CommandInvocation }};

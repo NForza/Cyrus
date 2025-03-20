@@ -13,6 +13,7 @@ namespace NForza.Cyrus.Templating
         {
             fileProvider = new TemplateResourceFileProvider(assembly);
             options = new TemplateOptions();
+            options.Filters.AddFilter("as-contract", CyrusFilters.ContractName);
             options.FileProvider = fileProvider;
             options.MemberAccessStrategy = UnsafeMemberAccessStrategy.Instance;
             configure?.Invoke(options);
