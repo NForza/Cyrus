@@ -41,7 +41,7 @@ public class CustomersQueryHandler
 }
 ```
 
-Query handlers can return any type of object, and can be either static or instance methods. They can also be synchronous or asynchronous. Here are valid variations of the query handler method:
+Query handlers can return any type of object, and can be either static or instance methods. Dependency injection is supported and query handlers can be synchronous or asynchronous. Here are valid variations of the query handler method:
 
 ```csharp
 public Customer Query(CustomerByIdQuery query)
@@ -50,7 +50,7 @@ public static async Task<Customer> Query(CustomerByIdQuery query)
 public async Task<Customer> Query(CustomerByIdQuery query)
 ```
 
-No extra configuration is needed to hook up queries and their handlers. The code generation connects queries to handlers based on these conventions:
+No extra configuration is needed to hook up queries and their handlers. The code generation connects queries to handlers based on these requirements:
 
 - A Query type must have the `[Query]` attribute 
 - Handler methods must have the `[QueryHandler]` attribute
@@ -87,7 +87,7 @@ Command handlers must return one of the following:
 
 Returned events are dispatched through the system via an event bus, and you can use a local bus or integrate with an external event bus using [MassTransit](https://masstransit.io/).
 
-The conventions for command handlers are as follows:
+The requirements for command handlers are as follows:
 
 - Commands must have the `[Command]` attribute
 - Handler methods must be have the `[CommandHandler]` attribute
@@ -110,10 +110,9 @@ public class CustomerEventHandler
         Console.WriteLine($"Customer Added: {@event.Id}");
     }
 }
+```
 
-Event handlers must return `void`.
-
-The conventions for command handlers are as follows:
+Event handlers must return `void`. The requirements for command handlers are as follows:
 
 - Events must have the `[Event]` attribute
 - Handler methods must have the `[EventHandler]` attribute
@@ -124,7 +123,7 @@ The conventions for command handlers are as follows:
 
 By adding a Route and Verb to the CommandHandler or a Route to a QueryHandler, commands and queries can be exposed in a Web API:
 
-```CSharp
+```csharp
 [Command(Route = "customers", Verb = HttpVerb.Post)]
 public record struct AddCustomerCommand(Name Name, Address Address, CustomerType CustomerType);
 
