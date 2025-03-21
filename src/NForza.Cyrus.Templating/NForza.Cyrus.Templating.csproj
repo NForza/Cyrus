@@ -5,7 +5,6 @@
     <LangVersion>8</LangVersion>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
-    <IncludeSymbols>True</IncludeSymbols>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
