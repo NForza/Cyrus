@@ -25,14 +25,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="bin\Debug\netstandard2.0\NForza.Cyrus.Generators.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs/" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="WebApi\Templates\HttpContextObjectFactoryCommand.liquid" />
+    <EmbeddedResource Include="WebApi\Templates\HttpContextObjectFactoryQuery.liquid" />
+    <EmbeddedResource Include="Cqrs\Templates\CyrusInitializer.liquid" />
     <EmbeddedResource Include="Model\model-hubquery.liquid" />
     <EmbeddedResource Include="Model\model-hub.liquid" />
     <EmbeddedResource Include="Model\model-type.liquid" />
@@ -50,12 +49,14 @@
     <EmbeddedResource Include="Cqrs\Templates\CommandDispatcherExtensions.liquid" />
     <EmbeddedResource Include="Model\CyrusModel.liquid" />
     <EmbeddedResource Include="MassTransit\EventConsumers.liquid" />
-    <EmbeddedResource Include="WebApi\Templates\HttpContextCqrsFactory.liquid" />
     <EmbeddedResource Include="Cqrs\Templates\QueryProcessorExtensions.liquid" />
     <EmbeddedResource Include="SignalR\Templates\RegisterSignalRHubs.liquid" />
-    <EmbeddedResource Include="WebApi\Templates\RegisterEndpointGroups.liquid" />
-    <EmbeddedResource Include="Cqrs\Templates\CqrsServiceCollectionExtensions.liquid" />
     <EmbeddedResource Include="SignalR\Templates\SignalRHub.liquid" />
+    <EmbeddedResource Include="WebApi\Templates\EventHandlerDictionary.liquid" />
+    <EmbeddedResource Include="WebApi\Templates\WebApiContractRecord.liquid" />
+    <EmbeddedResource Include="WebApi\Templates\MapQuery.liquid" />
+    <EmbeddedResource Include="WebApi\Templates\MapCommand.liquid" />
+    <EmbeddedResource Include="WebApi\Templates\CyrusWebStartup.liquid" />
   </ItemGroup>
 
   <ItemGroup>
@@ -69,14 +70,6 @@
   <ItemGroup>
     <ProjectReference Include="..\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj" />
     <ProjectReference Include="..\NForza.Cyrus.Templating\NForza.Cyrus.Templating.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EditorConfigFiles Remove="C:\dev\Cyrus\src\NForza.Cyrus.Generators\.editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="C:\dev\Cyrus\src\NForza.Cyrus.Generators\.editorconfig" />
   </ItemGroup>
     
 </Project>

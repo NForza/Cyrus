@@ -21,9 +21,9 @@ public class QueryHandlerDictionary : Dictionary<Type, QueryHandlerDefinition>
         return returnTypes[queryType];
     }
 
-    public void AddHandler<TQuery, TResult>(string handlerName, Func<IServiceProvider, object, CancellationToken, Task<object>> handler)
+    public void AddHandler<TQuery, TResult>(string route, Func<IServiceProvider, object, CancellationToken, Task<object>> handler)
     {
         returnTypes.Add(typeof(TQuery), typeof(TResult));
-        Add(typeof(TQuery), new(handlerName, (services, query, token) => handler(services, query, token)));
+        Add(typeof(TQuery), new(route, (services, query, token) => handler(services, query, token)));
     }
 }

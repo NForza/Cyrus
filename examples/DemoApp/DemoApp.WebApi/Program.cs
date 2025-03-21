@@ -1,13 +1,10 @@
 using System.Reflection;
+using DemoApp.Contracts.Customers;
 using DemoApp.Domain.Customer;
 using FluentValidation;
 using MassTransit;
-using NForza.Cyrus.Cqrs;
+using NForza.Cyrus;
 using NForza.Cyrus.WebApi;
-using NForza.Cyrus.SignalR;
-using NForza.Cyrus.Abstractions;
-using NForza.Cyrus.Model;
-using NForza.Cyrus.Abstractions.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +16,8 @@ builder.Services.AddMassTransit(cfg =>
         cfg.ConfigureEndpoints(context);
     });
 });
+
+var vc = new ValidationContext<AddCustomerCommand>(new AddCustomerCommand());
 
 builder.Services.AddCors(options =>
 {
@@ -33,7 +32,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddValidatorsFromAssemblyContaining<Customer>();
 
-builder.Services.AddCyrus(o => o.AddEndpointGroups().AddTypedIdSerializers().AddSignalRHubs());
+builder.Services.AddCyrus();
 
 builder.Services.AddEndpointsApiExplorer();
 

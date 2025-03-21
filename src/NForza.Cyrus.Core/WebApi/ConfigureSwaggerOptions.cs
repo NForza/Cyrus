@@ -12,7 +12,14 @@ public class ConfigureSwaggerOptions(TypedIdDictionary typedIds) : IConfigureOpt
     {
         foreach (var typedId in typedIds)
         {
-            options.MapType(typedId.Key, () => new OpenApiSchema() { Type = "string", Format = typedId.Value == typeof(Guid) ? "uuid" : "" });
+            options.MapType(typedId.Key, () => new OpenApiSchema() { Type = GetSwaggerType(typedId.Value), Format = typedId.Value == typeof(Guid) ? "uuid" : "" });
         }
     }
+
+    private string GetSwaggerType(Type value) 
+        => value switch
+           {
+               Type t when t == typeof(int) => "integer",
+               _ => "string"
+           };
 }

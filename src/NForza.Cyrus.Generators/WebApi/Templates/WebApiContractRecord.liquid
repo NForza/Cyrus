@@ -1,0 +1,17 @@
+﻿namespace {{ Namespace }};
+
+public class {{ Name | as-contract }}
+{
+{%- for prop in Properties %}
+	{% if prop.Internal == true %}internal{% else %}public{% endif %} {{ prop.Type }}{% if prop.IsNullable == false %}?{% endif %} {{ prop.Name }} { get; set; }
+{% endfor -%}
+
+	public {{ FullName }} As{{ Name }}()
+	{
+		return new {{ FullName }}(
+			{%- for prop in ConstructorArguments %}
+			this.{{ prop.Name }}.Value{% unless forloop.last %},{% endunless %}
+			{% endfor -%}
+		);
+	}
+ }

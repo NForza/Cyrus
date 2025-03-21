@@ -2,6 +2,5 @@
 
 public interface ICommandDispatcher
 {
-    Task<CommandResult> ExecuteInternalAsync(object command, CancellationToken cancellationToken);
-    CommandResult ExecuteInternalSync(object command);
+    IServiceProvider ServiceProvider { get; }
 }

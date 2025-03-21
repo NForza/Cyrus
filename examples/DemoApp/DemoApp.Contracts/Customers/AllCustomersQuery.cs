@@ -2,5 +2,5 @@
 
 namespace DemoApp.Contracts.Customers;
 
-[Query]
-public record struct AllCustomersQuery(int page = 1 , long pageSize = 10);
+[Query(Route = "/customers/{page}/{pageSize}")]
+public record struct AllCustomersQuery(int Page = 1 , long PageSize = 10);

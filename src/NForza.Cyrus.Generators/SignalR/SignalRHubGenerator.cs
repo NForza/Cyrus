@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Generators.Config;
-using NForza.Cyrus.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
@@ -17,57 +13,57 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        //DebugThisGenerator(false);
 
-        var configurationProvider = ConfigProvider(context);
+        //var configurationProvider = ConfigProvider(context);
 
-        var allEndpointGroupsProvider = context.SyntaxProvider
-            .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => syntaxNode is ClassDeclarationSyntax,
-                transform: (context, _) => (ClassDeclarationSyntax)context.Node)
-             .Where(static classDeclaration => classDeclaration.BaseList is not null);
+        //var allEndpointGroupsProvider = context.SyntaxProvider
+        //    .CreateSyntaxProvider(
+        //        predicate: (syntaxNode, _) => syntaxNode is ClassDeclarationSyntax,
+        //        transform: (context, _) => (ClassDeclarationSyntax)context.Node)
+        //     .Where(static classDeclaration => classDeclaration.BaseList is not null);
 
-        var signalrHubModelProvider = allEndpointGroupsProvider
-            .Combine(context.CompilationProvider)
-            .Select(static (pair, _) =>
-            {
-                var (classDeclaration, compilation) = pair;
-                var semanticModel = compilation.GetSemanticModel(classDeclaration.SyntaxTree);
-                var classSymbol = (INamedTypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration)!;
+        //var signalrHubModelProvider = allEndpointGroupsProvider
+        //    .Combine(context.CompilationProvider)
+        //    .Select(static (pair, _) =>
+        //    {
+        //        var (classDeclaration, compilation) = pair;
+        //        var semanticModel = compilation.GetSemanticModel(classDeclaration.SyntaxTree);
+        //        var classSymbol = (INamedTypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration)!;
 
-                SignalRHubClassDefinition definition = new SignalRHubClassDefinition(classDeclaration, classSymbol, semanticModel);
-                return definition;
-            })
-            .Where(signalRHubClassDefinition => signalRHubClassDefinition.Symbol.IsDirectlyDerivedFrom("NForza.Cyrus.SignalR.SignalRHub"))
-            .Select((signalRHubClassDefinition, _) => signalRHubClassDefinition.Initialize())
-            .Collect();
+        //        SignalRHubClassDefinition definition = new SignalRHubClassDefinition(classDeclaration, classSymbol, semanticModel);
+        //        return definition;
+        //    })
+        //    .Where(signalRHubClassDefinition => signalRHubClassDefinition.Symbol.IsDirectlyDerivedFrom("NForza.Cyrus.SignalR.SignalRHub"))
+        //    .Select((signalRHubClassDefinition, _) => signalRHubClassDefinition.Initialize())
+        //    .Collect();
 
-        var endpointGroupModelsAndConfigurationProvider = signalrHubModelProvider.Combine(configurationProvider).Combine(context.CompilationProvider);
+        //var endpointGroupModelsAndConfigurationProvider = signalrHubModelProvider.Combine(configurationProvider).Combine(context.CompilationProvider);
 
-        context.RegisterSourceOutput(endpointGroupModelsAndConfigurationProvider, (spc, classesAndConfig) =>
-        {
-            var ((signalRModels, configuration), compilation) = classesAndConfig;
+        //context.RegisterSourceOutput(endpointGroupModelsAndConfigurationProvider, (spc, classesAndConfig) =>
+        //{
+        //    var ((signalRModels, configuration), compilation) = classesAndConfig;
 
-            var isWebApi = configuration.GenerationTarget.Contains(GenerationTarget.WebApi);
+        //    var isWebApi = configuration.GenerationTarget.Contains(GenerationTarget.WebApi);
 
-            if (isWebApi)
-            {
-                var registration = GenerateSignalRHubRegistration(signalRModels);
-                spc.AddSource($"RegisterSignalRHubs.g.cs", SourceText.From(registration, Encoding.UTF8));
+        //    if (isWebApi)
+        //    {
+        //        var registration = GenerateSignalRHubRegistration(signalRModels);
+        //        spc.AddSource($"RegisterSignalRHubs.g.cs", SourceText.From(registration, Encoding.UTF8));
 
-                foreach (var signalRModel in signalRModels)
-                {
-                    var sourceText = GenerateSignalRHub(signalRModel, LiquidEngine);
-                    spc.AddSource($"{signalRModel.Symbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
-                }
-                if (signalRModels.Any())
-                {
-                    string assemblyName = signalRModels.First().Symbol.ContainingAssembly.Name;
-                    var commandModels = GetPartialModelClass(assemblyName, "SignalR", "Hubs", "ModelHubDefinition", signalRModels.Select(e => ModelGenerator.ForHub(e, LiquidEngine)));
-                    spc.AddSource($"model-hubs.g.cs", SourceText.From(commandModels, Encoding.UTF8));
-                }
-            }
-        });
+        //        foreach (var signalRModel in signalRModels)
+        //        {
+        //            var sourceText = GenerateSignalRHub(signalRModel, LiquidEngine);
+        //            spc.AddSource($"{signalRModel.Symbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+        //        }
+        //        if (signalRModels.Any())
+        //        {
+        //            string assemblyName = signalRModels.First().Symbol.ContainingAssembly.Name;
+        //            var commandModels = GetPartialModelClass(assemblyName, "SignalR", "Hubs", "ModelHubDefinition", signalRModels.Select(e => ModelGenerator.ForHub(e, LiquidEngine)));
+        //            spc.AddSource($"model-hubs.g.cs", SourceText.From(commandModels, Encoding.UTF8));
+        //        }
+        //    }
+        //});
     }
 
     private string GenerateSignalRHubRegistration(System.Collections.Immutable.ImmutableArray<SignalRHubClassDefinition> signalRDefinitions)
