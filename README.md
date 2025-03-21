@@ -82,10 +82,10 @@ Command handlers must return one of the following:
 |-------------------------------------------------|-------------------------------------------------------------------------------|
 | void                                            | no return value or events                                                     |
 | `IEnumerable<object>`                           | no return value, but returned objects are published to the event bus          |
-| `(object Result, IEnumerable<object> events)`   | return value and events are published to the event bus                        |
-| `(IResult Result, IEnumerable<object> events)`  | WebApi result and events are published to the event bus                       |
+| `(object Result, IEnumerable<object> events)`   | return value and events that are published to the event bus                   |
+| `(IResult Result, IEnumerable<object> events)`  | WebApi result and events that are published to the event bus                  |
 
-Returned events are dispatched through the system via an event bus, and you can use a local bus or integrate with an external event bus using [MassTransit](https://masstransit.io/).
+Returned events are dispatched through the system via an event bus, and you can use a local bus (which is the default) or integrate with an external event bus using [MassTransit](https://masstransit.io/).
 
 The requirements for command handlers are as follows:
 
@@ -96,7 +96,7 @@ The requirements for command handlers are as follows:
 
 ### Events and Event Handlers
 
-Events and their handlers are structured similarly to commands and queries. Events inform for other parts of the solution of these changes. 
+Events and their handlers are structured similarly to commands and queries. Events inform for other parts of the solution of changes. 
 
 ```csharp
 [Event]
