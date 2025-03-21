@@ -1,4 +1,3 @@
-
 # Cyrus - An Opinionated Framework for Creating CQRS Applications and Web APIs
 
 Cyrus is a CQRS framework that focuses on ease of use, simplicity, and minimizing boilerplate code. It incorporates principles from [DDD](https://en.wikipedia.org/wiki/Domain-driven_design) and [Cqrs](https://en.wikipedia.org/wiki/Command_Query_Responsibility_Segregation) to enable the rapid and pragmatic creation of Web APIs. Cyrus leverages [Roslyn Source Generators](https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.cookbook.md) to generate code rather than relying on reflection.
@@ -20,7 +19,142 @@ Cyrus allows you to define strongly typed IDs by defining a `partial record stru
 public partial record struct Address;
 ```
 
-This generates additional code that simplifies using this type in your code, including a custom `JsonConverter`, a `TypeConverter`, casting operators, and other methods.
+### Queries and Query Handlers
+
+Query Handlers process queries to retrieve data. A Query object is defined as a simple `record` or `record struct`:
+
+```csharp
+[Query]
+public record struct CustomerByIdQuery(CustomerId Id);
+```
+
+A simplified handler for this query might look like this:
+
+```csharp
+public class CustomersQueryHandler
+{
+    [QueryHandler]
+    public static Customer Query(CustomerByIdQuery query)
+    {
+        return new Customer(query.Id, new($"Customer-{query.Id}"));
+    }
+}
+```
+
+Query handlers can return any type of object, and can be either static or instance methods. Dependency injection is supported and query handlers can be synchronous or asynchronous. Here are valid variations of the query handler method:
+
+```csharp
+public Customer Query(CustomerByIdQuery query)
+public static Customer Query(CustomerByIdQuery query)
+public static async Task<Customer> Query(CustomerByIdQuery query)
+public async Task<Customer> Query(CustomerByIdQuery query)
+```
+
+No extra configuration is needed to hook up queries and their handlers. The code generation connects queries to handlers based on these requirements:
+
+- A Query type must have the `[Query]` attribute 
+- Handler methods must have the `[QueryHandler]` attribute
+- Handler methods must take one parameter, which should be a `Query` type
+
+Dependency injection is supported for instance methods, both synchronous and asynchronous.
+
+### Commands and Command Handlers
+
+Commands and their handlers are structured similarly to queries. Command are required to make changes to the domain and generate zero or more events inform for other parts of the solution of these changes. For example:
+
+```csharp
+[Command]
+public record struct AddCustomerCommand(Name Name, Address Address);
+
+public class AddCustomerCommandHandler
+{
+    [CommandHandler]
+    public IEnumerable<object> Execute(AddCustomerCommand command)
+    {
+        Console.WriteLine($"Customer created: {command.Name}, {command.Address}");
+        return [new CustomerAddedEvent(new CustomerId(), command.Name, command.Address)];
+    }
+}
+```
+
+Command handlers must return one of the following:
+| return type                                     | effects after executing hander                                                |
+|-------------------------------------------------|-------------------------------------------------------------------------------|
+| void                                            | no return value or events                                                     |
+| `IEnumerable<object>`                           | no return value, but returned objects are published to the event bus          |
+| `(object Result, IEnumerable<object> events)`   | return value and events that are published to the event bus                   |
+| `(IResult Result, IEnumerable<object> events)`  | WebApi result and events that are published to the event bus                  |
+
+Returned events are dispatched through the system via an event bus, and you can use a local bus (which is the default) or integrate with an external event bus using [MassTransit](https://masstransit.io/).
+
+The requirements for command handlers are as follows:
+
+- Commands must have the `[Command]` attribute
+- Handler methods must be have the `[CommandHandler]` attribute
+- Handler methods must take one parameter, which is a `Command`
+- Handler methods must return one of the mentioned return types
+
+### Events and Event Handlers
+
+Events and their handlers are structured similarly to commands and queries. Events inform for other parts of the solution of changes. 
+
+```csharp
+[Event]
+public record CustomerAddedEvent(CustomerId Id, Name Name, Address Address);
+
+public class CustomerEventHandler
+{
+    [EventHandler]
+    public void Handle(CustomerAddedEvent @event)
+    {
+        Console.WriteLine($"Customer Added: {@event.Id}");
+    }
+}
+```
+
+Event handlers must return `void`. The requirements for command handlers are as follows:
+
+- Events must have the `[Event]` attribute
+- Handler methods must have the `[EventHandler]` attribute
+- Handler methods must take one parameter, which is an `Event`
+- Handler methods must return `void`
+
+### Exposing Commands and Queries in a Web API
+
+By adding a Route and Verb to the CommandHandler or a Route to a QueryHandler, commands and queries can be exposed in a Web API:
+
+```csharp
+[Command(Route = "customers", Verb = HttpVerb.Post)]
+public record struct AddCustomerCommand(Name Name, Address Address, CustomerType CustomerType);
+
+[Query(Route = "/customers/{page}/{pageSize}")]
+public record struct AllCustomersQuery(int Page = 1 , long PageSize = 10);
+```
+
+### Application Startup
+
+Cyrus just needs a few simple calls in the Program.cs to hook up all Commands, Queries and events:
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCyrus();
+
+var app = builder.Build();
+
+app.MapCyrus();
+
+await app.RunAsync();
+```
+Check the [demo solution](https://github.com/thuijer/Cyrus/blob/master/) for more details.
+
+### Under the hood
+
+Cyrus uses a small amount of Reflection when the app is starting up, but **none** when the application is running. Cyrus generates a lot of source code at compile time to glue all the different parts together using [C# Source Generators]. This greatly simplifies development by reducing boilerplate code.
+
+### Generated code for TypedIds
+
+For every TypedIds Cyrus generates additional code that simplifies using this type in your code, including a custom `JsonConverter`, a `TypeConverter`, casting operators, validation and other methods.
 
 ```csharp
 [JsonConverter(typeof(AddressJsonConverter))]
@@ -63,135 +197,6 @@ public partial record struct CustomerId(Guid Value) : ITypedId
     public override string ToString() => Value.ToString();
 }
 ```
-
-### Queries and Query Handlers
-
-Query Handlers process queries to retrieve data. A Query object is defined as a simple `record` or `record struct`:
-
-```csharp
-public record struct CustomerByIdQuery(CustomerId Id);
-```
-
-A simplified handler for this query might look like this:
-
-```csharp
-public class CustomersQueryHandler
-{
-    public static Customer Query(CustomerByIdQuery query)
-    {
-        return new Customer(query.Id, new($"Customer-{query.Id}"));
-    }
-}
-```
-
-Query handlers can return any type of object, and can be either static or instance methods. They can also be synchronous or asynchronous. Here are valid variations of the query handler method:
-
-```csharp
-public Customer Query(CustomerByIdQuery query)
-public static Customer Query(CustomerByIdQuery query)
-public static async Task<Customer> Query(CustomerByIdQuery query)
-public async Task<Customer> Query(CustomerByIdQuery query)
-```
-
-No extra configuration is needed to hook up queries and their handlers. The code generation connects queries to handlers based on these conventions:
-
-- A Query class name must end with `Query`
-- Handler methods must be named `Query`
-- Handler methods must take one parameter, which should be a `Query` class
-
-Dependency injection is supported for instance methods, both synchronous and asynchronous.
-
-### Commands and Command Handlers
-
-Commands and their handlers are structured similarly to queries. Command are required to make changes to the domain and generate zero or more events inform for other parts of the solution of these changes. For example:
-
-```csharp
-public record struct AddCustomerCommand(Name Name, Address Address);
-
-public class AddCustomerCommandHandler
-{
-    public CommandResult Execute(AddCustomerCommand command)
-    {
-        Console.WriteLine($"Customer created: {command.Name}, {command.Address}");
-        return new CommandResult(new CustomerAddedEvent(new CustomerId(), command.Name, command.Address));
-    }
-}
-```
-
-Command handlers must return either `CommandResult` or `Task<CommandResult>`. Returned events are dispatched through the system via an event bus, and you can use a local bus or integrate with an external event bus using [MassTransit](https://masstransit.io/).
-
-The conventions for command handlers are as follows:
-
-- Commands must end their name with `Command`
-- Handler methods must be named `Execute`
-- Handler methods must take one parameter, which is a `Command`
-- Handler methods must return `CommandResult` or `Task<CommandResult>`
-
-### Exposing Commands and Queries in a Web API
-
-By deriving from the `EndpointGroup` class, you can expose a set of related commands and queries under a specific URL prefix. For example, the following exposes customer-related endpoints:
-
-```csharp
-public class CustomerEndpointGroup : EndpointGroup
-{
-    public CustomerEndpointGroup() : base("Customers")
-    {
-        CommandEndpoint<AddCustomerCommand>()
-            .Post("")
-            .AcceptedOnEvent<CustomerAddedEvent>("/customers/{Id}")
-            .OtherwiseFail();
-
-        CommandEndpoint<UpdateCustomerCommand>()
-            .Put("")
-            .AcceptedOnEvent<CustomerUpdatedEvent>("/customers/{Id}")
-            .OtherwiseFail();
-
-        QueryEndpoint<AllCustomersQuery>()
-            .Get("/customers");
-
-        QueryEndpoint<CustomerByIdQuery>()
-            .Get("/customers/{Id}");
-    }
-}
-```
-
-This configuration will expose the following URLs in the Web API:
-
-```
-POST /customers - Expects an AddCustomerCommand object in the JSON body. Returns a 202 Accepted with a location header set to `/customers/{Id}`.
-PUT /customers  - Expects an UpdateCustomerCommand object in the JSON body. Returns a 202 Accepted with a location header set to `/customers/{Id}`.
-GET /customers  - Returns all customers. 200 OK when the query result is not null, and 404 Not Found when the result is null.
-GET /customers/{Id}  - Returns a customer with the specified Id. 200 OK when the query result is not null, and 404 Not Found when the result is null.
-```
-
-EndpointGroups are automatically detected and registered by the Cyrus generators if they derive from the `EndpointGroup` class.
-
-### Application Startup
-
-Cyrus generates several extension methods to simplify application startup.
-
-These methods are available on `IServiceCollection`:
-
-- `AddCyrus(Action<CyrusOptions> cfg)` - Registers all CommandHandlers, QueryHandlers, and supporting types. Optionally takes a lambda for custom configuration.
-
-These methods are available on `IEndpointRouteBuilder`:
-
-- `MapCyrus()` - Registers all endpoints from all known EndpointGroups.
-
-A basic Cyrus application startup might look like this:
-
-```csharp
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddCyrus(o => o.AddEndpointGroups().AddTypedIdSerializers());
-
-var app = builder.Build();
-app.MapCyrus();
-
-await app.RunAsync();
-```
-
-Check the [demo solution](https://github.com/thuijer/Cyrus/blob/master/) for more details.
 
 ## Why Cyrus?
 
