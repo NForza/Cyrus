@@ -4,25 +4,29 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Text;
 using NForza.Cyrus.Cqrs;
-{{ Usings }}
+using NForza.Cyrus;
+{%- for u in Usings %}
+using {{ u }};
+{% endfor -%}
 
 #nullable enable
 
 namespace NForza.Cyrus.SignalR;
 
-public static class AddSignalRHubExtensions
+public class SignalRHubInitializer: ICyrusInitializer
 {
-    public static CyrusOptions AddSignalRHubs(this CyrusOptions options)
+    public void RegisterServices(IServiceCollection services)
     {
-        options.Services.AddSignalR();
-        options.Services.AddSingleton(BuildSignalRHubDictionary());
-        return options;
+        services.AddSignalR();
     }
+}
 
-    public static SignalRHubDictionary BuildSignalRHubDictionary()
+public class SignalRHubStartup: ICyrusWebStartup
+{
+    public void AddStartup(WebApplication app)
     {
-        var signalRHubDictionary = new SignalRHubDictionary();
-        {{ RegisterSignalRHubs }}
-        return signalRHubDictionary;
+        {% for hub in Hubs %}
+        app.MapHub<{{ hub.FullName }}>("{{ hub.Path }}");
+        {% endfor %}
     }
 }

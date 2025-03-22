@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 
-namespace NForza.Cyrus.WebApi;
+namespace NForza.Cyrus;
 
 public interface ICyrusWebStartup
 {
