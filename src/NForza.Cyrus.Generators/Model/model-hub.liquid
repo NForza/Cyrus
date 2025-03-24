@@ -1,4 +1,4 @@
-﻿new ModelHubDefinition("{{ Name }}", {{ Path }}, 
+﻿new ModelHubDefinition("{{ Name }}", "{{ Path }}", 
   [
 	{%- for c in Commands -%}
 	  "{{ c.Name }}"{% unless forloop.last %}, {% endunless -%}

@@ -29,7 +29,7 @@ internal record SignalRHubClassDefinition
     void SetPath(INamedTypeSymbol symbol, BlockSyntax? constructorBody)
     {
         string? usePathArgument = constructorBody != null ? GetMethodCallsOf(constructorBody, "UsePath").FirstOrDefault()?.ArgumentList.Arguments.FirstOrDefault()?.ToString() : null;
-        Path = usePathArgument ?? symbol.Name.ToLower();
+        Path = usePathArgument != null ? usePathArgument.Trim('\"') : symbol.Name.ToLower();
     }
 
     public SignalRHubClassDefinition(ClassDeclarationSyntax declaration, INamedTypeSymbol symbol, SemanticModel semanticModel)
@@ -58,7 +58,7 @@ internal record SignalRHubClassDefinition
 
     private void SetCommands(INamedTypeSymbol symbol, BlockSyntax constructorBody)
     {
-        var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "CommandMethodFor")
+        var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "Command")
                 .Select(ies => ies.Expression)
                 .OfType<GenericNameSyntax>();
         var commands = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());
@@ -71,7 +71,7 @@ internal record SignalRHubClassDefinition
 
     private void SetQueries(INamedTypeSymbol symbol, BlockSyntax constructorBody)
     {
-        var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "QueryMethodFor")
+        var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "Query")
                 .Select(ies => ies.Expression)
                 .OfType<GenericNameSyntax>();
         var queries = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());

@@ -17,7 +17,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
 
         var configurationProvider = ConfigProvider(context);
 
@@ -79,8 +79,11 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
             .Where(u => !string.IsNullOrWhiteSpace(u));
 
         var hubs = signalRDefinitions
-            .Select(cm => cm.Symbol)
-            .Select(s => s.ToFullName());
+            .Select(s => new
+            {
+                Name = s.Symbol.ToFullName(),
+                Path = s.Path
+            });
 
         var model = new
         {
