@@ -123,7 +123,7 @@ public class CommandEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerat
                 CommandType = handler.Parameters[0].Type.ToFullName(),
                 CommandName = handler.Parameters[0].Type.Name,
                 AdapterMethod = GetAdapterMethodName(handler),
-                IsAsync = handler.IsAsync(),
+                ReturnsTask = handler.ReturnsTask(),
                 HasReturnType = handler.ReturnType.SpecialType != SpecialType.System_Void,
                 CommandInvocation = handler.GetCommandInvocation(variableName: "cmd")
             };

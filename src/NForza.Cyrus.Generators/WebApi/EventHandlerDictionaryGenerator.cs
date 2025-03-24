@@ -85,7 +85,7 @@ public class EventHandlerDictionaryGenerator : CyrusGeneratorBase, IIncrementalG
                 var typeSymbolName = typeSymbol.ToFullName();
                 var handlerName = $"{typeSymbol.Name}.{eventHandler.Name}({eventHandler.Parameters[0].Type.Name})";
                 var returnType = (INamedTypeSymbol)eventHandler.ReturnType;
-                var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
+                var returnsTask = returnType.IsTaskType();
                 return new
                 {
                     EventType = eventType,

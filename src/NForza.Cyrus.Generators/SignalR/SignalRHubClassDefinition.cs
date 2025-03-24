@@ -64,8 +64,14 @@ internal record SignalRHubClassDefinition
         var commands = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());
         Commands = commands.Select(genericArg =>
         {
-            var symbol = SemanticModel.GetSymbolInfo(genericArg).Symbol!;
-            return new SignalRCommand { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, FullTypeName = symbol.ToFullName() };
+            var symbol = (SemanticModel.GetSymbolInfo(genericArg).Symbol as ITypeSymbol)!;
+            return new SignalRCommand
+            {
+                MethodName = genericArg.GetText().ToString(),
+                Name = symbol.Name,
+                Handler = GetCommandHandler(symbol) ?? throw new InvalidCastException("Can't find return type for " + symbol.ToFullName()),
+                FullTypeName = symbol.ToFullName()
+            };
         });
     }
 
@@ -121,6 +127,31 @@ internal record SignalRHubClassDefinition
                         }
 
                         return returnType;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private IMethodSymbol? GetCommandHandler(ITypeSymbol symbol)
+    {
+        Compilation compilation = SemanticModel.Compilation;
+        foreach (var reference in compilation.References)
+        {
+            var assemblySymbol = compilation.GetAssemblyOrModuleSymbol(reference) as IAssemblySymbol;
+            if (assemblySymbol == null)
+                continue;
+
+            foreach (var type in assemblySymbol.GlobalNamespace.GetAllTypes())
+            {
+                foreach (var method in type.GetMembers().OfType<IMethodSymbol>())
+                {
+                    if (method.Parameters.Length == 1 && method.IsCommandHandler() &&
+                        SymbolEqualityComparer.Default.Equals(method.Parameters[0].Type, symbol))
+                    {                        
+                        return method;
                     }
                 }
             }

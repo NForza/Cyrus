@@ -98,15 +98,21 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
 
     private string GenerateSignalRHub(SignalRHubClassDefinition classDefinition, LiquidEngine liquidEngine)
     {
-        //this needs to be moved to the template
-        string commands = GenerateCommands(classDefinition.Commands);
         string queries = GenerateQueries(classDefinition.Queries);
 
         var model = new
         {
             classDefinition.Symbol.Name,
             Namespace = classDefinition.Symbol.ContainingNamespace.ToDisplayString(),
-            CommandMethods = commands,
+            Commands = classDefinition.Commands.Select( c => new
+            {
+                c.MethodName,
+                c.FullTypeName,
+                c.Handler.ReturnType,
+                ReturnsVoid = c.Handler.ReturnType.IsVoid(),
+                Invocation = c.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "services"),
+                ReturnsTask = c.Handler.ReturnType.IsTaskType()
+            }),
             QueryMethods = queries,
         };
 

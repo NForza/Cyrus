@@ -1,4 +1,4 @@
-﻿    app.Map{{ Verb }}("{{ Path }}", {% if IsAsync %}async {% endif %}({% if HasBody %}[FromBody] {{ CommandType | as-contract }} command, {% endif -%} [FromServices] IEventBus eventBus, [FromServices] IHttpContextObjectFactory objectFactory, [FromServices] IHttpContextAccessor ctx) =>    {
+﻿    app.Map{{ Verb }}("{{ Path }}", {% if ReturnsTask %}async {% endif %}({% if HasBody %}[FromBody] {{ CommandType | as-contract }} command, {% endif -%} [FromServices] IEventBus eventBus, [FromServices] IHttpContextObjectFactory objectFactory, [FromServices] IHttpContextAccessor ctx) =>    {
         {% if HasBody == false %}{{ CommandType | as-contract }} command = new();{% endif %}
         using var scope = app.Services.CreateScope();
         var services = scope.ServiceProvider;
@@ -6,7 +6,7 @@
             .CreateFromHttpContextWithBodyAndRouteParameters<{{ CommandType | as-contract }}, {{ CommandType }}>(ctx.HttpContext, command);
         if (!ObjectValidation.Validate<{{ CommandType }}>(cmd, services, out var problem))
             return Results.BadRequest(problem);
-        {% if HasReturnType %}var commandResult = {% endif %}{% if IsAsync %}await {% endif %}{{ CommandInvocation }};
+        {% if HasReturnType %}var commandResult = {% endif %}{% if ReturnsTask %}await {% endif %}{{ CommandInvocation }};
         return new CommandResultAdapter(eventBus).{{ AdapterMethod }}({% if HasReturnType %}commandResult{% endif %});
     })
     .WithSwaggerParameters("{{Path}}");
