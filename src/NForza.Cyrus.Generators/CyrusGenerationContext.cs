@@ -10,6 +10,7 @@ namespace NForza.Cyrus.Generators
             Compilation compilation, 
             ImmutableArray<IMethodSymbol> commandHandlers,
             ImmutableArray<INamedTypeSymbol> queries,
+            ImmutableArray<IMethodSymbol> queryHandlers,
             ImmutableArray<INamedTypeSymbol> events,
             ImmutableArray<IMethodSymbol> eventHandlers,
             GenerationConfig generationConfig)
@@ -17,6 +18,7 @@ namespace NForza.Cyrus.Generators
             Compilation = compilation;
             CommandHandlers = commandHandlers;
             Queries = queries;
+            QueryHandlers = queryHandlers;
             EventHandlers = eventHandlers;
             Events = events;
             GenerationConfig = generationConfig;
@@ -24,6 +26,7 @@ namespace NForza.Cyrus.Generators
 
         public Compilation Compilation { get; private set; }
         public ImmutableArray<INamedTypeSymbol> Queries { get; private set; }
+        public ImmutableArray<IMethodSymbol> QueryHandlers { get; private set; }
         public ImmutableArray<IMethodSymbol> CommandHandlers { get; private set; }
         public ImmutableArray<INamedTypeSymbol> Events { get; private set; }
         public ImmutableArray<IMethodSymbol> EventHandlers { get; private set; }

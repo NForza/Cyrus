@@ -4,17 +4,16 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
+using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.Generators.Cqrs;
 
-[Generator]
-public class CqrsQueryHandlerGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
+public class QueryHandlerGenerator : CyrusGeneratorBase<ImmutableArray<IMethodSymbol>>
 {
-    public override void Initialize(IncrementalGeneratorInitializationContext context)
+    public override IncrementalValueProvider<ImmutableArray<IMethodSymbol>> GetProvider(IncrementalGeneratorInitializationContext context, IncrementalValueProvider<GenerationConfig> configProvider)
     {
-        DebugThisGenerator(false);
-
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: (syntaxNode, _) => syntaxNode.IsQueryHandler(),
@@ -25,34 +24,35 @@ public class CqrsQueryHandlerGenerator : CyrusSourceGeneratorBase, IIncrementalG
             .Select((x, _) => x!)
             .Collect();
 
-        var combinedProvider = allQueryHandlersProvider.Combine(context.CompilationProvider);
+        return allQueryHandlersProvider;
+    }
 
-        context.RegisterSourceOutput(combinedProvider, (spc, queryHandlersWithCompilation) =>
+    override public void GenerateSource(SourceProductionContext context, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
+    {
+        var queryHandlers = cyrusProvider.QueryHandlers;
+
+        if (queryHandlers.Any())
         {
-            var (queryHandlers, compilation) = queryHandlersWithCompilation;
-            if (queryHandlers.Any())
-            {
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
-                var queryHandlerRegistrations = string.Join(Environment.NewLine, queryHandlers
-                    .Select(x => x.ContainingType)
-                    .Where(x => x != null)
-                    .Distinct(SymbolEqualityComparer.Default)
-                    .Select(qht => $" services.AddTransient<{qht.ToFullName()}>();"));
+            var queryHandlerRegistrations = string.Join(Environment.NewLine, queryHandlers
+                .Select(x => x.ContainingType)
+                .Where(x => x != null)
+                .Distinct(SymbolEqualityComparer.Default)
+                .Select(qht => $" services.AddTransient<{qht.ToFullName()}>();"));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
-                var ctx = new
-                {
-                    Usings = new string[] { "NForza.Cyrus.Cqrs" },
-                    Namespace = "QueryHandlers",
-                    Name = "QueryHandlersRegistration",
-                    Initializer = queryHandlerRegistrations
-                };
-                var fileContents = LiquidEngine.Render(ctx, "CyrusInitializer");
-                spc.AddSource("QueryHandlerRegistration.g.cs", SourceText.From(fileContents, Encoding.UTF8));
+            var ctx = new
+            {
+                Usings = new string[] { "NForza.Cyrus.Cqrs" },
+                Namespace = "QueryHandlers",
+                Name = "QueryHandlersRegistration",
+                Initializer = queryHandlerRegistrations
+            };
+            var fileContents = LiquidEngine.Render(ctx, "CyrusInitializer");
+            context.AddSource("QueryHandlerRegistration.g.cs", SourceText.From(fileContents, Encoding.UTF8));
 
-                var sourceText = GenerateQueryProcessorExtensionMethods(queryHandlers, compilation);
-                spc.AddSource($"QueryProcessor.g.cs", SourceText.From(sourceText, Encoding.UTF8));
-            }
-        });
+            var sourceText = GenerateQueryProcessorExtensionMethods(queryHandlers, cyrusProvider.Compilation);
+            context.AddSource($"QueryProcessor.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+        }
     }
 
     private string GenerateQueryProcessorExtensionMethods(ImmutableArray<IMethodSymbol> handlers, Compilation compilation)
