@@ -17,6 +17,17 @@ Cyrus allows you to define strongly typed IDs by defining a `partial record stru
 ```csharp
 [StringId(3, 200)]
 public partial record struct Address;
+
+[IntId]
+public partial record struct Amount;
+
+[GuidId]
+public partial record struct CustomerId;
+```
+These becomes a new datatype that can be used in type definitions:
+
+```csharp
+public record Customer(CustomerId Id, Address Address);
 ```
 
 ### Queries and Query Handlers
@@ -28,7 +39,7 @@ Query Handlers process queries to retrieve data. A Query object is defined as a 
 public record struct CustomerByIdQuery(CustomerId Id);
 ```
 
-A simplified handler for this query might look like this:
+A handler is responsible for handling a request for data. A simplified handler for this query might look like this:
 
 ```csharp
 public class CustomersQueryHandler
