@@ -8,6 +8,9 @@ namespace NForza.Cyrus.Generators
     {
         public CyrusGenerationContext(
             Compilation compilation,
+            ImmutableArray<INamedTypeSymbol> guidIds,
+            ImmutableArray<INamedTypeSymbol> intIds,
+            ImmutableArray<INamedTypeSymbol> stringIds,
             ImmutableArray<INamedTypeSymbol> commands,
             ImmutableArray<IMethodSymbol> commandHandlers,
             ImmutableArray<INamedTypeSymbol> queries,
@@ -17,6 +20,9 @@ namespace NForza.Cyrus.Generators
             GenerationConfig generationConfig)
         {
             Compilation = compilation;
+            GuidIds = guidIds;
+            IntIds = intIds;
+            StringIds = stringIds;
             Commands = commands;
             CommandHandlers = commandHandlers;
             Queries = queries;
@@ -27,6 +33,10 @@ namespace NForza.Cyrus.Generators
         }
 
         public Compilation Compilation { get; private set; }
+        public ImmutableArray<INamedTypeSymbol> GuidIds { get; private set; }
+        public ImmutableArray<INamedTypeSymbol> IntIds { get; private set; }
+        public ImmutableArray<INamedTypeSymbol> StringIds { get; private set; }
+        public ImmutableArray<INamedTypeSymbol> TypedIds => GuidIds.AddRange(IntIds).AddRange(StringIds);   
         public ImmutableArray<INamedTypeSymbol> Commands { get; private set; }
         public ImmutableArray<IMethodSymbol> CommandHandlers { get; private set; }
         public ImmutableArray<INamedTypeSymbol> Queries { get; private set; }

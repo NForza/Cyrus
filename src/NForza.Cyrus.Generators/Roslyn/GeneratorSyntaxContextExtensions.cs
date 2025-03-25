@@ -23,7 +23,7 @@ namespace NForza.Cyrus.Generators.Roslyn
             return symbol;
         }
 
-        public static INamedTypeSymbol? GetRecordSymbolFromContext(this GeneratorSyntaxContext context)
+        public static INamedTypeSymbol? GetNamedTypeSymbolFromContext(this GeneratorSyntaxContext context)
         {
             var classDeclarationSyntax = (RecordDeclarationSyntax)context.Node;
             var model = context.SemanticModel;

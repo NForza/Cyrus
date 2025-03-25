@@ -2,39 +2,27 @@
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Generators.Roslyn;
+using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.Generators.TypedIds;
 
-[Generator]
-public class IntIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
+public class IntIdGenerator : CyrusGeneratorBase
 {
-    public override void Initialize(IncrementalGeneratorInitializationContext context)
+    public override void GenerateSource(SourceProductionContext context, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
-        DebugThisGenerator(false);
-        var incrementalValuesProvider = context.SyntaxProvider
-                    .CreateSyntaxProvider(
-                        predicate: (syntaxNode, _) => IsRecordWithIntIdAttribute(syntaxNode),
-                        transform: (context, _) => GetNamedTypeSymbolFromContext(context));
-
-        var recordStructsWithAttribute = incrementalValuesProvider
-            .Where(x => x is not null)
-            .Select((x, _) => x!)
-            .Collect();
-
-        context.RegisterSourceOutput(recordStructsWithAttribute, (spc, recordSymbols) =>
-        {
+        var recordSymbols = cyrusProvider.IntIds;
             foreach (var recordSymbol in recordSymbols)
             {
                 var sourceText = GenerateIntId(recordSymbol);
-                spc.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                context.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             };
 
             if (recordSymbols.Any())
             {
                 var intModels = GetPartialModelClass(recordSymbols.First().ContainingAssembly.Name, "TypedIds", "Integers", "string", recordSymbols.Select(im => $"\"{im.Name}\""));
-                spc.AddSource($"model-ints.g.cs", SourceText.From(intModels, Encoding.UTF8));
+                context.AddSource($"model-ints.g.cs", SourceText.From(intModels, Encoding.UTF8));
             }
-        });
     }
 
     private string GenerateIntId(INamedTypeSymbol item)
@@ -44,7 +32,7 @@ public class IntIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
         {
             item.Name,
             Namespace = item.ContainingNamespace.ToDisplayString(),
-            UnderlyingType = GetUnderlyingTypeOfTypedId(item),
+            UnderlyingType = item.GetUnderlyingTypeOfTypedId(),
             Minimum = min,
             HasMinimum = min.HasValue,
             Maximum = max,

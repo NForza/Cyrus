@@ -13,7 +13,7 @@ public class EventProvider : CyrusProviderBase<ImmutableArray<INamedTypeSymbol>>
         var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: (syntaxNode, _) => syntaxNode.IsEvent(),
-                transform: (context, _) => context.GetRecordSymbolFromContext());
+                transform: (context, _) => context.GetNamedTypeSymbolFromContext());
 
         var allEventsProvider = incrementalValuesProvider.Combine(configProvider)
             .Where(x => x.Left is not null)

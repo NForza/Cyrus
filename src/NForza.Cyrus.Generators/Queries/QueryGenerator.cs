@@ -26,7 +26,7 @@ public class QueryGenerator : CyrusGeneratorBase
 
             var referencedTypes = queries.SelectMany(cs => cs.GetReferencedTypes());
             var referencedTypeModels = GetPartialModelClass(assemblyName, "Queries", "Models", "ModelTypeDefinition", referencedTypes.Select(cm => ModelGenerator.ForNamedType(cm, LiquidEngine)));
-            spc.AddSource($"model-event-types.g.cs", SourceText.From(referencedTypeModels, Encoding.UTF8));
+      //      spc.AddSource($"model-event-types.g.cs", SourceText.From(referencedTypeModels, Encoding.UTF8));
         }
     }
 }

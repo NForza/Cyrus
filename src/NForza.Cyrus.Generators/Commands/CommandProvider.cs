@@ -13,7 +13,7 @@ public class CommandProvider : CyrusProviderBase<ImmutableArray<INamedTypeSymbol
         var queryProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: (syntaxNode, _) => syntaxNode.IsCommand(),
-                transform: (context, _) => context.GetRecordSymbolFromContext());
+                transform: (context, _) => context.GetNamedTypeSymbolFromContext());
 
         var allQueriesProvider = queryProvider
             .Where(x => x is not null)

@@ -49,5 +49,22 @@ namespace NForza.Cyrus.Generators.Roslyn
             };
             return false;
         }
+
+        public static bool IsRecordWithAttribute(this SyntaxNode syntaxNode, string attributeName)
+        {
+            bool isRecordWithAttribute = syntaxNode is RecordDeclarationSyntax recordDeclaration &&
+                           recordDeclaration.HasAttribute(attributeName);
+            return isRecordWithAttribute;
+        }
+
+        public static bool IsRecordWithGuidIdAttribute(this SyntaxNode syntaxNode)
+            => IsRecordWithAttribute(syntaxNode, "GuidId");
+
+        public static bool IsRecordWithIntIdAttribute(this SyntaxNode syntaxNode)
+            => IsRecordWithAttribute(syntaxNode, "IntId");
+
+        public static bool IsRecordWithStringIdAttribute(this SyntaxNode syntaxNode)
+            => IsRecordWithAttribute(syntaxNode, "StringId");
+
     }
 }
