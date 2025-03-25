@@ -34,11 +34,4 @@ public static class IEndpointRouteBuilderExtensions
             .ExcludeFromDescription();
         return endpoints;
     }
-
-    //public static IEndpointRouteBuilder MapSignalR(this IEndpointRouteBuilder endpoints)
-    //{
-    //    var hubs = endpoints.ServiceProvider.GetService<SignalRHubDictionary>();
-    //    hubs?.ToList().ForEach(hub => hub.Value(endpoints));
-    //    return endpoints;
-    //}
 }

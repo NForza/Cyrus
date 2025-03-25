@@ -8,6 +8,6 @@ public static class QueryProcessorExtensions
 {
 {% for q in Queries %}
     public static async Task<{{ q.ReturnType }}> Query(this IQueryProcessor queryProcessor, {{ q.QueryType }} query, CancellationToken cancellationToken = default) 
-        => {% if q.IsAsync %}await {% endif %}{{ q.Invocation }};
+        => {% if q.ReturnsTask %}await {% endif %}{{ q.Invocation }};
 {% endfor %}
 }

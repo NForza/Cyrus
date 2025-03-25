@@ -100,7 +100,7 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
             Name = h.Name,
             ReturnsVoid = h.ReturnsVoid,
             ReturnType = (INamedTypeSymbol)h.ReturnType,
-            IsAsync = h.ReturnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default)
+            ReturnsTask = h.ReturnType.IsTaskType()
         }).ToList();
 
         var model = new
@@ -108,12 +108,12 @@ public class CqrsCommandGenerator : CyrusGeneratorBase, IIncrementalGenerator
             Commands = commands.Select(q => new
             {
                 ReturnTypeOriginal = q.ReturnType,
-                ReturnType = q.IsAsync ? q.ReturnType.TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
+                ReturnType = q.ReturnsTask ? q.ReturnType.TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
                 Invocation = q.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "commandDispatcher.ServiceProvider"),
                 Name = q.Name,
                 q.ReturnsVoid,
                 q.CommandType,
-                q.IsAsync
+                q.ReturnsTask
             }).ToList()
         };
 

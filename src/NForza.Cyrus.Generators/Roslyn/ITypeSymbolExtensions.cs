@@ -115,8 +115,23 @@ internal static class ITypeSymbolExtensions
 
         foreach (var property in typeSymbol.GetMembers().OfType<IPropertySymbol>().Where(p => p.DeclaredAccessibility == Accessibility.Public))
         {
-           property.Type.CollectReferencedTypesFromPublicProperties(visited, result, isRoot: false);
+            property.Type.CollectReferencedTypesFromPublicProperties(visited, result, isRoot: false);
         }
+    }
+
+
+    public static bool IsTaskType(this ITypeSymbol typeSymbol)
+    {
+        if (typeSymbol is not INamedTypeSymbol namedType)
+            return false;
+
+        return namedType.Name == "Task" &&
+                namedType.ContainingNamespace.ToDisplayString() == "System.Threading.Tasks";
+    }
+
+    public static bool IsVoid(this ITypeSymbol typeSymbol)
+    {
+        return typeSymbol.ToDisplayString() == "void";
     }
 
     private static bool IsKnownType(this ITypeSymbol typeSymbol)

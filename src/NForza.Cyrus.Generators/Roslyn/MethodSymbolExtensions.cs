@@ -5,30 +5,13 @@ namespace NForza.Cyrus.Generators.Roslyn
 {
     internal static class MethodSymbolExtensions
     {
-        public static bool ReturnsCommandResult(this IMethodSymbol methodSymbol)
+        public static bool ReturnsTask(this IMethodSymbol methodSymbol)
         {
-            ITypeSymbol returnType = methodSymbol.ReturnType;
+            if (methodSymbol.ReturnType is not INamedTypeSymbol namedType)
+                return false;
 
-            if (returnType.Name == "CommandResult")
-                return true;
-
-            if (returnType is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.IsGenericType)
-            {
-                if (namedTypeSymbol.OriginalDefinition.ToString() == "System.Threading.Tasks.Task<T>")
-                {
-                    var genericArg = namedTypeSymbol.TypeArguments[0];
-                    return genericArg.Name == "CommandResult";
-                }
-            }
-
-            return false;
-        }
-
-        public static bool IsAsync(this IMethodSymbol handler)
-        {
-            var returnType = handler.ReturnType;
-            var isAsync = returnType.Name == "Task" || returnType.Name == "ValueTask";
-            return isAsync;
+            return namedType.Name == "Task" &&
+                   namedType.ContainingNamespace.ToDisplayString() == "System.Threading.Tasks";
         }
 
         public static string GetCommandInvocation(this IMethodSymbol handler, string variableName, string serviceProviderVariable = "services")
@@ -36,9 +19,9 @@ namespace NForza.Cyrus.Generators.Roslyn
             var commandType = handler.Parameters[0].Type.ToFullName();
             var typeSymbol = handler.ContainingType.ToFullName();
             var returnType = handler.ReturnType;
-            var isAsync = handler.IsAsync();    
+            var returnsTask = handler.ReturnsTask();
 
-            if (isAsync)
+            if (returnsTask)
             {
                 return handler.IsStatic
                     ? $"{typeSymbol}.{handler.Name}({variableName})"
@@ -58,9 +41,9 @@ namespace NForza.Cyrus.Generators.Roslyn
             var queryType = handler.Parameters[0].Type.ToFullName();
             var typeSymbol = handler.ContainingType.ToFullName();
             var returnType = handler.ReturnType;
-            var isAsync = handler.IsAsync();
+            var returnsTask = handler.ReturnsTask();
 
-            if (isAsync)
+            if (returnsTask)
             {
                 return handler.IsStatic
                     ? $"{handlerClass}.{handler.Name}(query)"

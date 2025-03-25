@@ -14,7 +14,7 @@ public class QueryEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
+        DebugThisGenerator(false);
 
         var configProvider = ConfigProvider(context);
 
@@ -107,7 +107,7 @@ public class QueryEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
             {
                 Path = handler.GetQueryHandlerRoute(),
                 Query = handler.Parameters[0].Type.ToFullName(),
-                IsAsync = handler.IsAsync(),
+                ReturnsTask = handler.ReturnsTask(),
                 QueryInvocation = handler.GetQueryInvocation()
             };
             sb.AppendLine(LiquidEngine.Render(query, "MapQuery"));

@@ -69,7 +69,7 @@ public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerat
             QueryType = h.Parameters[0].Type.ToFullName(),
             Name = h.Name,
             ReturnType = (INamedTypeSymbol)h.ReturnType,
-            IsAsync = h.ReturnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default)
+            ReturnsTask = h.ReturnsTask()
         }).ToList();
 
         var model = new
@@ -77,11 +77,11 @@ public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerat
             Queries = queries.Select(q => new
             {
                 ReturnTypeOriginal = q.ReturnType,
-                ReturnType = q.IsAsync ? q.ReturnType.TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
+                ReturnType = q.ReturnsTask ? q.ReturnType.TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
                 Invocation = q.Handler.GetQueryInvocation(serviceProviderVariable: "queryProcessor.ServiceProvider"),
                 Name = q.Name,
                 q.QueryType,
-                q.IsAsync
+                q.ReturnsTask
             }).ToList()
         };
 

@@ -5,8 +5,13 @@ using NForza.Cyrus.SignalR;
 
 namespace {{ Namespace }};
 
-public class {{ Name }}_Generated(ICommandDispatcher commandDispatcher, IQueryProcessor queryProcessor) : HubBase
+public class {{ Name }}_Generated(IServiceProvider services, IQueryProcessor queryProcessor) : HubBase
 {
-    {{ CommandMethods }}
+    {% for cmd in Commands %}
+        public async Task {{ cmd.MethodName }} ({{ cmd.FullTypeName }} command) 
+        {% if cmd.ReturnsVoid %} { {% else %} => {% endif %} 
+                {%- if cmd.ReturnsTask %}await {% endif %}{{ cmd.Invocation }};
+           {%- if cmd.ReturnsVoid %} } {% endif %} 
+    {% endfor %}
     {{ QueryMethods }}
 }
