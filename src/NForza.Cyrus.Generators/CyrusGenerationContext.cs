@@ -2,19 +2,28 @@
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Config;
 
-namespace NForza.Cyrus.Generators.Cqrs
+namespace NForza.Cyrus.Generators
 {
-    internal class CyrusGenerationContext
+    public class CyrusGenerationContext
     {
-        public CyrusGenerationContext(Compilation compilation, ImmutableArray<IMethodSymbol> commandHandlers, GenerationConfig generationConfig)
+        public CyrusGenerationContext(
+            Compilation compilation, 
+            ImmutableArray<IMethodSymbol> commandHandlers,
+            ImmutableArray<INamedTypeSymbol> events,
+            ImmutableArray<IMethodSymbol> eventHandlers,
+            GenerationConfig generationConfig)
         {
             Compilation = compilation;
             CommandHandlers = commandHandlers;
+            EventHandlers = eventHandlers;
+            Events = events;
             GenerationConfig = generationConfig;
         }
 
         public Compilation Compilation { get; private set; }
-        public ImmutableArray<IMethodSymbol> CommandHandlers { get ; private set; }
+        public ImmutableArray<IMethodSymbol> CommandHandlers { get; private set; }
+        public ImmutableArray<INamedTypeSymbol> Events { get; private set; }
+        public ImmutableArray<IMethodSymbol> EventHandlers { get; private set; }
         public GenerationConfig GenerationConfig { get; private set; }
     }
 }

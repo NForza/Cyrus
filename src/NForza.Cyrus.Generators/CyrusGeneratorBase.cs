@@ -1,13 +1,12 @@
 ﻿using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Config;
-using NForza.Cyrus.Generators.Cqrs;
 using NForza.Cyrus.Templating;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace NForza.Cyrus.Generators;
 
-internal abstract class CyrusGeneratorBase<T>
+public abstract class CyrusGeneratorBase<T>
 {
     public abstract IncrementalValueProvider<T> GetProvider(IncrementalGeneratorInitializationContext context, IncrementalValueProvider<GenerationConfig> configProvider);
     public abstract void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine);
