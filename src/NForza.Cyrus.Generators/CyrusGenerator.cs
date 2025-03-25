@@ -7,6 +7,7 @@ namespace NForza.Cyrus.Generators;
 [Generator]
 public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 {
+    private CommandProvider CommandProvider { get; } = new();
     private CommandHandlerProvider CommandHandlerProvider { get; } = new();
     private QueryProvider QueryProvider { get; } = new();
     private QueryHandlerProvider QueryHandlerProvider { get; } = new();
@@ -19,14 +20,16 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 
         var configProvider = ConfigProvider(context);
 
+        var commandProvider = CommandProvider.GetProvider(context, configProvider);
         var commandHandlerProvider = CommandHandlerProvider.GetProvider(context, configProvider);
-        var eventHandlerProvider = EventHandlerProvider.GetProvider(context, configProvider);
         var eventProvider = EventProvider.GetProvider(context, configProvider);
+        var eventHandlerProvider = EventHandlerProvider.GetProvider(context, configProvider);
         var queryProvider = QueryProvider.GetProvider(context, configProvider);
         var queryHandlerProvider = QueryHandlerProvider.GetProvider(context, configProvider);
 
         var cyrusProvider = 
             context.CompilationProvider
+            .Combine(commandProvider)
             .Combine(commandHandlerProvider)
             .Combine(queryProvider)
             .Combine(queryHandlerProvider)
@@ -35,14 +38,15 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
             .Combine(configProvider)
             .Select((combinedProviders, _) =>
             {
-                var ((((((compilation, commandHandlers), queries), queryHandlers), eventHandlers), events), generationConfig) = combinedProviders;
+                var (((((((compilation, commands), commandHandlers), queries), queryHandlers), eventHandlers), events), generationConfig) = combinedProviders;
                 return new CyrusGenerationContext(
-                    compilation: compilation, 
+                    compilation: compilation,
+                    commands: commands,
                     commandHandlers: commandHandlers,
-                    queryHandlers: queryHandlers,
                     queries: queries,
-                    eventHandlers: eventHandlers,
+                    queryHandlers: queryHandlers,
                     events: events,
+                    eventHandlers: eventHandlers,
                     generationConfig: generationConfig);
             });
 
