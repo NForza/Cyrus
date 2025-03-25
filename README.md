@@ -39,7 +39,7 @@ Query Handlers process queries to retrieve data. A Query object is defined as a 
 public record struct CustomerByIdQuery(CustomerId Id);
 ```
 
-A simplified handler for this query might look like this:
+A handler is responsible for handling a request for data. A simplified handler for this query might look like this:
 
 ```csharp
 public class CustomersQueryHandler
