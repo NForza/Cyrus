@@ -9,18 +9,21 @@ namespace NForza.Cyrus.Generators
         public CyrusGenerationContext(
             Compilation compilation, 
             ImmutableArray<IMethodSymbol> commandHandlers,
+            ImmutableArray<INamedTypeSymbol> queries,
             ImmutableArray<INamedTypeSymbol> events,
             ImmutableArray<IMethodSymbol> eventHandlers,
             GenerationConfig generationConfig)
         {
             Compilation = compilation;
             CommandHandlers = commandHandlers;
+            Queries = queries;
             EventHandlers = eventHandlers;
             Events = events;
             GenerationConfig = generationConfig;
         }
 
         public Compilation Compilation { get; private set; }
+        public ImmutableArray<INamedTypeSymbol> Queries { get; private set; }
         public ImmutableArray<IMethodSymbol> CommandHandlers { get; private set; }
         public ImmutableArray<INamedTypeSymbol> Events { get; private set; }
         public ImmutableArray<IMethodSymbol> EventHandlers { get; private set; }
