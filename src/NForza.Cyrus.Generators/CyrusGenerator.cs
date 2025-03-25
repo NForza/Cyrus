@@ -7,11 +7,11 @@ namespace NForza.Cyrus.Generators;
 [Generator]
 public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 {
-    private CommandHandlerGenerator CommandHandlerGenerator { get; } = new();
-    private QueryGenerator QueryGenerator { get; } = new();
-    private QueryHandlerGenerator QueryHandlerGenerator { get; } = new();
-    private EventGenerator EventGenerator { get; } = new();
-    private EventHandlerGenerator EventHandlerGenerator { get; } = new();
+    private CommandHandlerProvider CommandHandlerProvider { get; } = new();
+    private QueryProvider QueryProvider { get; } = new();
+    private QueryHandlerProvider QueryHandlerProvider { get; } = new();
+    private EventProvider EventProvider { get; } = new();
+    private EventHandlerProvider EventHandlerProvider { get; } = new();
 
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -19,11 +19,11 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 
         var configProvider = ConfigProvider(context);
 
-        var commandHandlerProvider = CommandHandlerGenerator.GetProvider(context, configProvider);
-        var eventHandlerProvider = EventHandlerGenerator.GetProvider(context, configProvider);
-        var eventProvider = EventGenerator.GetProvider(context, configProvider);
-        var queryProvider = QueryGenerator.GetProvider(context, configProvider);
-        var queryHandlerProvider = QueryHandlerGenerator.GetProvider(context, configProvider);
+        var commandHandlerProvider = CommandHandlerProvider.GetProvider(context, configProvider);
+        var eventHandlerProvider = EventHandlerProvider.GetProvider(context, configProvider);
+        var eventProvider = EventProvider.GetProvider(context, configProvider);
+        var queryProvider = QueryProvider.GetProvider(context, configProvider);
+        var queryHandlerProvider = QueryHandlerProvider.GetProvider(context, configProvider);
 
         var cyrusProvider = 
             context.CompilationProvider
@@ -48,11 +48,11 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 
         context.RegisterSourceOutput(cyrusProvider, (spc, source) =>
         {
-            CommandHandlerGenerator.GenerateSource(spc, source, LiquidEngine);
-            QueryGenerator.GenerateSource(spc, source, LiquidEngine);
-            QueryHandlerGenerator.GenerateSource(spc, source, LiquidEngine);
-            EventHandlerGenerator.GenerateSource(spc, source, LiquidEngine);
-            EventGenerator.GenerateSource(spc, source, LiquidEngine);
+            new CommandHandlerGenerator().GenerateSource(spc, source, LiquidEngine);
+            new QueryGenerator().GenerateSource(spc, source, LiquidEngine);
+            new QueryHandlerGenerator().GenerateSource(spc, source, LiquidEngine);
+            new EventHandlerGenerator().GenerateSource(spc, source, LiquidEngine);
+            new EventGenerator().GenerateSource(spc, source, LiquidEngine);
         });
     }
 }

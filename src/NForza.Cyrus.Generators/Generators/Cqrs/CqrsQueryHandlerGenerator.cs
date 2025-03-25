@@ -4,29 +4,13 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.Generators.Cqrs;
 
-public class QueryHandlerGenerator : CyrusGeneratorBase<ImmutableArray<IMethodSymbol>>
+public class QueryHandlerGenerator : CyrusGeneratorBase
 {
-    public override IncrementalValueProvider<ImmutableArray<IMethodSymbol>> GetProvider(IncrementalGeneratorInitializationContext context, IncrementalValueProvider<GenerationConfig> configProvider)
-    {
-        var incrementalValuesProvider = context.SyntaxProvider
-            .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => syntaxNode.IsQueryHandler(),
-                transform: (context, _) => context.GetMethodSymbolFromContext());
-
-        var allQueryHandlersProvider = incrementalValuesProvider
-            .Where(x => x is not null)
-            .Select((x, _) => x!)
-            .Collect();
-
-        return allQueryHandlersProvider;
-    }
-
     override public void GenerateSource(SourceProductionContext context, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
         var queryHandlers = cyrusProvider.QueryHandlers;

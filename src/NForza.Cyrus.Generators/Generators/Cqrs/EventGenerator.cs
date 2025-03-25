@@ -1,32 +1,15 @@
-﻿using System.Collections.Immutable;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.Generators.Cqrs;
 
-public class EventGenerator : CyrusGeneratorBase<ImmutableArray<INamedTypeSymbol>>
+public class EventGenerator : CyrusGeneratorBase
 {
-    public override IncrementalValueProvider<ImmutableArray<INamedTypeSymbol>> GetProvider(IncrementalGeneratorInitializationContext context, IncrementalValueProvider<GenerationConfig> configProvider)
-    {
-        var incrementalValuesProvider = context.SyntaxProvider
-            .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => syntaxNode.IsEvent(),
-                transform: (context, _) => context.GetRecordSymbolFromContext());
-
-        var allEventsProvider = incrementalValuesProvider.Combine(configProvider)
-            .Where(x => x.Left is not null)
-            .Select((x, _) => x.Left!)
-            .Collect();
-
-        return allEventsProvider;
-    }
-
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
         var events = cyrusProvider.Events;

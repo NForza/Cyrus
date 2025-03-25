@@ -1,14 +1,12 @@
 ﻿using Microsoft.CodeAnalysis;
-using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Templating;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace NForza.Cyrus.Generators;
 
-public abstract class CyrusGeneratorBase<T>
+public abstract class CyrusGeneratorBase
 {
-    public abstract IncrementalValueProvider<T> GetProvider(IncrementalGeneratorInitializationContext context, IncrementalValueProvider<GenerationConfig> configProvider);
     public abstract void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine);
 
     public string GetPartialModelClass(string assemblyName, string subNamespace, string propertyName, string propertyType, IEnumerable<string> propertyValues)
@@ -33,6 +31,4 @@ public abstract class CyrusGeneratorBase<T>
             return liquidEngine;
         }
     }
-
-
 }

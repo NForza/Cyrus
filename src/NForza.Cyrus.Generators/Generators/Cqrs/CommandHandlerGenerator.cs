@@ -4,37 +4,14 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.Generators.Cqrs
 {
-    internal class CommandHandlerGenerator : CyrusGeneratorBase<ImmutableArray<IMethodSymbol>>
+    public class CommandHandlerGenerator : CyrusGeneratorBase
     {
-        public override IncrementalValueProvider<ImmutableArray<IMethodSymbol>> GetProvider(IncrementalGeneratorInitializationContext context, IncrementalValueProvider<GenerationConfig> configProvider)
-        {
-            var provider = context.SyntaxProvider
-                        .CreateSyntaxProvider(
-                            predicate: (syntaxNode, _) => syntaxNode.IsCommandHandler(),
-                            transform: (context, _) => context.GetMethodSymbolFromContext());
-
-            var commandHandlerProvider = provider.Combine(configProvider)
-                .Where(x =>
-                {
-                    var (methodNode, config) = x;
-                    if (config == null || !config.GenerationTarget.Contains(GenerationTarget.Domain))
-                        return false;
-                    return true;
-                })
-                .Where(x => x.Left != null)
-                .Select((x, _) => x.Left!)
-                .Collect();
-
-            return commandHandlerProvider;
-        }
-
         public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
         {
             if (cyrusProvider.GenerationConfig != null && cyrusProvider.CommandHandlers.Any())
