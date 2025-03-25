@@ -6,14 +6,14 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
-using NForza.Cyrus.Generators.Model;
+using NForza.Cyrus.Generators.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.SignalR;
+namespace NForza.Cyrus.Generators.Generators.SignalR;
 
 [Generator]
-public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public class SignalRHubGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -82,7 +82,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
             .Select(s => new
             {
                 Name = s.Symbol.ToFullName(),
-                Path = s.Path
+                s.Path
             });
 
         var model = new
@@ -104,7 +104,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
         {
             classDefinition.Symbol.Name,
             Namespace = classDefinition.Symbol.ContainingNamespace.ToDisplayString(),
-            Commands = classDefinition.Commands.Select( c => new
+            Commands = classDefinition.Commands.Select(c => new
             {
                 c.MethodName,
                 c.FullTypeName,

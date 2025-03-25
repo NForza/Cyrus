@@ -34,10 +34,37 @@ namespace NForza.Cyrus.Generators.Roslyn
         {
             if (syntaxNode is RecordDeclarationSyntax classDeclaration)
             {
-                bool isEvent = classDeclaration.HasQueryAttribute();
-                return isEvent;
+                bool isQuery = classDeclaration.HasQueryAttribute();
+                return isQuery;
             };
             return false;
         }
+
+        public static bool IsCommand(this SyntaxNode syntaxNode)
+        {
+            if (syntaxNode is RecordDeclarationSyntax classDeclaration)
+            {
+                bool isCommand = classDeclaration.HasCommandAttribute();
+                return isCommand;
+            };
+            return false;
+        }
+
+        public static bool IsRecordWithAttribute(this SyntaxNode syntaxNode, string attributeName)
+        {
+            bool isRecordWithAttribute = syntaxNode is RecordDeclarationSyntax recordDeclaration &&
+                           recordDeclaration.HasAttribute(attributeName);
+            return isRecordWithAttribute;
+        }
+
+        public static bool IsRecordWithGuidIdAttribute(this SyntaxNode syntaxNode)
+            => IsRecordWithAttribute(syntaxNode, "GuidId");
+
+        public static bool IsRecordWithIntIdAttribute(this SyntaxNode syntaxNode)
+            => IsRecordWithAttribute(syntaxNode, "IntId");
+
+        public static bool IsRecordWithStringIdAttribute(this SyntaxNode syntaxNode)
+            => IsRecordWithAttribute(syntaxNode, "StringId");
+
     }
 }

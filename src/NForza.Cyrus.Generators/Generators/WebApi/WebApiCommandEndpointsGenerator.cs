@@ -7,14 +7,14 @@ using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.WebApi;
+namespace NForza.Cyrus.Generators.Generators.WebApi;
 
 [Generator]
-public class CommandEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public class CommandEndpointsGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
 
         var configProvider = ConfigProvider(context);
 
@@ -33,7 +33,7 @@ public class CommandEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerat
 
                 var csharpCompilation = (CSharpCompilation)compilation;
                 var typesInCompilation = csharpCompilation.GetAllTypesFromCyrusAssemblies();
-                var commandsInCompilation = typesInCompilation.Where(t => t.IsCommand() )
+                var commandsInCompilation = typesInCompilation.Where(t => t.IsCommand())
                     .ToList();
                 var commandHandlersInCompilation = typesInCompilation.SelectMany(t => t.GetMembers().OfType<IMethodSymbol>().Where(m => m.IsCommandHandler()));
 
@@ -97,9 +97,9 @@ public class CommandEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerat
             Commands = queries.Select(cmd =>
                 new
                 {
-                    Name = cmd.Name,
+                    cmd.Name,
                     TypeName = cmd.ToFullName(),
-                    Properties = cmd.GetPublicProperties().Select(p => new { Name = p.Name, Type = p.Type.ToFullName() })
+                    Properties = cmd.GetPublicProperties().Select(p => new { p.Name, Type = p.Type.ToFullName() })
                 })
         };
         var httpContextObjectFactoryInitialization = LiquidEngine.Render(model, "HttpContextObjectFactoryCommand");
@@ -123,11 +123,11 @@ public class CommandEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerat
                 CommandType = handler.Parameters[0].Type.ToFullName(),
                 CommandName = handler.Parameters[0].Type.Name,
                 AdapterMethod = GetAdapterMethodName(handler),
-                ReturnsTask = handler.ReturnsTask(),
+                handler.IsAsync,
                 HasReturnType = handler.ReturnType.SpecialType != SpecialType.System_Void,
                 CommandInvocation = handler.GetCommandInvocation(variableName: "cmd")
             };
-            
+
             sb.AppendLine(LiquidEngine.Render(command, "MapCommand"));
         }
         return sb.ToString().Trim();

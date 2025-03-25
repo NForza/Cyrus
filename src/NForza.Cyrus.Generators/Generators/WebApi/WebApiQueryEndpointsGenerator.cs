@@ -7,14 +7,14 @@ using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.WebApi;
+namespace NForza.Cyrus.Generators.Generators.WebApi;
 
 [Generator]
-public class QueryEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public class QueryEndpointsGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
 
         var configProvider = ConfigProvider(context);
 
@@ -74,7 +74,7 @@ public class QueryEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
                     .Where(q => q.IsQuery())
                     .OfType<INamedTypeSymbol>();
 
-                AddHttpContextObjectFactoryMethodsRegistrations(spc, queries);          
+                AddHttpContextObjectFactoryMethodsRegistrations(spc, queries);
                 WebApiContractGenerator.GenerateContracts(queries, spc, LiquidEngine);
             }
         });
@@ -82,15 +82,16 @@ public class QueryEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
 
     private void AddHttpContextObjectFactoryMethodsRegistrations(SourceProductionContext sourceProductionContext, IEnumerable<INamedTypeSymbol> queries)
     {
-        var model = new 
-        { 
-            Queries = queries.Select( q => 
-                new 
-                { 
-                    Name = q.Name,
+        var model = new
+        {
+            Queries = queries.Select(q =>
+                new
+                {
+                    q.Name,
                     TypeName = q.ToFullName(),
-                    Properties = q.GetPublicProperties().Select(p => new { Name = p.Name, Type = p.Type.ToFullName() })
-                }) };
+                    Properties = q.GetPublicProperties().Select(p => new { p.Name, Type = p.Type.ToFullName() })
+                })
+        };
         var httpContextObjectFactoryInitialization = LiquidEngine.Render(model, "HttpContextObjectFactoryQuery");
 
         var initModel = new { Namespace = "WebApi", Name = "HttpContextObjectFactoryQueryInitializer", Initializer = httpContextObjectFactoryInitialization };
@@ -107,7 +108,7 @@ public class QueryEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
             {
                 Path = handler.GetQueryHandlerRoute(),
                 Query = handler.Parameters[0].Type.ToFullName(),
-                ReturnsTask = handler.ReturnsTask(),
+                ReturnsTask = handler.ReturnType.IsTaskType(),
                 QueryInvocation = handler.GetQueryInvocation()
             };
             sb.AppendLine(LiquidEngine.Render(query, "MapQuery"));

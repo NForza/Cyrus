@@ -3,38 +3,27 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Generators.Roslyn;
+using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.TypedIds;
+namespace NForza.Cyrus.Generators.Generators.TypedIds;
 
-[Generator]
-public class TypedIdJsonConverterGenerator : TypedIdGeneratorBase, IIncrementalGenerator
+public class TypedIdJsonConverterGenerator : CyrusGeneratorBase
 {
-    public override void Initialize(IncrementalGeneratorInitializationContext context)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
-        DebugThisGenerator(false);
-        var incrementalValuesProvider = context.SyntaxProvider
-                     .CreateSyntaxProvider(
-                         predicate: (syntaxNode, _) => IsRecordWithStringIdAttribute(syntaxNode) || IsRecordWithGuidIdAttribute(syntaxNode) || IsRecordWithIntIdAttribute(syntaxNode),
-                         transform: (context, _) => GetNamedTypeSymbolFromContext(context));
-        var typedIdsProvider = incrementalValuesProvider
-            .Where(x => x is not null)
-            .Select((x, _) => x!)
-            .Collect();
-
-        context.RegisterSourceOutput(typedIdsProvider, (spc, typedIds) =>
+        var typedIds = cyrusProvider.TypedIds;
+        foreach (var typedId in typedIds)
         {
-            foreach (var typedId in typedIds)
-            {
-                var sourceText = GenerateJsonConverterForTypedId(typedId);
-                spc.AddSource($"{typedId.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
-            };
-        });
+            var sourceText = GenerateJsonConverterForTypedId(typedId);
+            spc.AddSource($"{typedId.Name}JsonConverter.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+        };
     }
 
     private string GenerateJsonConverterForTypedId(INamedTypeSymbol item)
     {
         string fullyQualifiedNamespace = item.ContainingNamespace.ToDisplayString();
-        var underlyingTypeName = GetUnderlyingTypeOfTypedId(item);
+        var underlyingTypeName = item.GetUnderlyingTypeOfTypedId();
 
         string? templateName = underlyingTypeName switch
         {

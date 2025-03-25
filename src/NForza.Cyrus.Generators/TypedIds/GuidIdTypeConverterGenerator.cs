@@ -1,36 +1,21 @@
 ﻿using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.TypedIds;
+namespace NForza.Cyrus.Generators.Generators.TypedIds;
 
-[Generator]
-public class GuidIdTypeConverterGenerator : TypedIdGeneratorBase, IIncrementalGenerator
+public class GuidIdTypeConverterGenerator : CyrusGeneratorBase
 {
-    public override void Initialize(IncrementalGeneratorInitializationContext context)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
-        DebugThisGenerator(false);
-
-        var incrementalValuesProvider = context.SyntaxProvider
-                    .CreateSyntaxProvider(
-                        predicate: (syntaxNode, _) => IsRecordWithGuidIdAttribute(syntaxNode),
-                        transform: (context, _) => GetNamedTypeSymbolFromContext(context));
-
-        var recordStructsWithAttribute = incrementalValuesProvider
-            .Where(x => x is not null)
-            .Select((x, _) => x!)
-            .Collect();
-
-        context.RegisterSourceOutput(recordStructsWithAttribute, (spc, recordSymbols) =>
+        var recordSymbols = cyrusProvider.GuidIds;
+        foreach (var recordSymbol in recordSymbols)
         {
-            foreach (var recordSymbol in recordSymbols)
-            {
-                var sourceText = GenerateGuidIdTypeConverter(recordSymbol);
-                spc.AddSource($"{recordSymbol}TypeConverter.g.cs", SourceText.From(sourceText, Encoding.UTF8));
-            };
-        });
+            var sourceText = GenerateGuidIdTypeConverter(recordSymbol);
+            spc.AddSource($"{recordSymbol}TypeConverter.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+        };
     }
-
 
     private string GenerateGuidIdTypeConverter(INamedTypeSymbol item)
     {

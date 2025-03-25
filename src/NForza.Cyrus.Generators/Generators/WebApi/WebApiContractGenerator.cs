@@ -9,7 +9,7 @@ using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.WebApi;
+namespace NForza.Cyrus.Generators.Generators.WebApi;
 
 public static class WebApiContractGenerator
 {
@@ -44,19 +44,19 @@ public static class WebApiContractGenerator
             var model = new
             {
                 Namespace = contract.ContainingNamespace,
-                Name = contract.Name,
+                contract.Name,
                 FullName = contract.ToFullName(),
                 ConstructorArguments = constructorArguments.Select(p =>
                     new
                     {
-                        Name = p.Name,
+                        p.Name,
                         Type = p.Type.ToFullName(),
                         IsNullable = p.Type.IsNullable()
                     }).ToList(),
                 Properties = contract.GetPublicProperties().Select(p =>
                     new
                     {
-                        Name = p.Name,
+                        p.Name,
                         Internal = propertiesFromRoute.Contains(p.Name),
                         Type = p.Type.ToFullName(),
                         IsNullable = p.Type.IsNullable()

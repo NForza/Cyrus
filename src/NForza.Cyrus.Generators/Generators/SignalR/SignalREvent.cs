@@ -1,4 +1,4 @@
-﻿namespace NForza.Cyrus.Generators.SignalR;
+﻿namespace NForza.Cyrus.Generators.Generators.SignalR;
 
 public class SignalREvent
 {

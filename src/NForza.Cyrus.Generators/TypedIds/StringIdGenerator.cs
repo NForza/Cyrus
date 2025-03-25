@@ -2,38 +2,26 @@
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Generators.Roslyn;
+using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.TypedIds;
+namespace NForza.Cyrus.Generators.Generators.TypedIds;
 
-[Generator]
-public class StringIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
+public class StringIdGenerator : CyrusGeneratorBase
 {
-    public override void Initialize(IncrementalGeneratorInitializationContext context)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
-        DebugThisGenerator(false);
-        var incrementalValuesProvider = context.SyntaxProvider
-                    .CreateSyntaxProvider(
-                        predicate: (syntaxNode, _) => IsRecordWithStringIdAttribute(syntaxNode),
-                        transform: (context, _) => GetNamedTypeSymbolFromContext(context));
-
-        var recordStructsWithAttribute = incrementalValuesProvider
-            .Where(x => x is not null)
-            .Select((x, _) => x!)
-            .Collect();
-
-        context.RegisterSourceOutput(recordStructsWithAttribute, (spc, recordSymbols) =>
+        var stringIds = cyrusProvider.StringIds;
+        foreach (var recordSymbol in stringIds)
         {
-            foreach (var recordSymbol in recordSymbols)
-            {
-                var sourceText = GenerateCodeForRecordStruct(recordSymbol);
-                spc.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
-            };
-            if (recordSymbols.Any())
-            {
-                var stringModels = GetPartialModelClass(recordSymbols.First().ContainingAssembly.Name, "TypedIds", "Strings", "string", recordSymbols.Select(s => $"\"{s.Name}\""));
-                spc.AddSource($"model-strings.g.cs", SourceText.From(stringModels, Encoding.UTF8));
-            }
-        });
+            var sourceText = GenerateCodeForRecordStruct(recordSymbol);
+            spc.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+        };
+        if (stringIds.Any())
+        {
+            var stringModels = GetPartialModelClass(stringIds.First().ContainingAssembly.Name, "TypedIds", "Strings", "string", stringIds.Select(s => $"\"{s.Name}\""));
+            spc.AddSource($"model-strings.g.cs", SourceText.From(stringModels, Encoding.UTF8));
+        }
     }
 
     private string GenerateCodeForRecordStruct(INamedTypeSymbol item)
@@ -43,7 +31,7 @@ public class StringIdGenerator : TypedIdGeneratorBase, IIncrementalGenerator
         {
             item.Name,
             Namespace = item.ContainingNamespace.ToDisplayString(),
-            UnderlyingType = GetUnderlyingTypeOfTypedId(item),
+            UnderlyingType = item.GetUnderlyingTypeOfTypedId(),
             Minimum = min,
             HasMinimum = min.HasValue,
             Maximum = max,

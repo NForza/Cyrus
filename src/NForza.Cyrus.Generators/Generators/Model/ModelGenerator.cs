@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using Microsoft.CodeAnalysis;
+using NForza.Cyrus.Generators.Generators.SignalR;
 using NForza.Cyrus.Generators.Roslyn;
-using NForza.Cyrus.Generators.SignalR;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.Model;
+namespace NForza.Cyrus.Generators.Generators.Model;
 
 internal class ModelGenerator
 {

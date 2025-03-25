@@ -6,10 +6,10 @@ using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.WebApi;
+namespace NForza.Cyrus.Generators.Generators.WebApi;
 
 [Generator]
-public class EventHandlerDictionaryGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public class EventHandlerDictionaryGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -85,12 +85,12 @@ public class EventHandlerDictionaryGenerator : CyrusGeneratorBase, IIncrementalG
                 var typeSymbolName = typeSymbol.ToFullName();
                 var handlerName = $"{typeSymbol.Name}.{eventHandler.Name}({eventHandler.Parameters[0].Type.Name})";
                 var returnType = (INamedTypeSymbol)eventHandler.ReturnType;
-                var returnsTask = returnType.IsTaskType();
+                var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
                 return new
                 {
                     EventType = eventType,
                     HandlerName = handlerName,
-                    IsStatic = eventHandler.IsStatic,
+                    eventHandler.IsStatic,
                     MethodName = methodName,
                     TypeSymbolName = typeSymbolName
                 };

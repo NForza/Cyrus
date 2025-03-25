@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.SignalR;
+namespace NForza.Cyrus.Generators.Generators.SignalR;
 
 internal record SignalRHubClassDefinition
 {
@@ -150,7 +150,7 @@ internal record SignalRHubClassDefinition
                 {
                     if (method.Parameters.Length == 1 && method.IsCommandHandler() &&
                         SymbolEqualityComparer.Default.Equals(method.Parameters[0].Type, symbol))
-                    {                        
+                    {
                         return method;
                     }
                 }

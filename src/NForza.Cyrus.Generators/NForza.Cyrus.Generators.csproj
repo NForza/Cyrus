@@ -29,13 +29,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="WebApi\Templates\HttpContextObjectFactoryCommand.liquid" />
-    <EmbeddedResource Include="WebApi\Templates\HttpContextObjectFactoryQuery.liquid" />
-    <EmbeddedResource Include="Cqrs\Templates\CyrusInitializer.liquid" />
-    <EmbeddedResource Include="Model\model-hubquery.liquid" />
-    <EmbeddedResource Include="Model\model-hub.liquid" />
-    <EmbeddedResource Include="Model\model-type.liquid" />
-    <EmbeddedResource Include="Model\model-property.liquid" />
+    <EmbeddedResource Include="Commands\Templates\CommandDispatcherExtensions.liquid" />
+    <EmbeddedResource Include="Commands\Templates\CyrusInitializer.liquid" />
+    <EmbeddedResource Include="Generators\WebApi\Templates\HttpContextObjectFactoryCommand.liquid" />
+    <EmbeddedResource Include="Generators\WebApi\Templates\HttpContextObjectFactoryQuery.liquid" />
+    <EmbeddedResource Include="Generators\Model\model-hubquery.liquid" />
+    <EmbeddedResource Include="Generators\Model\model-hub.liquid" />
+    <EmbeddedResource Include="Generators\Model\model-type.liquid" />
+    <EmbeddedResource Include="Generators\Model\model-property.liquid" />
     <EmbeddedResource Include="TypedIds\Templates\ServiceCollectionJsonConverterExtensions.liquid" />
     <EmbeddedResource Include="TypedIds\Templates\GuidIdJsonConverter.liquid" />
     <EmbeddedResource Include="TypedIds\Templates\IntIdJsonConverter.liquid" />
@@ -46,17 +47,16 @@
     <EmbeddedResource Include="TypedIds\Templates\IntId.liquid" />
     <EmbeddedResource Include="TypedIds\Templates\GuidId.liquid" />
     <EmbeddedResource Include="TypedIds\Templates\GuidIdTypeConverter.liquid" />
-    <EmbeddedResource Include="Cqrs\Templates\CommandDispatcherExtensions.liquid" />
-    <EmbeddedResource Include="Model\CyrusModel.liquid" />
-    <EmbeddedResource Include="MassTransit\EventConsumers.liquid" />
-    <EmbeddedResource Include="Cqrs\Templates\QueryProcessorExtensions.liquid" />
-    <EmbeddedResource Include="SignalR\Templates\RegisterSignalRHubs.liquid" />
-    <EmbeddedResource Include="SignalR\Templates\SignalRHub.liquid" />
-    <EmbeddedResource Include="WebApi\Templates\EventHandlerDictionary.liquid" />
-    <EmbeddedResource Include="WebApi\Templates\WebApiContractRecord.liquid" />
-    <EmbeddedResource Include="WebApi\Templates\MapQuery.liquid" />
-    <EmbeddedResource Include="WebApi\Templates\MapCommand.liquid" />
-    <EmbeddedResource Include="WebApi\Templates\CyrusWebStartup.liquid" />
+    <EmbeddedResource Include="Generators\Model\CyrusModel.liquid" />
+    <EmbeddedResource Include="Events\MassTransit\EventConsumers.liquid" />
+    <EmbeddedResource Include="Queries\Templates\QueryProcessorExtensions.liquid" />
+    <EmbeddedResource Include="Generators\SignalR\Templates\RegisterSignalRHubs.liquid" />
+    <EmbeddedResource Include="Generators\SignalR\Templates\SignalRHub.liquid" />
+    <EmbeddedResource Include="Generators\WebApi\Templates\EventHandlerDictionary.liquid" />
+    <EmbeddedResource Include="Generators\WebApi\Templates\WebApiContractRecord.liquid" />
+    <EmbeddedResource Include="Generators\WebApi\Templates\MapQuery.liquid" />
+    <EmbeddedResource Include="Generators\WebApi\Templates\MapCommand.liquid" />
+    <EmbeddedResource Include="Generators\WebApi\Templates\CyrusWebStartup.liquid" />
   </ItemGroup>
 
   <ItemGroup>

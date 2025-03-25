@@ -64,4 +64,16 @@ public static class INamedTypeSymbolExtensions
 
         return hasEqualityOperators;
     }
+
+    public static string GetUnderlyingTypeOfTypedId(this INamedTypeSymbol typeSymbol)
+    {
+        return typeSymbol.GetAttributes()
+            .Select(a => a.AttributeClass?.Name)
+            .FirstOrDefault(name => name is "StringIdAttribute" or "IntIdAttribute" or "GuidIdAttribute") switch
+        {
+            "StringIdAttribute" => "string",
+            "IntIdAttribute" => "int",
+            _ => "System.Guid"
+        };
+    }
 }
