@@ -9,7 +9,7 @@ using NForza.Cyrus.Generators.Roslyn;
 namespace NForza.Cyrus.Generators.WebApi;
 
 [Generator]
-public class EventHandlerDictionaryGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public class EventHandlerDictionaryGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -85,7 +85,7 @@ public class EventHandlerDictionaryGenerator : CyrusGeneratorBase, IIncrementalG
                 var typeSymbolName = typeSymbol.ToFullName();
                 var handlerName = $"{typeSymbol.Name}.{eventHandler.Name}({eventHandler.Parameters[0].Type.Name})";
                 var returnType = (INamedTypeSymbol)eventHandler.ReturnType;
-                var returnsTask = returnType.IsTaskType();
+                var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
                 return new
                 {
                     EventType = eventType,

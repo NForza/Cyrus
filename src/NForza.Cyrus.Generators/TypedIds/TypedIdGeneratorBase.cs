@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace NForza.Cyrus.Generators.TypedIds;
 
-public abstract class TypedIdGeneratorBase : CyrusGeneratorBase
+public abstract class TypedIdGeneratorBase : CyrusSourceGeneratorBase
 {
     protected static bool IsRecordWithAttribute(SyntaxNode syntaxNode, string attributeName)
     {

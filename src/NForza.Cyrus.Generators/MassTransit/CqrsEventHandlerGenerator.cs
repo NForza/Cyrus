@@ -8,7 +8,7 @@ using NForza.Cyrus.Generators.Roslyn;
 namespace NForza.Cyrus.Generators.MassTransit;
 
 [Generator]
-public class MassTransitConsumerGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public class MassTransitConsumerGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {

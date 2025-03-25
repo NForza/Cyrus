@@ -10,11 +10,11 @@ using NForza.Cyrus.Generators.Roslyn;
 namespace NForza.Cyrus.Generators.WebApi;
 
 [Generator]
-public class QueryEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public class QueryEndpointsGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
 
         var configProvider = ConfigProvider(context);
 
@@ -107,7 +107,7 @@ public class QueryEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
             {
                 Path = handler.GetQueryHandlerRoute(),
                 Query = handler.Parameters[0].Type.ToFullName(),
-                ReturnsTask = handler.ReturnsTask(),
+                ReturnsTask = handler.ReturnType.IsTaskType(),
                 QueryInvocation = handler.GetQueryInvocation()
             };
             sb.AppendLine(LiquidEngine.Render(query, "MapQuery"));

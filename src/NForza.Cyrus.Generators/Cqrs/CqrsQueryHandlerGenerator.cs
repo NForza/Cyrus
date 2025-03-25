@@ -9,7 +9,7 @@ using NForza.Cyrus.Generators.Roslyn;
 namespace NForza.Cyrus.Generators.Cqrs;
 
 [Generator]
-public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public class CqrsQueryHandlerGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -69,7 +69,7 @@ public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerat
             QueryType = h.Parameters[0].Type.ToFullName(),
             Name = h.Name,
             ReturnType = (INamedTypeSymbol)h.ReturnType,
-            ReturnsTask = h.ReturnsTask()
+            IsAsync = h.ReturnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default)
         }).ToList();
 
         var model = new
@@ -77,11 +77,11 @@ public class CqrsQueryHandlerGenerator : CyrusGeneratorBase, IIncrementalGenerat
             Queries = queries.Select(q => new
             {
                 ReturnTypeOriginal = q.ReturnType,
-                ReturnType = q.ReturnsTask ? q.ReturnType.TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
+                ReturnType = q.ReturnType.IsTaskType() ? q.ReturnType.TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
                 Invocation = q.Handler.GetQueryInvocation(serviceProviderVariable: "queryProcessor.ServiceProvider"),
                 Name = q.Name,
                 q.QueryType,
-                q.ReturnsTask
+                ReturnsTask = q.ReturnType.IsTaskType(),    
             }).ToList()
         };
 

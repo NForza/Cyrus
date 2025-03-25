@@ -6,7 +6,7 @@ using NForza.Cyrus.Generators.Config;
 namespace NForza.Cyrus.Generators.WebApi;
 
 [Generator]
-public class BusRegistrationGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public class BusRegistrationGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {

@@ -119,7 +119,6 @@ internal static class ITypeSymbolExtensions
         }
     }
 
-
     public static bool IsTaskType(this ITypeSymbol typeSymbol)
     {
         if (typeSymbol is not INamedTypeSymbol namedType)

@@ -10,11 +10,11 @@ using NForza.Cyrus.Generators.Roslyn;
 namespace NForza.Cyrus.Generators.WebApi;
 
 [Generator]
-public class CommandEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public class CommandEndpointsGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(false);
+        DebugThisGenerator(true);
 
         var configProvider = ConfigProvider(context);
 
@@ -123,7 +123,7 @@ public class CommandEndpointsGenerator : CyrusGeneratorBase, IIncrementalGenerat
                 CommandType = handler.Parameters[0].Type.ToFullName(),
                 CommandName = handler.Parameters[0].Type.Name,
                 AdapterMethod = GetAdapterMethodName(handler),
-                ReturnsTask = handler.ReturnsTask(),
+                IsAsync = handler.IsAsync,
                 HasReturnType = handler.ReturnType.SpecialType != SpecialType.System_Void,
                 CommandInvocation = handler.GetCommandInvocation(variableName: "cmd")
             };

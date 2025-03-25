@@ -13,7 +13,7 @@ using NForza.Cyrus.Templating;
 namespace NForza.Cyrus.Generators.SignalR;
 
 [Generator]
-public class SignalRHubGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public class SignalRHubGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {

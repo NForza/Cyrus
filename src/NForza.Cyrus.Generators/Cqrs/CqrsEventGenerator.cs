@@ -8,7 +8,7 @@ using NForza.Cyrus.Generators.Roslyn;
 namespace NForza.Cyrus.Generators.Cqrs;
 
 [Generator]
-public class CqrsEventGenerator : CyrusGeneratorBase, IIncrementalGenerator
+public class CqrsEventGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
