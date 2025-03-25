@@ -4,21 +4,22 @@ using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.Generators.Cqrs;
+namespace NForza.Cyrus.Generators.Events;
 
-public class CommandProvider : CyrusProviderBase<ImmutableArray<INamedTypeSymbol>>
+public class EventProvider : CyrusProviderBase<ImmutableArray<INamedTypeSymbol>>
 {
     public override IncrementalValueProvider<ImmutableArray<INamedTypeSymbol>> GetProvider(IncrementalGeneratorInitializationContext context, IncrementalValueProvider<GenerationConfig> configProvider)
     {
-        var queryProvider = context.SyntaxProvider
+        var incrementalValuesProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => syntaxNode.IsCommand(),
+                predicate: (syntaxNode, _) => syntaxNode.IsEvent(),
                 transform: (context, _) => context.GetRecordSymbolFromContext());
 
-        var allQueriesProvider = queryProvider
-            .Where(x => x is not null)
-            .Select((x, _) => x!)
+        var allEventsProvider = incrementalValuesProvider.Combine(configProvider)
+            .Where(x => x.Left is not null)
+            .Select((x, _) => x.Left!)
             .Collect();
-        return allQueriesProvider;
+
+        return allEventsProvider;
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.Generators.Cqrs;
+namespace NForza.Cyrus.Generators.Events;
 
 public class EventHandlerProvider : CyrusProviderBase<ImmutableArray<IMethodSymbol>>
 {

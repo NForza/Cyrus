@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.CodeAnalysis;
+using NForza.Cyrus.Generators.Commands;
+using NForza.Cyrus.Generators.Events;
 using NForza.Cyrus.Generators.Generators.Cqrs;
 
 namespace NForza.Cyrus.Generators;
