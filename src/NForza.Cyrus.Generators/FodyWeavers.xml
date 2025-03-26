@@ -3,12 +3,12 @@
   <Costura>
     <IncludeAssemblies>
       NForza.Cyrus.Templating
-      Fluid
+      NForza.Cyrus.Abstractions
       Microsoft.Extensions.FileProviders.Abstractions
       Microsoft.Extensions.Primitives
       System.Text.Encodings.Web
       Parlot
-      NForza.Cyrus.Abstractions
+      Fluid
     </IncludeAssemblies>
   </Costura>
 </Weavers>

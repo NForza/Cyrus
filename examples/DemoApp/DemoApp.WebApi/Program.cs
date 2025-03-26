@@ -17,8 +17,6 @@ builder.Services.AddMassTransit(cfg =>
     });
 });
 
-var vc = new ValidationContext<AddCustomerCommand>(new AddCustomerCommand());
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp", builder =>
@@ -47,6 +45,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAngularApp");
-app.MapCyrus();
+
+ILogger logger = app.Services.GetRequiredService<ILogger<Program>>();
+
+app.MapCyrus(logger);
 
 await app.RunAsync();
