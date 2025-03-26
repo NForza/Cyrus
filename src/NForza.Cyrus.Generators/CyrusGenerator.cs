@@ -6,6 +6,7 @@ using NForza.Cyrus.Generators.Cqrs;
 using NForza.Cyrus.Generators.Events;
 using NForza.Cyrus.Generators.Generators.Cqrs;
 using NForza.Cyrus.Generators.Generators.TypedIds;
+using NForza.Cyrus.Generators.Generators.WebApi;
 using NForza.Cyrus.Generators.Queries;
 
 namespace NForza.Cyrus.Generators;
@@ -75,6 +76,7 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
                     new QueryHandlerGenerator().GenerateSource(spc, source, LiquidEngine);
                     new EventHandlerGenerator().GenerateSource(spc, source, LiquidEngine);
                     new EventGenerator().GenerateSource(spc, source, LiquidEngine);
+                    new BusRegistrationGenerator().GenerateSource(spc, source, LiquidEngine);   
                 }
                 catch (Exception ex)
                 {

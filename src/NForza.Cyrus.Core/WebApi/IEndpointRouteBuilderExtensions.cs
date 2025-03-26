@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Model;
 
@@ -8,7 +9,7 @@ namespace NForza.Cyrus.WebApi;
 
 public static class IEndpointRouteBuilderExtensions
 {
-    public static IEndpointRouteBuilder MapCyrus(this WebApplication endpoints)
+    public static IEndpointRouteBuilder MapCyrus(this WebApplication endpoints, ILogger? logger = null)
     {
         IEnumerable<ICyrusWebStartup> startups = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(assembly => assembly.GetTypes())
@@ -17,6 +18,7 @@ public static class IEndpointRouteBuilderExtensions
 
         foreach (var startup in startups)
         {
+            logger?.LogInformation($"Adding startup {startup.GetType().Name}");
             startup.AddStartup(endpoints);
         }
         return endpoints.MapModel();
