@@ -10,7 +10,6 @@
     <dependencies>
       <dependency id="NForza.Cyrus.Core" version="%VERSION%" />
       <dependency id="NForza.Cyrus.Generators" version="%VERSION%" />
-      <dependency id="NForza.Cyrus.TypedIds" version="%VERSION%" />
     </dependencies>
   </metadata>
 </package>
