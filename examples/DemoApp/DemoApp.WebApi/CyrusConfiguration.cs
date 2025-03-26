@@ -8,5 +8,6 @@ public class CyrusConfiguration : CyrusConfig
     {
         GenerateWebApi();
         UseContractsFromAssembliesContaining("Contracts");
+        UseMassTransit();
     }
 }
