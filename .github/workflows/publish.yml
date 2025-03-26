@@ -54,9 +54,6 @@ jobs:
     - name: Pack the Abstractions project
       run: dotnet pack --configuration Release --output ./output "./src/NForza.Cyrus.Abstractions/NForza.Cyrus.Abstractions.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
 
-    - name: Pack the Templating project
-      run: dotnet pack --configuration Release --output ./output "./src/NForza.Cyrus.Templating/NForza.Cyrus.Templating.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
-
     - name: Pack the MassTransit project
       run: dotnet pack --configuration Release --output ./output "./src/NForza.Cyrus.MassTransit/NForza.Cyrus.MassTransit.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
     
