@@ -7,7 +7,6 @@ using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.Generators.TypedIds;
 
-[Generator]
 public class GuidIdGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)

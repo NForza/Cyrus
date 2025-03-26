@@ -5,64 +5,35 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
+using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.Generators.WebApi;
 
-[Generator]
-public class EventHandlerDictionaryGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
+public class EventHandlerDictionaryGenerator : CyrusGeneratorBase
 {
-    public override void Initialize(IncrementalGeneratorInitializationContext context)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
-        DebugThisGenerator(true);
-
-        var configProvider = ConfigProvider(context);
-
-        var compilationProvider = context.CompilationProvider;
-
-        var eventHandlerProvider = compilationProvider
-            .SelectMany((compilation, _) =>
-            {
-                var allTypes = compilation.GetAllTypesFromCyrusAssemblies();
-
-                var eventHandlers = allTypes
-                    .SelectMany(t => t.GetMembers().OfType<IMethodSymbol>())
-                    .Where(t => t.IsEventHandler())
-                    .ToList();
-
-                return eventHandlers;
-            })
-           .Collect();
-
-        var combinedProvider = context
-            .CompilationProvider
-            .Combine(eventHandlerProvider)
-            .Combine(configProvider);
-
-        context.RegisterSourceOutput(combinedProvider, (spc, source) =>
+        var config = cyrusProvider.GenerationConfig;
+        if (config.GenerationTarget.Contains(GenerationTarget.WebApi))
         {
-            var ((compilation, eventHandlers), config) = source;
+            var contents = CreateEventHandlerRegistrations(cyrusProvider.EventHandlers, cyrusProvider.Compilation);
 
-            if (config != null && config.GenerationTarget.Contains(GenerationTarget.WebApi))
+            if (!string.IsNullOrWhiteSpace(contents))
             {
-                var contents = CreateEventHandlerRegistrations(eventHandlers, compilation);
-
-                if (!string.IsNullOrWhiteSpace(contents))
+                var ctx = new
                 {
-                    var ctx = new
-                    {
-                        Usings = new string[] { "NForza.Cyrus.Cqrs" },
-                        Namespace = "EventHandlers",
-                        Name = "EventHandlersDictionary",
-                        Initializer = contents
-                    };
+                    Usings = new string[] { "NForza.Cyrus.Cqrs" },
+                    Namespace = "EventHandlers",
+                    Name = "EventHandlersDictionary",
+                    Initializer = contents
+                };
 
-                    var fileContents = LiquidEngine.Render(ctx, "CyrusInitializer");
-                    spc.AddSource(
-                       "EventHandlerDictionary.g.cs",
-                       SourceText.From(fileContents, Encoding.UTF8));
-                }
+                var fileContents = LiquidEngine.Render(ctx, "CyrusInitializer");
+                spc.AddSource(
+                   "EventHandlerDictionary.g.cs",
+                   SourceText.From(fileContents, Encoding.UTF8));
             }
-        });
+        }
     }
 
     private string CreateEventHandlerRegistrations(IEnumerable<IMethodSymbol> eventHandlers, Compilation compilation)

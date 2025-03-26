@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Config;
+using NForza.Cyrus.Generators.Generators.SignalR;
 
 namespace NForza.Cyrus.Generators
 {
@@ -13,10 +14,13 @@ namespace NForza.Cyrus.Generators
             ImmutableArray<INamedTypeSymbol> stringIds,
             ImmutableArray<INamedTypeSymbol> commands,
             ImmutableArray<IMethodSymbol> commandHandlers,
+            ImmutableArray<ISymbol> allCommandsAndHandlers,
             ImmutableArray<INamedTypeSymbol> queries,
             ImmutableArray<IMethodSymbol> queryHandlers,
             ImmutableArray<INamedTypeSymbol> events,
             ImmutableArray<IMethodSymbol> eventHandlers,
+            ImmutableArray<ISymbol> allQueriesAndHandlers,
+            ImmutableArray<SignalRHubClassDefinition> signalRHubs,
             GenerationConfig generationConfig)
         {
             Compilation = compilation;
@@ -25,10 +29,13 @@ namespace NForza.Cyrus.Generators
             StringIds = stringIds;
             Commands = commands;
             CommandHandlers = commandHandlers;
+            AllCommandsAndHandlers = allCommandsAndHandlers;
             Queries = queries;
             QueryHandlers = queryHandlers;
             EventHandlers = eventHandlers;
             Events = events;
+            AllQueriesAndHandlers = allQueriesAndHandlers;
+            SignalRHubs = signalRHubs;
             GenerationConfig = generationConfig;
         }
 
@@ -39,10 +46,13 @@ namespace NForza.Cyrus.Generators
         public ImmutableArray<INamedTypeSymbol> TypedIds => GuidIds.AddRange(IntIds).AddRange(StringIds);   
         public ImmutableArray<INamedTypeSymbol> Commands { get; private set; }
         public ImmutableArray<IMethodSymbol> CommandHandlers { get; private set; }
+        public ImmutableArray<ISymbol> AllCommandsAndHandlers { get; private set; }
         public ImmutableArray<INamedTypeSymbol> Queries { get; private set; }
         public ImmutableArray<IMethodSymbol> QueryHandlers { get; private set; }
+        public ImmutableArray<ISymbol> AllQueriesAndHandlers { get; private set; }
         public ImmutableArray<INamedTypeSymbol> Events { get; private set; }
         public ImmutableArray<IMethodSymbol> EventHandlers { get; private set; }
+        public ImmutableArray<SignalRHubClassDefinition> SignalRHubs { get; private set; }
         public GenerationConfig GenerationConfig { get; private set; }
     }
 }

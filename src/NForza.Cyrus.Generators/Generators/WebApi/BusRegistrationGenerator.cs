@@ -10,22 +10,15 @@ public class BusRegistrationGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
-        var config = cyrusProvider.GenerationConfig;
-        if (config.GenerationTarget.Contains(GenerationTarget.WebApi))
+        if (cyrusProvider.GenerationConfig.GenerationTarget.Contains(GenerationTarget.WebApi))
         {
-            var contents = AddBusRegistrations(config);
+            var contents = AddBusRegistrations(cyrusProvider.GenerationConfig);
+
             if (!string.IsNullOrWhiteSpace(contents))
             {
                 var ctx = new
                 {
-                    Usings = config.EventBus == "MassTransit"
-                            ? 
-                            [
-                                "NForza.Cyrus.MassTransit",
-                                "NForza.Cyrus.Cqrs"
-                            ] 
-                            : 
-                            new string[] { "NForza.Cyrus.Cqrs" },
+                    Usings = new string[] { "NForza.Cyrus.Cqrs" },
                     Namespace = "BusRegistration",
                     Name = "BusRegistration",
                     Initializer = contents
