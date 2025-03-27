@@ -33,7 +33,7 @@ namespace NForza.Cyrus.Generators.Roslyn
                     switch (methodName)
                     {
                         case "UseMassTransit":
-                            result.EventBus = "MassTransit";
+                            result.EventBus = EventBusType.MassTransit;
                             break;
                         case "GenerateContracts":
                             result.GenerationTarget.Add(GenerationTarget.Contracts);

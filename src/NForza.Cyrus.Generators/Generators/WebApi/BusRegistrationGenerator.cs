@@ -18,7 +18,7 @@ public class BusRegistrationGenerator : CyrusGeneratorBase
             {
                 var ctx = new
                 {
-                    Usings = new string[] { "NForza.Cyrus.Cqrs" },
+                    Usings = cyrusProvider.GenerationConfig.EventBus == EventBusType.MassTransit ? ["NForza.Cyrus.Cqrs", "NForza.Cyrus.MassTransit"] : new string[] { "NForza.Cyrus.Cqrs" },
                     Namespace = "BusRegistration",
                     Name = "BusRegistration",
                     Initializer = contents
