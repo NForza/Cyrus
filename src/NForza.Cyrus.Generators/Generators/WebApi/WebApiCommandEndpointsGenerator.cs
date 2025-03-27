@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -77,8 +78,8 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
                 CommandType = handler.Parameters[0].Type.ToFullName(),
                 CommandName = handler.Parameters[0].Type.Name,
                 AdapterMethod = GetAdapterMethodName(handler),
-                handler.IsAsync,
-                HasReturnType = handler.ReturnType.SpecialType != SpecialType.System_Void,
+                ReturnsTask =  handler.ReturnsTask(),
+                HasReturnType = handler.ReturnType.SpecialType != SpecialType.System_Void && !(handler.ReturnsTask() && handler.TypeArguments.Any()),
                 CommandInvocation = handler.GetCommandInvocation(variableName: "cmd")
             };
 
@@ -89,9 +90,16 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
 
     private string GetAdapterMethodName(IMethodSymbol handler)
     {
-        var returnType = handler.ReturnType;
-        if (returnType.SpecialType == SpecialType.System_Void)
+        var returnType = handler switch
+        {
+            _ when handler.ReturnsTask(out var taskResultType) && taskResultType != null => taskResultType,
+            _ when handler.ReturnsTask() => null,
+            _ => handler.ReturnType
+        };
+        
+        if (returnType == null || returnType.SpecialType == SpecialType.System_Void)
             return "FromVoid";
+
         if (returnType.IsTupleType)
         {
             return "FromIResultAndEvents";
