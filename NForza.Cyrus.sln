@@ -28,8 +28,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.Core", "src\NF
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DemoApp", "DemoApp", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GettingStarted", "GettingStarted", "{EA70C04C-2226-48BB-8ED1-246C5BFE64D7}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoApp.Contracts", "examples\DemoApp\DemoApp.Contracts\DemoApp.Contracts.csproj", "{F226A20A-3ED9-8DED-646B-3F02A3D018F3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.Templating", "src\NForza.Cyrus.Templating\NForza.Cyrus.Templating.csproj", "{0D5FC394-E7FF-464D-62F8-0A84E9C970D7}"

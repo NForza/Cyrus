@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace NForza.Cyrus.Generators.Roslyn
@@ -6,12 +7,39 @@ namespace NForza.Cyrus.Generators.Roslyn
     internal static class MethodSymbolExtensions
     {
         public static bool ReturnsTask(this IMethodSymbol methodSymbol)
-        {
-            if (methodSymbol.ReturnType is not INamedTypeSymbol namedType)
-                return false;
+            => ReturnsTask(methodSymbol, out _);
 
-            return namedType.Name == "Task" &&
-                   namedType.ContainingNamespace.ToDisplayString() == "System.Threading.Tasks";
+        public static bool ReturnsTask(this IMethodSymbol methodSymbol, out ITypeSymbol? taskResultType)
+        {
+            taskResultType = null;
+            if (methodSymbol == null)
+            {
+                throw new ArgumentNullException(nameof(methodSymbol));
+            }
+
+            if (!(methodSymbol.ReturnType is INamedTypeSymbol namedReturn))
+            {
+                return false;
+            }
+
+            if (namedReturn.ContainingNamespace?.ToDisplayString() != "System.Threading.Tasks" ||
+                namedReturn.Name != "Task")
+            {
+                return false;
+            }
+
+            if (!namedReturn.IsGenericType)
+            {
+                return true;
+            }
+
+            if (namedReturn.TypeArguments.Length == 1)
+            {
+                taskResultType = namedReturn.TypeArguments[0];
+                return true;
+            }
+
+            return false;
         }
 
         public static string GetCommandInvocation(this IMethodSymbol handler, string variableName, string serviceProviderVariable = "services")
