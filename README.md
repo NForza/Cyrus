@@ -1,4 +1,4 @@
-![Cyrus](images/cyrus.png "Cyrus")
+<img src="images/cyrus.png" alt="Cyrus" width="250" />
 
 # Cyrus - An Opinionated Framework for Creating CQRS Applications and Web APIs
 
