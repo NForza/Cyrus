@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
@@ -16,7 +17,7 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase
         var queryHandlers = cyrusProvider.QueryHandlers;
         if (queryHandlers.Any())
         {
-            if (config.EventBus == "MassTransit")
+            if (config.EventBus == EventBusType.MassTransit)
             {
                 var sourceText = GenerateEventConsumers(queryHandlers);
                 spc.AddSource($"EventConsumers.g.cs", SourceText.From(sourceText, Encoding.UTF8));

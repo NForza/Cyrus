@@ -2,7 +2,7 @@
 
 namespace SimpleCyrusWebApi.NewCustomer;
 
-[Command]
+[Command(Verb = HttpVerb.Post)]
 public record struct NewCustomerCommand
 {
     public CustomerId Id { get; set; }

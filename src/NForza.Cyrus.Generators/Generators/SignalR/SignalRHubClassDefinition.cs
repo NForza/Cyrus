@@ -7,7 +7,7 @@ using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Generators.Generators.SignalR;
 
-internal record SignalRHubClassDefinition
+public record SignalRHubClassDefinition
 {
     IEnumerable<InvocationExpressionSyntax> GetMethodCallsOf(SyntaxNode node, string methodName)
     {

@@ -6,78 +6,45 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
+using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.Generators.WebApi;
 
-[Generator]
-public class QueryEndpointsGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
+public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
 {
-    public override void Initialize(IncrementalGeneratorInitializationContext context)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
-        DebugThisGenerator(true);
-
-        var configProvider = ConfigProvider(context);
-
-        var compilationProvider = context.CompilationProvider;
-
-        var queriesAndQueryHandlerProvider = compilationProvider
-            .SelectMany((compilation, _) =>
-            {
-                var allTypes = compilation.GetAllTypesFromCyrusAssemblies();
-
-                var queries = allTypes
-                    .Where(t => t.IsQuery())
-                    .ToList();
-
-                var queryHandlers = allTypes
-                    .SelectMany(t => t.GetMembers().OfType<IMethodSymbol>()
-                    .Where(m => m.IsQueryHandler()))
-                    .ToList();
-
-                return queries.Cast<ISymbol>().Concat(queryHandlers);
-            })
-           .Collect();
-
-        var combinedProvider = context
-            .CompilationProvider
-            .Combine(queriesAndQueryHandlerProvider)
-            .Combine(configProvider);
-
-        context.RegisterSourceOutput(combinedProvider, (spc, source) =>
+        var config = cyrusProvider.GenerationConfig;
+        if (config != null && config.GenerationTarget.Contains(GenerationTarget.WebApi))
         {
-            var ((compilation, queriesAndHandlers), config) = source;
+            var contents = AddQueryHandlerMappings(spc, cyrusProvider.AllQueriesAndHandlers.OfType<IMethodSymbol>());
 
-            if (config != null && config.GenerationTarget.Contains(GenerationTarget.WebApi))
+            if (!string.IsNullOrWhiteSpace(contents))
             {
-                var contents = AddQueryHandlerMappings(spc, queriesAndHandlers.OfType<IMethodSymbol>());
-
-                if (!string.IsNullOrWhiteSpace(contents))
+                var ctx = new
                 {
-                    var ctx = new
-                    {
-                        Usings = new string[] {
+                    Usings = new string[] {
                             "Microsoft.AspNetCore.Mvc",
                             "Microsoft.AspNetCore.Http"
                     },
-                        Namespace = "WebApiQueries",
-                        Name = "Query",
-                        StartupCommands = contents
-                    };
+                    Namespace = "WebApiQueries",
+                    Name = "Query",
+                    StartupCommands = contents
+                };
 
-                    var fileContents = LiquidEngine.Render(ctx, "CyrusWebStartup");
-                    spc.AddSource(
-                       "QueryHandlerMapping.g.cs",
-                       SourceText.From(fileContents, Encoding.UTF8));
-                }
-
-                IEnumerable<INamedTypeSymbol> queries = queriesAndHandlers
-                    .Where(q => q.IsQuery())
-                    .OfType<INamedTypeSymbol>();
-
-                AddHttpContextObjectFactoryMethodsRegistrations(spc, queries);
-                WebApiContractGenerator.GenerateContracts(queries, spc, LiquidEngine);
+                var fileContents = LiquidEngine.Render(ctx, "CyrusWebStartup");
+                spc.AddSource(
+                   "QueryHandlerMapping.g.cs",
+                   SourceText.From(fileContents, Encoding.UTF8));
             }
-        });
+
+            IEnumerable<INamedTypeSymbol> queries = cyrusProvider.AllQueriesAndHandlers
+                .Where(q => q.IsQuery())
+                .OfType<INamedTypeSymbol>();
+
+            AddHttpContextObjectFactoryMethodsRegistrations(spc, queries);
+            WebApiContractGenerator.GenerateContracts(queries, spc, LiquidEngine);
+        }
     }
 
     private void AddHttpContextObjectFactoryMethodsRegistrations(SourceProductionContext sourceProductionContext, IEnumerable<INamedTypeSymbol> queries)
