@@ -41,6 +41,16 @@ public static class WebApiContractGenerator
         if (contract.IsRecordType())
         {
             var constructorArguments = contract.GetConstructorArguments();
+            var constructorArgumentNames = constructorArguments.Select(p => p.Name).ToList();
+            var publicProperties = contract.GetPublicProperties().Select(p =>
+                                new
+                                {
+                                    p.Name,
+                                    Internal = propertiesFromRoute.Contains(p.Name),
+                                    Type = p.Type.ToFullName(),
+                                    IsNullable = p.Type.IsNullable()
+                                })
+                                .ToList();
             var model = new
             {
                 Namespace = contract.ContainingNamespace,
@@ -53,15 +63,8 @@ public static class WebApiContractGenerator
                         Type = p.Type.ToFullName(),
                         IsNullable = p.Type.IsNullable()
                     }).ToList(),
-                Properties = contract.GetPublicProperties().Select(p =>
-                    new
-                    {
-                        p.Name,
-                        Internal = propertiesFromRoute.Contains(p.Name),
-                        Type = p.Type.ToFullName(),
-                        IsNullable = p.Type.IsNullable()
-                    })
-                    .ToList()
+                Properties = publicProperties,
+                ConstructorProperties = publicProperties.Where(p => !constructorArgumentNames.Contains(p.Name)).ToList()
             };
 
             var fileContents = liquidEngine.Render(model, "WebApiContractRecord");
