@@ -47,24 +47,15 @@ public class QueryHandlerGenerator : CyrusGeneratorBase
             return string.Empty;
         }
 
-        var queries = handlers.Select(h => new
-        {
-            Handler = h,
-            QueryType = h.Parameters[0].Type.ToFullName(),
-            h.Name,
-            ReturnType = (INamedTypeSymbol)h.ReturnType,
-            IsAsync = h.ReturnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default)
-        }).ToList();
-
         var model = new
         {
-            Queries = queries.Select(q => new
+            Queries = handlers.Select(q => new
             {
                 ReturnTypeOriginal = q.ReturnType,
-                ReturnType = q.ReturnType.IsTaskType() ? q.ReturnType.TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
-                Invocation = q.Handler.GetQueryInvocation(serviceProviderVariable: "queryProcessor.ServiceProvider"),
+                ReturnType = q.ReturnType.IsTaskType() ? ((INamedTypeSymbol) q.ReturnType).TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
+                Invocation = q.GetQueryInvocation(serviceProviderVariable: "queryProcessor.ServiceProvider"),
                 q.Name,
-                q.QueryType,
+                QueryType = q.Parameters[0].Type.ToFullName(),
                 ReturnsTask = q.ReturnType.IsTaskType(),
             }).ToList()
         };
