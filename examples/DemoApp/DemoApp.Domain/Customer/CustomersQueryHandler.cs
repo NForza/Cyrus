@@ -1,6 +1,6 @@
 ﻿using DemoApp.Contracts;
 using DemoApp.Contracts.Customers;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.OutputCaching;
 using NForza.Cyrus.Abstractions;
 
 namespace DemoApp.Domain.Customer;
@@ -8,7 +8,7 @@ namespace DemoApp.Domain.Customer;
 public class CustomersQueryHandler
 {
     [QueryHandler]
-    [Authorize(Roles = "Admin")]
+    [OutputCache(Duration = 60)]
     public Task<Customer[]> QueryAllCustomers(AllCustomersQuery query)
     {
         var customers = Enumerable.Range(1, 10)

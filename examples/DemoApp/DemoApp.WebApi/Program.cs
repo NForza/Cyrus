@@ -29,7 +29,6 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddValidatorsFromAssemblyContaining<Customer>();
-
 builder.Services.AddCyrus();
 
 builder.Services.AddEndpointsApiExplorer();
