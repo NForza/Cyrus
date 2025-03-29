@@ -8,4 +8,10 @@
         var queryResult = {% if ReturnsTask %}await {% endif %}{{ QueryInvocation }};
         return QueryResultAdapter.FromObject(queryResult);
     })
+    {%- if Attributes.size > 0 -%}
+    .WithMetadata([
+    {%- for attr in Attributes %}
+        {{ attr }}{% unless forloop.last %},{% endunless %}
+    {% endfor %}])
+    {% endif -%}
     .WithSwaggerParameters("{{Path}}");

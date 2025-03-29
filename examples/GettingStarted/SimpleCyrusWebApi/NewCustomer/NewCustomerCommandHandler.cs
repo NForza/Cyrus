@@ -11,6 +11,6 @@ public class NewCustomerCommandHandler(DemoContext context)
     {
         context.Customers.Add(new Customer(command.Id, command.Name, command.Address));
         await context.SaveChangesAsync();
-        return (Results.Accepted(), [new CustomerCreatedEvent(command.Id)]);
+        return (Results.Ok(), [new CustomerCreatedEvent(command.Id)]);
     }
 }

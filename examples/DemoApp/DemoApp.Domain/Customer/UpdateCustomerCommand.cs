@@ -1,4 +1,5 @@
 ﻿using DemoApp.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using NForza.Cyrus.Abstractions;
 
 namespace DemoApp.Domain.Customer;

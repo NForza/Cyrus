@@ -1,5 +1,7 @@
 ﻿using DemoApp.Contracts.Customers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OutputCaching;
 using NForza.Cyrus.Abstractions;
 
 namespace DemoApp.Domain.Customer;

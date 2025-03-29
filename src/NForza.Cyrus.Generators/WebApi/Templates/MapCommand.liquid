@@ -9,4 +9,10 @@
         {% if HasReturnType %}var commandResult = {% endif %}{% if ReturnsTask %}await {% endif %}{{ CommandInvocation }};
         return new CommandResultAdapter(eventBus).{{ AdapterMethod }}({% if HasReturnType %}commandResult{% endif %});
     })
+    {%- if Attributes.size > 0 -%}
+    .WithMetadata([
+    {%- for attr in Attributes %}
+        {{ attr }}{% unless forloop.last %},{% endunless %}
+    {% endfor %}])
+    {% endif -%}
     .WithSwaggerParameters("{{Path}}");

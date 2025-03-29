@@ -9,7 +9,7 @@ using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.WebApi;
 public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
-{
+{   
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
         var config = cyrusProvider.GenerationConfig;
@@ -79,13 +79,14 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
                 AdapterMethod = GetAdapterMethodName(handler),
                 ReturnsTask = handler.ReturnsTask(),
                 HasReturnType = handler.ReturnType.SpecialType != SpecialType.System_Void && !(handler.ReturnsTask() && handler.TypeArguments.Any()),
-                CommandInvocation = handler.GetCommandInvocation(variableName: "cmd")
+                CommandInvocation = handler.GetCommandInvocation(variableName: "cmd"),
+                Attributes = handler.GetAttributes().Select( a => a.ToNewInstanceString()).Where(a => a != null)
             };
-
             sb.AppendLine(liquidEngine.Render(command, "MapCommand"));
         }
         return sb.ToString().Trim();
     }
+
 
     private string GetAdapterMethodName(IMethodSymbol handler)
     {
