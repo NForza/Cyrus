@@ -8,7 +8,7 @@ using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.Generators.WebApi;
+namespace NForza.Cyrus.Generators.WebApi;
 
 public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
 {

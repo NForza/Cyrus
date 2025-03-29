@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
-using NForza.Cyrus.Generators.Generators.Model;
+using NForza.Cyrus.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.Generators.SignalR;
+namespace NForza.Cyrus.Generators.SignalR;
 
 public class SignalRHubGenerator : CyrusGeneratorBase
 {

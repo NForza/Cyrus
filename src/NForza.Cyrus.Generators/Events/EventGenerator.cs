@@ -2,7 +2,7 @@
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using NForza.Cyrus.Generators.Generators.Model;
+using NForza.Cyrus.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 

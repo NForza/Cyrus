@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.Generators.SignalR;
+namespace NForza.Cyrus.Generators.SignalR;
 
 public class SignalRHubProvider : CyrusProviderBase<ImmutableArray<SignalRHubClassDefinition>>
 {
