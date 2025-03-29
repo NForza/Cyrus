@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Config;
-using NForza.Cyrus.Generators.Generators.SignalR;
+using NForza.Cyrus.Generators.SignalR;
 
 namespace NForza.Cyrus.Generators
 {

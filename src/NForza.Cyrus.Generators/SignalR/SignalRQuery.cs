@@ -1,6 +1,6 @@
 ﻿using NForza.Cyrus.Abstractions.Model;
 
-namespace NForza.Cyrus.Generators.Generators.SignalR;
+namespace NForza.Cyrus.Generators.SignalR;
 
 public class SignalRQuery
 {

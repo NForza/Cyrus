@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.Generators.WebApi;
+namespace NForza.Cyrus.Generators.WebApi;
 
 public class AllQueryAndHandlersProvider : CyrusProviderBase<ImmutableArray<ISymbol>>
 {

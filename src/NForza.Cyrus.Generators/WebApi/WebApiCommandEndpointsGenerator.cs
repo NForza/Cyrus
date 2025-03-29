@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -8,7 +7,7 @@ using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.Generators.WebApi;
+namespace NForza.Cyrus.Generators.WebApi;
 public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
@@ -78,7 +77,7 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
                 CommandType = handler.Parameters[0].Type.ToFullName(),
                 CommandName = handler.Parameters[0].Type.Name,
                 AdapterMethod = GetAdapterMethodName(handler),
-                ReturnsTask =  handler.ReturnsTask(),
+                ReturnsTask = handler.ReturnsTask(),
                 HasReturnType = handler.ReturnType.SpecialType != SpecialType.System_Void && !(handler.ReturnsTask() && handler.TypeArguments.Any()),
                 CommandInvocation = handler.GetCommandInvocation(variableName: "cmd")
             };
@@ -96,7 +95,7 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
             _ when handler.ReturnsTask() => null,
             _ => handler.ReturnType
         };
-        
+
         if (returnType == null || returnType.SpecialType == SpecialType.System_Void)
             return "FromVoid";
 

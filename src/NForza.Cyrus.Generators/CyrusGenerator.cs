@@ -5,10 +5,10 @@ using NForza.Cyrus.Generators.Commands;
 using NForza.Cyrus.Generators.Cqrs;
 using NForza.Cyrus.Generators.Events;
 using NForza.Cyrus.Generators.Generators.Cqrs;
-using NForza.Cyrus.Generators.Generators.SignalR;
 using NForza.Cyrus.Generators.Generators.TypedIds;
-using NForza.Cyrus.Generators.Generators.WebApi;
 using NForza.Cyrus.Generators.Queries;
+using NForza.Cyrus.Generators.SignalR;
+using NForza.Cyrus.Generators.WebApi;
 
 namespace NForza.Cyrus.Generators;
 
