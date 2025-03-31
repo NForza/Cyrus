@@ -6,14 +6,11 @@ public class CommandDispatcher(IEnumerable<IEventBus> eventBuses, IServiceProvid
 {
     public IServiceProvider ServiceProvider => serviceProvider;
 
-    public Task DispatchEvents(IEnumerable events)
+    public Task DispatchEvents(IEnumerable<object> events)
     {
         Parallel.ForEach(eventBuses, async eventBus =>
         {
-            foreach (var e in events)
-            {
-                await eventBus.Publish(e);
-            }
+            await eventBus.Publish(events.OfType<object>());
         });
         return Task.CompletedTask;
     }
