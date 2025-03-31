@@ -4,7 +4,7 @@ namespace NForza.Cyrus.Cqrs;
 
 public class LocalEventBus(EventHandlerDictionary eventHandlerDictionary, IServiceScopeFactory serviceScopeFactory) : IEventBus
 {
-    public Task Publish(object @event)
+    public virtual Task Publish(object @event)
     {
         var scope = serviceScopeFactory.CreateScope();
         var handlers = eventHandlerDictionary.GetEventHandlers(@event.GetType());

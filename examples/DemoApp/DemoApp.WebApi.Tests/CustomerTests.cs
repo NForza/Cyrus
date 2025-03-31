@@ -4,13 +4,24 @@ using DemoApp.Contracts;
 using DemoApp.Contracts.Customers;
 using DemoApp.Domain.Customer;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
+using NForza.Cyrus.Cqrs;
 using Xunit.Abstractions;
 
 namespace DemoApp.WebApi.Tests;
 
-public class CustomerTests(ITestOutputHelper testOutput)
+public class CustomerTests
 {
-    private readonly HttpClient client = new DemoAppTestClient(testOutput).CreateClient();
+    private readonly HttpClient client;
+    private readonly IServiceProvider services;
+    private readonly RecordingLocalEventBus eventBus;
+
+    public CustomerTests(ITestOutputHelper testOutput)
+    {
+       (client, services) = new DemoAppTestClient(testOutput)
+            .CreateClientAndServiceProvider();
+        eventBus = (RecordingLocalEventBus) services.GetRequiredService<IEventBus>();
+    }
 
     [Theory]
     [InlineData("/customers/1/10")]
@@ -65,5 +76,9 @@ public class CustomerTests(ITestOutputHelper testOutput)
         response.StatusCode.Should().Be(HttpStatusCode.Accepted);
         response.Headers.Location?.ToString().Should().NotBeNullOrEmpty();
         response.Headers.Location!.ToString().Should().StartWith("/customers/");
+
+        var customerAddedEvent = eventBus!.GetEvent<CustomerUpdatedEvent>();
+        customerAddedEvent.Should().NotBeNull();
+        customerAddedEvent!.Id.Should().Be(customerId);
     }
 }
