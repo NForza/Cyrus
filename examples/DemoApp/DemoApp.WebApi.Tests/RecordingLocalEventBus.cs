@@ -9,7 +9,7 @@ internal class RecordingLocalEventBus(EventHandlerDictionary eventHandlerDiction
     public T? GetEvent<T>() => Events.OfType<T>().FirstOrDefault();
     public IEnumerable<T> GetEvents<T>() => Events.OfType<T>();
 
-    override public Task Publish(params object[] events)
+    override public Task Publish(IEnumerable<object> events)
     {
         Events.AddRange(events);
         return base.Publish(events);

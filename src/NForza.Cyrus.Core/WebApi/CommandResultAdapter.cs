@@ -17,13 +17,13 @@ public class CommandResultAdapter(IEventBus eventBus)
 
     public IResult FromObjectAndEvents((object Object, IEnumerable<Object> Events) commandResult)
     {
-        commandResult.Events.ToList().ForEach(@event => eventBus.Publish(@event));
+        eventBus.Publish(commandResult.Events);
         return Results.Ok(commandResult.Object);
     }
 
     public IResult FromEvents(IEnumerable<Object> events)
     {
-        events.ToList().ForEach(@event => eventBus.Publish(@event));
+        eventBus.Publish(events);
         return Results.Ok();
     }
 

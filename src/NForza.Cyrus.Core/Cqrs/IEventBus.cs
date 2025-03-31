@@ -2,5 +2,5 @@
 
 public interface IEventBus
 {
-    Task Publish(params object[] events);
+    Task Publish(IEnumerable<object> events);
 }
