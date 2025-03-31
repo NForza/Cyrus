@@ -29,7 +29,7 @@ public class CommandResultAdapter(IEventBus eventBus)
 
     public IResult FromIResultAndEvents((IResult Result, IEnumerable<Object> Events) result)
     {
-        result.Events.ToList().ForEach(@event => eventBus.Publish(@event));
+        eventBus.Publish(result.Events);
         return result.Result;
     }
 }

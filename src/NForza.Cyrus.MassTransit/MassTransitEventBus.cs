@@ -5,8 +5,8 @@ namespace NForza.Cyrus.MassTransit;
 
 public class MassTransitEventBus(IBus bus) : IEventBus
 {
-    public Task Publish(object @event)
+    public Task Publish(params object[] events)
     {
-        return bus.Publish(@event);
+        return Task.WhenAll(events.Select(@event => bus.Publish(@event)));
     }
 }

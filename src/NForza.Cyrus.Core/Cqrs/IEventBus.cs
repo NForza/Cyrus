@@ -2,5 +2,5 @@
 
 public interface IEventBus
 {
-    Task Publish(object @event);
+    Task Publish(params object[] events);
 }

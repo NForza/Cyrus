@@ -4,13 +4,16 @@ namespace NForza.Cyrus.Cqrs;
 
 public class LocalEventBus(EventHandlerDictionary eventHandlerDictionary, IServiceScopeFactory serviceScopeFactory) : IEventBus
 {
-    public virtual Task Publish(object @event)
+    public virtual Task Publish(params object[] events)
     {
         var scope = serviceScopeFactory.CreateScope();
-        var handlers = eventHandlerDictionary.GetEventHandlers(@event.GetType());
-        foreach (var handler in handlers)
+        foreach (var @event in events)
         {
-            handler.Invoke(scope.ServiceProvider, @event);
+            var handlers = eventHandlerDictionary.GetEventHandlers(@event.GetType());
+            foreach (var handler in handlers)
+            {
+                handler.Invoke(scope.ServiceProvider, @event);
+            }
         }
         return Task.CompletedTask;
     }
