@@ -2,11 +2,11 @@
 
 namespace DemoApp.WebApi;
 
-//public class CyrusConfiguration : CyrusConfig
-//{
-//    public CyrusConfiguration()
-//    {
-//        GenerateWebApi();
-//        UseMassTransit();
-//    }
-//}
+public class CyrusConfiguration : CyrusConfig
+{
+    public CyrusConfiguration()
+    {
+        GenerateWebApi();
+        UseMassTransit();
+    }
+}
