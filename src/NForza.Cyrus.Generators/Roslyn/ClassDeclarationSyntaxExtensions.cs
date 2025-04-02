@@ -44,13 +44,6 @@ namespace NForza.Cyrus.Generators.Roslyn
                         case "GenerateWebApi":
                             result.GenerationTarget.Add(GenerationTarget.WebApi);
                             break;
-                        case "UseContractsFromAssembliesContaining":
-                            result.Contracts =
-                                    [.. methodCall.ArgumentList.Arguments
-                                    .Select(argument => argument.Expression as LiteralExpressionSyntax)
-                                    .Where(literal => literal != null)
-                                    .Select(literal => literal!.Token.ValueText)];
-                            break;
                     }
                 }
             }

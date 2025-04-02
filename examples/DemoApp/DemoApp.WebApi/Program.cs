@@ -1,5 +1,4 @@
 using System.Reflection;
-using DemoApp.Contracts.Customers;
 using DemoApp.Domain.Customer;
 using FluentValidation;
 using MassTransit;
@@ -7,6 +6,8 @@ using NForza.Cyrus;
 using NForza.Cyrus.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.SetMinimumLevel(LogLevel.Debug).AddConsole();
 
 builder.Services.AddMassTransit(cfg =>
 {
