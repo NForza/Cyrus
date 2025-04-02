@@ -2,6 +2,7 @@ using System.Reflection;
 using FluentValidation;
 using MassTransit;
 using NForza.Cyrus;
+using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.WebApi;
 using SimpleCyrusWebApi.Model;
 using SimpleCyrusWebApi.Storage;
@@ -38,6 +39,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+var eb = app.Services.GetRequiredService<IEventBus>();
 
 app.MapCyrus();
 app.Run();
