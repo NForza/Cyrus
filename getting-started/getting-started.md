@@ -185,4 +185,50 @@ public class UpdateCustomerCommandHandler
 
 * Note that the `CustomerId` is not a part of the contract of the object to be posted.
 
+* Add a query and query handler:
+
+```csharp
+public record Customer(CustomerId Id, Name Name, Address Address);
+
+[Query(Route = "/")]
+public record struct AllCustomersQuery;
+
+public class CustomersQueryHandler
+{
+    [QueryHandler]
+    public static IEnumerable<Customer> Handle(AllCustomersQuery query)
+    {
+        Console.WriteLine("Getting all customers");
+        return [new Customer(new CustomerId(), new Name("The Name"), new Address("The Address"))];
+    }
+};
+```
+
+* Run the application and open the `/swagger` page to see the new GET endpoint for the query.
+
+* Add another query, and add a query handler to the existing CustomersQueryHandler class:
+
+```csharp
+[Query(Route = "/{Id}")]
+public record struct CustomerByIdQuery(CustomerId Id);
+
+public class CustomersQueryHandler
+{
+    [QueryHandler]
+    public static IEnumerable<Customer> GetAll(AllCustomersQuery query)
+    {
+        Console.WriteLine("Getting all customers");
+        return [new Customer(new CustomerId(), new Name("The Name"), new Address("The Address"))];
+    }
+
+    [QueryHandler]
+    public async Task<Customer> GetById(CustomerByIdQuery query)
+    {
+        Console.WriteLine("Getting customer by Id: " + query.Id);
+        return new Customer(query.Id, new Name("The Name"), new Address("The Address"));
+    }
+};
+```
+
+
 
