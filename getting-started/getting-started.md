@@ -1,8 +1,8 @@
 # Create your first Cyrus application
 
-* Create a ASP.NET Core WebApi
+* Create a ASP.NET Core WebApi using .NET 8
 
-* Update all Nuget packages
+* Remove the (outdated) `Swashbuckle.AspNetCore` Nuget package
 
 * Add the `NForza.Cyrus` Nuget package
 
@@ -36,7 +36,7 @@ app.Run();
 
 * Verify that the application compiles and runs correctly
 
-* Add some strongly typed IDs:
+* Add some strongly typed IDs **in a namespace in a new C# file**:
 
 ```csharp
 [GuidId]
@@ -52,14 +52,13 @@ public partial record struct Address;
 * Add a command named NewCustomerCommand:
 
 ```csharp
-[Command(Route = "/", Verb = HttpVerb.Post)]
+[Command(Route = "/customers", Verb = HttpVerb.Post)]
 public record struct NewCustomerCommand(CustomerId CustomerId, Name Name, Address Address);
 ```
 
 * Add a command handler:
 
 ```csharp
-[CommandHandler]
 public class NewCustomerCommandHandler
 {
     [CommandHandler]
@@ -151,13 +150,16 @@ public class NewCustomerCommandHandler
 * Change the command handler to be an async method:
 
 ```csharp
+public class NewCustomerCommandHandler
+{
     [CommandHandler]
-    public static async Task<(IResult result, IEnumerable<object> events)> Handle(NewCustomerCommand command)
+    public static async Task<(IResult result, IEnumerable<object> events)> HandleAsync(NewCustomerCommand command)
     {
         Console.WriteLine("Creating a new customer");
-        await Task.Delay(100); 
+        await Task.Delay(100);
         return (Results.Accepted(), [new CustomerCreatedEvent(command.CustomerId, command.Name, command.Address)]);
     }
+}
 ```
 
 * Run the application and note that it still runs as before.
@@ -185,12 +187,14 @@ public class UpdateCustomerCommandHandler
 
 * Note that the `CustomerId` is not a part of the contract of the object to be posted.
 
+* Invoke the endpoint by supplying a Guid. In the debugger you can see that the posted JSON and the CustomerId from the route are merged into the UpdateCustomerCommand object that is received by the command handler. 
+
 * Add a query and query handler:
 
 ```csharp
 public record Customer(CustomerId Id, Name Name, Address Address);
 
-[Query(Route = "/")]
+[Query(Route = "/customers")]
 public record struct AllCustomersQuery;
 
 public class CustomersQueryHandler
@@ -209,8 +213,8 @@ public class CustomersQueryHandler
 * Add another query, and add a query handler to the existing CustomersQueryHandler class:
 
 ```csharp
-[Query(Route = "/{Id}")]
-public record struct CustomerByIdQuery(CustomerId Id);
+[Query(Route = "/customers/{CustomerId}")]
+public record struct CustomerByIdQuery(CustomerId CustomerId);
 
 public class CustomersQueryHandler
 {
@@ -224,11 +228,37 @@ public class CustomersQueryHandler
     [QueryHandler]
     public async Task<Customer> GetById(CustomerByIdQuery query)
     {
-        Console.WriteLine("Getting customer by Id: " + query.Id);
-        return new Customer(query.Id, new Name("The Name"), new Address("The Address"));
+        Console.WriteLine("Getting customer by Id: " + query.CustomerId);
+        return new Customer(query.CustomerId, new Name("The Name"), new Address("The Address"));
     }
 };
 ```
+
+## Goal
+
+This small demo shows the core focus of Cyrus: to be able to quickly create WebApis with as little boilerplate code as possible. Cyrus uses C# Source Generators to accomplish this. It uses very little Reflection or lookups. Only at startup there is some Reflection code to add all the required services and to boot the application. When running, Cyrus uses no Reflection at all.
+
+## Looking at the generated code
+
+* In the csproj, add the following:
+
+```xml
+  <PropertyGroup>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(MSBuildProjectDirectory)\obj\$(Configuration)\generated</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
+```
+
+* After compiling in Debug configuration, the generated files can be found in the `obj\Debug\generated` folder
+
+## Next topics
+
+* Adding metadata to endpoints
+* Adding validators for commands and queries
+* Splitting contracts and implementation
+* Using MassTransit in Cyrus to broadcast events
+* Generating TypeScript from a Cyrus model
+
 
 
 
