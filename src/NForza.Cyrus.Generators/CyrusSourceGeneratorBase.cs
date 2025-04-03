@@ -21,8 +21,18 @@ public abstract class CyrusSourceGeneratorBase : IncrementalGeneratorBase
                 predicate: (syntaxNode, _) => syntaxNode is ClassDeclarationSyntax classDeclaration && classDeclaration.Identifier.Text == "CyrusConfiguration",
                 transform: (context, _) => ((ClassDeclarationSyntax)context.Node).GetConfigFromClass())
             .Collect()
-            .Select((cfgs, _) => cfgs.First());
+            .Select((cfgs, _) => cfgs.FirstOrDefault() ?? CreateDefaultGenerationConfig());
         return configProvider;
+    }
+
+    private GenerationConfig CreateDefaultGenerationConfig()
+    {
+        return 
+            new GenerationConfig 
+            { 
+                EventBus = EventBusType.Local,
+                GenerationTarget = [GenerationTarget.Domain, GenerationTarget.WebApi, GenerationTarget.Contracts]
+            };
     }
 
     public virtual void Initialize(IncrementalGeneratorInitializationContext context) { }

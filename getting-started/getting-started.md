@@ -96,4 +96,3 @@ public class CustomerEventHandler
     * The app has an endpoint with a Route of "/" and that is uses the POST verb
     * The endpoint returns a 200 OK as indicated by the Command
     * When the endpoint is invoked, the event handler is triggered (output is on the console)
-    
