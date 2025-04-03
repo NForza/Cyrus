@@ -100,6 +100,10 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
         if (returnType == null || returnType.SpecialType == SpecialType.System_Void)
             return "FromVoid";
 
+        if (returnType.Name == "IResult" &&
+                returnType.ContainingNamespace.ToDisplayString() == "Microsoft.AspNetCore.Http")
+            return "FromIResult";   
+
         if (returnType.IsTupleType)
         {
             return "FromIResultAndEvents";

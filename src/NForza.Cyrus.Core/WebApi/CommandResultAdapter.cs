@@ -15,6 +15,11 @@ public class CommandResultAdapter(IEventBus eventBus)
         return Results.Ok();
     }
 
+    public IResult FromIResult(IResult result)
+    {
+        return result;
+    }
+
     public IResult FromObjectAndEvents((object Object, IEnumerable<Object> Events) commandResult)
     {
         eventBus.Publish(commandResult.Events);
