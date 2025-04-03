@@ -78,7 +78,7 @@ public class NewCustomerCommandHandler
 
 * Run the application and use the new endpoint from the `/swagger` page
 
-* Note that the app has an endpoint with a Route of "/" and that is uses the POST verb
+* Note that the app has an endpoint with a Route of "/customers" and that is uses the POST verb as described by the Command attributes
 
 * Verify that the command returns OK and that you see a message in the console
 
