@@ -1,4 +1,10 @@
-# Create your first Cyrus application
+# Cyrus - An Opinionated Framework for Creating CQRS Applications and Web APIs
+
+## Goal
+
+This small demo shows the core focus of Cyrus: to be able to quickly create WebApis with as little boilerplate code as possible. Cyrus uses C# Source Generators to accomplish this. It uses very little Reflection or lookups. Only at startup there is some Reflection code to add all the required services and to boot the application. When running, Cyrus uses no Reflection at all.
+
+## Create your first Cyrus application
 
 * Create a ASP.NET Core WebApi using .NET 8
 
@@ -7,6 +13,7 @@
 * Add the `NForza.Cyrus` Nuget package
 
 * Replace the contents of Program.cs with the following:
+
 ```csharp
 using NForza.Cyrus;
 using NForza.Cyrus.WebApi;
@@ -234,10 +241,6 @@ public class CustomersQueryHandler
 };
 ```
 
-## Goal
-
-This small demo shows the core focus of Cyrus: to be able to quickly create WebApis with as little boilerplate code as possible. Cyrus uses C# Source Generators to accomplish this. It uses very little Reflection or lookups. Only at startup there is some Reflection code to add all the required services and to boot the application. When running, Cyrus uses no Reflection at all.
-
 ## Looking at the generated code
 
 * In the csproj, add the following:
@@ -249,7 +252,7 @@ This small demo shows the core focus of Cyrus: to be able to quickly create WebA
   </PropertyGroup>
 ```
 
-* After compiling in Debug configuration, the generated files can be found in the `obj\Debug\generated` folder
+* After compiling in Debug configuration, the generated files can be found in the `obj\Debug\generated` in the project folder
 
 ## Next topics
 
@@ -258,7 +261,3 @@ This small demo shows the core focus of Cyrus: to be able to quickly create WebA
 * Splitting contracts and implementation
 * Using MassTransit in Cyrus to broadcast events
 * Generating TypeScript from a Cyrus model
-
-
-
-
