@@ -14,6 +14,7 @@ public class ConfigureSwaggerOptions(TypedIdDictionary typedIds) : IConfigureOpt
         {
             options.MapType(typedId.Key, () => new OpenApiSchema() { Type = GetSwaggerType(typedId.Value), Format = typedId.Value == typeof(Guid) ? "uuid" : "" });
         }
+        options.SchemaFilter<ContractSchemaFilter>();
     }
 
     private string GetSwaggerType(Type value) 
