@@ -2,6 +2,7 @@ using System.Reflection;
 using DemoApp.Domain.Customer;
 using FluentValidation;
 using MassTransit;
+using Microsoft.OpenApi.Models;
 using NForza.Cyrus;
 using NForza.Cyrus.WebApi;
 
@@ -34,7 +35,11 @@ builder.Services.AddCyrus();
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => options.SwaggerDoc("v1", new OpenApiInfo
+{
+    Title = "My Demo API",
+    Version = "swagger: \"2.0\""
+}));
 
 var app = builder.Build();
 
