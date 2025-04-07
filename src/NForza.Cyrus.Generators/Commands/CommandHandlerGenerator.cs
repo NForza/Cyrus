@@ -29,6 +29,7 @@ namespace NForza.Cyrus.Generators.Commands
                         cyrusProvider.CommandHandlers
                             .Select(ch => ch.ContainingType)
                             .Where(x => x != null)
+                            .Where(x => !x.IsStatic)
                             .Distinct(SymbolEqualityComparer.Default)
                             .Select(cht => $" services.AddTransient<{cht.ToFullName()}>();"));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
