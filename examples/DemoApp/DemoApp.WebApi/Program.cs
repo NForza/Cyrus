@@ -35,11 +35,7 @@ builder.Services.AddCyrus();
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen(options => options.SwaggerDoc("v1", new OpenApiInfo
-{
-    Title = "My Demo API",
-    Version = "swagger: \"2.0\""
-}));
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
