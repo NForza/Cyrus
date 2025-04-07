@@ -3,10 +3,19 @@
 {% for handler in EventHandlers %}
     eventDictionary.AddEventHandler<{{handler.EventType}}>(
     {% if handler.IsStatic %}    
+      {% if handler.ReturnsTask %}
+        async (_, @event) => await {{handler.TypeSymbolName}}.Handle(({{handler.EventType}})@event)
+      {% else %}
         (_, @event) => {{handler.TypeSymbolName}}.Handle(({{handler.EventType}})@event)
+      {% endif %}
     {% else %}
+      {% if handler.ReturnsTask %}
+        async (services, @event) => await services.GetRequiredService<{{handler.TypeSymbolName}}>().{{handler.MethodName}}(({{handler.EventType}})@event)
+      {% else %}
         (services, @event) => services.GetRequiredService<{{handler.TypeSymbolName}}>().{{handler.MethodName}}(({{handler.EventType}})@event)
-    {% endif %});
+      {% endif %}
+    {% endif %}
+    );
 {% endfor %}
     services.AddSingleton(eventDictionary);
 

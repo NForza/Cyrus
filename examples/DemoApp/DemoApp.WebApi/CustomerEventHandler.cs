@@ -1,10 +1,14 @@
 ﻿using DemoApp.Contracts.Customers;
+using NForza.Cyrus.Abstractions;
+
 namespace DemoApp.WebApi;
 
 public class CustomerEventHandler
 {
-    public void Handle(CustomerAddedEvent @event)
+    [EventHandler]
+    public async Task Handle(CustomerAddedEvent @event)
     {
+        await Task.Delay(10); 
         Console.WriteLine($"Customer Added: {@event.Id}");
     }
 }

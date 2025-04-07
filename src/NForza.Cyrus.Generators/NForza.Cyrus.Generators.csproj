@@ -48,11 +48,11 @@
     <EmbeddedResource Include="TypedIds\Templates\GuidId.liquid" />
     <EmbeddedResource Include="TypedIds\Templates\GuidIdTypeConverter.liquid" />
     <EmbeddedResource Include="Model\CyrusModel.liquid" />
-    <EmbeddedResource Include="Events\MassTransit\EventConsumers.liquid" />
+    <EmbeddedResource Include="Events\Templates\EventConsumers.liquid" />
     <EmbeddedResource Include="Queries\Templates\QueryProcessorExtensions.liquid" />
     <EmbeddedResource Include="SignalR\Templates\RegisterSignalRHubs.liquid" />
     <EmbeddedResource Include="SignalR\Templates\SignalRHub.liquid" />
-    <EmbeddedResource Include="WebApi\Templates\EventHandlerDictionary.liquid" />
+    <EmbeddedResource Include="Events\Templates\EventHandlerDictionary.liquid" />
     <EmbeddedResource Include="WebApi\Templates\WebApiContractRecord.liquid" />
     <EmbeddedResource Include="WebApi\Templates\MapQuery.liquid" />
     <EmbeddedResource Include="WebApi\Templates\MapCommand.liquid" />

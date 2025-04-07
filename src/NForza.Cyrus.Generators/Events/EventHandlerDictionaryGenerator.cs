@@ -7,7 +7,7 @@ using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.WebApi;
+namespace NForza.Cyrus.Generators.Events;
 
 public class EventHandlerDictionaryGenerator : CyrusGeneratorBase
 {
@@ -56,13 +56,14 @@ public class EventHandlerDictionaryGenerator : CyrusGeneratorBase
                 var typeSymbolName = typeSymbol.ToFullName();
                 var handlerName = $"{typeSymbol.Name}.{eventHandler.Name}({eventHandler.Parameters[0].Type.Name})";
                 var returnType = (INamedTypeSymbol)eventHandler.ReturnType;
-                var isAsync = returnType.OriginalDefinition.Equals(taskSymbol, SymbolEqualityComparer.Default);
+                var returnsTask = eventHandler.ReturnsTask();
                 return new
                 {
                     EventType = eventType,
                     HandlerName = handlerName,
                     eventHandler.IsStatic,
                     MethodName = methodName,
+                    ReturnsTask = returnsTask,
                     TypeSymbolName = typeSymbolName
                 };
             })
