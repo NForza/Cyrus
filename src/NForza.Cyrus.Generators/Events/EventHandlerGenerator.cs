@@ -19,6 +19,7 @@ public class EventHandlerGenerator : CyrusGeneratorBase
             var eventHandlerRegistrations = string.Join(Environment.NewLine, eventHandlers
                 .Select(x => x.ContainingType)
                 .Where(x => x != null)
+                .Where(x => !x.IsStatic)
                 .Distinct(SymbolEqualityComparer.Default)
                 .Select(eht => $" services.AddTransient<{eht.ToFullName()}>();"));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers

@@ -21,6 +21,7 @@ public class QueryHandlerGenerator : CyrusGeneratorBase
             var queryHandlerRegistrations = string.Join(Environment.NewLine, queryHandlers
                 .Select(x => x.ContainingType)
                 .Where(x => x != null)
+                .Where(x => !x.IsStatic)
                 .Distinct(SymbolEqualityComparer.Default)
                 .Select(qht => $" services.AddTransient<{qht.ToFullName()}>();"));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
