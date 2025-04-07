@@ -43,7 +43,7 @@ app.Run();
 
 * Verify that the application compiles and runs correctly
 
-* Add some strongly typed IDs **in a namespace in a new C# file**:
+* Add a new c# file `Types.cs` to the project and add some strongly typed IDs:
 
 ```csharp
 [GuidId]
@@ -56,7 +56,7 @@ public partial record struct Name;
 public partial record struct Address;
 ```
 
-* Add a command named NewCustomerCommand:
+* In the same file (or a new if you want), add a command named NewCustomerCommand:
 
 ```csharp
 [Command(Route = "/customers", Verb = HttpVerb.Post)]
@@ -258,6 +258,6 @@ public class CustomersQueryHandler
 
 * Adding metadata to endpoints
 * Adding validators for commands and queries
-* Splitting contracts and implementation
 * Using MassTransit in Cyrus to broadcast events
+* Splitting contracts and implementation
 * Generating TypeScript from a Cyrus model
