@@ -59,7 +59,7 @@ public partial record struct Address;
 * In the same file (or a new if you want), add a command named NewCustomerCommand:
 
 ```csharp
-[Command(Route = "/customers", Verb = HttpVerb.Post)]
+[Command]
 public record struct NewCustomerCommand(CustomerId CustomerId, Name Name, Address Address);
 ```
 
@@ -68,7 +68,7 @@ public record struct NewCustomerCommand(CustomerId CustomerId, Name Name, Addres
 ```csharp
 public class NewCustomerCommandHandler
 {
-    [CommandHandler]
+    [CommandHandler(Route = "/customers", Verb = HttpVerb.Post)]
     public void Handle(NewCustomerCommand command)
     {
         Console.WriteLine("Creating a new customer");
@@ -78,7 +78,7 @@ public class NewCustomerCommandHandler
 
 * Run the application and use the new endpoint from the `/swagger` page
 
-* Note that the app has an endpoint with a Route of "/customers" and that is uses the POST verb as described by the Command attributes
+* Note that the app has an endpoint with a Route of "/customers" and that is uses the POST verb as described by the CommandHandler attributes
 
 * Verify that the command returns OK and that you see a message in the console
 
@@ -87,7 +87,7 @@ public class NewCustomerCommandHandler
 ```csharp
 public class NewCustomerCommandHandler
 {
-    [CommandHandler]
+    [CommandHandler(Route = "/customers", Verb = HttpVerb.Post)]
     public IResult Handle(NewCustomerCommand command)
     {
         Console.WriteLine("Creating a new customer");
@@ -127,7 +127,7 @@ public class CustomerEventHandler
 ```csharp
 public class NewCustomerCommandHandler
 {
-    [CommandHandler]
+    [CommandHandler(Route = "/customers", Verb = HttpVerb.Post)]
     public (IResult result, IEnumerable<object> events) Handle(NewCustomerCommand command)
     {
         Console.WriteLine("Creating a new customer");
@@ -143,7 +143,7 @@ public class NewCustomerCommandHandler
 ```csharp
 public class NewCustomerCommandHandler
 {
-    [CommandHandler]
+    [CommandHandler(Route = "/customers", Verb = HttpVerb.Post)]
     public static (IResult result, IEnumerable<object> events) Handle(NewCustomerCommand command)
     {
         Console.WriteLine("Creating a new customer");
@@ -159,7 +159,7 @@ public class NewCustomerCommandHandler
 ```csharp
 public class NewCustomerCommandHandler
 {
-    [CommandHandler]
+    [CommandHandler(Route = "/customers", Verb = HttpVerb.Post)]
     public static async Task<(IResult result, IEnumerable<object> events)> HandleAsync(NewCustomerCommand command)
     {
         Console.WriteLine("Creating a new customer");
@@ -174,12 +174,12 @@ public class NewCustomerCommandHandler
 * Add a second command and command handler:
 
 ```csharp
-[Command(Route = "/{CustomerId:guid}", Verb = HttpVerb.Put)]
+[Command]
 public record struct UpdateCustomerCommand(CustomerId CustomerId, Name Name, Address Address);
 
 public class UpdateCustomerCommandHandler
 {
-    [CommandHandler]
+    [CommandHandler(Route = "/{CustomerId:guid}", Verb = HttpVerb.Put)]
     public static IResult Update(UpdateCustomerCommand command)
     {
         Console.WriteLine("Updating customer");
@@ -201,12 +201,12 @@ public class UpdateCustomerCommandHandler
 ```csharp
 public record Customer(CustomerId Id, Name Name, Address Address);
 
-[Query(Route = "/customers")]
+[Query]
 public record struct AllCustomersQuery;
 
 public class CustomersQueryHandler
 {
-    [QueryHandler]
+    [QueryHandler(Route = "/customers")]
     public static IEnumerable<Customer> Handle(AllCustomersQuery query)
     {
         Console.WriteLine("Getting all customers");
@@ -220,19 +220,19 @@ public class CustomersQueryHandler
 * Add another query, and add a query handler to the existing CustomersQueryHandler class:
 
 ```csharp
-[Query(Route = "/customers/{CustomerId}")]
+[Query]
 public record struct CustomerByIdQuery(CustomerId CustomerId);
 
 public class CustomersQueryHandler
 {
-    [QueryHandler]
+    [QueryHandler(Route = "/customers")]
     public static IEnumerable<Customer> GetAll(AllCustomersQuery query)
     {
         Console.WriteLine("Getting all customers");
         return [new Customer(new CustomerId(), new Name("The Name"), new Address("The Address"))];
     }
 
-    [QueryHandler]
+    [QueryHandler(Route = "/customers/{CustomerId}")]
     public async Task<Customer> GetById(CustomerByIdQuery query)
     {
         Console.WriteLine("Getting customer by Id: " + query.CustomerId);
