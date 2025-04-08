@@ -5,13 +5,13 @@ using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Generators.Analyzers;
 
-internal class CommandAnalyzer: CyrusAnalyzerBase
+internal class QueryAnalyzer: CyrusAnalyzerBase
 {
     public override void AnalyzeMethodSymbol(SymbolAnalysisContext context, IMethodSymbol methodSymbol)
     {
-        var isCommandHandler = methodSymbol.IsCommandHandler();
+        var isQueryHandler = methodSymbol.IsQueryHandler();
 
-        if (!isCommandHandler)
+        if (!isQueryHandler)
             return;
 
         var location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax()?.GetLocation()
@@ -22,7 +22,7 @@ internal class CommandAnalyzer: CyrusAnalyzerBase
             location = methodSymbol.Parameters[0].Locations.FirstOrDefault()
                        ?? Location.None;
             var diagnostic = Diagnostic.Create(
-                DiagnosticDescriptors.TooManyArgumentsForCommandHandler,
+                DiagnosticDescriptors.TooManyArgumentsForQueryHandler,
                 location,
                 methodSymbol.ToDisplayString());
             context.ReportDiagnostic(diagnostic);
@@ -34,7 +34,7 @@ internal class CommandAnalyzer: CyrusAnalyzerBase
         if (methodSymbol.Parameters.Length > 1)
         {
             var diagnostic = Diagnostic.Create(
-                DiagnosticDescriptors.TooManyArgumentsForCommandHandler,
+                DiagnosticDescriptors.TooManyArgumentsForQueryHandler,
                 location,
                 methodSymbol.ToDisplayString());
             context.ReportDiagnostic(diagnostic);
@@ -42,15 +42,15 @@ internal class CommandAnalyzer: CyrusAnalyzerBase
         }
 
         var commandParam = methodSymbol.Parameters[0].Type;
-        var hasCommandAttr = commandParam.GetAttributes()
-            .Any(attr => attr.AttributeClass?.Name == "CommandAttribute"
+        var hasQueryAttr = commandParam.GetAttributes()
+            .Any(attr => attr.AttributeClass?.Name == "QueryAttribute"
                       || attr.AttributeClass?.ToDisplayString() == "NForza.Cyrus.Abstractions");
 
-        if (!hasCommandAttr)
+        if (!hasQueryAttr)
         {
 
             var diagnostic = Diagnostic.Create(
-                DiagnosticDescriptors.MissingCommandAttribute,
+                DiagnosticDescriptors.MissingQueryAttribute,
                 location,
                 commandParam.Name);
 
