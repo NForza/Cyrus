@@ -258,7 +258,7 @@ public class CustomersQueryHandler
 
 ## Next topics
 
-* Adding metadata to endpoints
+* [Adding metadata to endpoints](adding-metadata.md)
 * Adding validators for commands and queries
 * Using MassTransit in Cyrus to broadcast events
 * Splitting contracts and implementation

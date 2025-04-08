@@ -14,4 +14,5 @@
         {{ attr }}{% unless forloop.last %},{% endunless %}
     {% endfor %}])
     {% endif -%}
+    .Produces<{{ ReturnType }}>()
     .WithSwaggerParameters("{{Path}}");

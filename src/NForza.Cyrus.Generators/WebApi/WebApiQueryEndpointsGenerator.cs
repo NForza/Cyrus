@@ -76,7 +76,8 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
                 Path = handler.GetQueryRoute(),
                 Query = handler.Parameters[0].Type.ToFullName(),
                 ReturnsTask = handler.ReturnType.IsTaskType(),
-                QueryInvocation = handler.GetQueryInvocation()  ,
+                QueryInvocation = handler.GetQueryInvocation(),
+                ReturnType = handler.ReturnsTask(out var taskResultType) ? taskResultType!.ToFullName() : handler.ReturnType.ToFullName(),
                 Attributes = handler.GetAttributes().Select(a => a.ToNewInstanceString()).Where(a => a != null)
             };
             sb.AppendLine(LiquidEngine.Render(query, "MapQuery"));
