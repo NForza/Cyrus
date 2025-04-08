@@ -43,6 +43,8 @@ app.Run();
 
 * Verify that the application compiles and runs correctly
 
+* Change the LaunchUrl from `weatherforcast` to `swagger` in LaunchSettings.json.
+
 * Add a new c# file `Types.cs` to the project and add some strongly typed IDs:
 
 ```csharp
@@ -56,7 +58,7 @@ public partial record struct Name;
 public partial record struct Address;
 ```
 
-* In the same file (or a new if you want), add a command named NewCustomerCommand:
+* In the same file (or a new if you prefer), add a command named NewCustomerCommand:
 
 ```csharp
 [Command]
