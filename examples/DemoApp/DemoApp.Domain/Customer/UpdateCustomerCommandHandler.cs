@@ -1,14 +1,12 @@
 ﻿using DemoApp.Contracts.Customers;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.OutputCaching;
 using NForza.Cyrus.Abstractions;
 
 namespace DemoApp.Domain.Customer;
 
 public class UpdateCustomerCommandHandler
 {
-    [CommandHandler]
+    [CommandHandler(Route = "customers/{Id}", Verb = HttpVerb.Put)]
     public static async Task<(IResult result, object[] events)> Execute(UpdateCustomerCommand command)
     {
         await Task.Delay(1000);

@@ -7,7 +7,7 @@ namespace DemoApp.Domain.Customer;
 
 public class CustomersQueryHandler
 {
-    [QueryHandler]
+    [QueryHandler(Route = "/customers/{page}/{pageSize}")]
     [OutputCache(Duration = 60)]
     public Task<Customer[]> QueryAllCustomers(AllCustomersQuery query)
     {
@@ -17,7 +17,7 @@ public class CustomersQueryHandler
         return Task.FromResult(customers);
     }
 
-    [QueryHandler]
+    [QueryHandler(Route = "customers/{Id:guid}")]
     public static Customer QueryCustomerById(CustomerByIdQuery query)
     {
         return new(query.Id, new($"Customer-{query.Id}"));

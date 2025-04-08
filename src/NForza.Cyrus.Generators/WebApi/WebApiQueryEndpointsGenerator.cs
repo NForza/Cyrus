@@ -73,7 +73,7 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
         {
             var query = new
             {
-                Path = handler.GetQueryHandlerRoute(),
+                Path = handler.GetQueryRoute(),
                 Query = handler.Parameters[0].Type.ToFullName(),
                 ReturnsTask = handler.ReturnType.IsTaskType(),
                 QueryInvocation = handler.GetQueryInvocation()  ,

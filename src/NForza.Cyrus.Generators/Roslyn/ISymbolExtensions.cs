@@ -19,7 +19,7 @@ public static class ISymbolExtensions
 
     public static string GetQueryRoute(this ISymbol methodSymbol)
     {
-        var attr = methodSymbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "QueryAttribute");
+        var attr = methodSymbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "QueryHandlerAttribute");
         if (attr != null)
         {
             if (attr.NamedArguments.Length > 0)
@@ -32,7 +32,7 @@ public static class ISymbolExtensions
 
     public static string GetCommandRoute(this ISymbol methodSymbol)
     {
-        var attr = methodSymbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "CommandAttribute");
+        var attr = methodSymbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "CommandHandlerAttribute");
         if (attr != null)
         {
             if (attr.NamedArguments.Length > 0)
@@ -45,7 +45,7 @@ public static class ISymbolExtensions
 
     public static string GetCommandVerb(this ISymbol methodSymbol)
     {
-        var attr = methodSymbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "CommandAttribute");
+        var attr = methodSymbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "CommandHandlerAttribute");
         if (attr != null)
         {
             if (attr.NamedArguments.Length > 0)
@@ -68,6 +68,7 @@ public static class ISymbolExtensions
     {
         return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "CommandHandlerAttribute");
     }
+
     public static bool IsCommand(this ISymbol methodSymbol)
     {
         return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "CommandAttribute");

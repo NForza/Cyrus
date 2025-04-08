@@ -21,7 +21,7 @@ public static class WebApiContractGenerator
         commandHandlers.ToList().ForEach(contract =>
         {
             var command = contract.GetCommandType();
-            var route = contract.GetCommandHandlerRoute();
+            var route = contract.GetCommandRoute();
             var propertiesFromRoute = GetRouteProperties(route, command);
             GenerateContract(command, propertiesFromRoute, sourceProductionContext, liquidEngine);
         });

@@ -7,7 +7,7 @@ namespace DemoApp.Domain.Customer;
 
 public class AddCustomerCommandHandler
 {
-    [CommandHandler]
+    [CommandHandler(Route = "customers", Verb = HttpVerb.Post)]
     public (IResult Result, IEnumerable<object> Events) Handle(AddCustomerCommand command)
     {
         CustomerId id = new CustomerId();
