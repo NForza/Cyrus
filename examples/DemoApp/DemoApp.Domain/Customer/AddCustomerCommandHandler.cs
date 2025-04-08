@@ -1,6 +1,7 @@
 ﻿using DemoApp.Contracts;
 using DemoApp.Contracts.Customers;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using NForza.Cyrus.Abstractions;
 
 namespace DemoApp.Domain.Customer;
@@ -8,6 +9,7 @@ namespace DemoApp.Domain.Customer;
 public class AddCustomerCommandHandler
 {
     [CommandHandler(Route = "customers", Verb = HttpVerb.Post)]
+    [ProducesResponseType(202)]
     public (IResult Result, IEnumerable<object> Events) Handle(AddCustomerCommand command)
     {
         CustomerId id = new CustomerId();
