@@ -71,8 +71,8 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
         {
             var command = new
             {
-                Path = handler.GetCommandHandlerRoute(),
-                Verb = handler.GetCommandHandlerVerb(),
+                Path = handler.GetCommandRoute(),
+                Verb = handler.GetCommandVerb(),
                 HasBody = handler.HasCommandBody(),
                 CommandType = handler.Parameters[0].Type.ToFullName(),
                 CommandName = handler.Parameters[0].Type.Name,
