@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
@@ -71,7 +73,7 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
         {
             var command = new
             {
-                Path = handler.GetCommandRoute(),
+                Path = TypeAnnotations.AugmentRouteWithTypeAnnotations(handler.GetCommandRoute(), handler.Parameters[0].Type),
                 Verb = handler.GetCommandVerb(),
                 HasBody = handler.HasCommandBody(),
                 CommandType = handler.Parameters[0].Type.ToFullName(),
@@ -86,7 +88,6 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
         }
         return sb.ToString().Trim();
     }
-
 
     private string GetAdapterMethodName(IMethodSymbol handler)
     {

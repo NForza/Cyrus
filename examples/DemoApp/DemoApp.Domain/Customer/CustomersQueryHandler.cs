@@ -17,7 +17,7 @@ public class CustomersQueryHandler
         return Task.FromResult(customers);
     }
 
-    [QueryHandler(Route = "customers/{Id:guid}")]
+    [QueryHandler(Route = "customers/{Id}")]
     public static Customer QueryCustomerById(CustomerByIdQuery query)
     {
         return new(query.Id, new($"Customer-{query.Id}"));
