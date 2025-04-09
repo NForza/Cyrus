@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -18,6 +19,7 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
             DiagnosticDescriptors.MissingEventAttribute,
             DiagnosticDescriptors.TooManyArgumentsForEventHandler,
             DiagnosticDescriptors.EventHandlerShouldHaveAEventParameter,
+            DiagnosticDescriptors.ProjectShouldReferenceCyrusMassTransit
         ];
 
     public override void Initialize(AnalysisContext context)
@@ -29,9 +31,13 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
 
     private void AnalyzeMethodSymbol(SymbolAnalysisContext context)
     {
+#if DEBUG_ANALYZER
+        Debugger.Launch();
+#endif
         var methodSymbol = (IMethodSymbol)context.Symbol;
         new CommandAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
         new QueryAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
-
+        new EventAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
+        new MassTransitAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
     }
 }
