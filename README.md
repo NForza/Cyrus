@@ -137,11 +137,11 @@ Event handlers must return `void`. The requirements for command handlers are as 
 By adding a Route and Verb to the CommandHandler or a Route to a QueryHandler, commands and queries can be exposed in a Web API:
 
 ```csharp
-[Command(Route = "customers", Verb = HttpVerb.Post)]
-public record struct AddCustomerCommand(Name Name, Address Address, CustomerType CustomerType);
+[CommandHandler(Route = "customers", Verb = HttpVerb.Post)]
+public void AddCustomerCommandHandler(AddCustomerCommand command) { ... }
 
-[Query(Route = "/customers/{page}/{pageSize}")]
-public record struct AllCustomersQuery(int Page = 1 , long PageSize = 10);
+[QueryHandler(Route = "/customers/{page}/{pageSize}")]
+public IEnumerable<Command> AllCustomersQueryHandler(AllCustomersQuery query) { ... }
 ```
 
 ### Application Startup
@@ -159,7 +159,7 @@ app.MapCyrus();
 
 await app.RunAsync();
 ```
-Check the [demo solution](https://github.com/thuijer/Cyrus/blob/master/) for more details.
+Check the [demo solution](https://github.com/NForza/Cyrus/blob/master/) for more details.
 
 ### Under the hood
 
