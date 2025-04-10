@@ -6,6 +6,23 @@ public class {{ Name | as-contract }}
 	{% if prop.Internal == true %}internal{% else %}public{% endif %} {{ prop.Type }}{% if prop.IsNullable == false %}?{% endif %} {{ prop.Name }} { get; set; }
 {% endfor -%}
 
+	public IEnumerable<string> ValidationErrors
+	{
+		get
+		{
+			var errors = new List<string>();
+			{%- for prop in Properties %}
+				{% if prop.IsNullable == false -%}
+				if ({{ prop.Name }} == null)
+				{
+					errors.Add("{{ prop.Name }} is required.");
+				}
+				{%- endif -%}
+			{% endfor %}
+			return errors;
+		}
+	}
+
 	public {{ FullName }} As{{ Name }}()
 	{
 		return new {{ FullName }}(

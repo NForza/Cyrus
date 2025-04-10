@@ -14,22 +14,26 @@ public class HttpContextObjectFactory : IHttpContextObjectFactory
         }   
     }
 
-    Dictionary<Type, Func<HttpContext, object?, object>> objectFactories = new();
+    Dictionary<Type, Func<HttpContext, object?, (object, IEnumerable<string>)>> objectFactories = new();
 
-    private void Register<T>(Func<HttpContext, object?, object> factory)
+    private void Register<T>(Func<HttpContext, object?, (object, IEnumerable<string>)> factory)
     {
         objectFactories[typeof(T)] = (ctx, o) => factory(ctx, o is T q ? q : null);
     }
 
-    public T CreateFromHttpContextWithBodyAndRouteParameters<TContract, T>(HttpContext ctx, TContract body)
+    public (T? obj, IEnumerable<string> validationErrors) CreateFromHttpContextWithBodyAndRouteParameters<TContract, T>(HttpContext ctx, TContract body)
     {
         var func = objectFactories[typeof(TContract)];
-        return (T)func(ctx, body);
+        var result = func(ctx, body);
+        if (result.Item1 != null)
+            return ((T?)result.Item1, []);
+        return (default(T), result.Item2);
     }
 
-    public T CreateFromHttpContextWithRouteParameters<TContract, T>(HttpContext ctx)
+    public (T obj, IEnumerable<string> validationErrors) CreateFromHttpContextWithRouteParameters<TContract, T>(HttpContext ctx)
     {
         var func = objectFactories[typeof(TContract)];
-        return (T)func(ctx, null);
+        var result = func(ctx, null);
+        return ((T)result.Item1, result.Item2);
     }
 }

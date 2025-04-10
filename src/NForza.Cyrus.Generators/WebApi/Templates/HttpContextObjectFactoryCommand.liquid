@@ -9,6 +9,11 @@
               cmdContract.{{ prop.Name }} = ({{prop.Type}}){{ prop.Name}}Value;
             }
             {% endfor %}
-            return cmdContract.As{{ cmd.Name }}();
+            var errors = cmdContract.ValidationErrors;
+            if (errors.Any())
+            {
+                return (null, errors);
+            }
+            return (cmdContract.As{{ cmd.Name }}(), []);
         }));
     {% endfor %}
