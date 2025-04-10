@@ -21,19 +21,18 @@ public partial record struct {{ Name }}(int Value): ITypedId, IComparable, IComp
 
     public static implicit operator {{ UnderlyingType }}({{ Name }} typedId) => typedId.Value;
     public static explicit operator {{ Name }}({{ UnderlyingType }} value) => new(value);
-    public bool IsValid => 
-        {% if HasMaximumOrMinumum == false %}
+    public bool IsValid => {% if HasMaximumOrMinumum == false -%}
             true
-        {% else %}
-            {% if HasMinimum %}
+        {%- else -%}
+            {% if HasMinimum -%}
                 Value >= {{ Minimum }}
-            {% endif %}
-            {% if HasMaximumAndMinumum %}
+            {%- endif -%}
+            {% if HasMaximumAndMinumum -%}
                 && 
-            {% endif %}
-            {% if HasMaximum %}
+            {%- endif %}
+            {%- if HasMaximum -%}
             Value < {{ Maximum }}
-            {% endif %}
+            {%- endif -%}
         {% endif %};
     public override string ToString() => Value.ToString();
 }

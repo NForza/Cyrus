@@ -18,9 +18,9 @@ public class CustomerTests
 
     public CustomerTests(ITestOutputHelper testOutput)
     {
-       (client, services) = new DemoAppTestClient(testOutput)
-            .CreateClientAndServiceProvider();
-        eventBus = (RecordingLocalEventBus) services.GetRequiredService<IEventBus>();
+        (client, services) = new DemoAppTestClient(testOutput)
+             .CreateClientAndServiceProvider();
+        eventBus = (RecordingLocalEventBus)services.GetRequiredService<IEventBus>();
     }
 
     [Theory]
@@ -53,11 +53,21 @@ public class CustomerTests
         response.Headers.Location!.ToString().Should().StartWith("/customers/");
     }
 
-    [Theory(Skip = "Waiting for bug fix")]
+    [Theory]
     [InlineData("/customers")]
     public async Task Posting_Add_Customer_Command_Without_A_Name_Should_Return_Bad_Request(string url)
     {
-        var command = new { Name = (string?)null, Address = "The Netherlands" };
+        var command = new AddCustomerCommand
+        {
+            Id = new CustomerId(),
+            CustomerType = CustomerType.Private,
+            Name = new Name(""),
+            Address = new Address
+            {
+                Street = new Street("The Netherlands"),
+                StreetNumber = new(1)
+            }
+        };
         var response = await client.PostAsJsonAsync(url, command);
         response.Should().NotBeNull();
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -65,11 +75,11 @@ public class CustomerTests
         content.Should().Contain("Name can't be empty");
     }
 
-    [Theory(Skip ="Waiting for bug fix")]
+    [Theory]
     [InlineData("/customers")]
-    public async Task Posting_Add_Customer_Command_Without_Number_Should_Return_Bad_Request(string url)
+    public async Task Posting_Add_Customer_Command_With_Number_Zero_Should_Return_Bad_Request(string url)
     {
-        var command = new { Name = (string?)null, Address = new { Street = "The Netherlands", StreetNumber = 0 } };
+        var command = new AddCustomerCommand { Id = new CustomerId(), CustomerType = CustomerType.Private, Name = new Name("Test"), Address = new Address { Street = new Street("The Netherlands"), StreetNumber = new(0) } };
         var response = await client.PostAsJsonAsync(url, command);
         response.Should().NotBeNull();
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);

@@ -10,6 +10,11 @@
               queryContract.{{ prop.Name }} = ({{prop.Type}}){{ prop.Name}}Value;
             }
             {% endfor %}
-            return queryContract.As{{ query.Name }}();
+            var errors = queryContract.ValidationErrors;
+            if (errors.Any())
+            {
+                return (null, errors);
+            }
+            return (queryContract.As{{ query.Name }}(), []);
         }));
     {% endfor %}

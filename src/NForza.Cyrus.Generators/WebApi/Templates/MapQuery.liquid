@@ -2,7 +2,9 @@
     {
         using var scope = app.Services.CreateScope();
         var services = scope.ServiceProvider;
-        {{ Query }} query = objectFactory.CreateFromHttpContextWithRouteParameters<{{ Query | as-contract }}, {{ Query }}>(ctx.HttpContext);
+        ({{ Query }} query, IEnumerable<string> validationErrors) = objectFactory.CreateFromHttpContextWithRouteParameters<{{ Query | as-contract }}, {{ Query }}>(ctx.HttpContext);
+        if (validationErrors.Any())
+            return Results.BadRequest(validationErrors);
         if (!ObjectValidation.Validate<{{ Query }}>(query, services, out var problem))
             return Results.BadRequest(problem);
         var queryResult = {% if ReturnsTask %}await {% endif %}{{ QueryInvocation }};
