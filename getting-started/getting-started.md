@@ -6,9 +6,9 @@ This small demo shows the core focus of Cyrus: to be able to quickly create WebA
 
 ## Create your first Cyrus application
 
-* Create a ASP.NET Core WebApi using .NET 8
+* Create a ASP.NET Core WebApi using .NET 9
 
-* Remove the (outdated) `Swashbuckle.AspNetCore` Nuget package
+* Remove the (outdated) `Swashbuckle.AspNetCore` Nuget package. Cyrus uses `Scalar` to visualise the OpenApi specification.
 
 * Add the `NForza.Cyrus` Nuget package
 
