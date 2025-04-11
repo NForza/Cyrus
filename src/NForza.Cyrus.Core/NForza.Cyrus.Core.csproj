@@ -9,7 +9,7 @@
     <IsPackable>true</IsPackable>
     <PackageId>NForza.Cyrus.Core</PackageId>
     <PackageVersion>1.0.0</PackageVersion>
-    <Description>Opiniated source generation framework for CQRS apps</Description>
+    <Description>Opiniated source generation framework for CQRS webapps</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/NForza.Cyrus</PackageProjectUrl>
     <RepositoryUrl>https://github.com/NForza.Cyrus</RepositoryUrl>

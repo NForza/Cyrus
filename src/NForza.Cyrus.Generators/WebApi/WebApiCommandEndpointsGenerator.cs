@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Fluid.Ast;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
@@ -105,8 +106,23 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
                 returnType.ContainingNamespace.ToDisplayString() == "Microsoft.AspNetCore.Http")
             return "FromIResult";   
 
-        if (returnType.IsTupleType)
+        if (returnType.IsTupleType && returnType is INamedTypeSymbol namedTypeSymbol)
         {
+            if (namedTypeSymbol.TupleElements.Length == 2)
+            {
+                var firstElement = namedTypeSymbol.TupleElements[0];
+                if (firstElement.Type.Name == "IResult" &&
+                    firstElement.Type.ContainingNamespace.ToDisplayString() == "Microsoft.AspNetCore.Http")
+                {
+                    var secondElement = namedTypeSymbol.TupleElements[1];
+                    if (secondElement.Type.Name == "Object")
+                    {
+                      return "FromIResultAndEvent";
+                    }
+                    return "FromIResultAndEvents";
+                }
+            }
+
             return "FromIResultAndEvents";
         }
         return "FromObjects";

@@ -5,7 +5,7 @@
     <LangVersion>12</LangVersion>
     <Configurations>Debug;Release;DebugGenerator</Configurations>
     <IsPackable>true</IsPackable>
-    <Title>Strongly Typed IDs using source generators from NForza.Cyrus</Title>
+    <Title>Opiniated source generation framework for CQRS webapps</Title>
     <PackageId>NForza.Cyrus.Abstractions</PackageId>
     <Company>NForza</Company>
     <Authors>NForza</Authors>

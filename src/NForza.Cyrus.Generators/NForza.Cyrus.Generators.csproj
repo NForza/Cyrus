@@ -10,7 +10,7 @@
     <Authors>NForza</Authors>
     <PackageId>NForza.Cyrus.Generators</PackageId>
     <Version>1.0.0</Version>
-    <Description>Opiniated source generation framework for CQRS apps</Description>
+    <Description>Opiniated source generation framework for CQRS webapps</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/NForza.Cyrus</PackageProjectUrl>
     <RepositoryUrl>https://github.com/NForza.Cyrus</RepositoryUrl>
