@@ -16,5 +16,4 @@
     {%- for attr in Attributes %}
         {{ attr }}{% unless forloop.last %},{% endunless %}
     {% endfor %}])
-    {% endif -%}
-    .WithSwaggerParameters("{{Path}}");
+    {% endif -%};
