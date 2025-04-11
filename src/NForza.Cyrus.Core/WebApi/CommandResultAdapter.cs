@@ -37,4 +37,10 @@ public class CommandResultAdapter(IEventBus eventBus)
         eventBus.Publish(result.Events);
         return result.Result;
     }
+
+    public IResult FromIResultAndEvent((IResult Result, object Event) result)
+    {
+        eventBus.Publish([result.Event]);
+        return result.Result;
+    }
 }
