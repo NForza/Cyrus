@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Configurations>Debug;Release;DebugGenerator</Configurations>
@@ -12,7 +12,7 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
     <ProjectReference Include="..\..\..\src\NForza.Cyrus.MassTransit\NForza.Cyrus.MassTransit.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
     <ProjectReference Include="..\..\..\src\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\src\NForza.Cyrus.Generators\NForza.Cyrus.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <InternalsVisibleTo Include="DemoApp.WebApi.Tests" />

@@ -6,7 +6,7 @@ public class {{ Name | as-contract }}
 	{% if prop.Internal == true %}internal{% else %}public{% endif %} {{ prop.Type }}{% if prop.IsNullable == false %}?{% endif %} {{ prop.Name }} { get; set; }
 {% endfor -%}
 
-	public IEnumerable<string> ValidationErrors
+	internal IEnumerable<string> ValidationErrors
 	{
 		get
 		{

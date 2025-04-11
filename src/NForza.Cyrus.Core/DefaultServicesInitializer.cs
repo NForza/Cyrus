@@ -5,7 +5,6 @@ using NForza.Cyrus;
 using Microsoft.Extensions.DependencyModel;
 using NForza.Cyrus.Abstractions.Model;
 using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.AspNetCore.Http.Json;
 
 public class DefaultCyrusServices : ICyrusInitializer
@@ -16,7 +15,6 @@ public class DefaultCyrusServices : ICyrusInitializer
         services.AddSingleton<IQueryProcessor, QueryProcessor>();
         services.AddHttpContextAccessor();
         services.AddSingleton<IHttpContextObjectFactory, HttpContextObjectFactory>();
-        services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
         services.AddTransient<IConfigureOptions<JsonOptions>, JsonOptionsConfigurator>();
 
         services.Scan(scan => scan
