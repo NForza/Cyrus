@@ -47,6 +47,7 @@ namespace NForza.Cyrus.Generators
         public ImmutableArray<INamedTypeSymbol> Commands { get; private set; }
         public ImmutableArray<IMethodSymbol> CommandHandlers { get; private set; }
         public ImmutableArray<ISymbol> AllCommandsAndHandlers { get; private set; }
+        public ImmutableArray<INamedTypeSymbol> AllCommands => AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToImmutableArray();
         public ImmutableArray<INamedTypeSymbol> Queries { get; private set; }
         public ImmutableArray<IMethodSymbol> QueryHandlers { get; private set; }
         public ImmutableArray<ISymbol> AllQueriesAndHandlers { get; private set; }
