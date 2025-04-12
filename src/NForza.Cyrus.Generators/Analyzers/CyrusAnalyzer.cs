@@ -34,18 +34,9 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
         context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.StructDeclaration);
     }
 
-    private void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext context)
+    private static void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext context)
     {
-        var structDeclaration = (StructDeclarationSyntax)context.Node;
-        if (structDeclaration.Kind() != SyntaxKind.RecordStructDeclaration)
-        {
-            var diagnostic = Diagnostic.Create(
-                DiagnosticDescriptors.MissingEventAttribute,
-                structDeclaration.GetLocation(),
-                structDeclaration.Identifier.Text);
-
-            context.ReportDiagnostic(diagnostic);
-        }
+        new TypedIdAnalyzer().AnalyzeSyntaxNode(context);
     }
 
     private void AnalyzeMethodSymbol(SymbolAnalysisContext context)

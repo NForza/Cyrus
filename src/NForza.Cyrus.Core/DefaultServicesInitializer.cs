@@ -17,6 +17,9 @@ public class DefaultCyrusServices : ICyrusInitializer
         services.AddSingleton<IHttpContextObjectFactory, HttpContextObjectFactory>();
         services.AddTransient<IConfigureOptions<JsonOptions>, JsonOptionsConfigurator>();
 
+        services.AddEndpointsApiExplorer();
+        services.AddOpenApi();
+
         services.Scan(scan => scan
             .FromDependencyContext(DependencyContext.Default!)
             .AddClasses(classes => classes.AssignableTo<ICyrusModel>())
