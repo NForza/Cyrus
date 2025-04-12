@@ -90,24 +90,6 @@ public class SignalRHubGenerator : CyrusGeneratorBase
         return source;
     }
 
-    private static string GenerateCommands(IEnumerable<SignalRCommand> signalRCommands)
-    {
-        var sb = new StringBuilder();
-        foreach (var command in signalRCommands)
-        {
-            sb.AppendLine(
-    @$"public async Task {command.MethodName}({command.FullTypeName} command) 
-    {{
-        var result = await commandDispatcher.Execute(command);
-        if (result.Succeeded)
-        {{
-            await SendEvents(result.Events);
-        }}
-    }}");
-        }
-        return sb.ToString();
-    }
-
     private static string GenerateQueries(IEnumerable<SignalRQuery> signalRQueries)
     {
         var sb = new StringBuilder();
