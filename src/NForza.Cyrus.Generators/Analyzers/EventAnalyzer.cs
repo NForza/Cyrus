@@ -48,7 +48,6 @@ internal class EventAnalyzer: CyrusAnalyzerBase
 
         if (!hasEventAttr)
         {
-
             var diagnostic = Diagnostic.Create(
                 DiagnosticDescriptors.MissingEventAttribute,
                 location,

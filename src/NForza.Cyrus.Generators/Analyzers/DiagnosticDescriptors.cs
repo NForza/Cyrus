@@ -101,4 +101,14 @@ public static class DiagnosticDescriptors
         isEnabledByDefault: true,
         description: "Project must reference NForza.Cyrus.MassTransit."
     );
+
+    public static readonly DiagnosticDescriptor TypedIdMustBeARecordStruct = new DiagnosticDescriptor(
+        id: "CYRUS008",
+        title: "TypedIds",
+        messageFormat: "TypedId {0} must be a record struct",
+        category: "Cyrus",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "TypedIds must be record structs."
+    );
 }
