@@ -95,14 +95,9 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
             catch (Exception ex)
             {
                 spc.ReportDiagnostic(Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "CY0001",
-                        "Cyrus Generator Error",
-                        $"{ex.Message}\n{ex.StackTrace}",
-                        "CyrusGenerator",
-                        DiagnosticSeverity.Error,
-                        isEnabledByDefault: true),
-                        Location.None));
+                       DiagnosticDescriptors.InternalCyrusError,
+                       Location.None,
+                       ex.Message + ": " + ex.StackTrace.Replace("\r", "").Replace("\n", ",")));
                 throw;
             }
         });

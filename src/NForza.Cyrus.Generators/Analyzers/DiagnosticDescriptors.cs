@@ -2,6 +2,16 @@
 
 public static class DiagnosticDescriptors
 {
+    public static readonly DiagnosticDescriptor InternalCyrusError = new DiagnosticDescriptor(
+        id: "CYRUSERROR001",
+        title: "Internal Cyrus Error",
+        messageFormat: "Internal Cyrus Error: {0}",
+        category: "Cyrus",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "An internal error occured in the Cyrus Source Generator."
+    );
+
     public static readonly DiagnosticDescriptor MissingCommandAttribute = new DiagnosticDescriptor(
         id: "CYRUS001",
         title: "Missing [Command] attribute",
@@ -72,7 +82,7 @@ public static class DiagnosticDescriptors
         description: "Events passed to a method marked with [EventHandler] must be explicitly marked with the [Event] attribute."
     );
 
-    public static readonly DiagnosticDescriptor TooManyArgumentsForEventHandler = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor IncorrectNumberOfArgumentsForEventHandler = new DiagnosticDescriptor(
         id: "CYRUS005",
         title: "Too many arguments for EventHandler",
         messageFormat: "EventHandler '{0}' should have 1 argument",

@@ -33,16 +33,19 @@ namespace NForza.Cyrus.Generators.Commands
                             .Distinct(SymbolEqualityComparer.Default)
                             .Select(cht => $" services.AddTransient<{cht.ToFullName()}>();"));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
-                var ctx = new
+                if (!string.IsNullOrEmpty(commandHandlerRegistrations))
                 {
-                    Usings = new string[] { "NForza.Cyrus.Cqrs" },
-                    Namespace = "CommandHandlers",
-                    Name = "CommandHandlersRegistration",
-                    Initializer = commandHandlerRegistrations
-                };
+                    var ctx = new
+                    {
+                        Usings = new string[] { "NForza.Cyrus.Cqrs" },
+                        Namespace = "CommandHandlers",
+                        Name = "CommandHandlersRegistration",
+                        Initializer = commandHandlerRegistrations
+                    };
 
-                var fileContents = liquidEngine.Render(ctx, "CyrusInitializer");
-                spc.AddSource("CommandHandlerRegistration.g.cs", SourceText.From(fileContents, Encoding.UTF8));
+                    var fileContents = liquidEngine.Render(ctx, "CyrusInitializer");
+                    spc.AddSource("CommandHandlerRegistration.g.cs", SourceText.From(fileContents, Encoding.UTF8));
+                }
 
                 string assemblyName = commandHandlers.First().ContainingAssembly.Name;
                 var commandSymbols = commandHandlers.Select(ch => (INamedTypeSymbol)ch.Parameters[0].Type);

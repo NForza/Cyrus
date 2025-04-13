@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace NForza.Cyrus.Generators.Analyzers;
@@ -13,6 +11,7 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
 {
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         [
+            DiagnosticDescriptors.InternalCyrusError,
             DiagnosticDescriptors.MissingCommandAttribute,
             DiagnosticDescriptors.TooManyArgumentsForCommandHandler,
             DiagnosticDescriptors.CommandHandlerShouldHaveACommandParameter,
@@ -20,7 +19,7 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
             DiagnosticDescriptors.TooManyArgumentsForQueryHandler,
             DiagnosticDescriptors.QueryHandlerShouldHaveAQueryParameter,
             DiagnosticDescriptors.MissingEventAttribute,
-            DiagnosticDescriptors.TooManyArgumentsForEventHandler,
+            DiagnosticDescriptors.IncorrectNumberOfArgumentsForEventHandler,
             DiagnosticDescriptors.EventHandlerShouldHaveAEventParameter,
             DiagnosticDescriptors.ProjectShouldReferenceCyrusMassTransit,
             DiagnosticDescriptors.TypedIdMustBeARecordStruct
@@ -45,9 +44,21 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
         Debugger.Launch();
 #endif
         var methodSymbol = (IMethodSymbol)context.Symbol;
-        new CommandAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
-        new QueryAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
-        new EventAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
-        new MassTransitAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
+        try
+        {
+            new CommandAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
+            new QueryAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
+            new EventAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
+            new MassTransitAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
+        }
+        catch (Exception ex)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DiagnosticDescriptors.InternalCyrusError,
+                Location.None,
+                ex.Message + ": " + ex.StackTrace.Replace("\r", "").Replace("\n", ",")
+                ));
+            throw;
+        }
     }
 }
