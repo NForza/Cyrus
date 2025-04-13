@@ -56,7 +56,7 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(Diagnostic.Create(
                 DiagnosticDescriptors.InternalCyrusError,
                 Location.None,
-                ex.Message
+                ex.Message + ": " + ex.StackTrace
                 ));
             throw;
         }
