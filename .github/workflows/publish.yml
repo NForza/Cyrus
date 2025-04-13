@@ -21,12 +21,13 @@ jobs:
       
     - name: Calculate package version
       run: |
-        TIMESTAMP=$(date +%Y%m%d%H%M%S)
+        TIMESTAMP=$(date +%Y%m%d-%H%M%S)
         if [ "${GITHUB_REF_NAME}" = "main" ]; then
           echo "PACKAGE_VERSION=${BASE_VERSION}.${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
         else
           echo "PACKAGE_VERSION=${BASE_VERSION}.${GITHUB_RUN_NUMBER}-beta-${TIMESTAMP}" >> $GITHUB_ENV
         fi
+
     - name: Show package version
       run: |
         echo "Version: ${{ env.PACKAGE_VERSION }}"
