@@ -97,7 +97,7 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
                 spc.ReportDiagnostic(Diagnostic.Create(
                        DiagnosticDescriptors.InternalCyrusError,
                        Location.None,
-                       ex.Message + ": " + ex.StackTrace));
+                       ex.Message + ": " + ex.StackTrace.Replace("\r", "").Replace("\n", ","));
                 throw;
             }
         });
