@@ -45,9 +45,24 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
         Debugger.Launch();
 #endif
         var methodSymbol = (IMethodSymbol)context.Symbol;
-        new CommandAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
-        new QueryAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
-        new EventAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
-        new MassTransitAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
+        try
+        {
+            new CommandAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
+            new QueryAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
+            new EventAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
+            new MassTransitAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
+        }
+        catch (Exception ex)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                new DiagnosticDescriptor(
+                    "CY0002",
+                    "Cyrus Analyzer Error",
+                    $"{ex.Message}\n{ex.StackTrace}",
+                    "CyrusAnalyzer",
+                    DiagnosticSeverity.Error,
+                    isEnabledByDefault: true),
+                    Location.None));
+        }
     }
 }
