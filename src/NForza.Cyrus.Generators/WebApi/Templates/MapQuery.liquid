@@ -10,6 +10,7 @@
         var queryResult = {% if ReturnsTask %}await {% endif %}{{ QueryInvocation }};
         return QueryResultAdapter.FromObject(queryResult);
     })
+    .WithOpenApi()
     {%- if Attributes.size > 0 -%}
     .WithMetadata([
     {%- for attr in Attributes %}

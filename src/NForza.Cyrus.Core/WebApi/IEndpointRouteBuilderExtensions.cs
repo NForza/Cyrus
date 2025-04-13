@@ -34,6 +34,7 @@ public static class IEndpointRouteBuilderExtensions
                 return Results.Content(json, "application/json");
             })
             .ExcludeFromDescription();
+        endpoints.MapGet("/swagger", () => Results.Redirect("/scalar/v1", permanent: true)).ExcludeFromDescription();
         endpoints.MapGet("/swagger/index.html", () => Results.Redirect("/scalar/v1", permanent: true)).ExcludeFromDescription();
 
         return endpoints;
