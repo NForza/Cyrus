@@ -19,7 +19,7 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
             DiagnosticDescriptors.TooManyArgumentsForQueryHandler,
             DiagnosticDescriptors.QueryHandlerShouldHaveAQueryParameter,
             DiagnosticDescriptors.MissingEventAttribute,
-            DiagnosticDescriptors.TooManyArgumentsForEventHandler,
+            DiagnosticDescriptors.IncorrectNumberOfArgumentsForEventHandler,
             DiagnosticDescriptors.EventHandlerShouldHaveAEventParameter,
             DiagnosticDescriptors.ProjectShouldReferenceCyrusMassTransit,
             DiagnosticDescriptors.TypedIdMustBeARecordStruct

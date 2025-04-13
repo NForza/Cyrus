@@ -20,7 +20,7 @@ internal class EventAnalyzer : CyrusAnalyzerBase
         {
             location = methodSymbol.Locations.FirstOrDefault() ?? Location.None;
             var diagnostic = Diagnostic.Create(
-                DiagnosticDescriptors.TooManyArgumentsForEventHandler,
+                DiagnosticDescriptors.IncorrectNumberOfArgumentsForEventHandler,
                 location,
                 methodSymbol.ToDisplayString());
             context.ReportDiagnostic(diagnostic);
@@ -32,7 +32,7 @@ internal class EventAnalyzer : CyrusAnalyzerBase
         if (methodSymbol.Parameters.Length > 1)
         {
             var diagnostic = Diagnostic.Create(
-                DiagnosticDescriptors.TooManyArgumentsForEventHandler,
+                DiagnosticDescriptors.IncorrectNumberOfArgumentsForEventHandler,
                 location,
                 methodSymbol.ToDisplayString());
             context.ReportDiagnostic(diagnostic);
