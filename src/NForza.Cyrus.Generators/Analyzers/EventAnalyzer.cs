@@ -5,7 +5,7 @@ using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Generators.Analyzers;
 
-internal class EventAnalyzer: CyrusAnalyzerBase
+internal class EventAnalyzer : CyrusAnalyzerBase
 {
     public override void AnalyzeMethodSymbol(SymbolAnalysisContext context, IMethodSymbol methodSymbol)
     {
@@ -14,13 +14,11 @@ internal class EventAnalyzer: CyrusAnalyzerBase
         if (!isEventHandler)
             return;
 
-        var location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax()?.GetLocation()
-                       ?? Location.None;
+        var location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax()?.GetLocation() ?? Location.None;
 
         if (methodSymbol.Parameters.Length == 0)
         {
-            location = methodSymbol.Parameters[0].Locations.FirstOrDefault()
-                       ?? Location.None;
+            location = methodSymbol.Locations.FirstOrDefault() ?? Location.None;
             var diagnostic = Diagnostic.Create(
                 DiagnosticDescriptors.TooManyArgumentsForEventHandler,
                 location,

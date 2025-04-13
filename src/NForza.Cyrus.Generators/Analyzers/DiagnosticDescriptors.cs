@@ -82,7 +82,7 @@ public static class DiagnosticDescriptors
         description: "Events passed to a method marked with [EventHandler] must be explicitly marked with the [Event] attribute."
     );
 
-    public static readonly DiagnosticDescriptor TooManyArgumentsForEventHandler = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor IncorrectNumberOfArgumentsForEventHandler = new DiagnosticDescriptor(
         id: "CYRUS005",
         title: "Too many arguments for EventHandler",
         messageFormat: "EventHandler '{0}' should have 1 argument",
