@@ -26,7 +26,7 @@ jobs:
           echo "PACKAGE_VERSION=${BASE_VERSION}.${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
         else
           echo "PACKAGE_VERSION=${BASE_VERSION}.${GITHUB_RUN_NUMBER}-beta-${TIMESTAMP}" >> $GITHUB_ENV
-      
+        fi
     - name: Show package version
       run: |
         echo "Version: ${{ env.PACKAGE_VERSION }}"
