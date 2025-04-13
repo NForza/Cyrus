@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace NForza.Cyrus.Generators.Analyzers;
@@ -13,6 +11,7 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
 {
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         [
+            DiagnosticDescriptors.InternalCyrusError,
             DiagnosticDescriptors.MissingCommandAttribute,
             DiagnosticDescriptors.TooManyArgumentsForCommandHandler,
             DiagnosticDescriptors.CommandHandlerShouldHaveACommandParameter,
@@ -55,14 +54,11 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
         catch (Exception ex)
         {
             context.ReportDiagnostic(Diagnostic.Create(
-                new DiagnosticDescriptor(
-                    "CY0002",
-                    "Cyrus Analyzer Error",
-                    $"{ex.Message}\n{ex.StackTrace}",
-                    "CyrusAnalyzer",
-                    DiagnosticSeverity.Error,
-                    isEnabledByDefault: true),
-                    Location.None));
+                DiagnosticDescriptors.InternalCyrusError,
+                Location.None,
+                ex.Message
+                ));
+            throw;
         }
     }
 }

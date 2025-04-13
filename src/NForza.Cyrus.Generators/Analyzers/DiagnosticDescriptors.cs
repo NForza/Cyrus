@@ -2,6 +2,16 @@
 
 public static class DiagnosticDescriptors
 {
+    public static readonly DiagnosticDescriptor InternalCyrusError = new DiagnosticDescriptor(
+        id: "CYRUSERROR001",
+        title: "Internal Cyrus Error",
+        messageFormat: "Internal Cyrus Error: {0}",
+        category: "Cyrus",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "An internal error occured in the Cyrus Source Generator."
+    );
+
     public static readonly DiagnosticDescriptor MissingCommandAttribute = new DiagnosticDescriptor(
         id: "CYRUS001",
         title: "Missing [Command] attribute",
