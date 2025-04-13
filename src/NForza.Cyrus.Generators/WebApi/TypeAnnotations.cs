@@ -7,7 +7,6 @@ namespace NForza.Cyrus.Generators.WebApi
 {
     internal static class TypeAnnotations
     {
-
         public static string AugmentRouteWithTypeAnnotations(string path, ITypeSymbol typeSymbol)
         {
             return Regex.Replace(path, @"\{(?<param>\w+)\}", match =>

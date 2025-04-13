@@ -18,7 +18,7 @@ public class DefaultCyrusServices : ICyrusInitializer
         services.AddTransient<IConfigureOptions<JsonOptions>, JsonOptionsConfigurator>();
 
         services.AddEndpointsApiExplorer();
-        services.AddOpenApi();
+        services.AddOpenApi(options => options.AddSchemaTransformer<CyrusOpenApiSchemaTransformer>());
 
         services.Scan(scan => scan
             .FromDependencyContext(DependencyContext.Default!)
