@@ -11,19 +11,19 @@ public class AddCustomerCommandValidator
     {
         if (command.Id == CustomerId.Empty)
         {
-            yield return "Id cannot be empty.";
+            yield return "Id can't be empty.";
         }
         if (command.Name.IsEmpty())
         {
-            yield return "Name cannot be empty.";
+            yield return "Name can't be empty.";
         }
         if (command.Address.Street.IsEmpty())
         {
-            yield return "Street cannot be empty.";
+            yield return "Street can't be empty.";
         }
         if (!command.Address.StreetNumber.IsValid())
         {
-            yield return "StreetNumber is invalid.";
+            yield return "Street number must be greater than 0.";
         }
     }
 }

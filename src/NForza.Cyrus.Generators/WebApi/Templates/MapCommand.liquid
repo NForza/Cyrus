@@ -6,8 +6,8 @@
             .CreateFromHttpContextWithBodyAndRouteParameters<{{ CommandType | as-contract }}, {{ CommandType }}>(ctx.HttpContext, command);
         if (validationErrors.Any())
             return Results.BadRequest(validationErrors);
-        {% if ValidatorMethod != nil %}
-        {% if ValidatorMethodIsStatic %}
+        {%- if ValidatorMethod != nil %}
+        {%- if ValidatorMethodIsStatic %}
         validationErrors = {{ ValidatorClass }}.{{ ValidatorMethodName }}(cmd);
         {% else %}
         var validator = services.GetRequiredService<{{ ValidatorClass }}>();
@@ -15,7 +15,7 @@
         {% endif %}
         if (validationErrors.Any())
         {
-            Results.BadRequest(validationErrors);
+            return Results.BadRequest(validationErrors);
         }
         {% endif %}
 
