@@ -121,4 +121,24 @@ public static class DiagnosticDescriptors
         isEnabledByDefault: true,
         description: "TypedIds must be record structs."
     );
+
+    public static readonly DiagnosticDescriptor IncorrectNumberOfArgumentsForValidator = new DiagnosticDescriptor(
+        id: "CYRUS009",
+        title: "Too many arguments for Validator",
+        messageFormat: "Validator '{0}' should have 1 argument",
+        category: "Cyrus",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Validators must have 1 parameter which is a Command or Query object."
+    );
+
+    public static readonly DiagnosticDescriptor ValidatorsShouldReturnIEnumerableOfString = new DiagnosticDescriptor(
+        id: "CYRUS009",
+        title: "Incorrect return type for Validator",
+        messageFormat: "Validator '{0}' should return IEnumerable<string>",
+        category: "Cyrus",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Validators should return IEnumerable<string>."
+    );
 }
