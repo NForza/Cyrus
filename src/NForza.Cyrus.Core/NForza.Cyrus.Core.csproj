@@ -22,7 +22,6 @@
     <PackageReference Include="Scalar.AspNetCore" Version="2.1.11" />
     <PackageReference Include="Scrutor" Version="6.0.1" />
     <ProjectReference Include="..\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj" />
-    <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
   </ItemGroup>
 

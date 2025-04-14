@@ -33,6 +33,7 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
         var signalRHubProvider = new SignalRHubProvider().GetProvider(context, configProvider);
         var allCommandsAndHandlersProvider = new AllCommandsAndHandlersProvider().GetProvider(context, configProvider);
         var allQueriesAndHandlersProvider = new AllQueryAndHandlersProvider().GetProvider(context, configProvider);
+        var validatorProvider = new ValidatorProvider().GetProvider(context, configProvider);
 
         var cyrusProvider =
             context.CompilationProvider

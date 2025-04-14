@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using Fluid.Ast;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
@@ -20,8 +17,9 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
         {
             IEnumerable<IMethodSymbol> handlers = cyrusProvider.AllCommandsAndHandlers.OfType<IMethodSymbol>().ToList();
             IEnumerable<INamedTypeSymbol> commands = cyrusProvider.AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToList();
+            IEnumerable<IMethodSymbol> validators = cyrusProvider.Validators;
 
-            var contents = AddCommandHandlerMappings(spc, handlers, cyrusProvider.Compilation, liquidEngine);
+            var contents = AddCommandHandlerMappings(spc, handlers, validators, cyrusProvider.Compilation, liquidEngine);
 
             if (!string.IsNullOrWhiteSpace(contents))
             {
@@ -66,12 +64,12 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
         sourceProductionContext.AddSource($"HttpContextObjectFactoryCommands.g.cs", SourceText.From(source, Encoding.UTF8));
     }
 
-
-    private string AddCommandHandlerMappings(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers, Compilation compilation, LiquidEngine liquidEngine)
+    private string AddCommandHandlerMappings(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers, IEnumerable<IMethodSymbol> validators, Compilation compilation, LiquidEngine liquidEngine)
     {
         StringBuilder sb = new StringBuilder();
         foreach (var handler in handlers)
         {
+            var validator = validators.FirstOrDefault(v => v.Parameters.Length == 1 && v.Parameters[0].Type.Equals(handler.Parameters[0].Type, SymbolEqualityComparer.Default));
             var command = new
             {
                 Path = TypeAnnotations.AugmentRouteWithTypeAnnotations(handler.GetCommandRoute(), handler.Parameters[0].Type),
@@ -81,6 +79,10 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
                 CommandName = handler.Parameters[0].Type.Name,
                 AdapterMethod = GetAdapterMethodName(handler),
                 ReturnsTask = handler.ReturnsTask(),
+                ValidatorMethod = validator,
+                ValidatorMethodIsStatic = validator.IsStatic,
+                ValidatorMethodName = validator?.Name,
+                ValidatorClass = validator?.ContainingType?.ToFullName(),
                 HasReturnType = handler.ReturnType.SpecialType != SpecialType.System_Void && !(handler.ReturnsTask() && handler.TypeArguments.Any()),
                 CommandInvocation = handler.GetCommandInvocation(variableName: "cmd"),
                 Attributes = handler.GetAttributes().Select( a => a.ToNewInstanceString()).Where(a => a != null)

@@ -15,6 +15,6 @@ public partial record struct {{ Name }}(string Value): IStringId
     public bool IsEmpty() => string.IsNullOrEmpty(Value);
     public static implicit operator {{ UnderlyingType}}({{ Name }} typedId) => typedId.Value;
     public static explicit operator {{ Name }}({{ UnderlyingType }} value) => new(value);
-    public bool IsValid => !string.IsNullOrEmpty(Value){% if HasMinimum %} && Value.Length >= {{ Minimum }}{% endif %}{% if HasMaximum %} && Value.Length <= {{ Maximum }}{% endif %};
+    public bool IsValid() => !string.IsNullOrEmpty(Value){% if HasMinimum %} && Value.Length >= {{ Minimum }}{% endif %}{% if HasMaximum %} && Value.Length <= {{ Maximum }}{% endif %};
     public override string ToString() => Value?.ToString();
 }

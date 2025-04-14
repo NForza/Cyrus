@@ -17,7 +17,8 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
         var config = cyrusProvider.GenerationConfig;
         if (config != null && config.GenerationTarget.Contains(GenerationTarget.WebApi))
         {
-            var contents = AddQueryHandlerMappings(spc, cyrusProvider.AllQueriesAndHandlers.OfType<IMethodSymbol>());
+            IEnumerable<IMethodSymbol> validators = cyrusProvider.Validators;
+            var contents = AddQueryHandlerMappings(spc, cyrusProvider.AllQueriesAndHandlers.OfType<IMethodSymbol>(), validators);
 
             if (!string.IsNullOrWhiteSpace(contents))
             {
@@ -66,17 +67,22 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
         sourceProductionContext.AddSource($"HttpContextObjectFactoryQueries.g.cs", SourceText.From(source, Encoding.UTF8));
     }
 
-    private string AddQueryHandlerMappings(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers)
+    private string AddQueryHandlerMappings(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers, IEnumerable<IMethodSymbol> validators)
     {
         StringBuilder sb = new StringBuilder();
         foreach (var handler in handlers)
         {
+            IMethodSymbol validator = validators.FirstOrDefault(v => v.Parameters[0].Type.ToFullName() == handler.Parameters[0].Type.ToFullName());
             var query = new
             {
                 Path = TypeAnnotations.AugmentRouteWithTypeAnnotations(handler.GetQueryRoute(), handler.Parameters[0].Type),
                 Query = handler.Parameters[0].Type.ToFullName(),
                 ReturnsTask = handler.ReturnType.IsTaskType(),
                 QueryInvocation = handler.GetQueryInvocation(),
+                ValidatorMethod = validator,
+                ValidatorMethodIsStatic = validator.IsStatic,
+                ValidatorMethodName = validator?.Name,
+                ValidatorClass = validator?.ContainingType?.ToFullName(),
                 ReturnType = handler.ReturnsTask(out var taskResultType) ? taskResultType!.ToFullName() : handler.ReturnType.ToFullName(),
                 Attributes = handler.GetAttributes().Select(a => a.ToNewInstanceString()).Where(a => a != null)
             };

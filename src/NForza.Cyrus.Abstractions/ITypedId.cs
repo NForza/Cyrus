@@ -2,6 +2,6 @@
 {
     public interface ITypedId
     {
-        bool IsValid { get; }
+        bool IsValid();
     }
 }
