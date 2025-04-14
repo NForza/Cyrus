@@ -21,7 +21,7 @@ public partial record struct {{ Name }}(int Value): IIntId, IComparable, ICompar
 
     public static implicit operator {{ UnderlyingType }}({{ Name }} typedId) => typedId.Value;
     public static explicit operator {{ Name }}({{ UnderlyingType }} value) => new(value);
-    public bool IsValid => {% if HasMaximumOrMinumum == false -%}
+    public bool IsValid() => {% if HasMaximumOrMinumum == false -%}
             true
         {%- else -%}
             {% if HasMinimum -%}

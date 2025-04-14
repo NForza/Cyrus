@@ -1,4 +1,7 @@
 ﻿using System;
+#if DEBUG_ANALYZER
+using System.Diagnostics;
+#endif
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;

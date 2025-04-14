@@ -4,8 +4,27 @@ using Microsoft.CodeAnalysis;
 
 namespace NForza.Cyrus.Generators.Roslyn;
 
-internal static class MethodSymbolExtensions
+internal static class IMethodSymbolExtensions
 {
+    public static bool IsCommandHandler(this IMethodSymbol methodSymbol)
+    {
+        return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "CommandHandlerAttribute");
+    }
+
+    public static bool IsValidator(this IMethodSymbol methodSymbol)
+    {
+        return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "ValidatorAttribute");
+    }
+
+    public static bool IsEventHandler(this IMethodSymbol methodSymbol)
+    {
+        return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "EventHandlerAttribute");
+    }
+    public static bool IsQueryHandler(this IMethodSymbol methodSymbol)
+    {
+        return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "QueryHandlerAttribute");
+    }
+
     public static bool ReturnsTask(this IMethodSymbol methodSymbol)
         => ReturnsTask(methodSymbol, out _);
 

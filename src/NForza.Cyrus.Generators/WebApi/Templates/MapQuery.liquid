@@ -5,8 +5,18 @@
         ({{ Query }} query, IEnumerable<string> validationErrors) = objectFactory.CreateFromHttpContextWithRouteParameters<{{ Query | as-contract }}, {{ Query }}>(ctx.HttpContext);
         if (validationErrors.Any())
             return Results.BadRequest(validationErrors);
-        if (!ObjectValidation.Validate<{{ Query }}>(query, services, out var problem))
-            return Results.BadRequest(problem);
+        {% if ValidatorMethod != nil %}
+        {% if ValidatorMethodIsStatic %}
+        validationErrors = {{ ValidatorClass }}.{{ ValidatorMethodName }}(query);
+        {% else %}
+        var validator = services.GetRequiredService<{{ ValidatorClass }}>();
+        validationErrors = validator.{{ ValidatorMethodName }}(query);
+        {% endif %}
+        if (validationErrors.Any())
+        {
+            Results.BadRequest(validationErrors);
+        }
+        {% endif %}
         var queryResult = {% if ReturnsTask %}await {% endif %}{{ QueryInvocation }};
         return QueryResultAdapter.FromObject(queryResult);
     })
