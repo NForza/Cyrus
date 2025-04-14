@@ -80,7 +80,7 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
                 AdapterMethod = GetAdapterMethodName(handler),
                 ReturnsTask = handler.ReturnsTask(),
                 ValidatorMethod = validator,
-                ValidatorMethodIsStatic = validator.IsStatic,
+                ValidatorMethodIsStatic = validator?.IsStatic,
                 ValidatorMethodName = validator?.Name,
                 ValidatorClass = validator?.ContainingType?.ToFullName(),
                 HasReturnType = handler.ReturnType.SpecialType != SpecialType.System_Void && !(handler.ReturnsTask() && handler.TypeArguments.Any()),

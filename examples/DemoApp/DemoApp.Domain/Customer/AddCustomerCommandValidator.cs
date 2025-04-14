@@ -7,7 +7,7 @@ namespace DemoApp.Domain.Customer;
 public class AddCustomerCommandValidator 
 {
     [Validator]
-    public static IEnumerable<string> Validate(AddCustomerCommand command)
+    public IEnumerable<string> Validate(AddCustomerCommand command)
     {
         if (command.Id == CustomerId.Empty)
         {

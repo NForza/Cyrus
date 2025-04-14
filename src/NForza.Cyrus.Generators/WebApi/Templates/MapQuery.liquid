@@ -7,7 +7,7 @@
             return Results.BadRequest(validationErrors);
         {% if ValidatorMethod != nil %}
         {% if ValidatorMethodIsStatic %}
-        validationErrors = new {{ ValidatorClass }}().{{ ValidatorMethodName }}(cmd);
+        validationErrors = {{ ValidatorClass }}.{{ ValidatorMethodName }}(query);
         {% else %}
         var validator = services.GetRequiredService<{{ ValidatorClass }}>();
         validationErrors = validator.{{ ValidatorMethodName }}(query);

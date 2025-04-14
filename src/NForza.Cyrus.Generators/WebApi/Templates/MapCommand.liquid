@@ -8,10 +8,10 @@
             return Results.BadRequest(validationErrors);
         {% if ValidatorMethod != nil %}
         {% if ValidatorMethodIsStatic %}
-        validationErrors = new {{ ValidatorClass }}().{{ ValidatorMethodName }}(cmd);
+        validationErrors = {{ ValidatorClass }}.{{ ValidatorMethodName }}(cmd);
         {% else %}
         var validator = services.GetRequiredService<{{ ValidatorClass }}>();
-        validationErrors = validator.{{ ValidatorMethodName }}(query);
+        validationErrors = validator.{{ ValidatorMethodName }}(cmd);
         {% endif %}
         if (validationErrors.Any())
         {

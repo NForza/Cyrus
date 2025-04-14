@@ -80,7 +80,7 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
                 ReturnsTask = handler.ReturnType.IsTaskType(),
                 QueryInvocation = handler.GetQueryInvocation(),
                 ValidatorMethod = validator,
-                ValidatorMethodIsStatic = validator.IsStatic,
+                ValidatorMethodIsStatic = validator?.IsStatic,
                 ValidatorMethodName = validator?.Name,
                 ValidatorClass = validator?.ContainingType?.ToFullName(),
                 ReturnType = handler.ReturnsTask(out var taskResultType) ? taskResultType!.ToFullName() : handler.ReturnType.ToFullName(),

@@ -49,10 +49,11 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
             .Combine(eventHandlerProvider)
             .Combine(eventProvider)
             .Combine(signalRHubProvider)
+            .Combine(validatorProvider)
             .Combine(configProvider)
             .Select((combinedProviders, _) =>
             {
-                var (((((((((((((compilation, intIds), guidIds), stringIds), commands), commandHandlers), allCommandsAndHandlers), queries), queryHandlers), allQueriesAndHandlersProvider), eventHandlers), events), signalRHubs), generationConfig) = combinedProviders;
+                var ((((((((((((((compilation, intIds), guidIds), stringIds), commands), commandHandlers), allCommandsAndHandlers), queries), queryHandlers), allQueriesAndHandlers), eventHandlers), events), signalRHubs), validators), generationConfig) = combinedProviders;
                 return new CyrusGenerationContext(
                     compilation: compilation,
                     guidIds: guidIds,
@@ -65,8 +66,9 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
                     queryHandlers: queryHandlers,
                     events: events,
                     eventHandlers: eventHandlers,
-                    allQueriesAndHandlers: allQueriesAndHandlersProvider,
+                    allQueriesAndHandlers: allQueriesAndHandlers,
                     signalRHubs: signalRHubs,
+                    validators: validators,
                     generationConfig: generationConfig);
             });
 
@@ -92,6 +94,7 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
                 new BusRegistrationGenerator().GenerateSource(spc, source, LiquidEngine);
                 new WebApiCommandEndpointsGenerator().GenerateSource(spc, source, LiquidEngine);
                 new WebApiQueryEndpointsGenerator().GenerateSource(spc, source, LiquidEngine);
+                new ValidatorGenerator().GenerateSource(spc, source, LiquidEngine);
             }
             catch (Exception ex)
             {
