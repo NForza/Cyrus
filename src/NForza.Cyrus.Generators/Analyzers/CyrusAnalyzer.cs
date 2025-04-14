@@ -25,7 +25,9 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
             DiagnosticDescriptors.IncorrectNumberOfArgumentsForEventHandler,
             DiagnosticDescriptors.EventHandlerShouldHaveAEventParameter,
             DiagnosticDescriptors.ProjectShouldReferenceCyrusMassTransit,
-            DiagnosticDescriptors.TypedIdMustBeARecordStruct
+            DiagnosticDescriptors.TypedIdMustBeARecordStruct,
+            DiagnosticDescriptors.IncorrectNumberOfArgumentsForValidator,
+            DiagnosticDescriptors.ValidatorsShouldReturnIEnumerableOfString
         ];
 
     public override void Initialize(AnalysisContext context)
@@ -53,6 +55,7 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
             new QueryAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
             new EventAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
             new MassTransitAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
+            new ValidatorAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
         }
         catch (Exception ex)
         {
