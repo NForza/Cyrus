@@ -14,7 +14,7 @@ public class EventHandlerDictionaryGenerator : CyrusGeneratorBase
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
         var config = cyrusProvider.GenerationConfig;
-        if (config.GenerationTarget.Contains(GenerationTarget.WebApi))
+        if (config.GenerationTarget.Contains(GenerationTarget.WebApi) || config.GenerationTarget.Contains(GenerationTarget.Domain))
         {
             var contents = CreateEventHandlerRegistrations(cyrusProvider.EventHandlers, cyrusProvider.Compilation);
 
