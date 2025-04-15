@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Commands;
 using NForza.Cyrus.Generators.Cqrs;
 using NForza.Cyrus.Generators.Events;
+using NForza.Cyrus.Generators.Events.MassTransit;
 using NForza.Cyrus.Generators.Generators.Cqrs;
 using NForza.Cyrus.Generators.Generators.TypedIds;
 using NForza.Cyrus.Generators.Queries;
@@ -95,6 +96,7 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
                 new WebApiCommandEndpointsGenerator().GenerateSource(spc, source, LiquidEngine);
                 new WebApiQueryEndpointsGenerator().GenerateSource(spc, source, LiquidEngine);
                 new ValidatorGenerator().GenerateSource(spc, source, LiquidEngine);
+                new MassTransitConsumerGenerator().GenerateSource(spc, source, LiquidEngine);
             }
             catch (Exception ex)
             {
