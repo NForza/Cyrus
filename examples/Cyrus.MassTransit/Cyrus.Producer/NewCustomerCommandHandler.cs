@@ -1,12 +1,15 @@
 ﻿using Cyrus.Server;
+using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Cqrs;
 
 namespace Cyrus.Producer;
 
 public class NewCustomerCommandHandler
 {
-    public CommandResult Execute(NewCustomerCommand command)
+    [CommandHandler(Route = "/", Verb = HttpVerb.Post)]
+    [Tags("Customer")]
+    public (IResult result, object @event) Execute(NewCustomerCommand command)
     {
-        return new CommandResult(new CustomerCreatedEvent(command.Id));
+        return (Results.Accepted(),  new CustomerCreatedEvent(command.Id));
     }
 }

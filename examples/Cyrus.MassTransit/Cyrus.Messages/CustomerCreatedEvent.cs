@@ -2,9 +2,5 @@
 
 namespace Cyrus.Server;
 
-[GuidId]
-public partial record struct CustomerId;
-
-public record NewCustomerCommand(CustomerId Id);
-
+[Event]
 public record CustomerCreatedEvent(CustomerId Id);

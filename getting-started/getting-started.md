@@ -259,7 +259,7 @@ public class CustomersQueryHandler
 ## Next topics
 
 * [Adding metadata to endpoints](adding-metadata.md)
-* Adding validators for commands and queries
+* [Adding validators for commands and queries](adding-validators.md)
 * Using MassTransit in Cyrus to broadcast events
 * Splitting contracts and implementation
 * Generating TypeScript from a Cyrus model

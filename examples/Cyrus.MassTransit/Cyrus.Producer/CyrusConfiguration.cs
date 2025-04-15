@@ -9,6 +9,5 @@ public class CyrusConfiguration : CyrusConfig
         UseMassTransit();
         GenerateWebApi();
         GenerateDomain();
-        UseContractsFromAssembliesContaining("Messages");
     }
 }
