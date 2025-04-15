@@ -14,23 +14,23 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
         var config = cyrusProvider.GenerationConfig;
-        var queryHandlers = cyrusProvider.QueryHandlers;
-        if (queryHandlers.Any())
+        var eventHandlers = cyrusProvider.EventHandlers;
+        if (eventHandlers.Any())
         {
             if (config.EventBus == EventBusType.MassTransit)
             {
-                var sourceText = GenerateEventConsumers(queryHandlers);
+                var sourceText = GenerateEventConsumers(eventHandlers);
                 spc.AddSource($"EventConsumers.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }
         }
     }
 
-    private string GenerateEventConsumers(ImmutableArray<IMethodSymbol> handlers)
+    private string GenerateEventConsumers(ImmutableArray<IMethodSymbol> eventHandlers)
     {
         StringBuilder source = new();
         var model = new
         {
-            Consumers = handlers.Select(h => new { h.Parameters[0].Type.Name, FullName = h.Parameters[0].Type.ToFullName() })
+            Consumers = eventHandlers.Select(h => new { h.Parameters[0].Type.Name, FullName = h.Parameters[0].Type.ToFullName() })
         };
 
         var resolvedSource = LiquidEngine.Render(model, "EventConsumers");
