@@ -1,8 +1,7 @@
-using NForza.Cyrus.Abstractions;
-using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.WebApi;
 using MassTransit;
 using System.Reflection;
+using NForza.Cyrus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,22 +11,10 @@ builder.Services.AddMassTransit(cfg =>
     cfg.UsingRabbitMq();
 });
 
-builder.Services.AddCyrus(o => o
-    .AddEndpointGroups()
-    .AddTypedIdSerializers());
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddCyrus();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
 app.MapCyrus();
 
 app.Run();
