@@ -1,6 +1,6 @@
 ﻿using NForza.Cyrus.Abstractions;
 
-namespace Cyrus.Server;
+namespace Cyrus.Messages;
 
 [Command]
 public record NewCustomerCommand(CustomerId Id);

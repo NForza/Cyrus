@@ -18,6 +18,7 @@
     <PackageTags>source-generator;csharp</PackageTags>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <IsRoslynComponent>true</IsRoslynComponent>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGenerator|AnyCPU'">

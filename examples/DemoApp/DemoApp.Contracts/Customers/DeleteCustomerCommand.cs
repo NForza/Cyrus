@@ -3,4 +3,4 @@
 namespace DemoApp.Contracts.Customers;
 
 [Command]
-public partial record DeleteCustomerCommand(CustomerId? Id);
+public partial record DeleteCustomerCommand(CustomerId Id);
