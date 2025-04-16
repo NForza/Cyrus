@@ -1,4 +1,5 @@
 using System.Reflection;
+using DemoApp.Contracts;
 using DemoApp.Domain.Customer;
 using FluentValidation;
 using MassTransit;

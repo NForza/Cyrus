@@ -1,4 +1,4 @@
-﻿using Cyrus.Server;
+﻿using Cyrus.Messages;
 using NForza.Cyrus.Abstractions;
 
 namespace Cyrus.Consumer;

@@ -1,8 +1,13 @@
-﻿namespace {{ Namespace }};
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
+namespace {{ Namespace }};
+
+[JsonSerializable(typeof({{ Name | as-contract }}))]
 public class {{ Name | as-contract }}
 {
 {%- for prop in Properties %}
+	{% if prop.IsNullable == false %}[Required]{% endif %}
 	{% if prop.Internal == true %}internal{% else %}public{% endif %} {{ prop.Type }}{% if prop.IsNullable == false %}?{% endif %} {{ prop.Name }} { get; set; }
 {% endfor -%}
 
