@@ -25,8 +25,12 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
                 var ctx = new
                 {
                     Usings = new string[] {
-                            "Microsoft.AspNetCore.Mvc",
-                            "Microsoft.AspNetCore.Http"
+                        "System.Collections.Generic",
+                        "System.Linq",
+                        "Microsoft.AspNetCore.Builder",
+                        "Microsoft.AspNetCore.Mvc",
+                        "Microsoft.AspNetCore.Http",
+                        "Microsoft.Extensions.DependencyInjection",
                     },
                     Namespace = "WebApiQueries",
                     Name = "Query",
@@ -62,7 +66,12 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
         };
         var httpContextObjectFactoryInitialization = LiquidEngine.Render(model, "HttpContextObjectFactoryQuery");
 
-        var initModel = new { Namespace = "WebApi", Name = "HttpContextObjectFactoryQueryInitializer", Initializer = httpContextObjectFactoryInitialization };
+        var initModel = new { 
+            Namespace = "WebApi", 
+            Name = "HttpContextObjectFactoryQueryInitializer",
+            Usings = new string[] { "System.Linq" },
+            Initializer = httpContextObjectFactoryInitialization 
+        };
         var source = LiquidEngine.Render(initModel, "CyrusInitializer");
         sourceProductionContext.AddSource($"HttpContextObjectFactoryQueries.g.cs", SourceText.From(source, Encoding.UTF8));
     }

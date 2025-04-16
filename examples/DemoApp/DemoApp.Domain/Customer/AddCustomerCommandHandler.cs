@@ -1,4 +1,6 @@
-﻿using DemoApp.Contracts;
+﻿using System;
+using System.Collections.Generic;
+using DemoApp.Contracts;
 using DemoApp.Contracts.Customers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

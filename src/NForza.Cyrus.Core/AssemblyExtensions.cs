@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Linq;
+using System.Reflection;
 
 namespace NForza.Cyrus;
 
@@ -10,7 +11,7 @@ public static class AssemblyExtensions
         "mscorlib", 
         "netstandard", 
         "WindowsBase", 
-        "Swashbuckle", 
+        "Scalar", 
         "RabbitMQ", 
         "MassTransit"
     ];

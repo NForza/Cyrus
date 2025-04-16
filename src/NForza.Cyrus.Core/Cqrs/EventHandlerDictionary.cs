@@ -1,4 +1,7 @@
-﻿namespace NForza.Cyrus.Cqrs;
+﻿using System;
+using System.Collections.Generic;
+
+namespace NForza.Cyrus.Cqrs;
 
 public class EventHandlerDictionary : MultiMap<Type, Action<IServiceProvider, object>>
 {

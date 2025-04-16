@@ -3,6 +3,9 @@ using DemoApp.Contracts;
 using DemoApp.Domain.Customer;
 using FluentValidation;
 using MassTransit;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NForza.Cyrus;
 using NForza.Cyrus.WebApi;
 

@@ -1,4 +1,5 @@
-﻿using DemoApp.Contracts;
+﻿using System.Collections.Generic;
+using DemoApp.Contracts;
 using DemoApp.Contracts.Customers;
 using NForza.Cyrus.Abstractions;
 

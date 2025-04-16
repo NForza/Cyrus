@@ -1,4 +1,5 @@
-﻿using DemoApp.Contracts.Customers;
+﻿using System;
+using DemoApp.Contracts.Customers;
 using NForza.Cyrus.Abstractions;
 
 namespace DemoApp.Domain.Customer;

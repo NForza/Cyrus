@@ -1,5 +1,8 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using System.Net.Http;
 using System.Net.Http.Json;
+using System.Threading.Tasks;
 using DemoApp.Contracts;
 using DemoApp.Contracts.Customers;
 using DemoApp.Domain.Customer;

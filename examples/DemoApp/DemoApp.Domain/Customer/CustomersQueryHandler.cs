@@ -1,4 +1,6 @@
-﻿using DemoApp.Contracts;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using DemoApp.Contracts;
 using DemoApp.Contracts.Customers;
 using Microsoft.AspNetCore.OutputCaching;
 using NForza.Cyrus.Abstractions;
