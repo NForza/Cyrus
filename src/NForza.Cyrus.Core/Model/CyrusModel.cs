@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using NForza.Cyrus.Abstractions.Model;
 
 namespace NForza.Cyrus.Model;

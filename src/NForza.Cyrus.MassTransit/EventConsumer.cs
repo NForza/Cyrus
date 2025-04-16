@@ -1,4 +1,5 @@
-﻿using MassTransit;
+﻿using System.Threading.Tasks;
+using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using NForza.Cyrus.Cqrs;
 

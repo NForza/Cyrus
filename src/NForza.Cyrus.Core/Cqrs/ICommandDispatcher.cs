@@ -1,4 +1,6 @@
-﻿namespace NForza.Cyrus.Cqrs;
+﻿using System;
+
+namespace NForza.Cyrus.Cqrs;
 
 public interface ICommandDispatcher
 {

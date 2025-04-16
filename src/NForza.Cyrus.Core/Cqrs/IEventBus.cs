@@ -1,4 +1,7 @@
-﻿namespace NForza.Cyrus.Cqrs;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace NForza.Cyrus.Cqrs;
 
 public interface IEventBus
 {

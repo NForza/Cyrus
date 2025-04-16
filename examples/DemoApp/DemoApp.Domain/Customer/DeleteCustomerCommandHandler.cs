@@ -1,4 +1,5 @@
-﻿using DemoApp.Contracts.Customers;
+﻿using System;
+using DemoApp.Contracts.Customers;
 using Microsoft.AspNetCore.Http;
 using NForza.Cyrus.Abstractions;
 

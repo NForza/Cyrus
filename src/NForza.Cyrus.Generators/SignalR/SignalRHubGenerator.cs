@@ -45,7 +45,8 @@ public class SignalRHubGenerator : CyrusGeneratorBase
             .Select(cm => cm.Symbol.ContainingNamespace)
             .Distinct(SymbolEqualityComparer.Default)
             .Select(u => u?.ToFullName())
-            .Where(u => !string.IsNullOrWhiteSpace(u));
+            .Where(u => !string.IsNullOrWhiteSpace(u))
+            .Concat(["Microsoft.Extensions.DependencyInjection"]);
 
         var hubs = signalRDefinitions
             .Select(s => new

@@ -9,7 +9,7 @@ using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.WebApi;
 public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
-{   
+{
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
         var config = cyrusProvider.GenerationConfig;
@@ -26,8 +26,11 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
                 var ctx = new
                 {
                     Usings = new string[] {
-                            "Microsoft.AspNetCore.Mvc",
-                            "Microsoft.AspNetCore.Http"
+                        "System.Linq",
+                        "Microsoft.AspNetCore.Builder",
+                        "Microsoft.AspNetCore.Mvc",
+                        "Microsoft.AspNetCore.Http",
+                        "Microsoft.Extensions.DependencyInjection"
                     },
                     Namespace = "WebApiCommands",
                     Name = "Command",
@@ -59,7 +62,11 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
         };
         var httpContextObjectFactoryInitialization = LiquidEngine.Render(model, "HttpContextObjectFactoryCommand");
 
-        var initModel = new { Namespace = "WebApi", Name = "HttpContextObjectFactoryCommandInitializer", Initializer = httpContextObjectFactoryInitialization };
+        var initModel = new { 
+            Namespace = "WebApi", 
+            Name = "HttpContextObjectFactoryCommandInitializer", 
+            Usings = new string[] { "System.Linq" },
+            Initializer = httpContextObjectFactoryInitialization };
         var source = liquidEngine.Render(initModel, "CyrusInitializer");
         sourceProductionContext.AddSource($"HttpContextObjectFactoryCommands.g.cs", SourceText.From(source, Encoding.UTF8));
     }
@@ -85,7 +92,7 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
                 ValidatorClass = validator?.ContainingType?.ToFullName(),
                 HasReturnType = handler.ReturnType.SpecialType != SpecialType.System_Void && !(handler.ReturnsTask() && handler.TypeArguments.Any()),
                 CommandInvocation = handler.GetCommandInvocation(variableName: "cmd"),
-                Attributes = handler.GetAttributes().Select( a => a.ToNewInstanceString()).Where(a => a != null)
+                Attributes = handler.GetAttributes().Select(a => a.ToNewInstanceString()).Where(a => a != null)
             };
             sb.AppendLine(liquidEngine.Render(command, "MapCommand"));
         }
@@ -106,7 +113,7 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
 
         if (returnType.Name == "IResult" &&
                 returnType.ContainingNamespace.ToDisplayString() == "Microsoft.AspNetCore.Http")
-            return "FromIResult";   
+            return "FromIResult";
 
         if (returnType.IsTupleType && returnType is INamedTypeSymbol namedTypeSymbol)
         {
@@ -119,7 +126,7 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
                     var secondElement = namedTypeSymbol.TupleElements[1];
                     if (secondElement.Type.Name == "Object")
                     {
-                      return "FromIResultAndEvent";
+                        return "FromIResultAndEvent";
                     }
                     return "FromIResultAndEvents";
                 }

@@ -35,7 +35,10 @@ public class TypedIdInitializerGenerator : CyrusGeneratorBase
     {
         var converters = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<JsonConverter, {t.Name}JsonConverter>();"));
 
-        var imports = typedIds.Select(t => t.ContainingNamespace.ToDisplayString()).Distinct();
+        var imports = typedIds
+            .Select(t => t.ContainingNamespace.ToDisplayString())
+            .Concat(["System", "System.Collections.Generic"])
+            .Distinct();
 
         var types = typedIds.Select(t => new { Name = t.ToFullName(), UnderlyingType = t.GetUnderlyingTypeOfTypedId() }).ToList();
         var registrations = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<{t.ToDisplayString()}>();"));
