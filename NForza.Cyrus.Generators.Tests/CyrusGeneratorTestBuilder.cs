@@ -11,7 +11,7 @@ namespace NForza.Cyrus.Generators.Tests
     {
         private string? source;
 
-        public (ImmutableArray<Diagnostic> compilerOutput, ImmutableArray<Diagnostic> analyzerOutput, string generatedSource) Run()
+        public async Task<(ImmutableArray<Diagnostic> compilerOutput, ImmutableArray<Diagnostic> analyzerOutput, string generatedSource)> RunAsync()
         {
             if (string.IsNullOrWhiteSpace(source))
             {
@@ -47,7 +47,7 @@ namespace NForza.Cyrus.Generators.Tests
             var compilationWithAnalyzers = outputCompilation.WithAnalyzers([new CyrusAnalyzer()]);
 
             var compileDiagnostics = outputCompilation.GetDiagnostics();
-            var analyzerDiagnostics = compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync().Result;
+            var analyzerDiagnostics = await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync();
 
             var generatedCode = outputCompilation.SyntaxTrees
                 .Skip(1)
