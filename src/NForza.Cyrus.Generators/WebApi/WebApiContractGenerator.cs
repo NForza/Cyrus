@@ -31,7 +31,7 @@ public static class WebApiContractGenerator
     {
         var routeProperties = RouteParameterDiscovery.FindAllParametersInRoute(route);
         var publicPropertiesOfCommand = command.GetPublicProperties().Select(p => p.Name).ToList();
-        return routeProperties.Select(p => p.Name).Where(p => publicPropertiesOfCommand.Contains(p)).ToList();
+        return routeProperties.Where(p => publicPropertiesOfCommand.Contains(p)).ToList();
     }
 
     public static void GenerateContract(INamedTypeSymbol contract, IEnumerable<string> propertiesFromRoute, SourceProductionContext sourceProductionContext, LiquidEngine liquidEngine)
@@ -41,14 +41,14 @@ public static class WebApiContractGenerator
             var constructorArguments = contract.GetConstructorArguments();
             var constructorArgumentNames = constructorArguments.Select(p => p.Name).ToList();
             var publicProperties = contract.GetPublicProperties().Select(p =>
-                                new
-                                {
-                                    p.Name,
-                                    Internal = propertiesFromRoute.Contains(p.Name),
-                                    Type = p.Type.ToFullName(),
-                                    IsNullable = p.Type.IsNullable()
-                                })
-                                .ToList();
+                new
+                {
+                    p.Name,
+                    Internal = propertiesFromRoute.Contains(p.Name),
+                    Type = p.Type.ToFullName(),
+                    IsNullable = p.Type.IsNullable()
+                })
+                .ToList();
             var model = new
             {
                 Namespace = contract.ContainingNamespace,

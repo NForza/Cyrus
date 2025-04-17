@@ -10,6 +10,7 @@ namespace NForza.Cyrus.Generators.Tests
     internal class CyrusGeneratorTestBuilder
     {
         private string? source;
+        private Action<string> logAction;
 
         public async Task<(ImmutableArray<Diagnostic> compilerOutput, ImmutableArray<Diagnostic> analyzerOutput, IEnumerable<SyntaxTree> generatedSource)> RunAsync()
         {
@@ -48,7 +49,19 @@ namespace NForza.Cyrus.Generators.Tests
                 .Skip(1)
                 .ToList();
 
+            generatedSyntaxTrees.ToList().ForEach(tree =>
+            {
+                var text = $"{tree.FilePath}{Environment.NewLine}----{Environment.NewLine}{tree}{Environment.NewLine}{Environment.NewLine}";
+                logAction?.Invoke(text);
+            });
+
             return (compileDiagnostics, analyzerDiagnostics, generatedSyntaxTrees);
+        }
+
+        internal CyrusGeneratorTestBuilder LogGeneratedSource(Action<string> value)
+        {
+            logAction = value;
+            return this;
         }
 
         internal CyrusGeneratorTestBuilder WithSource(string source)

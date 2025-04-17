@@ -110,10 +110,10 @@ internal static class IMethodSymbolExtensions
         return (INamedTypeSymbol)firstParam;
     }
 
-    public static bool HasCommandBody(this IMethodSymbol methodSymbol)
+    public static bool HasParametersInBody(this IMethodSymbol methodSymbol)
     {
         var command = methodSymbol.GetCommandType();
-        var routeParameters = RouteParameterDiscovery.FindAllParametersInRoute(command.GetCommandRoute()).Select(p => p.Name);
+        var routeParameters = RouteParameterDiscovery.FindAllParametersInRoute(command.GetCommandRoute());
         return command.GetPublicProperties().Where(p => !routeParameters.Contains(p.Name)).Any();
     }
 }

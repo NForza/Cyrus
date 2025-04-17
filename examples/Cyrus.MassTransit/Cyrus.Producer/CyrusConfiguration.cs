@@ -7,7 +7,5 @@ public class CyrusConfiguration : CyrusConfig
     public CyrusConfiguration()
     {
         UseMassTransit();
-        GenerateWebApi();
-        GenerateDomain();
     }
 }
