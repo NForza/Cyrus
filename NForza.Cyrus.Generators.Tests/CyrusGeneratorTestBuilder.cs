@@ -11,7 +11,7 @@ namespace NForza.Cyrus.Generators.Tests
     {
         private string? source;
 
-        public async Task<(ImmutableArray<Diagnostic> compilerOutput, ImmutableArray<Diagnostic> analyzerOutput, string generatedSource)> RunAsync()
+        public async Task<(ImmutableArray<Diagnostic> compilerOutput, ImmutableArray<Diagnostic> analyzerOutput, IEnumerable<SyntaxTree> generatedSource)> RunAsync()
         {
             if (string.IsNullOrWhiteSpace(source))
             {
@@ -20,14 +20,9 @@ namespace NForza.Cyrus.Generators.Tests
 
             var syntaxTree = CSharpSyntaxTree.ParseText(source);
 
-            var referencedAssemblies = new string[]
-            {
-                typeof(IServiceCollection).Assembly.Location
-            };
-
             var trustedAssemblies = ((string?)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES"))!
                 .Split(Path.PathSeparator)
-                .Concat(referencedAssemblies)
+                .Concat([typeof(IServiceCollection).Assembly.Location])
                 .Distinct()
                 .Select(path => MetadataReference.CreateFromFile(path))
                 .ToList();
@@ -49,12 +44,11 @@ namespace NForza.Cyrus.Generators.Tests
             var compileDiagnostics = outputCompilation.GetDiagnostics();
             var analyzerDiagnostics = await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync();
 
-            var generatedCode = outputCompilation.SyntaxTrees
+            var generatedSyntaxTrees = outputCompilation.SyntaxTrees
                 .Skip(1)
-                .Select(tree => tree.ToString())
-                .FirstOrDefault();
+                .ToList();
 
-            return (compileDiagnostics, analyzerDiagnostics, generatedCode ?? string.Empty);
+            return (compileDiagnostics, analyzerDiagnostics, generatedSyntaxTrees);
         }
 
         internal CyrusGeneratorTestBuilder WithSource(string source)
