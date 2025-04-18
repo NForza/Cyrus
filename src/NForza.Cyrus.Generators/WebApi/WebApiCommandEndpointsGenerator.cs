@@ -15,11 +15,16 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
         var config = cyrusProvider.GenerationConfig;
         if (config != null && config.GenerationTarget.Contains(GenerationTarget.WebApi))
         {
-            IEnumerable<IMethodSymbol> handlers = cyrusProvider.AllCommandsAndHandlers.OfType<IMethodSymbol>().ToList();
+            IEnumerable<IMethodSymbol> handlers = 
+                cyrusProvider
+                    .AllCommandsAndHandlers
+                    .OfType<IMethodSymbol>()                    
+                    .ToList();
+
             IEnumerable<INamedTypeSymbol> commands = cyrusProvider.AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToList();
             IEnumerable<IMethodSymbol> validators = cyrusProvider.Validators;
 
-            var contents = AddCommandHandlerMappings(spc, handlers, validators, cyrusProvider.Compilation, liquidEngine);
+            var contents = AddCommandHandlerMappings(spc, handlers.Where(h => h.HasCommandRoute()), validators, cyrusProvider.Compilation, liquidEngine);
 
             if (!string.IsNullOrWhiteSpace(contents))
             {
@@ -42,17 +47,18 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
                    "CommandHandlerMapping.g.cs",
                    SourceText.From(fileContents, Encoding.UTF8));
             }
-            AddHttpContextObjectFactoryMethodsRegistrations(spc, commands, liquidEngine);
+
+            AddHttpContextObjectFactoryMethodsRegistrations(commands, spc, liquidEngine);
 
             WebApiContractGenerator.GenerateCommandContracts(handlers, spc, liquidEngine);
         }
     }
 
-    private void AddHttpContextObjectFactoryMethodsRegistrations(SourceProductionContext sourceProductionContext, IEnumerable<INamedTypeSymbol> queries, LiquidEngine liquidEngine)
+    private void AddHttpContextObjectFactoryMethodsRegistrations(IEnumerable<INamedTypeSymbol> commands, SourceProductionContext sourceProductionContext, LiquidEngine liquidEngine)
     {
         var model = new
         {
-            Commands = queries.Select(cmd =>
+            Commands = commands.Select(cmd =>
                 new
                 {
                     cmd.Name,
@@ -74,14 +80,14 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
     private string AddCommandHandlerMappings(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers, IEnumerable<IMethodSymbol> validators, Compilation compilation, LiquidEngine liquidEngine)
     {
         StringBuilder sb = new StringBuilder();
-        foreach (var handler in handlers)
+        foreach (var handler in handlers.Where(h => h.HasCommandRoute()))
         {
             var validator = validators.FirstOrDefault(v => v.Parameters.Length == 1 && v.Parameters[0].Type.Equals(handler.Parameters[0].Type, SymbolEqualityComparer.Default));
             var command = new
             {
                 Path = TypeAnnotations.AugmentRouteWithTypeAnnotations(handler.GetCommandRoute(), handler.Parameters[0].Type),
                 Verb = handler.GetCommandVerb(),
-                HasBody = handler.HasCommandBody(),
+                HasBody = handler.HasParametersInBody(),
                 CommandType = handler.Parameters[0].Type.ToFullName(),
                 CommandName = handler.Parameters[0].Type.Name,
                 AdapterMethod = GetAdapterMethodName(handler),

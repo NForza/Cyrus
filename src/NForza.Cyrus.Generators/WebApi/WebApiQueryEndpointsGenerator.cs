@@ -18,7 +18,12 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
         if (config != null && config.GenerationTarget.Contains(GenerationTarget.WebApi))
         {
             IEnumerable<IMethodSymbol> validators = cyrusProvider.Validators;
-            var contents = AddQueryHandlerMappings(spc, cyrusProvider.AllQueriesAndHandlers.OfType<IMethodSymbol>(), validators);
+            IEnumerable<IMethodSymbol> queryHandlers = 
+                cyrusProvider
+                    .AllQueriesAndHandlers
+                    .OfType<IMethodSymbol>()
+                    .Where(h => h.HasQueryRoute());
+            var contents = AddQueryHandlerMappings(spc, queryHandlers, validators);
 
             if (!string.IsNullOrWhiteSpace(contents))
             {
