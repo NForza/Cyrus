@@ -8,7 +8,7 @@ This small demo shows the core focus of Cyrus: to be able to quickly create WebA
 
 * Create a ASP.NET Core WebApi using .NET 9
 
-* Remove the (outdated) `Swashbuckle.AspNetCore` Nuget package. Cyrus uses `Scalar` to visualise the OpenApi specification.
+* Remove the Microsoft.AspNetCore.OpenApi package if it is part of the project.
 
 * Add the `NForza.Cyrus` Nuget package
 
@@ -22,28 +22,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCyrus();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
 app.MapCyrus();
-app.Run();
+
+await app.RunAsync();
 ```
 
-* Note that the startup code is standard, except for the `AddCyrus` and `MapCyrus` methods.
-
-* Verify that the application compiles and runs correctly
-
-* Change the LaunchUrl from `weatherforcast` to `swagger` in LaunchSettings.json.
+* Change the LaunchUrl to `/swagger` in LaunchSettings.json.
 
 * Add a new c# file `Types.cs` to the project and add some strongly typed IDs:
 
@@ -82,7 +68,7 @@ public class NewCustomerCommandHandler
 
 * Note that the app has an endpoint with a Route of "/customers" and that is uses the POST verb as described by the CommandHandler attributes
 
-* Verify that the command returns OK and that you see a message in the console
+* Verify that the command returns OK if you POST a request and that you see a message in the console
 
 * Change the command handler to return an IResult:
 
@@ -124,26 +110,26 @@ public class CustomerEventHandler
 }
 ```
 
-* Update the CommandHandler to return a Tuple of an IResult and an IEnumerable of events:
+* Update the CommandHandler to return a Tuple of an IResult and an event:
 
 ```csharp
 public class NewCustomerCommandHandler
 {
     [CommandHandler(Route = "/customers", Verb = HttpVerb.Post)]
-    public (IResult result, IEnumerable<object> events) Handle(NewCustomerCommand command)
+    public (IResult result, object @event) Handle(NewCustomerCommand command)
     {
         Console.WriteLine("Creating a new customer");
-        return (Results.Accepted(), [new CustomerCreatedEvent(command.CustomerId, command.Name, command.Address)]);
+        return (Results.Accepted(), new CustomerCreatedEvent(command.CustomerId, command.Name, command.Address));
     }
 }
 ```
 
 * Run the application and observe that the endpoint still returns Accepted, but now the event handler is invoked as well and writes its message to the console. 
 
-* Change the command handler to be a static method:
+* Change the command handler to be a static method, the class as a static class and return an IEnumerable<object> to return multiple events:
 
 ```csharp
-public class NewCustomerCommandHandler
+public static class NewCustomerCommandHandler
 {
     [CommandHandler(Route = "/customers", Verb = HttpVerb.Post)]
     public static (IResult result, IEnumerable<object> events) Handle(NewCustomerCommand command)
@@ -181,7 +167,7 @@ public record struct UpdateCustomerCommand(CustomerId CustomerId, Name Name, Add
 
 public class UpdateCustomerCommandHandler
 {
-    [CommandHandler(Route = "/{CustomerId:guid}", Verb = HttpVerb.Put)]
+    [CommandHandler(Route = "/{CustomerId}", Verb = HttpVerb.Put)]
     public static IResult Update(UpdateCustomerCommand command)
     {
         Console.WriteLine("Updating customer");
