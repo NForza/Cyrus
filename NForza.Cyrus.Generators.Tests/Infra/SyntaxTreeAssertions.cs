@@ -2,7 +2,7 @@
 using FluentAssertions.Collections;
 using Microsoft.CodeAnalysis;
 
-namespace NForza.Cyrus.Generators.Tests;
+namespace NForza.Cyrus.Generators.Tests.Infra;
 
 public static class SyntaxTreeAssertions
 {

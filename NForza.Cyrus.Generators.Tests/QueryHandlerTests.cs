@@ -4,10 +4,10 @@ using Xunit.Abstractions;
 
 namespace NForza.Cyrus.Generators.Tests;
 
-public class CommandHandlerTests(ITestOutputHelper outputWindow)
+public class QueryHandlerTests(ITestOutputHelper outputWindow)
 {
     [Fact]
-    public async Task Generating_CommandHandler_Should_Compile_And_Generate_Sources()
+    public async Task Generating_QueryHandler_Should_Compile_And_Generate_Sources()
     {
         var source = @"
                 using System;       
@@ -15,14 +15,15 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
 
                 namespace Demo;
             
-                [Command]
-                public record CreateCustomerCommand(Guid Id);
+                [Query]
+                public record GetCustomerByIdQuery(Guid Id);
 
-                public class Customer
+                public static class CustomerQuery
                 {
-                    [CommandHandler]
-                    public void Handle(CreateCustomerCommand command)
+                    [QueryHandler]
+                    public static string Handle(GetCustomerByIdQuery query)
                     {
+                        return query.Id.ToString();
                     }
                 }
             ";
@@ -38,14 +39,13 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
 
         generatedSyntaxTrees.Should().NotBeEmpty();
         generatedSyntaxTrees.Should().ContainSource("ServiceCollectionJsonConverterExtensions: ICyrusInitializer");
-        generatedSyntaxTrees.Should().ContainSource("CommandDispatcherExtensions");
-        generatedSyntaxTrees.Should().ContainSource("Handle(this ICommandDispatcher commandDispatcher, global::Demo.CreateCustomerCommand command");
-        generatedSyntaxTrees.Should().ContainSource("CommandHandlersRegistration");
-        generatedSyntaxTrees.Should().ContainSource("AddTransient<global::Demo.Customer>()");
+        generatedSyntaxTrees.Should().ContainSource("Task<string> Query(this IQueryProcessor queryProcessor, global::Demo.GetCustomerByIdQuery query");
+        generatedSyntaxTrees.Should().ContainSource("QueryHandlersRegistration");
+        generatedSyntaxTrees.Should().NotContainSource("AddTransient<global::Demo.CustomerQuery>()");
     }
 
     [Fact]
-    public async Task Generating_CommandHandler_For_Type_Which_Is_Not_A_Command_Should_Return_Error()
+    public async Task Generating_QueryHandler_For_Type_Which_Is_Not_A_Query_Should_Return_Error()
     {
         var source = @"
                 using System;       
@@ -53,13 +53,14 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
 
                 namespace Demo;
             
-                public record CreateCustomerCommand(Guid Id);
+                public record GetCustomerByIdQuery(Guid Id);
 
-                public class Customer
+                public static class CustomerQuery
                 {
-                    [CommandHandler]
-                    public void Handle(CreateCustomerCommand command)
+                    [QueryHandler]
+                    public static string Handle(GetCustomerByIdQuery query)
                     {
+                        return query.Id.ToString();
                     }
                 }
             ";
@@ -71,11 +72,11 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
             .RunAsync();
 
         compilerOutput.Should().NotHaveErrors();
-        analyzerOutput.Should().ContainError(DiagnosticDescriptors.MissingCommandAttribute);
+        analyzerOutput.Should().ContainError(DiagnosticDescriptors.MissingQueryAttribute);
     }
 
     [Fact]
-    public async Task Generating_CommandHandler_Without_A_Route_Should_Not_Generate_MapPost()
+    public async Task Generating_QueryHandler_Without_A_Route_Should_Not_Generate_MapGet()
     {
         var source = @"
                 using System;       
@@ -83,50 +84,18 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
 
                 namespace Demo;
             
-                [Command]
-                public record CreateCustomerCommand(Guid Id);
+                [Query]
+                public record GetCustomerByIdQuery(Guid Id);
 
-                public class Customer
+                public static class CustomerQuery
                 {
-                    [CommandHandler]
-                    public void Handle(CreateCustomerCommand command)
+                    [QueryHandler]
+                    public static string Handle(GetCustomerByIdQuery query)
                     {
+                        return query.Id.ToString();
                     }
                 }
-            ";
-
-        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
-            await new CyrusGeneratorTestBuilder()
-            .WithSource(source)
-            .LogGeneratedSource(outputWindow.WriteLine)
-            .RunAsync();
-
-        compilerOutput.Should().NotHaveErrors();
-        analyzerOutput.Should().BeEmpty();
-        generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().NotContainSource("MapPost");
-    }
-
-    [Fact]
-    public async Task Generating_CommandHandler_With_A_Route_Should_Generate_MapPost()
-    {
-        var source = @"
-                using System;       
-                using NForza.Cyrus.Abstractions;
-
-                namespace Demo;
-            
-                [Command]
-                public record CreateCustomerCommand(Guid Id);
-
-                public class Customer
-                {
-                    [CommandHandler(Route = ""/"")]
-                    public void Handle(CreateCustomerCommand command)
-                    {
-                    }
-                }
-            ";
+             ";
 
         (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
             await new CyrusGeneratorTestBuilder()
@@ -137,7 +106,41 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
         compilerOutput.Should().NotHaveErrors();
         analyzerOutput.Should().BeEmpty();
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().ContainSource("MapPost");
+        generatedSyntaxTrees.Should().NotContainSource("MapGet");
+    }
+
+    [Fact]
+    public async Task Generating_QueryHandler_With_A_Route_Should_Generate_MapGet()
+    {
+        var source = @"
+                using System;       
+                using NForza.Cyrus.Abstractions;
+
+                namespace Demo;
+            
+                [Query]
+                public record GetCustomerByIdQuery(Guid Id);
+
+                public static class CustomerQuery
+                {
+                    [QueryHandler(Route = ""/"")]
+                    public static string Handle(GetCustomerByIdQuery query)
+                    {
+                        return query.Id.ToString();
+                    }
+                }
+             ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        compilerOutput.Should().NotHaveErrors();
+        analyzerOutput.Should().BeEmpty();
+        generatedSyntaxTrees.Should().NotBeEmpty();
+        generatedSyntaxTrees.Should().ContainSource("MapGet");
     }
 
 }

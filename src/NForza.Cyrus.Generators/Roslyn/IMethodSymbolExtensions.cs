@@ -20,6 +20,7 @@ internal static class IMethodSymbolExtensions
     {
         return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "EventHandlerAttribute");
     }
+
     public static bool IsQueryHandler(this IMethodSymbol methodSymbol)
     {
         return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "QueryHandlerAttribute");

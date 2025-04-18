@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using NForza.Cyrus.Generators.Analyzers;
 
-namespace NForza.Cyrus.Generators.Tests
+namespace NForza.Cyrus.Generators.Tests.Infra
 {
     internal class CyrusGeneratorTestBuilder
     {
