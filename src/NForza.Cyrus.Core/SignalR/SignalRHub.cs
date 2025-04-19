@@ -1,14 +1,11 @@
 ﻿namespace NForza.Cyrus.SignalR;
 
-public class SignalRHub
+public class CyrusSignalRHub
 {
     public void UsePath(string path) { }
-    public ISignalRQueryBuilder<T> Query<T>() 
+    public ISignalRQueryBuilder<T> Expose<T>() 
         => new SignalRQueryBuilder<T>();
 
-    public ISignalRCommandBuilder<T> Command<T>() 
-        => new SignalRCommandBuilder<T>();
-
-    public void PublishesEventToCaller<T>() {  }
-    public void PublishesEventToAll<T>() { }
+    public void Send<T>() {  }
+    public void Broadcast<T>() { }
 }

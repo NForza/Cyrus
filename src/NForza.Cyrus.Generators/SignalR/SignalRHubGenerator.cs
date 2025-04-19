@@ -68,8 +68,6 @@ public class SignalRHubGenerator : CyrusGeneratorBase
 
     private string GenerateSignalRHub(SignalRHubClassDefinition classDefinition, LiquidEngine liquidEngine)
     {
-        string queries = GenerateQueries(classDefinition.Queries);
-
         var model = new
         {
             classDefinition.Symbol.Name,
@@ -83,26 +81,21 @@ public class SignalRHubGenerator : CyrusGeneratorBase
                 Invocation = c.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "services"),
                 ReturnsTask = c.Handler.ReturnType.IsTaskType()
             }),
-            QueryMethods = queries,
+            Queries = classDefinition.Queries.Select(c => new
+            {
+                c.MethodName,
+                c.FullTypeName,
+            }),
+            Events = classDefinition.Events.Select(c => new
+            {
+                c.MethodName,
+                c.FullTypeName,
+                c.Broadcast
+            }),
         };
 
         var source = liquidEngine.Render(model, "SignalRHub");
 
         return source;
-    }
-
-    private static string GenerateQueries(IEnumerable<SignalRQuery> signalRQueries)
-    {
-        var sb = new StringBuilder();
-        foreach (var query in signalRQueries)
-        {
-            sb.AppendLine(
-    @$"public async Task {query.MethodName}({query.FullTypeName} query) 
-    {{
-        var result = await queryProcessor.Query(query);
-        await SendQueryResultReply(""{query.MethodName}"", result);
-    }}");
-        }
-        return sb.ToString();
     }
 }

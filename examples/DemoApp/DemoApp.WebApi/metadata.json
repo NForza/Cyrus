@@ -87,6 +87,12 @@
       "isNullable": false,
       "properties": [
         {
+          "name": "Id",
+          "type": "CustomerId",
+          "isCollection": false,
+          "isNullable": false
+        },
+        {
           "name": "Name",
           "type": "Name",
           "isCollection": false,
@@ -125,7 +131,7 @@
       "isNullable": false,
       "properties": [
         {
-          "name": "CustomerId",
+          "name": "Id",
           "type": "CustomerId",
           "isCollection": false,
           "isNullable": false
@@ -152,13 +158,13 @@
       "isNullable": false,
       "properties": [
         {
-          "name": "page",
+          "name": "Page",
           "type": "int",
           "isCollection": false,
           "isNullable": false
         },
         {
-          "name": "pageSize",
+          "name": "PageSize",
           "type": "long",
           "isCollection": false,
           "isNullable": false

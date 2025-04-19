@@ -58,47 +58,59 @@ public record SignalRHubClassDefinition
 
     private void SetCommands(INamedTypeSymbol symbol, BlockSyntax constructorBody)
     {
-        var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "Command")
+        var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "Expose")
                 .Select(ies => ies.Expression)
                 .OfType<GenericNameSyntax>();
-        var commands = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());
-        Commands = commands.Select(genericArg =>
-        {
-            var symbol = (SemanticModel.GetSymbolInfo(genericArg).Symbol as ITypeSymbol)!;
-            return new SignalRCommand
+        var commands = memberAccessExpressionSyntaxes
+            .Select(name => name.TypeArgumentList.Arguments.Single());
+        Commands = commands
+            .Select(genericArg =>
             {
-                MethodName = genericArg.GetText().ToString(),
-                Name = symbol.Name,
-                Handler = GetCommandHandler(symbol) ?? throw new InvalidCastException("Can't find return type for " + symbol.ToFullName()),
-                FullTypeName = symbol.ToFullName()
-            };
-        });
+                var symbol = (SemanticModel.GetSymbolInfo(genericArg).Symbol as ITypeSymbol);
+                if (symbol == null || !symbol.IsCommand())
+                    return null;
+
+                return new SignalRCommand
+                {
+                    MethodName = genericArg.GetText().ToString(),
+                    Name = symbol.Name,
+                    Handler = GetCommandHandler(symbol) ?? throw new InvalidCastException("Can't find return type for " + symbol.ToFullName()),
+                    FullTypeName = symbol.ToFullName()
+                };
+            })
+            .Where(command => command != null)
+            .Cast<SignalRCommand>();
     }
 
     private void SetQueries(INamedTypeSymbol symbol, BlockSyntax constructorBody)
     {
-        var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "Query")
+        var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "Expose")
                 .Select(ies => ies.Expression)
                 .OfType<GenericNameSyntax>();
         var queries = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());
 
-        Queries = queries.Select(genericArg =>
-        {
-            var symbol = (ITypeSymbol)SemanticModel.GetSymbolInfo(genericArg).Symbol!;
-            ITypeSymbol returnType = GetReturnTypeOfQuery(symbol) ?? throw new InvalidCastException("Can't find return type for " + symbol.ToFullName());
-            (bool isCollection, ITypeSymbol? collectionType) = returnType?.IsCollection() ?? (false, null);
-            var isNullable = returnType?.IsNullable();
-            ITypeSymbol? queryReturnType = isCollection ? collectionType : returnType;
-            var propertyModelsOfReturnType = queryReturnType!.GetPropertyModels();
-            return
-                new SignalRQuery
-                {
-                    MethodName = genericArg.GetText().ToString(),
-                    Name = symbol.Name,
-                    FullTypeName = symbol.ToFullName(),
-                    ReturnType = new(queryReturnType!.Name, propertyModelsOfReturnType, [], isCollection, isNullable ?? false) //, [])
-                };
-        });
+        Queries = queries
+            .Select(genericArg =>
+            {
+                var symbol = (ITypeSymbol?)SemanticModel.GetSymbolInfo(genericArg).Symbol;
+                if (symbol == null || !symbol.IsQuery())
+                    return null;
+                ITypeSymbol returnType = GetReturnTypeOfQuery(symbol) ?? throw new InvalidCastException("Can't find return type for " + symbol.ToFullName());
+                (bool isCollection, ITypeSymbol? collectionType) = returnType?.IsCollection() ?? (false, null);
+                var isNullable = returnType?.IsNullable();
+                ITypeSymbol? queryReturnType = isCollection ? collectionType : returnType;
+                var propertyModelsOfReturnType = queryReturnType!.GetPropertyModels();
+                return
+                    new SignalRQuery
+                    {
+                        MethodName = genericArg.GetText().ToString(),
+                        Name = symbol.Name,
+                        FullTypeName = symbol.ToFullName(),
+                        ReturnType = new(queryReturnType!.Name, propertyModelsOfReturnType, [], isCollection, isNullable ?? false) //, [])
+                    };
+            })
+            .Where(query => query != null)
+            .Cast<SignalRQuery>();
     }
 
     private ITypeSymbol? GetReturnTypeOfQuery(ITypeSymbol symbol)
@@ -162,24 +174,24 @@ public record SignalRHubClassDefinition
 
     private void SetEvents(INamedTypeSymbol symbol, BlockSyntax constructorBody)
     {
-        var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "PublishesEventToCaller")
+        var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "Send")
                 .Select(ies => ies.Expression)
                 .OfType<GenericNameSyntax>();
         var callerEventTypes = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());
         var callerEvents = callerEventTypes.Select(genericArg =>
         {
             var symbol = SemanticModel.GetSymbolInfo(genericArg).Symbol!;
-            return new SignalREvent { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, FullTypeName = symbol.ToFullName(), IsBroadcast = false };
+            return new SignalREvent { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, FullTypeName = symbol.ToFullName(), Broadcast = false };
         });
 
-        memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "PublishesEventToAll")
+        memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "Broadcast")
                 .Select(ies => ies.Expression)
                 .OfType<GenericNameSyntax>();
         var broadcastEventTypes = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());
         var broadcastEvents = broadcastEventTypes.Select(genericArg =>
         {
             var symbol = SemanticModel.GetSymbolInfo(genericArg).Symbol!;
-            return new SignalREvent { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, FullTypeName = symbol.ToFullName(), IsBroadcast = true };
+            return new SignalREvent { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, FullTypeName = symbol.ToFullName(), Broadcast = true };
         });
 
         Events = callerEvents.Concat(broadcastEvents);

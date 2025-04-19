@@ -13,7 +13,7 @@ public class QueryHandlerTests(ITestOutputHelper outputWindow)
                 using System;       
                 using NForza.Cyrus.Abstractions;
 
-                namespace Demo;
+                namespace Test;
             
                 [Query]
                 public record GetCustomerByIdQuery(Guid Id);
@@ -39,9 +39,9 @@ public class QueryHandlerTests(ITestOutputHelper outputWindow)
 
         generatedSyntaxTrees.Should().NotBeEmpty();
         generatedSyntaxTrees.Should().ContainSource("ServiceCollectionJsonConverterExtensions: ICyrusInitializer");
-        generatedSyntaxTrees.Should().ContainSource("Task<string> Query(this IQueryProcessor queryProcessor, global::Demo.GetCustomerByIdQuery query");
+        generatedSyntaxTrees.Should().ContainSource("Task<string> Query(this IQueryProcessor queryProcessor, global::Test.GetCustomerByIdQuery query");
         generatedSyntaxTrees.Should().ContainSource("QueryHandlersRegistration");
-        generatedSyntaxTrees.Should().NotContainSource("AddTransient<global::Demo.CustomerQuery>()");
+        generatedSyntaxTrees.Should().NotContainSource("AddTransient<global::Test.CustomerQuery>()");
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class QueryHandlerTests(ITestOutputHelper outputWindow)
                 using System;       
                 using NForza.Cyrus.Abstractions;
 
-                namespace Demo;
+                namespace Test;
             
                 public record GetCustomerByIdQuery(Guid Id);
 
@@ -82,7 +82,7 @@ public class QueryHandlerTests(ITestOutputHelper outputWindow)
                 using System;       
                 using NForza.Cyrus.Abstractions;
 
-                namespace Demo;
+                namespace Test;
             
                 [Query]
                 public record GetCustomerByIdQuery(Guid Id);
@@ -116,7 +116,7 @@ public class QueryHandlerTests(ITestOutputHelper outputWindow)
                 using System;       
                 using NForza.Cyrus.Abstractions;
 
-                namespace Demo;
+                namespace Test;
             
                 [Query]
                 public record GetCustomerByIdQuery(Guid Id);
