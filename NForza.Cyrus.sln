@@ -32,7 +32,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoApp.Contracts", "exampl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.Templating", "src\NForza.Cyrus.Templating\NForza.Cyrus.Templating.csproj", "{0D5FC394-E7FF-464D-62F8-0A84E9C970D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.Generators.Tests", "NForza.Cyrus.Generators.Tests\NForza.Cyrus.Generators.Tests.csproj", "{B9E1854B-245D-4297-9CD8-B926C6A3C764}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.Generators.Tests", "src\NForza.Cyrus.Generators.Tests\NForza.Cyrus.Generators.Tests.csproj", "{B9E1854B-245D-4297-9CD8-B926C6A3C764}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

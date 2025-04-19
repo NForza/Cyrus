@@ -45,6 +45,44 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
     }
 
     [Fact]
+    public async Task Generating_Static_CommandHandler_Should_Compile_And_Generate_Sources()
+    {
+        var source = @"
+                using System;       
+                using NForza.Cyrus.Abstractions;
+
+                namespace Demo;
+            
+                [Command]
+                public record CreateCustomerCommand(Guid Id);
+
+                public static class Customer
+                {
+                    [CommandHandler]
+                    public static void Handle(CreateCustomerCommand command)
+                    {
+                    }
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        compilerOutput.Should().NotHaveErrors();
+        analyzerOutput.Should().BeEmpty();
+
+        generatedSyntaxTrees.Should().NotBeEmpty();
+        generatedSyntaxTrees.Should().ContainSource("ServiceCollectionJsonConverterExtensions: ICyrusInitializer");
+        generatedSyntaxTrees.Should().ContainSource("CommandDispatcherExtensions");
+        generatedSyntaxTrees.Should().ContainSource("Handle(this ICommandDispatcher commandDispatcher, global::Demo.CreateCustomerCommand command");
+        generatedSyntaxTrees.Should().NotContainSource("CommandHandlersRegistration");
+        generatedSyntaxTrees.Should().NotContainSource("AddTransient<global::Demo.Customer>()");
+    }
+
+    [Fact]
     public async Task Generating_CommandHandler_For_Type_Which_Is_Not_A_Command_Should_Return_Error()
     {
         var source = @"

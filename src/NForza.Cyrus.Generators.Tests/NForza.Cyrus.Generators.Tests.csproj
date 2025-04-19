@@ -22,8 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\NForza.Cyrus.Core\NForza.Cyrus.Core.csproj" />
-    <ProjectReference Include="..\src\NForza.Cyrus.Generators\NForza.Cyrus.Generators.csproj" />
+    <ProjectReference Include="..\NForza.Cyrus.Core\NForza.Cyrus.Core.csproj" />
+    <ProjectReference Include="..\NForza.Cyrus.Generators\NForza.Cyrus.Generators.csproj" />
   </ItemGroup>
 
   <ItemGroup>
