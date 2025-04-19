@@ -7,7 +7,7 @@ namespace SimpleCyrusWebApi.CustomerById;
 
 public class CustomerByIdQueryHandler(DemoContext context)
 {
-    [QueryHandler]
+    [QueryHandler(Route = "{Id}")]
     public async Task<Customer?> Query(CustomerByIdQuery query)
         => await context.Customers.FirstOrDefaultAsync(c => c.Id == query.Id);
 }

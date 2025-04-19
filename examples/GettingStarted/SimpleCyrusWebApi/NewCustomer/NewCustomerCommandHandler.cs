@@ -6,7 +6,7 @@ namespace SimpleCyrusWebApi.NewCustomer;
 
 public class NewCustomerCommandHandler(DemoContext context)
 {
-    [CommandHandler]
+    [CommandHandler(Route = "/")]
     public async Task<(IResult Result, IEnumerable<object> events)> Execute(NewCustomerCommand command)
     {
         context.Customers.Add(new Customer(command.Id, command.Name, command.Address));

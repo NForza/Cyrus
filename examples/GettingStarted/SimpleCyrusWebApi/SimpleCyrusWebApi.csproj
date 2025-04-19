@@ -9,13 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
-    <PackageReference Include="MassTransit" Version="8.4.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.3" />
-    <PackageReference Include="NForza.Cyrus" Version="1.0.158" />
-    <PackageReference Include="NForza.Cyrus.MassTransit" Version="1.0.158" />
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.4" />
+    <PackageReference Include="NForza.Cyrus" Version="1.0.202" />
+    <PackageReference Include="NForza.Cyrus.MassTransit" Version="1.0.202" />
   </ItemGroup>
 
 </Project>
