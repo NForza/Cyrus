@@ -2,5 +2,5 @@
 
 namespace SimpleCyrusWebApi.CustomerById;
 
-[Query(Route="{Id:Guid}")]
+[Query]
 public record struct CustomerByIdQuery(CustomerId Id);
