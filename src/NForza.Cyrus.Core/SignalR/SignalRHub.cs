@@ -6,6 +6,6 @@ public class CyrusSignalRHub
     public ISignalRQueryBuilder<T> Expose<T>() 
         => new SignalRQueryBuilder<T>();
 
-    public void Send<T>() {  }
+    public void Emit<T>() {  }
     public void Broadcast<T>() { }
 }

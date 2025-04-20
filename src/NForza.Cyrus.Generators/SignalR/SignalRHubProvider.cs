@@ -29,7 +29,6 @@ public class SignalRHubProvider : CyrusProviderBase<ImmutableArray<SignalRHubCla
                 return definition;
             })
             .Where(signalRHubClassDefinition => signalRHubClassDefinition.Symbol.IsDirectlyDerivedFrom("NForza.Cyrus.SignalR.CyrusSignalRHub"))
-            .Select((signalRHubClassDefinition, _) => signalRHubClassDefinition.Initialize())
             .Collect();
 
         return signalrHubModelProvider;

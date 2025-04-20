@@ -39,7 +39,7 @@ public record SignalRHubClassDefinition
         SemanticModel = semanticModel;
     }
 
-    public SignalRHubClassDefinition Initialize()
+    public SignalRHubClassDefinition Initialize(CyrusGenerationContext cyrusProvider)
     {
         var constructorBody = Declaration.DescendantNodes()
             .OfType<ConstructorDeclarationSyntax>()
@@ -49,14 +49,14 @@ public record SignalRHubClassDefinition
         if (constructorBody != null)
         {
             SetPath(Symbol, constructorBody);
-            SetCommands(Symbol, constructorBody);
+            SetCommands(Symbol, constructorBody, cyrusProvider);
+            SetQueries(Symbol, constructorBody, cyrusProvider);
             SetEvents(Symbol, constructorBody);
-            SetQueries(Symbol, constructorBody);
         }
         return this;
     }
 
-    private void SetCommands(INamedTypeSymbol symbol, BlockSyntax constructorBody)
+    private void SetCommands(INamedTypeSymbol symbol, BlockSyntax constructorBody, CyrusGenerationContext cyrusProvider)
     {
         var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "Expose")
                 .Select(ies => ies.Expression)
@@ -74,7 +74,7 @@ public record SignalRHubClassDefinition
                 {
                     MethodName = genericArg.GetText().ToString(),
                     Name = symbol.Name,
-                    Handler = GetCommandHandler(symbol) ?? throw new InvalidCastException("Can't find return type for " + symbol.ToFullName()),
+                    Handler = GetCommandHandler(symbol, cyrusProvider) ?? throw new InvalidCastException("Can't find return type for " + symbol.ToFullName()),
                     FullTypeName = symbol.ToFullName()
                 };
             })
@@ -82,7 +82,7 @@ public record SignalRHubClassDefinition
             .Cast<SignalRCommand>();
     }
 
-    private void SetQueries(INamedTypeSymbol symbol, BlockSyntax constructorBody)
+    private void SetQueries(INamedTypeSymbol symbol, BlockSyntax constructorBody, CyrusGenerationContext cyrusProvider)
     {
         var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "Expose")
                 .Select(ies => ies.Expression)
@@ -95,7 +95,7 @@ public record SignalRHubClassDefinition
                 var symbol = (ITypeSymbol?)SemanticModel.GetSymbolInfo(genericArg).Symbol;
                 if (symbol == null || !symbol.IsQuery())
                     return null;
-                ITypeSymbol returnType = GetReturnTypeOfQuery(symbol) ?? throw new InvalidCastException("Can't find return type for " + symbol.ToFullName());
+                ITypeSymbol returnType = GetReturnTypeOfQuery(symbol, cyrusProvider) ?? throw new InvalidCastException("Can't find return type for " + symbol.ToFullName());
                 (bool isCollection, ITypeSymbol? collectionType) = returnType?.IsCollection() ?? (false, null);
                 var isNullable = returnType?.IsNullable();
                 ITypeSymbol? queryReturnType = isCollection ? collectionType : returnType;
@@ -113,68 +113,31 @@ public record SignalRHubClassDefinition
             .Cast<SignalRQuery>();
     }
 
-    private ITypeSymbol? GetReturnTypeOfQuery(ITypeSymbol symbol)
+    private ITypeSymbol? GetReturnTypeOfQuery(ITypeSymbol symbol, CyrusGenerationContext cyrusProvider)
     {
-        Compilation compilation = SemanticModel.Compilation;
-        foreach (var reference in compilation.References)
+        var queryHandler = cyrusProvider.QueryHandlers.FirstOrDefault(handler => SymbolEqualityComparer.Default.Equals(handler.Parameters[0].Type, symbol));
+        if (queryHandler != null)
         {
-            var assemblySymbol = compilation.GetAssemblyOrModuleSymbol(reference) as IAssemblySymbol;
-            if (assemblySymbol == null)
-                continue;
-
-            foreach (var type in assemblySymbol.GlobalNamespace.GetAllTypes())
+            var returnType = queryHandler.ReturnType;
+            if (returnType is INamedTypeSymbol namedType &&
+                namedType.IsGenericType &&
+                (namedType.ConstructedFrom.ToDisplayString() == "System.Threading.Tasks.Task<TResult>" ||
+                 namedType.ConstructedFrom.ToDisplayString() == "System.Threading.Tasks.ValueTask<TResult>"))
             {
-                foreach (var method in type.GetMembers().OfType<IMethodSymbol>())
-                {
-                    if (method.Parameters.Length == 1 && method.IsQueryHandler() &&
-                        SymbolEqualityComparer.Default.Equals(method.Parameters[0].Type, symbol))
-                    {
-                        var returnType = method.ReturnType;
-                        if (returnType is INamedTypeSymbol namedType &&
-                            namedType.IsGenericType &&
-                            (namedType.ConstructedFrom.ToDisplayString() == "System.Threading.Tasks.Task<TResult>" ||
-                             namedType.ConstructedFrom.ToDisplayString() == "System.Threading.Tasks.ValueTask<TResult>"))
-                        {
-                            return namedType.TypeArguments[0];
-                        }
-
-                        return returnType;
-                    }
-                }
+                return namedType.TypeArguments[0];
             }
+            return returnType;
         }
 
         return null;
     }
 
-    private IMethodSymbol? GetCommandHandler(ITypeSymbol symbol)
-    {
-        Compilation compilation = SemanticModel.Compilation;
-        foreach (var reference in compilation.References)
-        {
-            var assemblySymbol = compilation.GetAssemblyOrModuleSymbol(reference) as IAssemblySymbol;
-            if (assemblySymbol == null)
-                continue;
-
-            foreach (var type in assemblySymbol.GlobalNamespace.GetAllTypes())
-            {
-                foreach (var method in type.GetMembers().OfType<IMethodSymbol>())
-                {
-                    if (method.Parameters.Length == 1 && method.IsCommandHandler() &&
-                        SymbolEqualityComparer.Default.Equals(method.Parameters[0].Type, symbol))
-                    {
-                        return method;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
+    private IMethodSymbol? GetCommandHandler(ITypeSymbol symbol, CyrusGenerationContext cyrusProvider)
+        => cyrusProvider.CommandHandlers.FirstOrDefault(handler => SymbolEqualityComparer.Default.Equals(handler.Parameters[0].Type, symbol));
 
     private void SetEvents(INamedTypeSymbol symbol, BlockSyntax constructorBody)
     {
-        var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "Send")
+        var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "Emit")
                 .Select(ies => ies.Expression)
                 .OfType<GenericNameSyntax>();
         var callerEventTypes = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());

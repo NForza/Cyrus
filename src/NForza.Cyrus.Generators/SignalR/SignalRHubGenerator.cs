@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -15,7 +14,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
-        var signalRHubs = cyrusProvider.SignalRHubs;
+        var signalRHubs = cyrusProvider.SignalRHubs.Select(h => h.Initialize(cyrusProvider));
         var configuration = cyrusProvider.GenerationConfig;
 
         var isWebApi = configuration.GenerationTarget.Contains(GenerationTarget.WebApi);
@@ -39,7 +38,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase
         }
     }
 
-    private string GenerateSignalRHubRegistration(ImmutableArray<SignalRHubClassDefinition> signalRDefinitions, LiquidEngine liquidEngine)
+    private string GenerateSignalRHubRegistration(IEnumerable<SignalRHubClassDefinition> signalRDefinitions, LiquidEngine liquidEngine)
     {
         var usings = signalRDefinitions
             .Select(cm => cm.Symbol.ContainingNamespace)

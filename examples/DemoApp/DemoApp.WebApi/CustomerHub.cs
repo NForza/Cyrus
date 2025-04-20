@@ -12,7 +12,7 @@ public class CustomerHub : CyrusSignalRHub
         Expose<AddCustomerCommand>();
         Expose<DeleteCustomerCommand>();
 
-        Send<CustomerUpdatedEvent>();
+        Emit<CustomerUpdatedEvent>();
         Broadcast<CustomerAddedEvent>();
     }
 }
