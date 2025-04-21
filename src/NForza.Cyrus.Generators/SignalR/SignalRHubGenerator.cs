@@ -93,6 +93,12 @@ public class SignalRHubGenerator : CyrusGeneratorBase
         return source;
     }
 
+    static CommandAdapterMethod[] adapterMethodsWithEvents =
+        [
+                            CommandAdapterMethod.FromIResultAndEvents,
+                            CommandAdapterMethod.FromIResultAndEvent
+        ];
+
     private string GenerateSignalRHub(SignalRHubClassDefinition classDefinition, LiquidEngine liquidEngine)
     {
         var model = new
@@ -107,7 +113,9 @@ public class SignalRHubGenerator : CyrusGeneratorBase
                     c.Handler.ReturnType,
                     ReturnsVoid = c.Handler.ReturnType.IsVoid(),
                     Invocation = c.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "services"),
-                    ReturnsTask = c.Handler.ReturnType.IsTaskType()
+                    ReturnsTask = c.Handler.ReturnType.IsTaskType(),
+                    ReturnsEvents = adapterMethodsWithEvents
+                        .Contains(c.Handler.GetAdapterMethodName()),
                 })
                 .ToList(),
             Queries = classDefinition.Queries

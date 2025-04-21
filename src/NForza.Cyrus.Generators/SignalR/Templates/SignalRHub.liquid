@@ -7,23 +7,25 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace {{ Namespace }};
 
-public class {{ Name | generated_hub_name }}(IServiceProvider services, IQueryProcessor queryProcessor) : CyrusHub
+public class {{ Name | generated_hub_name }}(IServiceProvider services, IQueryProcessor queryProcessor, ICommandDispatcher commandDispatcher) : CyrusHub
     (
       [
-      {% for e in Events %}
+      {% for e in Events -%}
         (typeof({{ e.FullTypeName }}), {{ e.Broadcast }}){% unless forloop.last %}, {% endunless -%}
       {% endfor %}
       ]
     )
-{
-   
-    {% for cmd in Commands %}
-        public async Task {{ cmd.MethodName }} ({{ cmd.FullTypeName }} command) 
-        {% if cmd.ReturnsVoid %} { {% else %} => {% endif %} 
-                {%- if cmd.ReturnsTask %}await {% endif %}{{ cmd.Invocation }};
-           {%- if cmd.ReturnsVoid %} } {% endif %} 
+{   
+    {% for cmd in Commands -%}
+        public async Task {{ cmd.MethodName }} ({{ cmd.FullTypeName }} command)
+        {       
+          var cmdResult = await commandDispatcher.Handle(command);
+          {%- if cmd.ReturnsEvents %}
+          SendEvents(cmdResult.Events);
+          {%- endif %}
+        }
     {% endfor %}
-    {% for q in Queries %}
+    {%- for q in Queries %}
         public async Task {{ q.MethodName }}({{ q.FullTypeName }} query) 
         {
             var result = await queryProcessor.Query(query);

@@ -117,4 +117,42 @@ internal static class IMethodSymbolExtensions
         var routeParameters = RouteParameterDiscovery.FindAllParametersInRoute(command.GetCommandRoute());
         return command.GetPublicProperties().Where(p => !routeParameters.Contains(p.Name)).Any();
     }
+
+    public static CommandAdapterMethod GetAdapterMethodName(this IMethodSymbol handler)
+    {
+        var returnType = handler switch
+        {
+            _ when handler.ReturnsTask(out var taskResultType) && taskResultType != null => taskResultType,
+            _ when handler.ReturnsTask() => null,
+            _ => handler.ReturnType
+        };
+
+        if (returnType == null || returnType.SpecialType == SpecialType.System_Void)
+            return CommandAdapterMethod.FromVoid;
+
+        if (returnType.Name == "IResult" &&
+                returnType.ContainingNamespace.ToDisplayString() == "Microsoft.AspNetCore.Http")
+            return CommandAdapterMethod.FromIResult;
+
+        if (returnType.IsTupleType && returnType is INamedTypeSymbol namedTypeSymbol)
+        {
+            if (namedTypeSymbol.TupleElements.Length == 2)
+            {
+                var firstElement = namedTypeSymbol.TupleElements[0];
+                if (firstElement.Type.Name == "IResult" &&
+                    firstElement.Type.ContainingNamespace.ToDisplayString() == "Microsoft.AspNetCore.Http")
+                {
+                    var secondElement = namedTypeSymbol.TupleElements[1];
+                    if (secondElement.Type.Name == "Object")
+                    {
+                        return CommandAdapterMethod.FromIResultAndEvent;
+                    }
+                    return CommandAdapterMethod.FromIResultAndEvents;
+                }
+            }
+
+            return CommandAdapterMethod.FromIResultAndEvents;
+        }
+        return CommandAdapterMethod.FromObjects;
+    }
 }
