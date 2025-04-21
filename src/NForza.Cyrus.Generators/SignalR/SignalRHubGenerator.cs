@@ -99,26 +99,32 @@ public class SignalRHubGenerator : CyrusGeneratorBase
         {
             classDefinition.Symbol.Name,
             Namespace = classDefinition.Symbol.ContainingNamespace.ToDisplayString(),
-            Commands = classDefinition.Commands.Select(c => new
-            {
-                c.MethodName,
-                c.FullTypeName,
-                c.Handler.ReturnType,
-                ReturnsVoid = c.Handler.ReturnType.IsVoid(),
-                Invocation = c.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "services"),
-                ReturnsTask = c.Handler.ReturnType.IsTaskType()
-            }),
-            Queries = classDefinition.Queries.Select(c => new
-            {
-                c.MethodName,
-                c.FullTypeName,
-            }),
-            Events = classDefinition.Events.Select(c => new
-            {
-                c.MethodName,
-                c.FullTypeName,
-                c.Broadcast
-            }),
+            Commands = classDefinition.Commands
+                .Select(c => new
+                {
+                    c.MethodName,
+                    c.FullTypeName,
+                    c.Handler.ReturnType,
+                    ReturnsVoid = c.Handler.ReturnType.IsVoid(),
+                    Invocation = c.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "services"),
+                    ReturnsTask = c.Handler.ReturnType.IsTaskType()
+                })
+                .ToList(),
+            Queries = classDefinition.Queries
+                .Select(c => new
+                {
+                    c.MethodName,
+                    c.FullTypeName,
+                })
+                .ToList(),
+            Events = classDefinition.Events
+                .Select(c => new
+                {
+                    c.MethodName,
+                    c.FullTypeName,
+                    c.Broadcast
+                })
+                .ToList(),
         };
 
         var source = liquidEngine.Render(model, "SignalRHub");

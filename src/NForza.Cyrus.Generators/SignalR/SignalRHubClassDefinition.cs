@@ -66,15 +66,16 @@ public record SignalRHubClassDefinition
         Commands = commands
             .Select(genericArg =>
             {
-                if (symbol == null || !symbol.IsCommand())
+                var commandSymbol = (ITypeSymbol?)SemanticModel.GetSymbolInfo(genericArg).Symbol;
+                if (commandSymbol == null || !commandSymbol.IsCommand())
                     return null;
 
                 return new SignalRCommand
                 {
                     MethodName = genericArg.GetText().ToString(),
                     Name = symbol.Name,
-                    Handler = GetCommandHandler(symbol, cyrusProvider),
-                    FullTypeName = symbol.ToFullName()
+                    Handler = GetCommandHandler(commandSymbol, cyrusProvider),
+                    FullTypeName = commandSymbol.ToFullName()
                 };
             })
             .Where(command => command != null)
@@ -91,10 +92,10 @@ public record SignalRHubClassDefinition
         IEnumerable<SignalRQuery> signalRQueries = queries
             .Select(genericArg =>
             {
-                var symbol = (ITypeSymbol?)SemanticModel.GetSymbolInfo(genericArg).Symbol;
-                if (symbol == null || !symbol.IsQuery())
+                var querySymbol = (ITypeSymbol?)SemanticModel.GetSymbolInfo(genericArg).Symbol;
+                if (querySymbol == null || !querySymbol.IsQuery())
                     return null;
-                ITypeSymbol? returnType = GetReturnTypeOfQuery(symbol, cyrusProvider);
+                ITypeSymbol? returnType = GetReturnTypeOfQuery(querySymbol, cyrusProvider);
                 (bool isCollection, ITypeSymbol? collectionType) = returnType?.IsCollection() ?? (false, null);
                 var isNullable = returnType?.IsNullable();
                 ITypeSymbol? queryReturnType = isCollection ? collectionType : returnType;
@@ -103,8 +104,8 @@ public record SignalRHubClassDefinition
                     new SignalRQuery
                     {
                         MethodName = genericArg.GetText().ToString(),
-                        Name = symbol.Name,
-                        FullTypeName = symbol.ToFullName(),
+                        Name = querySymbol.Name,
+                        FullTypeName = querySymbol.ToFullName(),
                         ReturnType = new(queryReturnType!.Name, propertyModelsOfReturnType, [], isCollection, isNullable ?? false) //, [])
                     };
             })
@@ -136,7 +137,7 @@ public record SignalRHubClassDefinition
     }
 
     private IMethodSymbol? GetCommandHandler(ITypeSymbol symbol, CyrusGenerationContext cyrusProvider)
-        => cyrusProvider.CommandHandlers.FirstOrDefault(handler => SymbolEqualityComparer.Default.Equals(handler.Parameters[0].Type, symbol));
+        => cyrusProvider.AllCommandHandlers.FirstOrDefault(handler => SymbolEqualityComparer.Default.Equals(handler.Parameters[0].Type, symbol));
 
     private void SetEvents(INamedTypeSymbol symbol, BlockSyntax constructorBody)
     {
