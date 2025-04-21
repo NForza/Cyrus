@@ -19,8 +19,8 @@ public class {{ Name | generated_hub_name }}(IServiceProvider services, IQueryPr
     {% for cmd in Commands -%}
         public async Task {{ cmd.MethodName }} ({{ cmd.FullTypeName }} command)
         {       
-          var cmdResult = await commandDispatcher.Handle(command);
-          {%- if cmd.ReturnsEvents %}
+          {% if cmd.ReturnsEvents %}var cmdResult = {% endif %}await commandDispatcher.Handle(command);
+          {% if cmd.ReturnsEvents %}
           SendEvents(cmdResult.Events);
           {%- endif %}
         }
