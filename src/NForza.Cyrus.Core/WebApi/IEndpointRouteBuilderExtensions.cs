@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -14,12 +15,23 @@ public static class IEndpointRouteBuilderExtensions
 {
     public static IEndpointRouteBuilder MapCyrus(this WebApplication endpoints, ILogger? logger = null)
     {
-        IEnumerable<ICyrusWebStartup> startups = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(assembly => assembly.GetTypes())
-            .Where(type => typeof(ICyrusWebStartup).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
-            .Select(type => (ICyrusWebStartup)Activator.CreateInstance(type)!);
+        IEnumerable<Assembly> assembliesToScan = AppDomain.CurrentDomain.GetAssemblies()
+            .Where(a => !a.IsFrameworkAssembly())
+            .ToList();
 
-        foreach (var startup in startups)
+        IEnumerable<Type> typesToScan = assembliesToScan
+            .SelectMany(assembly => assembly.GetTypes())
+            .ToList();
+
+        IEnumerable<Type> typesToCreate = typesToScan
+            .Where(type => type.IsAssignableTo(typeof(ICyrusWebStartup)) && !type.IsInterface && !type.IsAbstract)
+            .ToList();
+
+        IEnumerable<ICyrusWebStartup> startupObjects = typesToCreate
+            .Select(type => (ICyrusWebStartup)Activator.CreateInstance(type)!)
+            .ToList();
+
+        foreach (var startup in startupObjects)
         {
             logger?.LogInformation($"Adding startup {startup.GetType().Name}");
             startup.AddStartup(endpoints);

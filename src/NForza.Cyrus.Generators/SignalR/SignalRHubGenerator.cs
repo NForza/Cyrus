@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -15,6 +16,9 @@ public class SignalRHubGenerator : CyrusGeneratorBase
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
         var signalRHubs = cyrusProvider.SignalRHubs.Select(h => h.Initialize(cyrusProvider));
+
+        ReportMissingHandlers(signalRHubs, spc);
+
         var configuration = cyrusProvider.GenerationConfig;
 
         var isWebApi = configuration.GenerationTarget.Contains(GenerationTarget.WebApi);
@@ -34,6 +38,30 @@ public class SignalRHubGenerator : CyrusGeneratorBase
                 string assemblyName = signalRHubs.First().Symbol.ContainingAssembly.Name;
                 var commandModels = GetPartialModelClass(assemblyName, "SignalR", "Hubs", "ModelHubDefinition", signalRHubs.Select(e => ModelGenerator.ForHub(e, LiquidEngine)));
                 spc.AddSource($"model-hubs.g.cs", SourceText.From(commandModels, Encoding.UTF8));
+            }
+        }
+    }
+
+    private void ReportMissingHandlers(IEnumerable<SignalRHubClassDefinition> signalRHubs, SourceProductionContext spc)
+    {
+        foreach(var hub in signalRHubs)
+        {
+            foreach (var command in hub.Commands)
+            {
+                if (command.Handler == null)
+                {
+                    spc.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptors.MissingHandler,
+                        Location.None));
+                    continue;
+                }
+                if (command.Handler.ReturnType == null)
+                {
+                    spc.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptors.UnableToDetermineReturnType,
+                        Location.None));
+                }
+
             }
         }
     }

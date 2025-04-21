@@ -13,7 +13,8 @@ public static class AssemblyExtensions
         "WindowsBase", 
         "Scalar", 
         "RabbitMQ", 
-        "MassTransit"
+        "MassTransit",
+        "NForza.Cyrus",
     ];
 
     public static bool IsFrameworkAssembly(this Assembly assembly)

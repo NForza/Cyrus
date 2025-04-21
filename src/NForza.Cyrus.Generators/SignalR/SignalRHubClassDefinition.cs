@@ -66,7 +66,6 @@ public record SignalRHubClassDefinition
         Commands = commands
             .Select(genericArg =>
             {
-                var symbol = (SemanticModel.GetSymbolInfo(genericArg).Symbol as ITypeSymbol);
                 if (symbol == null || !symbol.IsCommand())
                     return null;
 
@@ -74,7 +73,7 @@ public record SignalRHubClassDefinition
                 {
                     MethodName = genericArg.GetText().ToString(),
                     Name = symbol.Name,
-                    Handler = GetCommandHandler(symbol, cyrusProvider) ?? throw new InvalidCastException("Can't find return type for " + symbol.ToFullName()),
+                    Handler = GetCommandHandler(symbol, cyrusProvider),
                     FullTypeName = symbol.ToFullName()
                 };
             })
@@ -89,13 +88,13 @@ public record SignalRHubClassDefinition
                 .OfType<GenericNameSyntax>();
         var queries = memberAccessExpressionSyntaxes.Select(name => name.TypeArgumentList.Arguments.Single());
 
-        Queries = queries
+        IEnumerable<SignalRQuery> signalRQueries = queries
             .Select(genericArg =>
             {
                 var symbol = (ITypeSymbol?)SemanticModel.GetSymbolInfo(genericArg).Symbol;
                 if (symbol == null || !symbol.IsQuery())
                     return null;
-                ITypeSymbol returnType = GetReturnTypeOfQuery(symbol, cyrusProvider) ?? throw new InvalidCastException("Can't find return type for " + symbol.ToFullName());
+                ITypeSymbol? returnType = GetReturnTypeOfQuery(symbol, cyrusProvider);
                 (bool isCollection, ITypeSymbol? collectionType) = returnType?.IsCollection() ?? (false, null);
                 var isNullable = returnType?.IsNullable();
                 ITypeSymbol? queryReturnType = isCollection ? collectionType : returnType;
@@ -111,11 +110,15 @@ public record SignalRHubClassDefinition
             })
             .Where(query => query != null)
             .Cast<SignalRQuery>();
+
+        Queries = signalRQueries
+            .Where(query => query != null)
+            .Cast<SignalRQuery>();
     }
 
     private ITypeSymbol? GetReturnTypeOfQuery(ITypeSymbol symbol, CyrusGenerationContext cyrusProvider)
     {
-        var queryHandler = cyrusProvider.QueryHandlers.FirstOrDefault(handler => SymbolEqualityComparer.Default.Equals(handler.Parameters[0].Type, symbol));
+        var queryHandler = cyrusProvider.AllQueryHandlers.FirstOrDefault(handler => SymbolEqualityComparer.Default.Equals(handler.Parameters[0].Type, symbol));
         if (queryHandler != null)
         {
             var returnType = queryHandler.ReturnType;

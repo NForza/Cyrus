@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.SignalR;
@@ -53,6 +54,8 @@ namespace NForza.Cyrus.Generators
         public ImmutableArray<INamedTypeSymbol> Queries { get; private set; }
         public ImmutableArray<IMethodSymbol> QueryHandlers { get; private set; }
         public ImmutableArray<ISymbol> AllQueriesAndHandlers { get; private set; }
+        public ImmutableArray<IMethodSymbol> AllQueryHandlers => AllQueriesAndHandlers.OfType<IMethodSymbol>().ToImmutableArray();
+        public ImmutableArray<IMethodSymbol> AllHandlers => AllCommandsAndHandlers.Concat(AllQueriesAndHandlers).OfType<IMethodSymbol>().ToImmutableArray();
         public ImmutableArray<IMethodSymbol> Validators { get; private set; }
         public ImmutableArray<INamedTypeSymbol> Events { get; private set; }
         public ImmutableArray<IMethodSymbol> EventHandlers { get; private set; }
