@@ -13,7 +13,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 using System;       
                 using NForza.Cyrus.Abstractions;
 
-                namespace Demo;
+                namespace Test;
             
                 [Command]
                 public record CreateCustomerCommand(Guid Id);
@@ -39,9 +39,9 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
         generatedSyntaxTrees.Should().NotBeEmpty();
         generatedSyntaxTrees.Should().ContainSource("ServiceCollectionJsonConverterExtensions: ICyrusInitializer");
         generatedSyntaxTrees.Should().ContainSource("CommandDispatcherExtensions");
-        generatedSyntaxTrees.Should().ContainSource("Handle(this ICommandDispatcher commandDispatcher, global::Demo.CreateCustomerCommand command");
+        generatedSyntaxTrees.Should().ContainSource("Handle(this ICommandDispatcher commandDispatcher, global::Test.CreateCustomerCommand command");
         generatedSyntaxTrees.Should().ContainSource("CommandHandlersRegistration");
-        generatedSyntaxTrees.Should().ContainSource("AddTransient<global::Demo.Customer>()");
+        generatedSyntaxTrees.Should().ContainSource("AddTransient<global::Test.Customer>()");
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 using System;       
                 using NForza.Cyrus.Abstractions;
 
-                namespace Demo;
+                namespace Test;
             
                 [Command]
                 public record CreateCustomerCommand(Guid Id);
@@ -77,9 +77,9 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
         generatedSyntaxTrees.Should().NotBeEmpty();
         generatedSyntaxTrees.Should().ContainSource("ServiceCollectionJsonConverterExtensions: ICyrusInitializer");
         generatedSyntaxTrees.Should().ContainSource("CommandDispatcherExtensions");
-        generatedSyntaxTrees.Should().ContainSource("Handle(this ICommandDispatcher commandDispatcher, global::Demo.CreateCustomerCommand command");
+        generatedSyntaxTrees.Should().ContainSource("Handle(this ICommandDispatcher commandDispatcher, global::Test.CreateCustomerCommand command");
         generatedSyntaxTrees.Should().NotContainSource("CommandHandlersRegistration");
-        generatedSyntaxTrees.Should().NotContainSource("AddTransient<global::Demo.Customer>()");
+        generatedSyntaxTrees.Should().NotContainSource("AddTransient<global::Test.Customer>()");
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 using System;       
                 using NForza.Cyrus.Abstractions;
 
-                namespace Demo;
+                namespace Test;
             
                 public record CreateCustomerCommand(Guid Id);
 
@@ -119,7 +119,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 using System;       
                 using NForza.Cyrus.Abstractions;
 
-                namespace Demo;
+                namespace Test;
             
                 [Command]
                 public record CreateCustomerCommand(Guid Id);
@@ -152,7 +152,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 using System;       
                 using NForza.Cyrus.Abstractions;
 
-                namespace Demo;
+                namespace Test;
             
                 [Command]
                 public record CreateCustomerCommand(Guid Id);

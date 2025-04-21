@@ -11,7 +11,7 @@ public class TypedIdTests
         var source = @"
                 using NForza.Cyrus.Abstractions;
 
-                namespace Demo;
+                namespace Test;
             
                 [GuidId]
                 public partial record struct CustomerId; 
@@ -37,7 +37,7 @@ public class TypedIdTests
         var source = @"
                 using NForza.Cyrus.Abstractions;
 
-                namespace Demo;
+                namespace Test;
             
                 [GuidId]
                 public partial struct CustomerId; 

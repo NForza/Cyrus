@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.SignalR;
@@ -45,11 +46,9 @@ namespace NForza.Cyrus.Generators
         public ImmutableArray<INamedTypeSymbol> GuidIds { get; private set; }
         public ImmutableArray<INamedTypeSymbol> IntIds { get; private set; }
         public ImmutableArray<INamedTypeSymbol> StringIds { get; private set; }
-        public ImmutableArray<INamedTypeSymbol> TypedIds => GuidIds.AddRange(IntIds).AddRange(StringIds);   
         public ImmutableArray<INamedTypeSymbol> Commands { get; private set; }
         public ImmutableArray<IMethodSymbol> CommandHandlers { get; private set; }
         public ImmutableArray<ISymbol> AllCommandsAndHandlers { get; private set; }
-        public ImmutableArray<INamedTypeSymbol> AllCommands => AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToImmutableArray();
         public ImmutableArray<INamedTypeSymbol> Queries { get; private set; }
         public ImmutableArray<IMethodSymbol> QueryHandlers { get; private set; }
         public ImmutableArray<ISymbol> AllQueriesAndHandlers { get; private set; }
@@ -58,5 +57,11 @@ namespace NForza.Cyrus.Generators
         public ImmutableArray<IMethodSymbol> EventHandlers { get; private set; }
         public ImmutableArray<SignalRHubClassDefinition> SignalRHubs { get; private set; }
         public GenerationConfig GenerationConfig { get; private set; }
+        public ImmutableArray<INamedTypeSymbol> TypedIds => GuidIds.AddRange(IntIds).AddRange(StringIds);
+        public ImmutableArray<INamedTypeSymbol> AllCommands => AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToImmutableArray();
+        public ImmutableArray<IMethodSymbol> AllCommandHandlers => AllCommandsAndHandlers.OfType<IMethodSymbol>().ToImmutableArray();
+        public ImmutableArray<IMethodSymbol> AllQueryHandlers => AllQueriesAndHandlers.OfType<IMethodSymbol>().ToImmutableArray();
+        public ImmutableArray<IMethodSymbol> AllHandlers => AllCommandsAndHandlers.Concat(AllQueriesAndHandlers).OfType<IMethodSymbol>().ToImmutableArray();
+
     }
 }

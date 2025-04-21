@@ -141,4 +141,25 @@ public static class DiagnosticDescriptors
         isEnabledByDefault: true,
         description: "Validators should return IEnumerable<string>."
     );
+
+    public static readonly DiagnosticDescriptor MissingHandler = new DiagnosticDescriptor(
+        id: "CYRUS010",
+        title: "Missing Handler",
+        messageFormat: "Handler for '{0}' not found",
+        category: "Cyrus",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Each command or query should have a handler."
+    );
+
+    public static readonly DiagnosticDescriptor UnableToDetermineReturnType = new DiagnosticDescriptor(
+        id: "CYRUS011",
+        title: "Unable to determine return type",
+        messageFormat: "Unable to determine return type for {0}",
+        category: "Cyrus",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Unable to determine return type."
+    );
+
 }

@@ -1,7 +1,5 @@
 using System.Reflection;
-using DemoApp.Contracts;
 using DemoApp.Domain.Customer;
-using FluentValidation;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,7 +31,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddValidatorsFromAssemblyContaining<Customer>();
 builder.Services.AddCyrus();
 
 var app = builder.Build();

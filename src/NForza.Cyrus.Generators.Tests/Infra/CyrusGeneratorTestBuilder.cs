@@ -10,7 +10,7 @@ namespace NForza.Cyrus.Generators.Tests.Infra
     internal class CyrusGeneratorTestBuilder
     {
         private string? source;
-        private Action<string> logAction;
+        private Action<string> logAction = s => { };
 
         public async Task<(ImmutableArray<Diagnostic> compilerOutput, ImmutableArray<Diagnostic> analyzerOutput, IEnumerable<SyntaxTree> generatedSource)> RunAsync()
         {
@@ -23,7 +23,10 @@ namespace NForza.Cyrus.Generators.Tests.Infra
 
             var trustedAssemblies = ((string?)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES"))!
                 .Split(Path.PathSeparator)
-                .Concat([typeof(IServiceCollection).Assembly.Location])
+                .Concat([
+                    typeof(IServiceCollection).Assembly.Location,
+                    typeof(ICyrusWebStartup).Assembly.Location
+                    ])
                 .Distinct()
                 .Select(path => MetadataReference.CreateFromFile(path))
                 .ToList();
@@ -39,7 +42,15 @@ namespace NForza.Cyrus.Generators.Tests.Infra
 
             GeneratorDriver driver = CSharpGeneratorDriver.Create([generator]);
 
-            driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+            var updatedDriver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
+            var runResult = updatedDriver.GetRunResult(); 
+            var generatorResult = runResult.Results[0];          
+            if (generatorResult.Exception != null)
+            {
+                logAction.Invoke(generatorResult.Exception.ToString());
+                throw generatorResult.Exception;
+            }
+
             var compilationWithAnalyzers = outputCompilation.WithAnalyzers([new CyrusAnalyzer()]);
 
             var compileDiagnostics = outputCompilation.GetDiagnostics();
@@ -52,7 +63,7 @@ namespace NForza.Cyrus.Generators.Tests.Infra
             generatedSyntaxTrees.ToList().ForEach(tree =>
             {
                 var text = $"{tree.FilePath}{Environment.NewLine}----{Environment.NewLine}{tree}{Environment.NewLine}{Environment.NewLine}";
-                logAction?.Invoke(text);
+                logAction.Invoke(text);
             });
 
             return (compileDiagnostics, analyzerDiagnostics, generatedSyntaxTrees);

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -15,7 +15,10 @@ public class SignalRHubGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
-        var signalRHubs = cyrusProvider.SignalRHubs;
+        var signalRHubs = cyrusProvider.SignalRHubs.Select(h => h.Initialize(cyrusProvider));
+
+        ReportMissingHandlers(signalRHubs, spc);
+
         var configuration = cyrusProvider.GenerationConfig;
 
         var isWebApi = configuration.GenerationTarget.Contains(GenerationTarget.WebApi);
@@ -39,7 +42,31 @@ public class SignalRHubGenerator : CyrusGeneratorBase
         }
     }
 
-    private string GenerateSignalRHubRegistration(ImmutableArray<SignalRHubClassDefinition> signalRDefinitions, LiquidEngine liquidEngine)
+    private void ReportMissingHandlers(IEnumerable<SignalRHubClassDefinition> signalRHubs, SourceProductionContext spc)
+    {
+        foreach(var hub in signalRHubs)
+        {
+            foreach (var command in hub.Commands)
+            {
+                if (command.Handler == null)
+                {
+                    spc.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptors.MissingHandler,
+                        Location.None));
+                    continue;
+                }
+                if (command.Handler.ReturnType == null)
+                {
+                    spc.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptors.UnableToDetermineReturnType,
+                        Location.None));
+                }
+
+            }
+        }
+    }
+
+    private string GenerateSignalRHubRegistration(IEnumerable<SignalRHubClassDefinition> signalRDefinitions, LiquidEngine liquidEngine)
     {
         var usings = signalRDefinitions
             .Select(cm => cm.Symbol.ContainingNamespace)
@@ -66,43 +93,50 @@ public class SignalRHubGenerator : CyrusGeneratorBase
         return source;
     }
 
+    static CommandAdapterMethod[] adapterMethodsWithEvents =
+        [
+                            CommandAdapterMethod.FromIResultAndEvents,
+                            CommandAdapterMethod.FromIResultAndEvent
+        ];
+
     private string GenerateSignalRHub(SignalRHubClassDefinition classDefinition, LiquidEngine liquidEngine)
     {
-        string queries = GenerateQueries(classDefinition.Queries);
-
         var model = new
         {
             classDefinition.Symbol.Name,
             Namespace = classDefinition.Symbol.ContainingNamespace.ToDisplayString(),
-            Commands = classDefinition.Commands.Select(c => new
-            {
-                c.MethodName,
-                c.FullTypeName,
-                c.Handler.ReturnType,
-                ReturnsVoid = c.Handler.ReturnType.IsVoid(),
-                Invocation = c.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "services"),
-                ReturnsTask = c.Handler.ReturnType.IsTaskType()
-            }),
-            QueryMethods = queries,
+            Commands = classDefinition.Commands
+                .Select(c => new
+                {
+                    c.MethodName,
+                    c.FullTypeName,
+                    c.Handler.ReturnType,
+                    ReturnsVoid = c.Handler.ReturnType.IsVoid(),
+                    Invocation = c.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "services"),
+                    ReturnsTask = c.Handler.ReturnType.IsTaskType(),
+                    ReturnsEvents = adapterMethodsWithEvents
+                        .Contains(c.Handler.GetAdapterMethodName()),
+                })
+                .ToList(),
+            Queries = classDefinition.Queries
+                .Select(c => new
+                {
+                    c.MethodName,
+                    c.FullTypeName,
+                })
+                .ToList(),
+            Events = classDefinition.Events
+                .Select(c => new
+                {
+                    c.MethodName,
+                    c.FullTypeName,
+                    c.Broadcast
+                })
+                .ToList(),
         };
 
         var source = liquidEngine.Render(model, "SignalRHub");
 
         return source;
-    }
-
-    private static string GenerateQueries(IEnumerable<SignalRQuery> signalRQueries)
-    {
-        var sb = new StringBuilder();
-        foreach (var query in signalRQueries)
-        {
-            sb.AppendLine(
-    @$"public async Task {query.MethodName}({query.FullTypeName} query) 
-    {{
-        var result = await queryProcessor.Query(query);
-        await SendQueryResultReply(""{query.MethodName}"", result);
-    }}");
-        }
-        return sb.ToString();
     }
 }

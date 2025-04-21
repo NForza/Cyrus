@@ -90,7 +90,7 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
                 HasBody = handler.HasParametersInBody(),
                 CommandType = handler.Parameters[0].Type.ToFullName(),
                 CommandName = handler.Parameters[0].Type.Name,
-                AdapterMethod = GetAdapterMethodName(handler),
+                AdapterMethod = handler.GetAdapterMethodName().ToString(),
                 ReturnsTask = handler.ReturnsTask(),
                 ValidatorMethod = validator,
                 ValidatorMethodIsStatic = validator?.IsStatic,
@@ -105,41 +105,4 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
         return sb.ToString().Trim();
     }
 
-    private string GetAdapterMethodName(IMethodSymbol handler)
-    {
-        var returnType = handler switch
-        {
-            _ when handler.ReturnsTask(out var taskResultType) && taskResultType != null => taskResultType,
-            _ when handler.ReturnsTask() => null,
-            _ => handler.ReturnType
-        };
-
-        if (returnType == null || returnType.SpecialType == SpecialType.System_Void)
-            return "FromVoid";
-
-        if (returnType.Name == "IResult" &&
-                returnType.ContainingNamespace.ToDisplayString() == "Microsoft.AspNetCore.Http")
-            return "FromIResult";
-
-        if (returnType.IsTupleType && returnType is INamedTypeSymbol namedTypeSymbol)
-        {
-            if (namedTypeSymbol.TupleElements.Length == 2)
-            {
-                var firstElement = namedTypeSymbol.TupleElements[0];
-                if (firstElement.Type.Name == "IResult" &&
-                    firstElement.Type.ContainingNamespace.ToDisplayString() == "Microsoft.AspNetCore.Http")
-                {
-                    var secondElement = namedTypeSymbol.TupleElements[1];
-                    if (secondElement.Type.Name == "Object")
-                    {
-                        return "FromIResultAndEvent";
-                    }
-                    return "FromIResultAndEvents";
-                }
-            }
-
-            return "FromIResultAndEvents";
-        }
-        return "FromObjects";
-    }
 }

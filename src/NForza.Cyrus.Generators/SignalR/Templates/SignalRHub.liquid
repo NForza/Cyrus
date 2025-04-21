@@ -7,13 +7,29 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace {{ Namespace }};
 
-public class {{ Name }}_Generated(IServiceProvider services, IQueryProcessor queryProcessor) : HubBase
-{
-    {% for cmd in Commands %}
-        public async Task {{ cmd.MethodName }} ({{ cmd.FullTypeName }} command) 
-        {% if cmd.ReturnsVoid %} { {% else %} => {% endif %} 
-                {%- if cmd.ReturnsTask %}await {% endif %}{{ cmd.Invocation }};
-           {%- if cmd.ReturnsVoid %} } {% endif %} 
+public class {{ Name | generated_hub_name }}(IServiceProvider services, IQueryProcessor queryProcessor, ICommandDispatcher commandDispatcher) : CyrusHub
+    (
+      [
+      {% for e in Events -%}
+        (typeof({{ e.FullTypeName }}), {{ e.Broadcast }}){% unless forloop.last %}, {% endunless -%}
+      {% endfor %}
+      ]
+    )
+{   
+    {% for cmd in Commands -%}
+        public async Task {{ cmd.MethodName }} ({{ cmd.FullTypeName }} command)
+        {       
+          {% if cmd.ReturnsEvents %}var cmdResult = {% endif %}await commandDispatcher.Handle(command);
+          {% if cmd.ReturnsEvents %}
+          SendEvents(cmdResult.Events);
+          {%- endif %}
+        }
     {% endfor %}
-    {{ QueryMethods }}
+    {%- for q in Queries %}
+        public async Task {{ q.MethodName }}({{ q.FullTypeName }} query) 
+        {
+            var result = await queryProcessor.Query(query);
+            await SendQueryResultReply("{{ q.MethodName }}", result);
+        }
+    {% endfor %}
 }
