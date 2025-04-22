@@ -16,13 +16,6 @@ internal static class TypeScriptGenerator
 {
     private static LiquidEngine liquidEngine = new LiquidEngine(Assembly.GetExecutingAssembly(), options =>
     {
-        options.Filters.AddFilter("camel_case", (input, arguments, context) =>
-        {
-            string value = input.ToStringValue();
-            if (string.IsNullOrEmpty(value)) return new StringValue(value);
-            return new StringValue(char.ToLowerInvariant(value[0]) + value[1..]);
-        });
-
         options.Filters.AddFilter("to_typescript_type", (input, arguments, context) =>
         {
             string value = input.ToStringValue();
