@@ -1,4 +1,23 @@
 ﻿using System;
 using NForza.Cyrus.TypescriptGenerate;
 
-TypeScriptGenerator.Generate("C:\\dev\\Cyrus\\examples\\DemoApp\\DemoApp.WebApi\\metadata.json", ".");
+using System.CommandLine;
+
+var inputFileOption = new Option<string>(
+    name: "--input",
+    description: "Path to model JSON file",
+    getDefaultValue: () => "metadata.json");
+
+var outputPathOption = new Option<string>(
+    name: "--output",
+    description: "TypeScript output folder",
+    getDefaultValue: () => ".");
+
+var root = new RootCommand("Generate")
+{
+    inputFileOption,
+    outputPathOption            
+};
+root.SetHandler(TypeScriptGenerator.Generate, inputFileOption, outputPathOption);
+
+return await root.InvokeAsync(args); 
