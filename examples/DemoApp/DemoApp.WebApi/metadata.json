@@ -190,8 +190,8 @@
       "name": "CustomerHub",
       "path": "/customer-hub",
       "commands": [
-        "CustomerHub",
-        "CustomerHub"
+        "AddCustomerCommand",
+        "DeleteCustomerCommand"
       ],
       "queries": [
         {

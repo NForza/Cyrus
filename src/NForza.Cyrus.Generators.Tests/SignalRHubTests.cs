@@ -49,6 +49,8 @@ public class SignalRHubTests(ITestOutputHelper outputWindow)
         generatedSyntaxTrees.Should().NotBeEmpty();
         generatedSyntaxTrees.Should().ContainSource("app.MapHub<global::Test.CustomerHub_Generated>(\"/customers\")");
         generatedSyntaxTrees.Should().ContainSource("public async Task NewCustomerCommand (global::Test.NewCustomerCommand command)");
+        generatedSyntaxTrees.Should().ContainSource("[\"NewCustomerCommand\"]");
+        generatedSyntaxTrees.Should().ContainSource("new ModelHubDefinition(\"CustomerHub\", \"/customers\"");
     }
 
     [Fact]
