@@ -105,19 +105,52 @@ internal static class TypeScriptGenerator
         return typeScriptType;
     }
 
-    public static void Generate(string metadataFile, string outputFolder)
+    public static int Generate(string metadataFile, string outputFolder)
     {
+        if (!Directory.Exists(outputFolder))
+        {
+            Console.Error.WriteLine($"Output folder {outputFolder} does not exist.");
+            return 1;
+        }
+        if (!File.Exists(metadataFile))
+        {
+            Console.Error.WriteLine($"Input file {outputFolder} does not exist.");
+            return 1;
+        }
+
+        Console.WriteLine("Reading input file: " + metadataFile);
         var json = File.ReadAllText(metadataFile);
         metadata = JsonSerializer.Deserialize<CyrusMetadata>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web)) ?? throw new InvalidOperationException("Can't read metadata");
 
-        GenerateGuids(outputFolder, metadata);
-        GenerateStrings(outputFolder, metadata);
-        GenerateIntegers(outputFolder, metadata);
-        GenerateCommands(outputFolder, metadata);
-        GenerateQueries(outputFolder, metadata);
-        GenerateEvents(outputFolder, metadata);
-        GenerateHubs(outputFolder, metadata);
-        GenerateModels(outputFolder, metadata);
+        var path = Path.GetFullPath(outputFolder);
+
+        Console.WriteLine("Writing output to: " + path);
+        Console.WriteLine();
+
+        Console.WriteLine("Writing Guids.");
+        GenerateGuids(path, metadata);
+
+        Console.WriteLine("Writing Strings.");
+        GenerateStrings(path, metadata);
+
+        Console.WriteLine("Writing Integers.");
+        GenerateIntegers(path, metadata);
+
+        Console.WriteLine("Writing Commands.");
+        GenerateCommands(path, metadata);
+
+        Console.WriteLine("Writing Queries.");
+        GenerateQueries(path, metadata);
+
+        Console.WriteLine("Writing Events.");
+        GenerateEvents(path, metadata);
+
+        Console.WriteLine("Writing Hubs.");
+        GenerateHubs(path, metadata);
+
+        Console.WriteLine("Writing Models.");
+        GenerateModels(path, metadata);
+        return 0;
     }
 
     private static void GenerateModels(string outputFolder, CyrusMetadata metadata)
