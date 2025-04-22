@@ -1,7 +1,7 @@
 ﻿new ModelHubDefinition("{{ Name }}", "{{ Path }}", 
   [
 	{%- for c in Commands -%}
-	  "{{ c.Name }}"{% unless forloop.last %}, {% endunless -%}
+	  "{{ c.MethodName }}"{% unless forloop.last %}, {% endunless -%}
 	{%- endfor -%}
   ],
   [
