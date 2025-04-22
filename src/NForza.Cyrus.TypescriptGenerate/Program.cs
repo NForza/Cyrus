@@ -18,6 +18,6 @@ var root = new RootCommand("Generate")
     inputFileOption,
     outputPathOption            
 };
-root.SetHandler(TypeScriptGenerator.Generate, inputFileOption, outputPathOption);
+root.SetHandler((input, output) => TypeScriptGenerator.Generate(input, output), inputFileOption, outputPathOption);
 
 return await root.InvokeAsync(args); 
