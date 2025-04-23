@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CustomerHubService } from './generated/CustomerHub';
 import { CustomerType } from './generated/CustomerType';
 import { CustomerAddedEvent } from './generated/CustomerAddedEvent';
+import { Customer } from './generated/Customer';
 
 @Component({
   selector: 'app-root',
@@ -12,10 +13,13 @@ export class AppComponent {
   title = 'CyrusApp';
   
   public messages: CustomerAddedEvent[] = [];
+  public customers: Customer[] = [];
+  private count: number = 1;
 
   constructor(private signalRService: CustomerHubService) {
     signalRService.startConnection();
     signalRService.onCustomerAdded.subscribe(e => this.addToList(e));
+    signalRService.allCustomersQueryResult.subscribe(r => this.customers = r);
   }
 
   private addToList(c: CustomerAddedEvent): void {
@@ -29,7 +33,7 @@ export class AppComponent {
     this.signalRService.startConnection();
   }
 
-  sendMessage(): void {
+  addCustomer(): void {
     this.signalRService.addCustomerCommand(
       { 
         customerType: CustomerType.Company,
@@ -37,4 +41,9 @@ export class AppComponent {
         name: "name1", 
         address: { street: "Street", streetNumber: 1 }});
   }
+
+  allCustomers(): void {
+    this.signalRService.allCustomersQuery({page: this.count, pageSize: 10});
+    this.count += 10;
+  }  
 }
