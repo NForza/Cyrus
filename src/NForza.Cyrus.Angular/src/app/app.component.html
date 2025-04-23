@@ -1,7 +1,15 @@
 <div>
-  <button (click)="sendMessage()">Send</button>
+  <button (click)="addCustomer()">Add Customer</button>
+</div>
+
+<div>
+  <button (click)="allCustomers()">Query</button>
 </div>
 
 <div *ngFor="let msg of messages">
   <p>Customer Added:  {{ msg.id }}, {{ msg.name }}, {{ msg.address.street }}, {{ msg.address.streetNumber }}</p>
+</div>
+
+<div *ngFor="let msg of customers">
+  <p>Customer:  {{ msg.name }}, {{ msg.name }}</p>
 </div>

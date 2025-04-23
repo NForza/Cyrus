@@ -13,7 +13,7 @@ public class CustomersQueryHandler
     [OutputCache(Duration = 60)]
     public Task<Customer[]> QueryAllCustomers(AllCustomersQuery query)
     {
-        var customers = Enumerable.Range(1, 10)
+        var customers = Enumerable.Range(query.Page, query.PageSize)
             .Select(i => new Customer(new(), new Name($"Customer-{i}")))
             .ToArray();
         return Task.FromResult(customers);
