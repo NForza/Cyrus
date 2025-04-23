@@ -1,1 +1,1 @@
-﻿{ {% for prop in Properties %}{{ prop.Name }}{% if prop.IsNullable %}?{% endif %}: {{ prop | to_typescript_default }}{% if prop.IsCollection %}[]{% endif %}{% unless forloop.last %}, {% endunless -%}{% endfor %} }
+﻿{ {% for prop in Properties %}{{ prop.Name | camel-cased }}{% if prop.IsNullable %}?{% endif %}: {{ prop | to_typescript_default }}{% if prop.IsCollection %}[]{% endif %}{% unless forloop.last %}, {% endunless -%}{% endfor %} }

@@ -15,6 +15,7 @@ namespace NForza.Cyrus.Templating
             options = new TemplateOptions();
             options.Filters.AddFilter("as-contract", CyrusFilters.ContractName);
             options.Filters.AddFilter("generated_hub_name", CyrusFilters.GeneratedHubName);
+            options.Filters.AddFilter("camel-cased", CyrusFilters.CamelCased);
             options.FileProvider = fileProvider;
             options.MemberAccessStrategy = UnsafeMemberAccessStrategy.Instance;
             configure?.Invoke(options);

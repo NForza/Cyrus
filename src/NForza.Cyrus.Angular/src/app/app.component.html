@@ -1,0 +1,7 @@
+<div>
+  <button (click)="sendMessage()">Send</button>
+</div>
+
+<div *ngFor="let msg of messages">
+  <p>Customer Added:  {{ msg.id }}, {{ msg.name }}, {{ msg.address.street }}, {{ msg.address.streetNumber }}</p>
+</div>

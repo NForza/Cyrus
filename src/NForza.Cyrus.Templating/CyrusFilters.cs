@@ -21,8 +21,8 @@ namespace NForza.Cyrus.Templating
             }
 
             return new ValueTask<FluidValue>(input);
-        }          
-        
+        }
+
         public static ValueTask<FluidValue> GeneratedHubName(FluidValue input, FilterArguments arguments, TemplateContext context)
         {
             if (input.Type == FluidValues.String)
@@ -35,6 +35,24 @@ namespace NForza.Cyrus.Templating
                 return new ValueTask<FluidValue>(new StringValue(text));
             }
 
+            return new ValueTask<FluidValue>(input);
+        }
+
+        public static ValueTask<FluidValue> CamelCased(FluidValue input, FilterArguments arguments, TemplateContext context)
+        {
+            if (input.Type == FluidValues.String)
+            {
+                var text = input.ToStringValue();
+                if (!string.IsNullOrEmpty(text) && !char.IsLower(text, 0))
+                {
+                    if (text.Length == 1)
+                        text = char.ToLowerInvariant(text[0]).ToString();
+                    else
+                        text = char.ToLowerInvariant(text[0]) + text.Substring(1);
+                }
+
+                return new ValueTask<FluidValue>((new StringValue(text)));
+            }
             return new ValueTask<FluidValue>(input);
         }
     }

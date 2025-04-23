@@ -12,10 +12,10 @@ export class {{ Name }}Service {
   private hubConnection: signalR.HubConnection;
 
 {%- for q in Queries %}
-  private _{{ q.Name | camel_case }}Result: BehaviorSubject<{{ q | query_return_type }}> = new BehaviorSubject<{{ q | query_return_type }}>({{ q.ReturnType | to_typescript_default }});
+  private _{{ q.Name | camel-cased }}Result: BehaviorSubject<{{ q | query_return_type }}> = new BehaviorSubject<{{ q | query_return_type }}>({{ q.ReturnType | to_typescript_default }});
 {%- endfor %}
 {%- for e in Events %}
-  private _{{ e | camel_case }}Subject: Subject<{{ e }}> = new Subject<{{ e }}>();
+  private _{{ e | camel-cased }}Subject: Subject<{{ e }}> = new Subject<{{ e }}>();
 {%- endfor %}
 
   constructor() {
@@ -24,15 +24,15 @@ export class {{ Name }}Service {
       .configureLogging(signalR.LogLevel.Information)
       .build();
     {%- for e in Events %}
-    this.hubConnection.on('{{ e | camel_case }}', (data: {{e}}) => {
+    this.hubConnection.on('{{ e | camel-cased }}', (data: {{e}}) => {
       console.log('Received {{e}}:', data);
-      this._{{ e | camel_case }}Subject.next(data);
+      this._{{ e | camel-cased }}Subject.next(data);
     });
     {%- endfor %}
     {%- for q in Queries %}  
-    this.hubConnection.on('{{ q.Name | camel_case }}Result', (data : {{ q | query_return_type}}) => {
+    this.hubConnection.on('{{ q.Name | camel-cased }}Result', (data : {{ q | query_return_type}}) => {
       console.log('Received {{e}}:', data);
-      this._{{ q.Name | camel_case }}Result.next(data);
+      this._{{ q.Name | camel-cased }}Result.next(data);
     });
     {%- endfor %}
     this.hubConnection.onclose((error) => {
@@ -51,29 +51,29 @@ export class {{ Name }}Service {
       });
   }
   {%- for c in Commands %}  
-  public {{ c | camel_case }}(command: {{ c }} ): void {
-    console.log('Sending {{ c | camel_case }}');           
-    this.hubConnection.invoke('{{ c | camel_case }}', command).catch((err) => {
-      console.error('Error sending {{ c | camel_case }}:', err);
+  public {{ c | camel-cased }}(command: {{ c }} ): void {
+    console.log('Sending {{ c | camel-cased }}');           
+    this.hubConnection.invoke('{{ c | camel-cased }}', command).catch((err) => {
+      console.error('Error sending {{ c | camel-cased }}:', err);
     });
   }
   {%- endfor %}
   {%- for q in Queries %}  
-  public {{ q.Name | camel_case }}(query: {{ q.Name }} ): void {
-    console.log('Sending {{ q.Name | camel_case }}');
-    this.hubConnection.invoke('{{ q.Name | camel_case }}', query).catch((err) => {
-      console.error('Error sending {{ q.Name | camel_case }}:', err);
+  public {{ q.Name | camel-cased }}(query: {{ q.Name }} ): void {
+    console.log('Sending {{ q.Name | camel-cased }}');
+    this.hubConnection.invoke('{{ q.Name | camel-cased }}', query).catch((err) => {
+      console.error('Error sending {{ q.Name | camel-cased }}:', err);
     });
   }
 
-  public get {{ q.Name | camel_case }}Result(): Observable<{{ q | query_return_type }}> {
-    return this._{{ q.Name | camel_case }}Result;
+  public get {{ q.Name | camel-cased }}Result(): Observable<{{ q | query_return_type }}> {
+    return this._{{ q.Name | camel-cased }}Result;
   }
   {%- endfor %}
 
   {%- for e in Events %}
   public get on{{ e | strip_postfix }}(): Observable<{{ e }}> {
-    return this._{{ e | camel_case }}Subject;
+    return this._{{ e | camel-cased }}Subject;
   }
   {%- endfor %}
 }
