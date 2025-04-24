@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace NForza.Cyrus.Generators.Roslyn;
 
-public static class AttibuteDataExtensions
+public static class AttributeDataExtensions
 {
     private static string[] excludedNamespaces = ["System", "NForza"];
 
