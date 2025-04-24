@@ -47,10 +47,10 @@ public class SignalRHubTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().ContainSource("app.MapHub<global::Test.CustomerHub_Generated>(\"/customers\")");
-        generatedSyntaxTrees.Should().ContainSource("public async Task NewCustomerCommand (global::Test.NewCustomerCommand command)");
-        generatedSyntaxTrees.Should().ContainSource("[\"NewCustomerCommand\"]");
-        generatedSyntaxTrees.Should().ContainSource("new ModelHubDefinition(\"CustomerHub\", \"/customers\"");
+        generatedSyntaxTrees.Should().Contain("app.MapHub<global::Test.CustomerHub_Generated>(\"/customers\")");
+        generatedSyntaxTrees.Should().Contain("public async Task NewCustomerCommand (global::Test.NewCustomerCommand command)");
+        generatedSyntaxTrees.Should().Contain("[\"NewCustomerCommand\"]");
+        generatedSyntaxTrees.Should().Contain("new ModelHubDefinition(\"CustomerHub\", \"/customers\"");
     }
 
     [Fact]
@@ -97,9 +97,9 @@ public class SignalRHubTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().ContainSource("app.MapHub<global::Test.CustomerHub_Generated>(\"/customers\")");
-        generatedSyntaxTrees.Should().ContainSource("public async Task CustomerByIdQuery(global::Test.CustomerByIdQuery query)");
-        generatedSyntaxTrees.Should().ContainSource("await SendQueryResultReply(\"CustomerByIdQuery\", result)");
+        generatedSyntaxTrees.Should().Contain("app.MapHub<global::Test.CustomerHub_Generated>(\"/customers\")");
+        generatedSyntaxTrees.Should().Contain("public async Task CustomerByIdQuery(global::Test.CustomerByIdQuery query)");
+        generatedSyntaxTrees.Should().Contain("await SendQueryResultReply(\"CustomerByIdQuery\", result)");
     }
 
 
@@ -148,8 +148,8 @@ public class SignalRHubTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().ContainSource("app.MapHub<global::Test.CustomerHub_Generated>(\"/customers\")");
-        generatedSyntaxTrees.Should().ContainSource("(typeof(global::Test.CustomerCreatedEvent), false)");
+        generatedSyntaxTrees.Should().Contain("app.MapHub<global::Test.CustomerHub_Generated>(\"/customers\")");
+        generatedSyntaxTrees.Should().Contain("(typeof(global::Test.CustomerCreatedEvent), false)");
     }
 
     [Fact]
@@ -197,7 +197,7 @@ public class SignalRHubTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().ContainSource("app.MapHub<global::Test.CustomerHub_Generated>(\"/customers\")");
-        generatedSyntaxTrees.Should().ContainSource("(typeof(global::Test.CustomerCreatedEvent), true)");
+        generatedSyntaxTrees.Should().Contain("app.MapHub<global::Test.CustomerHub_Generated>(\"/customers\")");
+        generatedSyntaxTrees.Should().Contain("(typeof(global::Test.CustomerCreatedEvent), true)");
     }
 }
