@@ -1,6 +1,5 @@
-﻿namespace NForza.Cyrus.Abstractions
+﻿namespace NForza.Cyrus.Abstractions;
+
+public interface IIntId : ITypedId
 {
-    public interface IIntId : ITypedId
-    {
-    }
 }

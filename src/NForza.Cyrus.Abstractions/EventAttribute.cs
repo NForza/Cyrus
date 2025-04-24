@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace NForza.Cyrus.Abstractions
+namespace NForza.Cyrus.Abstractions;
+
+[AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class)]
+public class EventAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class)]
-    public class EventAttribute : Attribute
-    {
-    }
 }

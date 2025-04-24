@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace NForza.Cyrus.Abstractions
+namespace NForza.Cyrus.Abstractions;
+
+[AttributeUsage(AttributeTargets.Struct)]
+public class GuidIdAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Struct)]
-    public class GuidIdAttribute : Attribute
-    {
-    }
 }

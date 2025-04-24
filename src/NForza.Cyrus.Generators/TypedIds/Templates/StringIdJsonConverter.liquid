@@ -6,14 +6,26 @@ namespace {{ Namespace }};
 
 public class {{ Name }}JsonConverter : JsonConverter<{{ Name }}>
 {
-    public override {{ Name }} Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override {{ Name }} Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options)
     {
-        var value = reader.GetString();  
-        return new {{ Name }}(value);
+        if (reader.TokenType == JsonTokenType.Null)
+            return default;
+
+        if (reader.TokenType != JsonTokenType.String)
+            throw new JsonException($"Expected string, found {reader.TokenType}.");
+
+        string? raw = reader.GetString();                 
+        return new {{ Name }}(raw);
     }
 
-    public override void Write(Utf8JsonWriter writer, {{ Name }} value, JsonSerializerOptions options)
+    public override void Write(
+        Utf8JsonWriter writer,
+        {{ Name }} value,
+        JsonSerializerOptions options)
     {
-        writer.WriteStringValue(value.Value?.ToString());
+        writer.WriteStringValue(value.Value);
     }
 }
