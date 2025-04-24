@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace {{ Namespace }};
 
-public class {{ Name | generated_hub_name }}(IServiceProvider services, IQueryProcessor queryProcessor, ICommandDispatcher commandDispatcher) : CyrusHub
+public class {{ Name | generated-hub-name }}(IQueryProcessor queryProcessor, ICommandDispatcher commandDispatcher) : CyrusHub
     (
       [
       {% for e in Events -%}

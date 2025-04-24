@@ -29,7 +29,7 @@ public static class AttibuteDataExtensions
                 return $"{constant.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}.{constant.Value}";
             }
 
-            return constant.Type.SpecialType switch
+            return constant.Type?.SpecialType switch
             {
                 SpecialType.System_String => $"\"{constant.Value}\"",
                 SpecialType.System_Char => $"'{constant.Value}'",

@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.Generators.TypedIds;
+namespace NForza.Cyrus.Generators.TypedIds;
 
 public class GuidIdTypeConverterGenerator : CyrusGeneratorBase
 {

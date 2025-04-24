@@ -8,7 +8,7 @@ using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.Generators.TypedIds;
+namespace NForza.Cyrus.Generators.TypedIds;
 
 public class TypedIdInitializerGenerator : CyrusGeneratorBase
 {

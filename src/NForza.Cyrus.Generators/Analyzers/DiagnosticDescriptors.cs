@@ -1,5 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 
+namespace NForza.Cyrus.Generators.Analyzers;
+
 public static class DiagnosticDescriptors
 {
     public static readonly DiagnosticDescriptor InternalCyrusError = new DiagnosticDescriptor(
@@ -9,7 +11,7 @@ public static class DiagnosticDescriptors
         category: "Cyrus",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "An internal error occured in the Cyrus Source Generator."
+        description: "An internal error occurred in the Cyrus Source Generator."
     );
 
     public static readonly DiagnosticDescriptor MissingCommandAttribute = new DiagnosticDescriptor(

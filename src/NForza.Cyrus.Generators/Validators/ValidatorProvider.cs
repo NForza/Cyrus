@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.WebApi;
+namespace NForza.Cyrus.Generators.Validators;
 
 public class ValidatorProvider : CyrusProviderBase<ImmutableArray<IMethodSymbol>>
 {
