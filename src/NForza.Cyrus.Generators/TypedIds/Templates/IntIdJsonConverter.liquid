@@ -6,13 +6,43 @@ namespace {{ Namespace }};
 
 public class {{ Name }}JsonConverter : JsonConverter<{{ Name }}>
 {
-    public override {{ Name }} Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override {{ Name }} Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options)
     {
-        var value = reader.GetInt32();  
-        return new {{ Name }}(value);
+        if (reader.TokenType == JsonTokenType.Null)
+            return default;
+
+        int number;
+
+        if (reader.TokenType == JsonTokenType.Number)
+        {
+            if (!reader.TryGetInt32(out number))
+                throw new JsonException(
+                    $"Number is outside Int32 range for {{ Name }}.");
+        }
+
+        else if (reader.TokenType == JsonTokenType.String)
+        {
+            var raw = reader.GetString();
+            if (!int.TryParse(raw, out number))
+                throw new JsonException(
+                    $"\"{raw}\" is not a valid integer for {{ Name }}.");
+        }
+        else
+        {
+            throw new JsonException(
+                $"Expected number or numeric string, found {reader.TokenType}.");
+        }
+
+        return new {{ Name }}(number);
     }
 
-    public override void Write(Utf8JsonWriter writer, {{ Name }} value, JsonSerializerOptions options)
+    public override void Write(
+        Utf8JsonWriter writer,
+        {{ Name }} value,
+        JsonSerializerOptions options)
     {
         writer.WriteNumberValue(value.Value);
     }

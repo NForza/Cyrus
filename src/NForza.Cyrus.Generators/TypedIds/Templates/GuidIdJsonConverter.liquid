@@ -6,14 +6,32 @@ namespace {{ Namespace }};
 
 public class {{ Name }}JsonConverter : JsonConverter<{{ Name }}>
 {
-    public override {{ Name }} Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override {{ Name }} Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options)
     {
-        var value = reader.GetGuid();  
-        return new {{ Name }}(value);
+        if (reader.TokenType == JsonTokenType.Null)
+        {
+            return default;
+        }
+
+        if (reader.TokenType != JsonTokenType.String)
+            throw new JsonException($"Expected string, found {reader.TokenType}.");
+
+        string? raw = reader.GetString();          
+        if (!Guid.TryParse(raw, out Guid guid))
+            throw new JsonException(
+                $"\"{raw}\" is not a valid GUID for {{ Name }}.");
+
+        return new {{ Name }}(guid);
     }
 
-    public override void Write(Utf8JsonWriter writer, {{ Name }} value, JsonSerializerOptions options)
+    public override void Write(
+        Utf8JsonWriter writer,
+        {{ Name }} value,
+        JsonSerializerOptions options)
     {
-        writer.WriteStringValue(value.Value.ToString());
+        writer.WriteStringValue(value.Value.ToString("D")); // “D” = 32 digits + 4 hyphens
     }
 }
