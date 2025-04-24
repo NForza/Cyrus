@@ -46,7 +46,8 @@ public static class WebApiContractGenerator
                     p.Name,
                     Internal = propertiesFromRoute.Contains(p.Name),
                     Type = p.Type.ToFullName(),
-                    IsNullable = p.Type.IsNullable()
+                    IsNullable = p.Type.IsNullable(),
+                    DefaultValue = p.GetDefaultValue(),
                 })
                 .ToList();
             var model = new
@@ -65,7 +66,7 @@ public static class WebApiContractGenerator
                 ConstructorProperties = publicProperties.Where(p => !constructorArgumentNames.Contains(p.Name)).ToList()
             };
 
-            var fileContents = liquidEngine.Render(model, "WebApiContractRecord");
+            var fileContents = liquidEngine.Render(model, "WebApiContract");
 
             sourceProductionContext.AddSource(
                $"{contract.Name}Contract.g.cs",

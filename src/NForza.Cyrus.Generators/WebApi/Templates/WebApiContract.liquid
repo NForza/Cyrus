@@ -9,7 +9,7 @@ public class {{ Name | as-contract }}
 {
 {%- for prop in Properties %}
 	{% if prop.IsNullable == false %}[Required]{% endif %}
-	{% if prop.Internal == true %}internal{% else %}public{% endif %} {{ prop.Type }}{% if prop.IsNullable == false %}?{% endif %} {{ prop.Name }} { get; set; }
+	{% if prop.Internal == true %}internal{% else %}public{% endif %} {{ prop.Type }}{% if prop.IsNullable == false %}?{% endif %} {{ prop.Name }} { get; set; }  {% if prop.DefaultValue %} = {{ prop.DefaultValue }}; {% endif %}
 {% endfor -%}
 
 	internal IEnumerable<string> ValidationErrors
