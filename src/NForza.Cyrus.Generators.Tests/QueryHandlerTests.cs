@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using NForza.Cyrus.Generators.Analyzers;
 using NForza.Cyrus.Generators.Tests.Infra;
 using Xunit.Abstractions;
 

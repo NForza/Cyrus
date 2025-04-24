@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.Cqrs;
+namespace NForza.Cyrus.Generators.Events;
 
 public class EventHandlerGenerator : CyrusGeneratorBase
 {

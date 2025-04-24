@@ -48,14 +48,11 @@ internal class CommandAnalyzer: CyrusAnalyzerBase
 
         if (!hasCommandAttr)
         {
-
             var diagnostic = Diagnostic.Create(
                 DiagnosticDescriptors.MissingCommandAttribute,
                 location,
                 commandParam.Name);
-
             context.ReportDiagnostic(diagnostic);
         }
-
     }
 }

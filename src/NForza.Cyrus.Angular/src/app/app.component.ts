@@ -16,10 +16,10 @@ export class AppComponent {
   public customers: Customer[] = [];
   private count: number = 1;
 
-  constructor(private signalRService: CustomerHubService) {
-    signalRService.startConnection();
-    signalRService.onCustomerAdded.subscribe(e => this.addToList(e));
-    signalRService.allCustomersQueryResult.subscribe(r => this.customers = r);
+  constructor(private customerHub: CustomerHubService) {
+    customerHub.startConnection();
+    customerHub.onCustomerAdded.subscribe(e => this.addToList(e));
+    customerHub.allCustomersQueryResult.subscribe(r => this.customers = r);
   }
 
   private addToList(c: CustomerAddedEvent): void {
@@ -30,20 +30,21 @@ export class AppComponent {
   }
 
   ngOnInit(): void {
-    this.signalRService.startConnection();
+    this.customerHub.startConnection();
   }
 
   addCustomer(): void {
-    this.signalRService.addCustomerCommand(
+    this.customerHub.addCustomerCommand(
       { 
         customerType: CustomerType.Company,
         id: crypto.randomUUID(),
         name: "name1", 
-        address: { street: "Street", streetNumber: 1 }});
+        address: { street: "Street", streetNumber: 1 }
+      });
   }
 
   allCustomers(): void {
-    this.signalRService.allCustomersQuery({page: this.count, pageSize: 10});
+    this.customerHub.allCustomersQuery({page: this.count, pageSize: 10});
     this.count += 10;
   }  
 }

@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.Generators.TypedIds;
+namespace NForza.Cyrus.Generators.TypedIds;
 
 public class GuidIdProvider : CyrusProviderBase<ImmutableArray<INamedTypeSymbol>>
 {
