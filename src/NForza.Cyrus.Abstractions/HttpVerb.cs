@@ -1,14 +1,13 @@
-﻿namespace NForza.Cyrus.Abstractions
+﻿namespace NForza.Cyrus.Abstractions;
+
+public enum HttpVerb
 {
-    public enum HttpVerb
-    {
-        Get,
-        Post,
-        Put,
-        Delete,
-        Patch,
-        Options,
-        Head,
-        Trace
-    }
+    Get,
+    Post,
+    Put,
+    Delete,
+    Patch,
+    Options,
+    Head,
+    Trace
 }

@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace NForza.Cyrus.Abstractions
+namespace NForza.Cyrus.Abstractions;
+
+[AttributeUsage(AttributeTargets.Method)]
+public class CommandHandlerAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Method)]
-    public class CommandHandlerAttribute : Attribute
-    {
-        public string Route { get; set; }
-        public HttpVerb Verb { get; set; }
-    }
+    public string Route { get; set; }
+    public HttpVerb Verb { get; set; }
 }

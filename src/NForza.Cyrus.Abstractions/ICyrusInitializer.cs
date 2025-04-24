@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace NForza.Cyrus
+namespace NForza.Cyrus;
+
+public interface ICyrusInitializer
 {
-    public interface ICyrusInitializer
-    {
-        void RegisterServices(IServiceCollection services);
-    }
+    void RegisterServices(IServiceCollection services);
 }

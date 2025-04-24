@@ -1,21 +1,20 @@
 ﻿using System.Collections.Generic;
 
-namespace NForza.Cyrus.Abstractions.Model
+namespace NForza.Cyrus.Abstractions.Model;
+
+public class ModelHubDefinition 
 {
-    public class ModelHubDefinition 
+    public ModelHubDefinition(string name, string path, IEnumerable<string> commands, IEnumerable<ModelQueryDefinition> queries, IEnumerable<string> events)
     {
-        public ModelHubDefinition(string name, string path, IEnumerable<string> commands, IEnumerable<ModelQueryDefinition> queries, IEnumerable<string> events)
-        {
-            Name = name;
-            Path = path;
-            Commands = commands;
-            Queries = queries;
-            Events = events;
-        }
-        public string Name { get; }
-        public string Path { get; }
-        public IEnumerable<string> Commands { get; }
-        public IEnumerable<ModelQueryDefinition> Queries { get; }
-        public IEnumerable<string> Events { get; }
+        Name = name;
+        Path = path;
+        Commands = commands;
+        Queries = queries;
+        Events = events;
     }
+    public string Name { get; }
+    public string Path { get; }
+    public IEnumerable<string> Commands { get; }
+    public IEnumerable<ModelQueryDefinition> Queries { get; }
+    public IEnumerable<string> Events { get; }
 }

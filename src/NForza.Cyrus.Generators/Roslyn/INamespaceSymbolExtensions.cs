@@ -1,25 +1,24 @@
 ﻿using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace NForza.Cyrus.Generators.Roslyn
+namespace NForza.Cyrus.Generators.Roslyn;
+
+public static class INamespaceSymbolExtensions
 {
-    public static class INamespaceSymbolExtensions
+    public static IEnumerable<INamedTypeSymbol> GetAllTypes(this INamespaceSymbol namespaceSymbol)
     {
-        public static IEnumerable<INamedTypeSymbol> GetAllTypes(this INamespaceSymbol namespaceSymbol)
+        foreach (var member in namespaceSymbol.GetMembers())
         {
-            foreach (var member in namespaceSymbol.GetMembers())
+            if (member is INamespaceSymbol nestedNamespace)
             {
-                if (member is INamespaceSymbol nestedNamespace)
+                foreach (var nestedType in GetAllTypes(nestedNamespace))
                 {
-                    foreach (var nestedType in GetAllTypes(nestedNamespace))
-                    {
-                        yield return nestedType;
-                    }
+                    yield return nestedType;
                 }
-                else if (member is INamedTypeSymbol namedType)
-                {
-                    yield return namedType;
-                }
+            }
+            else if (member is INamedTypeSymbol namedType)
+            {
+                yield return namedType;
             }
         }
     }
