@@ -164,4 +164,23 @@ public static class DiagnosticDescriptors
         description: "Unable to determine return type."
     );
 
+    public static readonly DiagnosticDescriptor IResultTupleElementShouldBeCalledResult = new DiagnosticDescriptor(
+        id: "CYRUS012",
+        title: "IResult tuple element should be called Result",
+        messageFormat: "Invalid tuple element name {0} for IResult",
+        category: "Cyrus",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Invalid tuple element name."
+    );
+    public static readonly DiagnosticDescriptor EventsTupleElementShouldBeCalledEvents = new DiagnosticDescriptor(
+        id: "CYRUS014",
+        title: "Events tuple element should be called Events",
+        messageFormat: "Invalid tuple element name {0} for Events",
+        category: "Cyrus",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Invalid tuple element name."
+    );
+
 }

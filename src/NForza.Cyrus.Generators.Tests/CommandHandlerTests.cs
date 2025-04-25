@@ -179,4 +179,104 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
         generatedSyntaxTrees.Should().Contain("MapPost");
     }
 
+    [Fact]
+    public async Task Generating_CommandHandler_Invalid_IResult_Tuple_Element_Name_Should_Generate_Analyzer_Error()
+    {
+        var source = @"
+                using System;       
+                using NForza.Cyrus.Abstractions;
+                using Microsoft.AspNetCore.Http;
+
+                namespace Test;
+            
+                [Command]
+                public record CreateCustomerCommand(Guid Id);
+
+                public class Customer
+                {
+                    [CommandHandler(Route = ""/"")]
+                    public (IResult wrong_name, object Events) Handle(CreateCustomerCommand command)
+                    {
+                        return (Results.Accepted(), new object());
+                    }
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        compilerOutput.Should().NotHaveErrors();
+        analyzerOutput.Should().ContainDiagnostic(DiagnosticDescriptors.IResultTupleElementShouldBeCalledResult);
+    }
+
+    [Fact]
+    public async Task Generating_CommandHandler_Invalid_Events_Tuple_Element_Name_Should_Generate_Analyzer_Error()
+    {
+        var source = @"
+                using System;       
+                using NForza.Cyrus.Abstractions;
+                using Microsoft.AspNetCore.Http;
+
+                namespace Test;
+            
+                [Command]
+                public record CreateCustomerCommand(Guid Id);
+
+                public class Customer
+                {
+                    [CommandHandler(Route = ""/"")]
+                    public (IResult Result, object wrong_name) Handle(CreateCustomerCommand command)
+                    {
+                        return (Results.Accepted(), new object());
+                    }
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        compilerOutput.Should().NotHaveErrors();
+        analyzerOutput.Should().ContainDiagnostic(DiagnosticDescriptors.EventsTupleElementShouldBeCalledEvents);
+    }
+
+    [Fact]
+    public async Task Generating_CommandHandler_Invalid_Single_Event_Tuple_Element_Name_Should_Generate_Analyzer_Error()
+    {
+        var source = @"
+                using System;       
+                using System.Collections.Generic;
+                using NForza.Cyrus.Abstractions;
+                using Microsoft.AspNetCore.Http;
+
+                namespace Test;
+            
+                [Command]
+                public record CreateCustomerCommand(Guid Id);
+
+                public class Customer
+                {
+                    [CommandHandler(Route = ""/"")]
+                    public (IResult Result, IEnumerable<object> wrong_name) Handle(CreateCustomerCommand command)
+                    {
+                        return (Results.Accepted(), [new object()]);
+                    }
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        compilerOutput.Should().NotHaveErrors();
+        analyzerOutput.Should().ContainDiagnostic(DiagnosticDescriptors.EventsTupleElementShouldBeCalledEvents);
+    }
+
 }

@@ -27,7 +27,9 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
             DiagnosticDescriptors.ProjectShouldReferenceCyrusMassTransit,
             DiagnosticDescriptors.TypedIdMustBeARecordStruct,
             DiagnosticDescriptors.IncorrectNumberOfArgumentsForValidator,
-            DiagnosticDescriptors.ValidatorsShouldReturnIEnumerableOfString
+            DiagnosticDescriptors.ValidatorsShouldReturnIEnumerableOfString,
+            DiagnosticDescriptors.IResultTupleElementShouldBeCalledResult,
+            DiagnosticDescriptors.EventsTupleElementShouldBeCalledEvents
         ];
 
     public override void Initialize(AnalysisContext context)

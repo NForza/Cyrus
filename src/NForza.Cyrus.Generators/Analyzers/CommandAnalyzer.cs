@@ -54,5 +54,33 @@ internal class CommandAnalyzer: CyrusAnalyzerBase
                 commandParam.Name);
             context.ReportDiagnostic(diagnostic);
         }
+
+        if (methodSymbol.ReturnType is INamedTypeSymbol t && t.IsTupleType)
+        {
+            foreach (var te in t.TupleElements)
+            {
+                if (te.Type.ToDisplayString() == "Microsoft.AspNetCore.Http.IResult" &&
+                    te.Name != "Result")
+                {
+                    location = te.Locations.FirstOrDefault() ?? Location.None;
+                    var diagnostic = Diagnostic.Create(
+                        DiagnosticDescriptors.IResultTupleElementShouldBeCalledResult,
+                        location,
+                        te.ToDisplayString());
+                    context.ReportDiagnostic(diagnostic);
+                }
+
+                if ((te.Type.ToDisplayString() == "object" || te.Type.ToDisplayString() == "System.Collections.Generic.IEnumerable<object>") &&
+                    te.Name != "Events")
+                {
+                    location = te.Locations.FirstOrDefault() ?? Location.None;
+                    var diagnostic = Diagnostic.Create(
+                        DiagnosticDescriptors.EventsTupleElementShouldBeCalledEvents,
+                        location,
+                        te.ToDisplayString());
+                    context.ReportDiagnostic(diagnostic);
+                }
+            }
+        }
     }
 }
