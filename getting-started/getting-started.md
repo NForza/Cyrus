@@ -132,7 +132,7 @@ public class NewCustomerCommandHandler
 public static class NewCustomerCommandHandler
 {
     [CommandHandler(Route = "/customers", Verb = HttpVerb.Post)]
-    public static (IResult result, IEnumerable<object> events) Handle(NewCustomerCommand command)
+    public static (IResult Result, IEnumerable<object> Events) Handle(NewCustomerCommand command)
     {
         Console.WriteLine("Creating a new customer");
         return (Results.Accepted(), [new CustomerCreatedEvent(command.CustomerId, command.Name, command.Address)]);
@@ -148,7 +148,7 @@ public static class NewCustomerCommandHandler
 public class NewCustomerCommandHandler
 {
     [CommandHandler(Route = "/customers", Verb = HttpVerb.Post)]
-    public static async Task<(IResult result, IEnumerable<object> events)> HandleAsync(NewCustomerCommand command)
+    public static async Task<(IResult Result, IEnumerable<object> Events)> HandleAsync(NewCustomerCommand command)
     {
         Console.WriteLine("Creating a new customer");
         await Task.Delay(100);
