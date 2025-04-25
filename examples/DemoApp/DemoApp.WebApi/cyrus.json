@@ -165,7 +165,7 @@
         },
         {
           "name": "PageSize",
-          "type": "long",
+          "type": "int",
           "isCollection": false,
           "isNullable": false
         }

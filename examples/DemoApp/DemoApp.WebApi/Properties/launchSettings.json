@@ -12,6 +12,7 @@
     },
     "https": {
       "commandName": "Project",
+      "commandLineArgs": "--generateModel",
       "launchBrowser": true,
       "launchUrl": "model",
       "environmentVariables": {

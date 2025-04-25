@@ -17,4 +17,9 @@
     <ProjectReference Include="..\DemoApp.Domain\DemoApp.Domain.csproj" />
   </ItemGroup>
 
+  <Target Name="RunAfterBuild"
+        AfterTargets="Build">
+    <Exec Command="dotnet &quot;$(TargetPath)&quot; --generateModel" />
+  </Target>
+  
 </Project>
