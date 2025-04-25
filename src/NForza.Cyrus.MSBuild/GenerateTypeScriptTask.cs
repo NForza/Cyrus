@@ -7,7 +7,7 @@ namespace NForza.Cyrus.TypescriptGenerate;
 public partial class GenerateTypeScriptTask : Task
 {
     [Required]
-    public string MetadataFile { get; set; } = string.Empty; 
+    public string ModelFile { get; set; } = string.Empty; 
 
     [Required]
     public string OutputFolder { get; set; } = string.Empty;
@@ -16,15 +16,15 @@ public partial class GenerateTypeScriptTask : Task
     {
         Log.LogMessage(MessageImportance.High, "Starting TypeScript generation...");
 
-        try
-        {
-            TypeScriptGenerator.Generate(MetadataFile, OutputFolder);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Log.LogErrorFromException(ex);
-            return false;
-        }
+        //try
+        //{
+        //    TypeScriptGenerator.Generate(ModelFile, OutputFolder);
+        return true;
+        //}
+        //catch (Exception ex)
+        //{
+        //    Log.LogErrorFromException(ex);
+        //    return false;
+        //}
     }
 }

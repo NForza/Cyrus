@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35617.110
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.TypescriptGenerate", "NForza.Cyrus.TypescriptGenerate.csproj", "{F322374D-6EBB-4ADC-8ED9-2E0B2E4B9680}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.MSBuild", "NForza.Cyrus.MSBuild.csproj", "{F322374D-6EBB-4ADC-8ED9-2E0B2E4B9680}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.Abstractions", "..\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj", "{51591C0F-9BE0-C63D-9F14-872CDB03227E}"
 EndProject

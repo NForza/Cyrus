@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_NForzaCyrusMSBuild_TaskFolder>$(MSBuildThisFileDirectory)..\tasks\netstandard2.0</_NForzaCyrusMSBuild_TaskFolder>
+    <CustomTasksAssembly>$(_NForzaCyrusMSBuild_TaskFolder)\$(MSBuildThisFileName).dll</CustomTasksAssembly>
+  </PropertyGroup>
+
+  <UsingTask TaskName="Cyrus.GenerateTypeScriptTask" AssemblyFile="$(CustomTasksAssembly)"/>
+
+  <PropertyGroup>
+    <ModelFile Condition="'$(ModelFile)' == ''">metadata.json</ModelFile>
+    <OutputFolder Condition="'$(OutputFolder)' == ''">.</OutputFolder>
+  </PropertyGroup>
+</Project>

@@ -45,10 +45,20 @@ internal static class TypeScriptGenerator
         options.Filters.AddFilter("strip_postfix", (input, arguments, context) =>
         {
             string value = input.ToStringValue();
-            if (value.EndsWith("Command")) return new StringValue(value[..^"Command".Length]);
-            if (value.EndsWith("Query")) return new StringValue(value[..^"Query".Length]);
-            if (value.EndsWith("Event")) return new StringValue(value[..^"Event".Length]);
-            return input;
+            const string commandSuffix = "Command";
+            const string querySuffix = "Query";
+            const string eventSuffix = "Event";
+
+            if (value.EndsWith(commandSuffix, StringComparison.Ordinal))
+                return new StringValue(value.Substring(0, value.Length - commandSuffix.Length));
+
+            if (value.EndsWith(querySuffix, StringComparison.Ordinal))
+                return new StringValue(value.Substring(0, value.Length - querySuffix.Length));
+
+            if (value.EndsWith(eventSuffix, StringComparison.Ordinal))
+                return new StringValue(value.Substring(0, value.Length - eventSuffix.Length));
+
+            return input; 
         });
 
         options.Filters.AddFilter("query_return_type", (input, arguments, context) =>
@@ -98,21 +108,26 @@ internal static class TypeScriptGenerator
         return typeScriptType;
     }
 
-    public static int Generate(string metadataFile, string outputFolder)
+    public static int Generate(string modelFile, string outputFolder)
     {
+        if (modelFile is null)
+        {
+            throw new ArgumentNullException(nameof(modelFile));
+        }
+
         if (!Directory.Exists(outputFolder))
         {
             Console.Error.WriteLine($"Output folder {outputFolder} does not exist.");
             return 1;
         }
-        if (!File.Exists(metadataFile))
+        if (!File.Exists(modelFile))
         {
             Console.Error.WriteLine($"Input file {outputFolder} does not exist.");
             return 1;
         }
 
-        Console.WriteLine("Reading input file: " + metadataFile);
-        var json = File.ReadAllText(metadataFile);
+        Console.WriteLine("Reading input file: " + modelFile);
+        var json = File.ReadAllText(modelFile);
         metadata = JsonSerializer.Deserialize<CyrusMetadata>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web)) ?? throw new InvalidOperationException("Can't read metadata");
 
         var path = Path.GetFullPath(outputFolder);
