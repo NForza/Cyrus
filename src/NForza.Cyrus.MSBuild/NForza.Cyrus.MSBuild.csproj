@@ -16,7 +16,7 @@
     <Copyright>Copyright NForza 2025</Copyright>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GenerateDependencyFile>true</GenerateDependencyFile>
-    
+
     <TargetsForTfmSpecificBuildOutput>
       $(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage
     </TargetsForTfmSpecificBuildOutput>
