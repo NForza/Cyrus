@@ -112,33 +112,12 @@ internal static class TypeScriptGenerator
 
     public static bool Generate(string modelFile, string outputFolder, ITaskLogger logger)
     {
-        logger.LogMessage(MessageImportance.Normal, "Verifying input parameters");
-
-        if (modelFile is null || !File.Exists(modelFile))
-        {
-            logger.LogMessage(MessageImportance.High, $"Input file {outputFolder} does not exist.");
-            return false;
-        }
-
-        if (!Directory.Exists(outputFolder))
-        {
-            logger.LogMessage(MessageImportance.High, $"Output folder {outputFolder} does not exist. Trying to create now");
-            try
-            {
-                DirectoryInfo folder = Directory.CreateDirectory(outputFolder);
-                logger.LogMessage(MessageImportance.Normal, $"Output folder {folder.FullName} created.");
-            }
-            catch {
-                logger.LogMessage(MessageImportance.High, $"Output folder {outputFolder} could not be created.");
-                return false;
-            }
-        }
-
         logger.LogMessage(MessageImportance.Normal, "Reading input file: " + modelFile);
         var json = File.ReadAllText(modelFile);
         metadata = JsonSerializer.Deserialize<CyrusMetadata>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web)) ?? throw new InvalidOperationException("Can't read metadata");
 
         var path = Path.GetFullPath(outputFolder);
+        logger.LogMessage(MessageImportance.Normal, "model: " + JsonSerializer.Serialize(metadata));
 
         logger.LogMessage(MessageImportance.Normal, "Writing output to: " + path);
 
@@ -273,7 +252,7 @@ internal static class TypeScriptGenerator
         {
             yield return new Import { Name = type.Name };
         }
-        foreach (var p in type.Properties)
+        foreach (var p in type.Properties ?? [])
         {
             if (metadata.Guids.Contains(p.Type))
             {
