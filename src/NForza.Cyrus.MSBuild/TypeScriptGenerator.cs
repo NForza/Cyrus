@@ -110,10 +110,9 @@ internal static class TypeScriptGenerator
         return typeScriptType;
     }
 
-    public static bool Generate(string modelFile, string outputFolder, ITaskLogger logger)
+    public static bool Generate(Stream modelStream, string outputFolder, ITaskLogger logger)
     {
-        logger.LogMessage(MessageImportance.Normal, "Reading input file: " + modelFile);
-        var json = File.ReadAllText(modelFile);
+        var json = new StreamReader(modelStream).ReadToEnd();
         metadata = JsonSerializer.Deserialize<CyrusMetadata>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web)) ?? throw new InvalidOperationException("Can't read metadata");
 
         var path = Path.GetFullPath(outputFolder);
