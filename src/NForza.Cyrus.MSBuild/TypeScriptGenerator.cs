@@ -4,17 +4,19 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using Cyrus.Model;
 using Fluid.Values;
+using Microsoft.Build.Framework;
 using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Templating;
-using NForza.Cyrus.TypescriptGenerate.Model;
 
 
-namespace NForza.Cyrus.TypescriptGenerate;
+namespace Cyrus;
 
 internal static class TypeScriptGenerator
 {
-    private static LiquidEngine liquidEngine = new LiquidEngine(Assembly.GetExecutingAssembly(), options =>
+    private static LiquidEngine? _liquidEngine = null;
+    private static LiquidEngine liquidEngine => _liquidEngine ??= new LiquidEngine(Assembly.GetExecutingAssembly(), options =>
     {
         options.Filters.AddFilter("to_typescript_type", (input, arguments, context) =>
         {
@@ -58,7 +60,7 @@ internal static class TypeScriptGenerator
             if (value.EndsWith(eventSuffix, StringComparison.Ordinal))
                 return new StringValue(value.Substring(0, value.Length - eventSuffix.Length));
 
-            return input; 
+            return input;
         });
 
         options.Filters.AddFilter("query_return_type", (input, arguments, context) =>
@@ -108,57 +110,62 @@ internal static class TypeScriptGenerator
         return typeScriptType;
     }
 
-    public static int Generate(string modelFile, string outputFolder)
+    public static bool Generate(string modelFile, string outputFolder, ITaskLogger logger)
     {
-        if (modelFile is null)
+        logger.LogMessage(MessageImportance.Normal, "Verifying input parameters");
+
+        if (modelFile is null || !File.Exists(modelFile))
         {
-            throw new ArgumentNullException(nameof(modelFile));
+            logger.LogMessage(MessageImportance.High, $"Input file {outputFolder} does not exist.");
+            return false;
         }
 
         if (!Directory.Exists(outputFolder))
         {
-            Console.Error.WriteLine($"Output folder {outputFolder} does not exist.");
-            return 1;
-        }
-        if (!File.Exists(modelFile))
-        {
-            Console.Error.WriteLine($"Input file {outputFolder} does not exist.");
-            return 1;
+            logger.LogMessage(MessageImportance.High, $"Output folder {outputFolder} does not exist. Trying to create now");
+            try
+            {
+                DirectoryInfo folder = Directory.CreateDirectory(outputFolder);
+                logger.LogMessage(MessageImportance.Normal, $"Output folder {folder.FullName} created.");
+            }
+            catch {
+                logger.LogMessage(MessageImportance.High, $"Output folder {outputFolder} could not be created.");
+                return false;
+            }
         }
 
-        Console.WriteLine("Reading input file: " + modelFile);
+        logger.LogMessage(MessageImportance.Normal, "Reading input file: " + modelFile);
         var json = File.ReadAllText(modelFile);
         metadata = JsonSerializer.Deserialize<CyrusMetadata>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web)) ?? throw new InvalidOperationException("Can't read metadata");
 
         var path = Path.GetFullPath(outputFolder);
 
-        Console.WriteLine("Writing output to: " + path);
-        Console.WriteLine();
+        logger.LogMessage(MessageImportance.Normal, "Writing output to: " + path);
 
-        Console.WriteLine("Writing Guids.");
+        logger.LogMessage(MessageImportance.Normal, "Writing Guids.");
         GenerateGuids(path, metadata);
 
-        Console.WriteLine("Writing Strings.");
+        logger.LogMessage(MessageImportance.Normal, "Writing Strings.");
         GenerateStrings(path, metadata);
 
-        Console.WriteLine("Writing Integers.");
+        logger.LogMessage(MessageImportance.Normal, "Writing Integers.");
         GenerateIntegers(path, metadata);
 
-        Console.WriteLine("Writing Commands.");
+        logger.LogMessage(MessageImportance.Normal, "Writing Commands.");
         GenerateCommands(path, metadata);
 
-        Console.WriteLine("Writing Queries.");
+        logger.LogMessage(MessageImportance.Normal, "Writing Queries.");
         GenerateQueries(path, metadata);
 
-        Console.WriteLine("Writing Events.");
+        logger.LogMessage(MessageImportance.Normal, "Writing Events.");
         GenerateEvents(path, metadata);
 
-        Console.WriteLine("Writing Hubs.");
+        logger.LogMessage(MessageImportance.Normal, "Writing Hubs.");
         GenerateHubs(path, metadata);
 
-        Console.WriteLine("Writing Models.");
+        logger.LogMessage(MessageImportance.Normal, "Writing Models.");
         GenerateModels(path, metadata);
-        return 0;
+        return true;
     }
 
     private static void GenerateModels(string outputFolder, CyrusMetadata metadata)

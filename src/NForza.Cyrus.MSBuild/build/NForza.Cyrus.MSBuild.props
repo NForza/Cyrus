@@ -5,7 +5,7 @@
     <CustomTasksAssembly>$(_NForzaCyrusMSBuild_TaskFolder)\$(MSBuildThisFileName).dll</CustomTasksAssembly>
   </PropertyGroup>
 
-  <UsingTask TaskName="Cyrus.GenerateTypeScriptTask" AssemblyFile="$(CustomTasksAssembly)"/>
+  <UsingTask TaskName="Cyrus.GenerateTypeScript" AssemblyFile="$(CustomTasksAssembly)"/>
 
   <PropertyGroup>
     <ModelFile Condition="'$(ModelFile)' == ''">metadata.json</ModelFile>

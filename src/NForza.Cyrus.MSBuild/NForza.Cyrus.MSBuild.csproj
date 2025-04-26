@@ -6,9 +6,9 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <MSBuildRuntime>CurrentRuntime</MSBuildRuntime>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <IsPackable>true</IsPackable>
-    <Version>1.0.0</Version>
+    <Version>1.0.7</Version>
     <Title>Cyrus Typescript Generator</Title>
     <Authors>NForza</Authors>
     <Description>Generates Typescript types based on a Cyrus Model file</Description>
@@ -16,13 +16,14 @@
     <Copyright>Copyright NForza 2025</Copyright>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GenerateDependencyFile>true</GenerateDependencyFile>
-
+    
     <TargetsForTfmSpecificBuildOutput>
       $(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage
     </TargetsForTfmSpecificBuildOutput>
     <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
     <NoWarn>NU5100</NoWarn>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <RootNamespace>Cyrus</RootNamespace>
   </PropertyGroup>
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
@@ -38,10 +39,10 @@
   </Target>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="NForza.Cyrus.MSBuild.Tests"/>
     <Content Include="build\NForza.Cyrus.MSBuild.props" PackagePath="build\" />
     <Content Include="build\NForza.Cyrus.MSBuild.targets" PackagePath="build\" />
-  </ItemGroup>
-  <ItemGroup>
+
     <EmbeddedResource Include="Templates\enum.liquid" />
     <EmbeddedResource Include="Templates\integer.liquid" />
     <EmbeddedResource Include="Templates\type-defaults.liquid" />
@@ -52,9 +53,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Framework" Version="17.12.6" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.12.6" PrivateAssets="all" ExcludeAssets="Runtime" />
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="17.13.9" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.13.9" PrivateAssets="all" ExcludeAssets="Runtime">
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="6.0.1" PrivateAssets="all"/>
+
   </ItemGroup>
 
   <ItemGroup>

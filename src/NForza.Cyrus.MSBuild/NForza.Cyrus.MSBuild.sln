@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.Templating", "..\NForza.Cyrus.Templating\NForza.Cyrus.Templating.csproj", "{7D940674-042B-47C3-CC5B-8C6F8E5A3458}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.MSBuild.Tests", "..\NForza.Cyrus.MSBuild.Tests\NForza.Cyrus.MSBuild.Tests.csproj", "{AE062A17-40E3-4240-96F4-2BE057D4DCD2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{7D940674-042B-47C3-CC5B-8C6F8E5A3458}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D940674-042B-47C3-CC5B-8C6F8E5A3458}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D940674-042B-47C3-CC5B-8C6F8E5A3458}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE062A17-40E3-4240-96F4-2BE057D4DCD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE062A17-40E3-4240-96F4-2BE057D4DCD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE062A17-40E3-4240-96F4-2BE057D4DCD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE062A17-40E3-4240-96F4-2BE057D4DCD2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
