@@ -14,6 +14,11 @@ public static class IServiceProviderExtensions
         }
         var generator = CyrusModel.Aggregate(serviceProvider);
         var fileName = args.Length > 1 ? args[1] : "cyrus.json";
+        if (fileName == "--console")
+        {
+            Console.WriteLine(generator.AsJson());
+            return true;
+        }
         File.WriteAllText(fileName, generator.AsJson());
         return true;
     }
