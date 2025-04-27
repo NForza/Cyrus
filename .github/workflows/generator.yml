@@ -1,4 +1,4 @@
-name: Build NForza.Cyrus.TypescriptGenerate
+name: Build NForza.Cyrus.MSBuild
 
 on:
   workflow_dispatch:
