@@ -63,6 +63,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj" />
     <ProjectReference Include="..\NForza.Cyrus.Templating\NForza.Cyrus.Templating.csproj" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="9.0.4" />
   </ItemGroup>
 
 </Project>
