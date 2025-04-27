@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NForza.Cyrus.TypescriptGenerate": {
+      "commandName": "Project",
+      "commandLineArgs": "--input \"C:\\\\dev\\\\Cyrus\\\\examples\\\\DemoApp\\\\DemoApp.WebApi\\\\cyrus.json\" --output \"C:\\dev\\Cyrus\\src\\NForza.Cyrus.Angular\\src\\app\\generated\""
+    }
+  }
+}

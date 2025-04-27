@@ -13,7 +13,12 @@ public static class IServiceProviderExtensions
             return false;
         }
         var generator = CyrusModel.Aggregate(serviceProvider);
-        var fileName = args.Length > 1 ? args[1] : "cyrus.json";
+        var fileName = args.Length > 1 ? args[1].Trim() : "cyrus.json";
+        if (fileName == "--console")
+        {
+            Console.WriteLine(generator.AsJson());
+            return true;
+        }
         File.WriteAllText(fileName, generator.AsJson());
         return true;
     }
