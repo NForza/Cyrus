@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -33,6 +34,7 @@ public partial class GenerateTypeScript : Task
 
             if (!string.IsNullOrEmpty(AssemblyPath))
             {
+                Logger.LogMessage(MessageImportance.Normal, $"Verifying assembly at {AssemblyPath}");
                 if (!File.Exists(AssemblyPath))
                 {
                     Logger.LogMessage(MessageImportance.High, $"Assembly file {AssemblyPath} does not exist.");
@@ -45,14 +47,19 @@ public partial class GenerateTypeScript : Task
                     Logger.LogMessage(MessageImportance.High, errors);
                     return false;
                 }
+
+                modelStream = new MemoryStream(Encoding.UTF8.GetBytes(model));
             }
             else
             {
+                Logger.LogMessage(MessageImportance.Normal, $"No AssemblyPath specified, checking ModelFile");
                 if (ModelFile is null || !File.Exists(ModelFile))
                 {
-                    Logger.LogMessage(MessageImportance.High, $"Input file {OutputFolder} does not exist.");
+                    Logger.LogMessage(MessageImportance.High, $"Input file {ModelFile} does not exist.");
                     return false;
                 }
+                Logger.LogMessage(MessageImportance.Normal, $"ModelFile {ModelFile} found.");
+
             }
             if (!Directory.Exists(OutputFolder))
             {
@@ -92,16 +99,41 @@ public partial class GenerateTypeScript : Task
         var psi = new ProcessStartInfo("dotnet", $"\"{AssemblyPath}\" --generateModel --console")
         {
             RedirectStandardOutput = true,
-            UseShellExecute = false
+            RedirectStandardError = true,
+            UseShellExecute = false        ,
+            StandardErrorEncoding = Encoding.UTF8,
+            StandardOutputEncoding = Encoding.UTF8,
         };
-        var p = Process.Start(psi);
-        p.WaitForExit();
-
-        if (p.ExitCode != 0)
+        var proc = new Process
         {
-            Log.LogError($"dotnet exited with code {p.ExitCode}");
-            return (false, "", "");
+            StartInfo = psi,
+            EnableRaisingEvents = true
+        };
+
+        var stdOut = new StringBuilder();
+        var stdErr = new StringBuilder();
+
+        proc.OutputDataReceived += (_, e) =>
+            { if (e.Data != null) stdOut.AppendLine(e.Data); };
+        proc.ErrorDataReceived += (_, e) =>
+            { if (e.Data != null) stdErr.AppendLine(e.Data); };
+
+        proc.Start();
+        proc.BeginOutputReadLine();
+        proc.BeginErrorReadLine();
+
+        proc.WaitForExit(5000);   
+
+        if (!proc.HasExited)
+        {
+            Log.LogError($"dotnet {AssemblyPath} did not return in 5 seconds.");
+            return (false, stdErr.ToString(), stdOut.ToString());
         }
-        return (true, "", "");
+        if (proc.ExitCode != 0)
+        {
+            Log.LogError($"dotnet exited with code {proc.ExitCode}");
+            return (false, stdErr.ToString(), stdOut.ToString());
+        }
+        return (true, stdErr.ToString(), stdOut.ToString());
     }
 }

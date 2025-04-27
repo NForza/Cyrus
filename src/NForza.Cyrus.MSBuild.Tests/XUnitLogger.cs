@@ -14,7 +14,10 @@ namespace NForza.Cyrus.MSBuild.Tests
 
         public void LogMessage(MessageImportance importance, string messageFormat, params object[] messageArgs)
         {
-            outputWindow.WriteLine(string.Format(messageFormat, messageArgs));
+            if (messageArgs.Length > 0)
+                outputWindow.WriteLine(string.Format(messageFormat, messageArgs));
+            else
+                outputWindow.WriteLine(messageFormat);
         }
     }
 }

@@ -10,5 +10,6 @@
   <PropertyGroup>
     <ModelFile Condition="'$(ModelFile)' == ''">metadata.json</ModelFile>
     <OutputFolder Condition="'$(OutputFolder)' == ''">.</OutputFolder>
+    <AssemblyPath></AssemblyPath>
   </PropertyGroup>
 </Project>
