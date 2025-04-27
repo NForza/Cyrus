@@ -53,13 +53,14 @@ public partial class GenerateTypeScript : Task
             else
             {
                 Logger.LogMessage(MessageImportance.Normal, $"No AssemblyPath specified, checking ModelFile");
+                ModelFile = Path.GetFullPath(ModelFile);
                 if (ModelFile is null || !File.Exists(ModelFile))
                 {
                     Logger.LogMessage(MessageImportance.High, $"Input file {ModelFile} does not exist.");
                     return false;
                 }
                 Logger.LogMessage(MessageImportance.Normal, $"ModelFile {ModelFile} found.");
-
+                modelStream = File.OpenRead(ModelFile);
             }
             if (!Directory.Exists(OutputFolder))
             {
@@ -74,7 +75,6 @@ public partial class GenerateTypeScript : Task
                     Logger.LogMessage(MessageImportance.High, $"Output folder {OutputFolder} could not be created.");
                     return false;
                 }
-                modelStream = File.OpenRead(ModelFile);
             }
 
             if (modelStream != null)

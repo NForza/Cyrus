@@ -39,7 +39,7 @@
   </Target>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="NForza.Cyrus.MSBuild.Tests"/>
+    <InternalsVisibleTo Include="NForza.Cyrus.MSBuild.Tests" />
     <Content Include="build\NForza.Cyrus.MSBuild.props" PackagePath="build\" />
     <Content Include="build\NForza.Cyrus.MSBuild.targets" PackagePath="build\" />
 
@@ -57,7 +57,6 @@
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.13.9" PrivateAssets="all" ExcludeAssets="Runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="6.0.1" PrivateAssets="all"/>
 
   </ItemGroup>
 
