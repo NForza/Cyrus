@@ -26,4 +26,4 @@ builder.Services.AddMassTransit(x =>
     x.UsingInMemory((context, cfg) =>cfg.ConfigureEndpoints(context));
 });
 ```
-* That's all. (See here)[https://github.com/NForza/Cyrus/tree/main/examples/Cyrus.MassTransit] for an example with an event Producer and an event consumer, living in different applications.
+* That's all. [See here](https://github.com/NForza/Cyrus/tree/main/examples/Cyrus.MassTransit) for an example with an event Producer and an event consumer, living in different applications.
