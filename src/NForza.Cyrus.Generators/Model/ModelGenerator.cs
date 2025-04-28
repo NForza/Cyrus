@@ -29,6 +29,14 @@ internal class ModelGenerator
         return $"new ModelTypeDefinition(\"{namedType.Name}\", [{properties}], [{values}], {namedType.IsCollection().IsMatch.ToString().ToLower()}, {namedType.IsNullable().ToString().ToLower()})";
     }
 
+    internal static string ForQuery(IMethodSymbol queryHandler, LiquidEngine liquidEngine)
+    {
+        var returnType = (INamedTypeSymbol) queryHandler.GetQueryReturnType();   
+        var returnTypeDefinition = ForNamedType(returnType, liquidEngine);
+        string queryName = queryHandler.Parameters[0].Type.Name;
+        return $"new ModelQueryDefinition(\"{queryName}\", {returnTypeDefinition})";
+    }
+
     private static string GetValuesDeclaration(INamedTypeSymbol namedType)
     {
         return namedType.TypeKind == TypeKind.Enum ? string.Join(",", namedType.GetMembers()

@@ -121,15 +121,7 @@ public record SignalRHubClassDefinition
         var queryHandler = cyrusProvider.AllQueryHandlers.FirstOrDefault(handler => SymbolEqualityComparer.Default.Equals(handler.Parameters[0].Type, symbol));
         if (queryHandler != null)
         {
-            var returnType = queryHandler.ReturnType;
-            if (returnType is INamedTypeSymbol namedType &&
-                namedType.IsGenericType &&
-                (namedType.ConstructedFrom.ToDisplayString() == "System.Threading.Tasks.Task<TResult>" ||
-                 namedType.ConstructedFrom.ToDisplayString() == "System.Threading.Tasks.ValueTask<TResult>"))
-            {
-                return namedType.TypeArguments[0];
-            }
-            return returnType;
+            return queryHandler.GetQueryReturnType();
         }
 
         return null;

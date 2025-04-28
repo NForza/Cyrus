@@ -4,7 +4,7 @@ namespace NForza.Cyrus.Abstractions.Model;
 
 public class ModelHubDefinition 
 {
-    public ModelHubDefinition(string name, string path, IEnumerable<string> commands, IEnumerable<ModelQueryDefinition> queries, IEnumerable<string> events)
+    public ModelHubDefinition(string name, string path, IEnumerable<string> commands, IEnumerable<string> queries, IEnumerable<string> events)
     {
         Name = name;
         Path = path;
@@ -15,6 +15,6 @@ public class ModelHubDefinition
     public string Name { get; }
     public string Path { get; }
     public IEnumerable<string> Commands { get; }
-    public IEnumerable<ModelQueryDefinition> Queries { get; }
+    public IEnumerable<string> Queries { get; }
     public IEnumerable<string> Events { get; }
 }

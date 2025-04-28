@@ -12,6 +12,6 @@ internal class CyrusModelAggregator(IEnumerable<ICyrusModel> models) : ICyrusMod
     public IEnumerable<ModelTypeDefinition> Models => models.SelectMany(m => m.Models).Distinct(NamedTypeEqualityComparer.Instance);
     public IEnumerable<ModelTypeDefinition> Events => models.SelectMany(m => m.Events).Distinct(NamedTypeEqualityComparer.Instance);
     public IEnumerable<ModelTypeDefinition> Commands => models.SelectMany(m => m.Commands).Distinct(NamedTypeEqualityComparer.Instance);
-    public IEnumerable<ModelTypeDefinition> Queries => models.SelectMany(m => m.Queries).Distinct(NamedTypeEqualityComparer.Instance);
+    public IEnumerable<ModelQueryDefinition> Queries => models.SelectMany(m => m.Queries).Distinct();
     public IEnumerable<ModelHubDefinition> Hubs => models.SelectMany(m => m.Hubs).Distinct();
 }
