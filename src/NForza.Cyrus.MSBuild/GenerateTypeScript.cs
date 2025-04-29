@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
+using System.Runtime.Loader;
 using System.Text;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -14,6 +16,9 @@ public partial class GenerateTypeScript : Task
 
     [Required]
     public string OutputFolder { get; set; } = string.Empty;
+
+    const string TypeName = "Cyrus.TypeScriptGenerator";
+    const string MethodName = "GetModelAsJson";
 
     internal ITaskLogger Logger => _logger ??= new TaskLogger(this.Log);
     internal ITaskLogger? _logger = null;
@@ -96,44 +101,23 @@ public partial class GenerateTypeScript : Task
 
     private (bool succeeded, string errors, string model) GetModelFromAssembly()
     {
-        var psi = new ProcessStartInfo("dotnet", $"\"{AssemblyPath}\" --generateModel --console")
+        var bytes = File.ReadAllBytes(AssemblyPath);
+        var asm = Assembly.Load(bytes);
+        try
         {
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false        ,
-            StandardErrorEncoding = Encoding.UTF8,
-            StandardOutputEncoding = Encoding.UTF8,
-        };
-        var proc = new Process
-        {
-            StartInfo = psi,
-            EnableRaisingEvents = true
-        };
+            var type = asm.GetType(TypeName, throwOnError: true, ignoreCase: false);
+            var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
+            var method = type.GetMethod(MethodName, flags) ?? throw new MissingMethodException(TypeName, MethodName);
 
-        var stdOut = new StringBuilder();
-        var stdErr = new StringBuilder();
+            Logger.LogMessage(MessageImportance.Normal, $"Invoking {TypeName}.{MethodName}()");
 
-        proc.OutputDataReceived += (_, e) =>
-            { if (e.Data != null) stdOut.AppendLine(e.Data); };
-        proc.ErrorDataReceived += (_, e) =>
-            { if (e.Data != null) stdErr.AppendLine(e.Data); };
-
-        proc.Start();
-        proc.BeginOutputReadLine();
-        proc.BeginErrorReadLine();
-
-        proc.WaitForExit(5000);   
-
-        if (!proc.HasExited)
-        {
-            Log.LogError($"dotnet {AssemblyPath} did not return in 5 seconds.");
-            return (false, stdErr.ToString(), stdOut.ToString());
+            var result = method.Invoke(null, null);
+            return (true, "", result?.ToString() ?? "");
         }
-        if (proc.ExitCode != 0)
+        catch (Exception ex)
         {
-            Log.LogError($"dotnet exited with code {proc.ExitCode}");
-            return (false, stdErr.ToString(), stdOut.ToString());
+            Log.LogErrorFromException(ex, showStackTrace: true);
+            return (false, ex.ToString(), "");
         }
-        return (true, stdErr.ToString(), stdOut.ToString());
     }
 }
