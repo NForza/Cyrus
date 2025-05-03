@@ -66,7 +66,7 @@ jobs:
       run: dotnet pack --configuration Release --output ./output "./src/NForza.Cyrus.Templating/NForza.Cyrus.Templating.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
 
     - name: Pack the ModelGeneration project
-      run: dotnet pack --configuration Release --output "./src/NForza.Cyrus.MSBuild.ModelExtractor/\bin\$(Configuration)/net9.0/publish/" "./src/NForza.Cyrus.Templating/NForza.Cyrus.MSBuild.ModelExtractor.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
+      run: dotnet pack --configuration Release --output "./src/NForza.Cyrus.MSBuild.ModelExtractor/bin/$(Configuration)/net9.0/publish/" "./src/NForza.Cyrus.Templating/NForza.Cyrus.MSBuild.ModelExtractor.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
 
     - name: Pack the MSBuild project
       run: dotnet pack --configuration Release --output ./output "./src/NForza.Cyrus.MSBuild/NForza.Cyrus.MSBuild.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
