@@ -16,7 +16,6 @@
     <Copyright>Copyright NForza 2025</Copyright>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GenerateDependencyFile>true</GenerateDependencyFile>
-
     <TargetsForTfmSpecificBuildOutput>
       $(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage
     </TargetsForTfmSpecificBuildOutput>
@@ -67,9 +66,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\NForza.Cyrus.MSBuild.ModelExtractor\bin\Debug\net9.0\publish\*.*"
-        Pack="true"
-        PackagePath="tools/net9.0/model-extractor/" />
+    <None 
+      Include="..\NForza.Cyrus.MSBuild.ModelExtractor\bin\$(Configuration)\net9.0\publish\*.*" 
+      Pack="true" 
+      PackagePath="tools/net9.0/model-extractor/" />
   </ItemGroup>
-  
+
+  <Target Name="ShowToolFileNames" BeforeTargets="Build">
+    <ItemGroup>
+      <ToolFiles
+        Include="..\NForza.Cyrus.MSBuild.ModelExtractor\bin\$(Configuration)\net9.0\publish\*.*" />
+    </ItemGroup>
+    <Message Text="ToolFiles in publish folder" Importance="High" />
+    <Message Text=" - %(ToolFiles.Identity)" Importance="High" />
+  </Target>
 </Project>
