@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.Templating", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.MSBuild.Tests", "..\NForza.Cyrus.MSBuild.Tests\NForza.Cyrus.MSBuild.Tests.csproj", "{AE062A17-40E3-4240-96F4-2BE057D4DCD2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.MSBuild.ModelExtractor", "..\NForza.Cyrus.MSBuild.ModelExtractor\NForza.Cyrus.MSBuild.ModelExtractor.csproj", "{6E515402-0D0F-4C8B-A7D6-9279659AB405}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{AE062A17-40E3-4240-96F4-2BE057D4DCD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE062A17-40E3-4240-96F4-2BE057D4DCD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE062A17-40E3-4240-96F4-2BE057D4DCD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E515402-0D0F-4C8B-A7D6-9279659AB405}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E515402-0D0F-4C8B-A7D6-9279659AB405}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E515402-0D0F-4C8B-A7D6-9279659AB405}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E515402-0D0F-4C8B-A7D6-9279659AB405}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
