@@ -72,7 +72,7 @@ jobs:
       run: dotnet pack --configuration Release --output ./output "./src/NForza.Cyrus.MSBuild/NForza.Cyrus.MSBuild.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
 
     - name: List files
-      run: ls "./src/NForza.Cyrus.MSBuild.ModelExtractor/\bin\$(Configuration)/net9.0/publish/"
+      run: ls "./src/NForza.Cyrus.MSBuild.ModelExtractor/bin/$(Configuration)/net9.0/publish/"
     
     - name: Install Mono
       run: |
