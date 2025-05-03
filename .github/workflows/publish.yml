@@ -76,7 +76,7 @@ jobs:
         ls -sla
     
     - name: Pack the MSBuild project
-      run: dotnet pack --configuration ${CONFIGURATION} --output ./output "./src/NForza.Cyrus.MSBuild/NForza.Cyrus.MSBuild.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
+      run: dotnet msbuild -t:Pack -v:diag --configuration ${CONFIGURATION} --output ./output "./src/NForza.Cyrus.MSBuild/NForza.Cyrus.MSBuild.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
 
     - name: Install Mono
       run: |
