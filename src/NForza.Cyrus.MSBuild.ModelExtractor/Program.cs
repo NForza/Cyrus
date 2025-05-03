@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using NForza.Cyrus.Model;
 
 var modelAssemblyFile = args.Length > 0 ? args[0] : "";
 if (!File.Exists(modelAssemblyFile))
@@ -6,7 +7,6 @@ if (!File.Exists(modelAssemblyFile))
     Console.WriteLine($"Model assembly file not found: {modelAssemblyFile}");
     return 1;
 }
-
 
 var loadContext = new PluginLoadContext(modelAssemblyFile);
 var appAssembly = loadContext.LoadFromAssemblyPath(modelAssemblyFile);
@@ -23,24 +23,31 @@ if (coreAssembly is null)
     return 1;
 }
 
-var cyrusModel = coreAssembly.GetType("NForza.Cyrus.Model.CyrusModel");
-if (cyrusModel is null)
+var cyrusModelType = coreAssembly.GetType(typeof(CyrusModel).FullName);
+if (cyrusModelType is null)
 {
     Console.WriteLine("CyrusModel type not found in core assembly.");
     return 1;
 }
 
-var getAsJsonMethod = cyrusModel.GetMethod("GetAsJson", BindingFlags.Public | BindingFlags.Static);
+var getAsJsonMethod = cyrusModelType.GetMethod("GetAsJson", BindingFlags.Public | BindingFlags.Static);
 if (getAsJsonMethod is null)
 {
-    Console.WriteLine("GetModelAsJson method not found in CyrusModel type.");
+    cyrusModelType.GetMethods(BindingFlags.Public | BindingFlags.Static)
+        .ToList()
+        .ForEach(m => Console.WriteLine(m.Name));
+    Console.WriteLine("");
+    cyrusModelType.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+        .ToList()
+        .ForEach(m => Console.WriteLine(m.Name));
+    Console.WriteLine("GetAsJson method not found in CyrusModel type.");
     return 1;
 }
 
 var json = getAsJsonMethod.Invoke(null, null);
 if (json is null)
 {
-    Console.WriteLine("GetModelAsJson returned null.");
+    Console.WriteLine("GetAsJson returned null.");
     return 1;
 }
 

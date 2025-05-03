@@ -8,7 +8,7 @@
     <MSBuildRuntime>CurrentRuntime</MSBuildRuntime>
     <OutputType>Library</OutputType>
     <IsPackable>true</IsPackable>
-    <Version>1.0.13</Version>
+    <Version>1.0.19</Version>
     <Title>Cyrus Typescript Generator</Title>
     <Authors>NForza</Authors>
     <Description>Generates Typescript types based on a Cyrus Model file</Description>
@@ -58,7 +58,6 @@
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-
   </ItemGroup>
 
   <ItemGroup>
@@ -67,4 +66,10 @@
     <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="9.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\NForza.Cyrus.MSBuild.ModelExtractor\bin\Debug\net9.0\publish\*.*"
+        Pack="true"
+        PackagePath="tools/net9.0/model-extractor/" />
+  </ItemGroup>
+  
 </Project>

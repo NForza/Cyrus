@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackAsTool>true</PackAsTool>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\NForza.Cyrus.Core\NForza.Cyrus.Core.csproj" />

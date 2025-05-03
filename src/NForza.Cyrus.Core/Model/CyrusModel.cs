@@ -22,5 +22,4 @@ public static class CyrusModel
             .Select(type => (ICyrusModel)Activator.CreateInstance(type)!);
         return new CyrusModelAggregator(models).AsJson();
     }
-
 }

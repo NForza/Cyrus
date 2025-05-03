@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -9,14 +9,12 @@ namespace Cyrus;
 
 public partial class GenerateTypeScript : Task
 {
+    [Required]
+    public string ToolPath { get; set; } = string.Empty;
+
     public string ModelFile { get; set; } = string.Empty;
     public string AssemblyPath { get; set; } = string.Empty;
-
-    [Required]
     public string OutputFolder { get; set; } = string.Empty;
-
-    const string TypeName = "Cyrus.TypeScriptGenerator";
-    const string MethodName = "GetModelAsJson";
 
     internal ITaskLogger Logger => _logger ??= new TaskLogger(this.Log);
     internal ITaskLogger? _logger = null;
@@ -28,6 +26,12 @@ public partial class GenerateTypeScript : Task
 
     public override bool Execute()
     {
+        if (string.IsNullOrEmpty(OutputFolder))
+        {
+            Logger.LogMessage(MessageImportance.Normal, "OutputFolder for TypeScript Generation is not specified. Skipping.");
+            return true;
+        }
+
         Logger.LogMessage(MessageImportance.High, "Starting TypeScript generation...");
 
         Stream? modelStream = null;
@@ -99,23 +103,45 @@ public partial class GenerateTypeScript : Task
 
     private (bool succeeded, string errors, string model) GetModelFromAssembly()
     {
-        var bytes = File.ReadAllBytes(AssemblyPath);
-        var asm = Assembly.Load(bytes);
+        var modelGeneratorPath = Path.GetFullPath(ToolPath);
+        if (!File.Exists(modelGeneratorPath))
+        {
+            Logger.LogMessage(MessageImportance.High, $"Model generator {modelGeneratorPath} does not exist.");
+            return (false, "Model generator not found", string.Empty);
+        }
+
+        var psi = new ProcessStartInfo
+        {
+            FileName = "dotnet",
+            Arguments = $"\"{modelGeneratorPath}\" \"{AssemblyPath}\"",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
         try
         {
-            var type = asm.GetType(TypeName, throwOnError: true, ignoreCase: false);
-            var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
-            var method = type.GetMethod(MethodName, flags) ?? throw new MissingMethodException(TypeName, MethodName);
+            using var process = Process.Start(psi);
+            var output = process.StandardOutput.ReadToEnd();
+            var error = process.StandardError.ReadToEnd();
 
-            Logger.LogMessage(MessageImportance.Normal, $"Invoking {TypeName}.{MethodName}()");
+            if (!process.WaitForExit(1000))
+                throw new TimeoutException("Model generation timed out after 1 second.");
 
-            var result = method.Invoke(null, null);
-            return (true, "", result?.ToString() ?? "");
+            var succeeded = process.ExitCode == 0;
+            if (!succeeded)
+            {
+                Logger.LogMessage(MessageImportance.High, $"Model generator exited with code {process.ExitCode}.");
+            }
+
+            return (succeeded, error.Trim(), output.Trim());
         }
         catch (Exception ex)
         {
-            Log.LogErrorFromException(ex, showStackTrace: true);
-            return (false, ex.ToString(), "");
+            Logger.LogMessage(MessageImportance.High, $"Failed to run model generator: {ex.Message}");
+            return (false, ex.Message, string.Empty);
         }
+
     }
 }
