@@ -8,6 +8,7 @@
   <UsingTask TaskName="Cyrus.GenerateTypeScript" AssemblyFile="$(CustomTasksAssembly)"/>
 
   <PropertyGroup>
+    <Toolpath></Toolpath>
     <ModelFile Condition="'$(ModelFile)' == ''">metadata.json</ModelFile>
     <OutputFolder Condition="'$(OutputFolder)' == ''">.</OutputFolder>
     <AssemblyPath></AssemblyPath>

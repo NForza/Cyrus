@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.Json;
 using Cyrus.Model;
 using Fluid.Values;
-using Microsoft.Build.Framework;
 using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Templating;
-
 
 namespace Cyrus;
 
@@ -110,38 +104,37 @@ internal static class TypeScriptGenerator
         return typeScriptType;
     }
 
-    public static bool Generate(Stream modelStream, string outputFolder, ITaskLogger logger)
+    public static bool Generate(string json, string outputFolder)
     {
-        var json = new StreamReader(modelStream).ReadToEnd();
         metadata = JsonSerializer.Deserialize<CyrusMetadata>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web)) ?? throw new InvalidOperationException("Can't read metadata");
 
         var path = Path.GetFullPath(outputFolder);
-        logger.LogMessage(MessageImportance.Normal, "model: " + JsonSerializer.Serialize(metadata));
+        Console.WriteLine("model: " + JsonSerializer.Serialize(metadata));
 
-        logger.LogMessage(MessageImportance.Normal, "Writing output to: " + path);
+        Console.WriteLine("Writing output to: " + path);
 
-        logger.LogMessage(MessageImportance.Normal, "Writing Guids.");
+        Console.WriteLine("Writing Guids.");
         GenerateGuids(path, metadata);
 
-        logger.LogMessage(MessageImportance.Normal, "Writing Strings.");
+        Console.WriteLine("Writing Strings.");
         GenerateStrings(path, metadata);
 
-        logger.LogMessage(MessageImportance.Normal, "Writing Integers.");
+        Console.WriteLine("Writing Integers.");
         GenerateIntegers(path, metadata);
 
-        logger.LogMessage(MessageImportance.Normal, "Writing Commands.");
+        Console.WriteLine("Writing Commands.");
         GenerateCommands(path, metadata);
 
-        logger.LogMessage(MessageImportance.Normal, "Writing Queries.");
+        Console.WriteLine("Writing Queries.");
         GenerateQueries(path, metadata);
 
-        logger.LogMessage(MessageImportance.Normal, "Writing Events.");
+        Console.WriteLine("Writing Events.");
         GenerateEvents(path, metadata);
 
-        logger.LogMessage(MessageImportance.Normal, "Writing Hubs.");
+        Console.WriteLine("Writing Hubs.");
         GenerateHubs(path, metadata);
 
-        logger.LogMessage(MessageImportance.Normal, "Writing Models.");
+        Console.WriteLine("Writing Models.");
         GenerateModels(path, metadata);
         return true;
     }

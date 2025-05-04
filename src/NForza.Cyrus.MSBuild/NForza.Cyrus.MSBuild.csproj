@@ -8,7 +8,7 @@
     <MSBuildRuntime>CurrentRuntime</MSBuildRuntime>
     <OutputType>Library</OutputType>
     <IsPackable>true</IsPackable>
-    <Version>1.0.13</Version>
+    <Version>1.0.21</Version>
     <Title>Cyrus Typescript Generator</Title>
     <Authors>NForza</Authors>
     <Description>Generates Typescript types based on a Cyrus Model file</Description>
@@ -16,7 +16,6 @@
     <Copyright>Copyright NForza 2025</Copyright>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GenerateDependencyFile>true</GenerateDependencyFile>
-
     <TargetsForTfmSpecificBuildOutput>
       $(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage
     </TargetsForTfmSpecificBuildOutput>
@@ -24,6 +23,8 @@
     <NoWarn>NU5100</NoWarn>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <RootNamespace>Cyrus</RootNamespace>
+    <EnablePackFileBuildOutput>true</EnablePackFileBuildOutput>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
@@ -42,14 +43,6 @@
     <InternalsVisibleTo Include="NForza.Cyrus.MSBuild.Tests" />
     <Content Include="build\NForza.Cyrus.MSBuild.props" PackagePath="build\" />
     <Content Include="build\NForza.Cyrus.MSBuild.targets" PackagePath="build\" />
-
-    <EmbeddedResource Include="Templates\enum.liquid" />
-    <EmbeddedResource Include="Templates\integer.liquid" />
-    <EmbeddedResource Include="Templates\type-defaults.liquid" />
-    <EmbeddedResource Include="Templates\guid.liquid" />
-    <EmbeddedResource Include="Templates\hub.liquid" />
-    <EmbeddedResource Include="Templates\string.liquid" />
-    <EmbeddedResource Include="Templates\interface.liquid" />
   </ItemGroup>
 
   <ItemGroup>
@@ -57,13 +50,24 @@
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.13.9" PrivateAssets="all" ExcludeAssets="Runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj" />
-    <ProjectReference Include="..\NForza.Cyrus.Templating\NForza.Cyrus.Templating.csproj" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="9.0.4" />
+    <None Include="..\NForza.Cyrus.TypeScriptGenerator\bin\$(Configuration)\net9.0\publish\**\*.*"
+          Pack="true"
+          PackagePath="tools/net9.0/typescript-generator/"
+          Visible="false"
+          PrivateAssets="all"
+          CopyToOutputDirectory="Never" />
   </ItemGroup>
+  
+  <Target Name="ShowToolFileNames" BeforeTargets="Build">
+    <ItemGroup>
+      <ToolFiles Include="..\NForza.Cyrus.TypeScriptGenerator\bin\$(Configuration)\net9.0\publish\**\*.*" />
+    </ItemGroup>
+    <Message Text="ToolFiles in publish folder" Importance="High" />
+    <Message Text=" - %(ToolFiles.Identity)" Importance="High" />
+  </Target>
 
 </Project>
