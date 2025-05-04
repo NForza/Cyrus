@@ -8,7 +8,7 @@
     <MSBuildRuntime>CurrentRuntime</MSBuildRuntime>
     <OutputType>Library</OutputType>
     <IsPackable>true</IsPackable>
-    <Version>1.0.19</Version>
+    <Version>1.0.21</Version>
     <Title>Cyrus Typescript Generator</Title>
     <Authors>NForza</Authors>
     <Description>Generates Typescript types based on a Cyrus Model file</Description>
@@ -23,6 +23,8 @@
     <NoWarn>NU5100</NoWarn>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <RootNamespace>Cyrus</RootNamespace>
+    <EnablePackFileBuildOutput>true</EnablePackFileBuildOutput>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
@@ -52,43 +54,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\NForza.Cyrus.TypeScriptGenerator\bin\$(Configuration)\net9.0\publish\*.*" Pack="true" PackagePath="tools/net9.0/typescript-generator/" />
+    <None Include="..\NForza.Cyrus.TypeScriptGenerator\bin\$(Configuration)\net9.0\publish\**\*.*"
+          Pack="true"
+          PackagePath="tools/net9.0/typescript-generator/"
+          Visible="false"
+          PrivateAssets="all"
+          CopyToOutputDirectory="Never" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\Microsoft.AspNetCore.OpenApi.dll" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\Microsoft.Extensions.DependencyModel.dll" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\Microsoft.Extensions.FileProviders.Abstractions.dll" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\Microsoft.Extensions.Primitives.dll" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\Microsoft.OpenApi.dll" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\NForza.Cyrus.Abstractions.dll" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\NForza.Cyrus.Abstractions.pdb" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\NForza.Cyrus.Core.dll" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\NForza.Cyrus.Core.pdb" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\NForza.Cyrus.MSBuild.ModelExtractor.deps.json" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\NForza.Cyrus.MSBuild.ModelExtractor.dll" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\NForza.Cyrus.MSBuild.ModelExtractor.exe" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\NForza.Cyrus.MSBuild.ModelExtractor.pdb" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\NForza.Cyrus.MSBuild.ModelExtractor.runtimeconfig.json" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\NForza.Cyrus.Templating.dll" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\NForza.Cyrus.Templating.pdb" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\NForza.Cyrus.TypeScriptGenerator.deps.json" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\NForza.Cyrus.TypeScriptGenerator.dll" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\NForza.Cyrus.TypeScriptGenerator.exe" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\NForza.Cyrus.TypeScriptGenerator.pdb" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\NForza.Cyrus.TypeScriptGenerator.runtimeconfig.json" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\Parlot.dll" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\Scalar.AspNetCore.dll" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\Scrutor.dll" />
-    <None Remove="..\NForza.Cyrus.TypeScriptGenerator\bin\Debug\net9.0\publish\TimeZoneConverter.dll" />
-  </ItemGroup>
-
+  
   <Target Name="ShowToolFileNames" BeforeTargets="Build">
     <ItemGroup>
-      <ToolFiles Include="..\NForza.Cyrus.TypeScriptGenerator\bin\$(Configuration)\net9.0\publish\*.*" />
+      <ToolFiles Include="..\NForza.Cyrus.TypeScriptGenerator\bin\$(Configuration)\net9.0\publish\**\*.*" />
     </ItemGroup>
     <Message Text="ToolFiles in publish folder" Importance="High" />
     <Message Text=" - %(ToolFiles.Identity)" Importance="High" />
   </Target>
+
 </Project>

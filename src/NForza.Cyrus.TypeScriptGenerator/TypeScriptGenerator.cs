@@ -104,9 +104,8 @@ internal static class TypeScriptGenerator
         return typeScriptType;
     }
 
-    public static bool Generate(Stream modelStream, string outputFolder)
+    public static bool Generate(string json, string outputFolder)
     {
-        var json = new StreamReader(modelStream).ReadToEnd();
         metadata = JsonSerializer.Deserialize<CyrusMetadata>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web)) ?? throw new InvalidOperationException("Can't read metadata");
 
         var path = Path.GetFullPath(outputFolder);

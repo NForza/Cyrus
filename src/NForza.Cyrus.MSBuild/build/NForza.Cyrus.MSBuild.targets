@@ -6,9 +6,9 @@
 
   <Target Name="GenerateTypeScript" AfterTargets="Build">
     <Cyrus.GenerateTypeScript
-      ToolPath="$(MSBuildThisFileDirectory)..\tools\net9.0\typescript-generator\NForza.Cyrus.MSBuild.TypeScriptGenerator.dll"
+      ToolPath="$(MSBuildThisFileDirectory)..\tools\net9.0\typescript-generator\NForza.Cyrus.TypeScriptGenerator.dll"
       AssemblyPath="$(TargetPath)"
-      OutputFolder="$(CyrusTypeScriptFolder)" />
+      OutputFolder="$(Cyrus-TypeScriptFolder)" />
   </Target>
 
 
