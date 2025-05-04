@@ -66,12 +66,12 @@ jobs:
     - name: Pack the Templating project
       run: dotnet pack --configuration ${CONFIGURATION} --output ./output "./src/NForza.Cyrus.Templating/NForza.Cyrus.Templating.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
 
-    - name: Pack the ModelGeneration project
-      run: dotnet pack --configuration ${CONFIGURATION} --output "./src/NForza.Cyrus.MSBuild.ModelExtractor/bin/${CONFIGURATION}/net9.0/publish/" "./src/NForza.Cyrus.MSBuild.ModelExtractor/NForza.Cyrus.MSBuild.ModelExtractor.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
+    - name: Pack the TypeScriptGenerator project
+      run: dotnet pack --configuration ${CONFIGURATION} --output "./src/NForza.Cyrus.NForza.Cyrus.TypeScriptGenerator/bin/${CONFIGURATION}/net9.0/publish/" "./src/NForza.Cyrus.TypeScriptGenerator/NForza.Cyrus.TypeScriptGenerator.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
 
     - name: List files
       run: |
-        cd "./src/NForza.Cyrus.MSBuild.ModelExtractor/bin/${CONFIGURATION}/net9.0/publish/"
+        cd "./src/NForza.Cyrus.TypeScriptGenerator/bin/${CONFIGURATION}/net9.0/publish/"
         pwd
         ls -sla
     
