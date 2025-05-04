@@ -35,11 +35,6 @@ builder.Services.AddCyrus();
 
 var app = builder.Build();
 
-if (app.Services.OutputCyrusModelOnly(args))
-{
-    return;
-}
-
 app.UseCors("AllowAngularApp");
 
 ILogger logger = app.Services.GetRequiredService<ILogger<Program>>();

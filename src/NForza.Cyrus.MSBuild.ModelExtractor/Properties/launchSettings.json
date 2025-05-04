@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "NForza.Cyrus.MSBuild.ModelExtractor": {
-      "commandName": "Project",
-      "commandLineArgs": "\"C:\\dev\\Cyrus\\examples\\DemoApp\\DemoApp.WebApi\\bin\\Debug\\net9.0\\DemoApp.WebApi.dll\""
-    }
-  }
-}
