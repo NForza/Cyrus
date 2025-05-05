@@ -12,10 +12,10 @@ public class ModelTypeDefinition
         IsNullable = isNullable;
         Values = values;
     }
-    public string Name { get; }= string.Empty;
-    public bool IsCollection { get; } = false;
-    public bool IsNullable { get; } = false;
+    public string Name { get; set; } = string.Empty;
+    public bool IsCollection { get; set; } = false;
+    public bool IsNullable { get; set; } = false;
 
-    public ModelPropertyDefinition[] Properties { get; } = Array.Empty<ModelPropertyDefinition>();
-    public string[] Values { get; } = Array.Empty<string>();
+    public ModelPropertyDefinition[] Properties { get; set; } = [];
+    public string[] Values { get; set; } = [];
 }

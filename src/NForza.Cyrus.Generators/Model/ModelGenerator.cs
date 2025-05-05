@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.CodeAnalysis;
+using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Generators.SignalR;
 using NForza.Cyrus.Templating;
@@ -34,12 +35,13 @@ internal class ModelGenerator
         return $"new ModelTypeDefinition(\"{typeSymbol.Name}\", [{properties}], [{values}], {isCollection.ToString().ToLower()}, {typeSymbol.IsNullable().ToString().ToLower()})";
     }
 
-    internal static string ForQuery(IMethodSymbol queryHandler, LiquidEngine liquidEngine)
+    internal static string ForQueryHandler(IMethodSymbol queryHandler, LiquidEngine liquidEngine)
     {
+        var queryModelDefinition = ForNamedType(queryHandler.Parameters[0].Type, liquidEngine);
         var returnType = queryHandler.GetQueryReturnType();   
         var returnTypeDefinition = ForNamedType(returnType, liquidEngine);
         string queryName = queryHandler.Parameters[0].Type.Name;
-        return $"new ModelQueryDefinition(\"{queryName}\", {returnTypeDefinition})";
+        return $"new ModelQueryDefinition({queryModelDefinition}, {returnTypeDefinition})";
     }
 
     private static string GetValuesDeclaration(ITypeSymbol namedType)

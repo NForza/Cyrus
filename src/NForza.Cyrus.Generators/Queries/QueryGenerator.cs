@@ -21,7 +21,7 @@ public class QueryGenerator : CyrusGeneratorBase
                 "Queries",
                 "Queries",
                 "ModelQueryDefinition",
-                queryHandlers.Select(e => ModelGenerator.ForQuery(e, LiquidEngine)));
+                queryHandlers.Select(e => ModelGenerator.ForQueryHandler(e, LiquidEngine)));
             spc.AddSource($"model-queries.g.cs", SourceText.From(eventModels, Encoding.UTF8));
 
             var referencedTypes = queryHandlers.Select(q => q.GetQueryReturnType()).SelectMany(cs => cs.GetReferencedTypes());
