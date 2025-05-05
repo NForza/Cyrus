@@ -27,7 +27,8 @@
         "Clean",
         "Compile",
         "Publish",
-        "Restore"
+        "Restore",
+        "Test"
       ]
     },
     "Verbosity": {

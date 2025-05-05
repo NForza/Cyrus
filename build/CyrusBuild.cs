@@ -38,6 +38,19 @@ class CyrusBuild : NukeBuild
                 .EnableNoRestore());
         });
 
+    Target Test => _ => _
+        .DependsOn(Compile)
+        .Executes(() =>
+        {
+            DotNetTasks.DotNetTest(s => s
+                .SetProjectFile(cyrusSolutionPath)
+                .AddLoggers("trx")
+                .SetResultsDirectory(RootDirectory / "test-results")
+                .SetConfiguration(Configuration)
+                .EnableNoBuild()
+                .EnableNoRestore());
+        });
+
     Target Publish => _ => _
         .DependsOn(Compile)
         .Executes(() =>
