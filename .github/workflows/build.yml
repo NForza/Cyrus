@@ -15,7 +15,9 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9.0.x
-    - name: Install NUKE Global Tool
-      run: dotnet tool install Nuke.GlobalTool --global
-    - name: Run Nuke Test
-      run: nuke test
+    - name: Restore dotnet tools
+      run: dotnet tool restore
+    - name: Make build.sh executable
+      run: chmod +x build.sh
+    - name: Run NUKE Test
+      run: ./build.sh --target Test
