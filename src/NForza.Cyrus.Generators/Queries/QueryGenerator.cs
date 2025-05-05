@@ -12,7 +12,7 @@ public class QueryGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
     {
-        var queryHandlers = cyrusProvider.AllQueryHandlers;
+        var queryHandlers = cyrusProvider.QueryHandlers;
         if (queryHandlers.Any())
         {
             string assemblyName = queryHandlers.First().ContainingAssembly.Name;
