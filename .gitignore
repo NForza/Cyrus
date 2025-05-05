@@ -10,6 +10,12 @@
 *.userosscache
 *.sln.docstates
 
+# Nuke Build local files
+.nuke/
+
+# Test Results
+test-results/
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
