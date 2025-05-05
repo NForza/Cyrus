@@ -11,7 +11,8 @@
     <Authors>NForza</Authors>
     <RepositoryUrl>https://github.com/NForza/Cyrus</RepositoryUrl>
     <PackageTags>source-generator;csharp;cqrs;framework</PackageTags>
-    <PackageProjectUrl>https://github.com/NForza/Cyrus</PackageProjectUrl>  </PropertyGroup>
+    <PackageProjectUrl>https://github.com/NForza/Cyrus</PackageProjectUrl>  
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.4" />

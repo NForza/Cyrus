@@ -1,9 +1,11 @@
-﻿using System.Reflection;
-using System.Text.Json;
-using Cyrus.Model;
-using Fluid.Values;
-using NForza.Cyrus.Abstractions.Model;
+﻿using Cyrus.Model;
 using NForza.Cyrus.Templating;
+using NForza.Cyrus.Abstractions.Model;
+using Fluid.Values;
+using System.Text.Json;
+using System.Linq;
+using System.Reflection;
+
 
 namespace Cyrus;
 
@@ -164,11 +166,11 @@ internal static class TypeScriptGenerator
         GenerateHubQueryReturnTypes(outputFolder, metadata);
         foreach (var hub in metadata.Hubs)
         {
-            var queries = hub.Queries.Select(q => metadata.Queries.First(m => m.Name == q.Name));
+            var queries = hub.Queries.Select(queryName => metadata.Queries.First( q => q.Name == queryName).ReturnType);
             var commands = hub.Commands.Select(c => metadata.Commands.First(m => m.Name == c));
             var events = hub.Events.Select(c => metadata.Events.First(m => m.Name == c));
-            var queryReturnTypes = hub.Queries.Select(q => q.ReturnType);
-            var allTypes = queries.Concat(commands).Concat(queryReturnTypes).Concat(events).Distinct(TypeWithPropertiesEqualityComparer.Instance);
+            var queryReturnTypes = hub.Queries.Select(queryName => metadata.Queries.First(q => q.Name == queryName ).ReturnType);
+            var allTypes = queries.Concat(commands).Concat(queries).Concat(events).Distinct(TypeWithPropertiesEqualityComparer.Instance);
 
             var imports = allTypes.Select(g => g.Name).ToList();
 
@@ -180,7 +182,7 @@ internal static class TypeScriptGenerator
 
     private static void GenerateHubQueryReturnTypes(string outputFolder, CyrusMetadata metadata)
     {
-        var returnTypes = metadata.Hubs.SelectMany(h => h.Queries).Select(q => q.ReturnType).Distinct(TypeWithPropertiesEqualityComparer.Instance);
+        var returnTypes = metadata.Hubs.SelectMany(h => h.Queries).Select(queryName => metadata.Queries.First(q => q.Name == queryName).ReturnType).Distinct(TypeWithPropertiesEqualityComparer.Instance);
         GenerateTypesWithProperties(returnTypes, outputFolder, metadata);
     }
 
@@ -217,7 +219,7 @@ internal static class TypeScriptGenerator
         }
     }
 
-    private static void GenerateQueries(string outputFolder, CyrusMetadata metadata) => GenerateTypesWithProperties(metadata.Queries, outputFolder, metadata);
+    private static void GenerateQueries(string outputFolder, CyrusMetadata metadata) => GenerateTypesWithProperties(metadata.Queries.Select( q => q.ReturnType), outputFolder, metadata);
     private static void GenerateIntegers(string outputFolder, CyrusMetadata metadata)
     {
         foreach (var integerType in metadata.Integers)
