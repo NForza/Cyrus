@@ -22,22 +22,27 @@ internal class ModelGenerator
         return liquidEngine.Render(model, "model-hub");
     }
 
-    internal static string ForNamedType(INamedTypeSymbol namedType, LiquidEngine liquidEngine)
+    internal static string ForNamedType(ITypeSymbol typeSymbol, LiquidEngine liquidEngine)
     {
-        string properties = GetPropertiesDeclaration(namedType, liquidEngine);
-        string values = GetValuesDeclaration(namedType);
-        return $"new ModelTypeDefinition(\"{namedType.Name}\", [{properties}], [{values}], {namedType.IsCollection().IsMatch.ToString().ToLower()}, {namedType.IsNullable().ToString().ToLower()})";
+        (bool isCollection, ITypeSymbol? elementType) = typeSymbol.IsCollection();
+        if (isCollection)
+        {
+            typeSymbol = elementType;
+        }
+        string properties = GetPropertiesDeclaration(typeSymbol, liquidEngine);
+        string values = GetValuesDeclaration(typeSymbol);
+        return $"new ModelTypeDefinition(\"{typeSymbol.Name}\", [{properties}], [{values}], {isCollection.ToString().ToLower()}, {typeSymbol.IsNullable().ToString().ToLower()})";
     }
 
     internal static string ForQuery(IMethodSymbol queryHandler, LiquidEngine liquidEngine)
     {
-        var returnType = (INamedTypeSymbol) queryHandler.GetQueryReturnType();   
+        var returnType = queryHandler.GetQueryReturnType();   
         var returnTypeDefinition = ForNamedType(returnType, liquidEngine);
         string queryName = queryHandler.Parameters[0].Type.Name;
         return $"new ModelQueryDefinition(\"{queryName}\", {returnTypeDefinition})";
     }
 
-    private static string GetValuesDeclaration(INamedTypeSymbol namedType)
+    private static string GetValuesDeclaration(ITypeSymbol namedType)
     {
         return namedType.TypeKind == TypeKind.Enum ? string.Join(",", namedType.GetMembers()
                 .OfType<IFieldSymbol>()
@@ -45,9 +50,9 @@ internal class ModelGenerator
                 .Select(f => $"\"{f.Name}\"")) : string.Empty;
     }
 
-    private static string GetPropertiesDeclaration(INamedTypeSymbol namedType, LiquidEngine liquidEngine)
+    private static string GetPropertiesDeclaration(ITypeSymbol typeSymbol, LiquidEngine liquidEngine)
     {
-        var propertyDeclarations = namedType.GetPropertyModels().Select(m => liquidEngine.Render(new { property = m }, "model-property"));
+        var propertyDeclarations = typeSymbol.GetPropertyModels().Select(m => liquidEngine.Render(new { property = m }, "model-property"));
         return string.Join(",", propertyDeclarations);
     }
 }
