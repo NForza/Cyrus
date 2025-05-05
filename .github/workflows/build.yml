@@ -15,9 +15,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+    - name: Install NUKE Global Tool
+      run: dotnet tool install Nuke.GlobalTool --global
+    - name: Run Nuke Test
+      run: nuke test
