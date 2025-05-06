@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Analyzers;
 using NForza.Cyrus.Generators.Commands;
 using NForza.Cyrus.Generators.Events;
-using NForza.Cyrus.Generators.Events.MassTransit;
 using NForza.Cyrus.Generators.Generators.Cqrs;
-using NForza.Cyrus.Generators.Queries;
 using NForza.Cyrus.Generators.SignalR;
 using NForza.Cyrus.Generators.TypedIds;
 using NForza.Cyrus.Generators.Validators;
@@ -78,26 +77,15 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
         {
             try
             {
-                new StringIdGenerator().GenerateSource(spc, source, LiquidEngine);
-                new StringIdTypeConverterGenerator().GenerateSource(spc, source, LiquidEngine);
-                new IntIdGenerator().GenerateSource(spc, source, LiquidEngine);
-                new IntIdTypeConverterGenerator().GenerateSource(spc, source, LiquidEngine);
-                new GuidIdGenerator().GenerateSource(spc, source, LiquidEngine);
-                new GuidIdTypeConverterGenerator().GenerateSource(spc, source, LiquidEngine);
-                new TypedIdJsonConverterGenerator().GenerateSource(spc, source, LiquidEngine);
-                new TypedIdInitializerGenerator().GenerateSource(spc, source, LiquidEngine);
-                new CommandHandlerGenerator().GenerateSource(spc, source, LiquidEngine);
-                new QueryGenerator().GenerateSource(spc, source, LiquidEngine);
-                new QueryHandlerGenerator().GenerateSource(spc, source, LiquidEngine);
-                new EventHandlerGenerator().GenerateSource(spc, source, LiquidEngine);
-                new EventGenerator().GenerateSource(spc, source, LiquidEngine);
-                new SignalRHubGenerator().GenerateSource(spc, source, LiquidEngine);
-                new EventHandlerDictionaryGenerator().GenerateSource(spc, source, LiquidEngine);
-                new BusRegistrationGenerator().GenerateSource(spc, source, LiquidEngine);
-                new WebApiCommandEndpointsGenerator().GenerateSource(spc, source, LiquidEngine);
-                new WebApiQueryEndpointsGenerator().GenerateSource(spc, source, LiquidEngine);
-                new ValidatorGenerator().GenerateSource(spc, source, LiquidEngine);
-                new MassTransitConsumerGenerator().GenerateSource(spc, source, LiquidEngine);
+                Assembly.GetExecutingAssembly()
+                    .GetTypes()
+                    .Where(t => t.IsClass && t.IsSubclassOf(typeof(CyrusGeneratorBase)) && !t.IsAbstract)
+                    .ToList()
+                    .ForEach(t =>
+                    {
+                        var generator = (CyrusGeneratorBase)Activator.CreateInstance(t);
+                        generator.GenerateSource(spc, source, LiquidEngine);
+                    });
             }
             catch (Exception ex)
             {
