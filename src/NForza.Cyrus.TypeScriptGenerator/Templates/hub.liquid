@@ -12,7 +12,7 @@ export class {{ Name }}Service {
   private hubConnection: signalR.HubConnection;
 
 {%- for q in Queries %}
-  private _{{ q.Name | camel-cased }}Result: BehaviorSubject<{{ q | query_return_type }}> = new BehaviorSubject<{{ q | query_return_type }}>({{ q.ReturnType | to_typescript_default }});
+  private _{{ q.Name | camel-cased }}Result: BehaviorSubject<{{ q.ReturnType.Name | to-tstype }}> = new BehaviorSubject<{{ q.ReturnType.Name | to-tstype }}>({{ q.ReturnType | to-tsdefault }});
 {%- endfor %}
 {%- for e in Events %}
   private _{{ e | camel-cased }}Subject: Subject<{{ e }}> = new Subject<{{ e }}>();
@@ -20,7 +20,7 @@ export class {{ Name }}Service {
 
   constructor() {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:7166{{ Path }}') 
+      .withUrl('https://localhost:7166/{{ Path | strip-leading-slash }}') 
       .configureLogging(signalR.LogLevel.Information)
       .build();
     {%- for e in Events %}
@@ -30,8 +30,8 @@ export class {{ Name }}Service {
     });
     {%- endfor %}
     {%- for q in Queries %}  
-    this.hubConnection.on('{{ q.Name | camel-cased }}Result', (data : {{ q | query_return_type}}) => {
-      console.log('Received {{e}}:', data);
+    this.hubConnection.on('{{ q.Name | camel-cased }}Result', (data : {{ q.ReturnType.Name | to-tstype }}) => {
+      console.log('Received {{ q.Name | camel-cased }}Result:', data);
       this._{{ q.Name | camel-cased }}Result.next(data);
     });
     {%- endfor %}
@@ -66,7 +66,7 @@ export class {{ Name }}Service {
     });
   }
 
-  public get {{ q.Name | camel-cased }}Result(): Observable<{{ q | query_return_type }}> {
+  public get {{ q.Name | camel-cased }}Result(): Observable<{{ q.ReturnType.Name | to-tstype }}> {
     return this._{{ q.Name | camel-cased }}Result;
   }
   {%- endfor %}

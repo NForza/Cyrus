@@ -128,6 +128,20 @@ internal static class ITypeSymbolExtensions
                 namedType.ContainingNamespace.ToDisplayString() == "System.Threading.Tasks";
     }
 
+    public static (bool isTaskType, ITypeSymbol? typeSymbol) GetTaskType(this ITypeSymbol typeSymbol)
+    {
+        if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
+        {
+            return (false, null); 
+        }
+        if (!namedTypeSymbol.IsTaskType())
+            return (false, null);
+
+        return namedTypeSymbol.TypeArguments.Length == 1
+            ? (true, namedTypeSymbol.TypeArguments[0])
+            : (false, null);
+    }
+
     public static bool IsVoid(this ITypeSymbol typeSymbol)
     {
         return typeSymbol.ToDisplayString() == "void";

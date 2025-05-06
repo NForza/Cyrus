@@ -1,9 +1,12 @@
-﻿using System.Reflection;
-using System.Text.Json;
-using Cyrus.Model;
-using Fluid.Values;
-using NForza.Cyrus.Abstractions.Model;
+﻿using Cyrus.Model;
 using NForza.Cyrus.Templating;
+using NForza.Cyrus.Abstractions.Model;
+using Fluid.Values;
+using System.Text.Json;
+using System.Linq;
+using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
+
 
 namespace Cyrus;
 
@@ -12,15 +15,16 @@ internal static class TypeScriptGenerator
     private static LiquidEngine? _liquidEngine = null;
     private static LiquidEngine liquidEngine => _liquidEngine ??= new LiquidEngine(Assembly.GetExecutingAssembly(), options =>
     {
-        options.Filters.AddFilter("to_typescript_type", (input, arguments, context) =>
+        options.Filters.AddFilter("to-tstype", (input, arguments, context) =>
         {
             string value = input.ToStringValue();
             return new StringValue(CSharpToTypeScriptType(value, metadata));
         });
 
-        options.Filters.AddFilter("to_typescript_default", (input, arguments, context) =>
+        options.Filters.AddFilter("to-tsdefault", (input, arguments, context) =>
         {
-            ModelTypeDefinition value = input.ToObjectValue() as ModelTypeDefinition;
+            ModelTypeDefinition? value = input.ToObjectValue() as ModelTypeDefinition;
+            if (value == null) return input;
             return new StringValue(GetString(value));
 
             static string GetString(ModelTypeDefinition p)
@@ -38,7 +42,7 @@ internal static class TypeScriptGenerator
             }
         });
 
-        options.Filters.AddFilter("strip_postfix", (input, arguments, context) =>
+        options.Filters.AddFilter("strip-postfix", (input, arguments, context) =>
         {
             string value = input.ToStringValue();
             const string commandSuffix = "Command";
@@ -57,11 +61,14 @@ internal static class TypeScriptGenerator
             return input;
         });
 
-        options.Filters.AddFilter("query_return_type", (input, arguments, context) =>
+        options.Filters.AddFilter("strip-leading-slash", (input, arguments, context) =>
         {
-            ModelQueryDefinition value = input.ToObjectValue() as ModelQueryDefinition;
-            var tsType = CSharpToTypeScriptType(value.ReturnType.Name, metadata);
-            return new StringValue(value.ReturnType.Name + (value.ReturnType.IsNullable ? "?" : "") + (value.ReturnType.IsCollection ? "[]" : ""));
+            string value = input.ToStringValue();
+
+            if (value.StartsWith("/", StringComparison.Ordinal))
+                return new StringValue(value.Substring(1));
+
+            return input;
         });
     });
 
@@ -69,6 +76,18 @@ internal static class TypeScriptGenerator
 
     private static string CSharpToTypeScriptType(string input, CyrusMetadata metadata)
     {
+        static bool TypeFoundIn(IEnumerable<ModelTypeDefinition> models, string input, [NotNullWhen(true)] out string? value)
+        {
+            var model = models.FirstOrDefault(m => m.Name == input);
+            if (model != null)
+            {
+                value = model.Name + (model.IsNullable ? "?" : "") + (model.IsCollection ? "[]" : "");
+                return true;
+            }
+            value = null;
+            return false;
+        }
+
         if (string.IsNullOrEmpty(input)) return "";
 
         var typeMapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -95,10 +114,11 @@ internal static class TypeScriptGenerator
             _ when metadata.Guids.Contains(input) => input,
             _ when metadata.Strings.Contains(input) => input,
             _ when metadata.Integers.Contains(input) => input,
-            _ when metadata.Commands.Any(c => c.Name == input) => input,
-            _ when metadata.Queries.Any(c => c.Name == input) => input,
-            _ when metadata.Events.Any(c => c.Name == input) => input,
-            _ when metadata.Models.Any(c => c.Name == input) => input,
+            _ when TypeFoundIn(metadata.Commands, input, out var value) => value,
+            _ when TypeFoundIn(metadata.Queries, input, out var value) => value,
+            _ when TypeFoundIn(metadata.Events, input, out var value) => value,
+            _ when TypeFoundIn(metadata.Models, input, out var value) => value,
+            _ when TypeFoundIn(metadata.Queries.Select(q => q.ReturnType), input, out var value) => value,
             _ => "any"
         };
         return typeScriptType;
@@ -164,15 +184,22 @@ internal static class TypeScriptGenerator
         GenerateHubQueryReturnTypes(outputFolder, metadata);
         foreach (var hub in metadata.Hubs)
         {
-            var queries = hub.Queries.Select(q => metadata.Queries.First(m => m.Name == q.Name));
-            var commands = hub.Commands.Select(c => metadata.Commands.First(m => m.Name == c));
-            var events = hub.Events.Select(c => metadata.Events.First(m => m.Name == c));
-            var queryReturnTypes = hub.Queries.Select(q => q.ReturnType);
-            var allTypes = queries.Concat(commands).Concat(queryReturnTypes).Concat(events).Distinct(TypeWithPropertiesEqualityComparer.Instance);
+            IEnumerable<ModelQueryDefinition> queries = hub.Queries.Select(queryName => metadata.Queries.First(q => q.Name == queryName));
+            IEnumerable<ModelTypeDefinition> queryTypeDefinitions = queries.Cast<ModelTypeDefinition>();
+            IEnumerable<ModelTypeDefinition> commands = hub.Commands.Select(c => metadata.Commands.First(m => m.Name == c));
+            IEnumerable<ModelTypeDefinition> events = hub.Events.Select(c => metadata.Events.First(m => m.Name == c));
+            IEnumerable<ModelTypeDefinition> queryReturnTypes =queries.Select(q => q.ReturnType);
+            IEnumerable<ModelTypeDefinition> allTypes = 
+                queryTypeDefinitions
+                    .Concat(queryReturnTypes)
+                    .Concat(commands)
+                    .Concat(queryReturnTypes)
+                    .Concat(events)
+                    .Distinct(TypeWithPropertiesEqualityComparer.Instance);
 
             var imports = allTypes.Select(g => g.Name).ToList();
 
-            var result = liquidEngine.Render(new { Imports = imports, hub.Queries, hub.Commands, hub.Events, hub.Path, hub.Name }, "hub");
+            var result = liquidEngine.Render(new { Imports = imports, Queries = queries, hub.Commands, hub.Events, hub.Path, hub.Name }, "hub");
             string fileName = Path.ChangeExtension(Path.Combine(outputFolder, hub.Name), ".ts");
             File.WriteAllText(fileName, result);
         }
@@ -180,7 +207,7 @@ internal static class TypeScriptGenerator
 
     private static void GenerateHubQueryReturnTypes(string outputFolder, CyrusMetadata metadata)
     {
-        var returnTypes = metadata.Hubs.SelectMany(h => h.Queries).Select(q => q.ReturnType).Distinct(TypeWithPropertiesEqualityComparer.Instance);
+        var returnTypes = metadata.Hubs.SelectMany(h => h.Queries).Select(queryName => metadata.Queries.First(q => q.Name == queryName).ReturnType).Distinct(TypeWithPropertiesEqualityComparer.Instance);
         GenerateTypesWithProperties(returnTypes, outputFolder, metadata);
     }
 
@@ -217,7 +244,12 @@ internal static class TypeScriptGenerator
         }
     }
 
-    private static void GenerateQueries(string outputFolder, CyrusMetadata metadata) => GenerateTypesWithProperties(metadata.Queries, outputFolder, metadata);
+    private static void GenerateQueries(string outputFolder, CyrusMetadata metadata)
+    {
+        GenerateTypesWithProperties(metadata.Queries, outputFolder, metadata);
+        GenerateTypesWithProperties(metadata.Queries.Select(q => q.ReturnType), outputFolder, metadata);
+    }
+
     private static void GenerateIntegers(string outputFolder, CyrusMetadata metadata)
     {
         foreach (var integerType in metadata.Integers)

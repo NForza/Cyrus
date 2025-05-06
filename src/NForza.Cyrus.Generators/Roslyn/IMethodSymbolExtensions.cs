@@ -62,6 +62,19 @@ internal static class IMethodSymbolExtensions
         return false;
     }
 
+    public static ITypeSymbol GetQueryReturnType(this IMethodSymbol methodSymbol)
+    {
+        var returnType = methodSymbol.ReturnType;
+        if (returnType is INamedTypeSymbol namedType &&
+            namedType.IsGenericType &&
+            (namedType.ConstructedFrom.ToDisplayString() == "System.Threading.Tasks.Task<TResult>" ||
+             namedType.ConstructedFrom.ToDisplayString() == "System.Threading.Tasks.ValueTask<TResult>"))
+        {
+            return namedType.TypeArguments[0];
+        }
+        return returnType;
+    }
+
     public static string GetCommandInvocation(this IMethodSymbol handler, string variableName, string serviceProviderVariable = "services")
     {
         var commandType = handler.Parameters[0].Type.ToFullName();

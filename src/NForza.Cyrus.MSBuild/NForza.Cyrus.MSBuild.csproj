@@ -60,14 +60,6 @@
           Visible="false"
           PrivateAssets="all"
           CopyToOutputDirectory="Never" />
-  </ItemGroup>
-  
-  <Target Name="ShowToolFileNames" BeforeTargets="Build">
-    <ItemGroup>
-      <ToolFiles Include="..\NForza.Cyrus.TypeScriptGenerator\bin\$(Configuration)\net9.0\publish\**\*.*" />
-    </ItemGroup>
-    <Message Text="ToolFiles in publish folder" Importance="High" />
-    <Message Text=" - %(ToolFiles.Identity)" Importance="High" />
-  </Target>
+  </ItemGroup> 
 
 </Project>

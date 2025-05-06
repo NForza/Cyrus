@@ -9,7 +9,9 @@ if (string.IsNullOrEmpty(argumentParser.Output) || string.IsNullOrEmpty(argument
     return 1;
 }
 
-(var succeeded, var model) = new ModelGenerator(argumentParser.Path ?? string.Empty).GetModel();
+Directory.CreateDirectory(argumentParser.Output!);
+
+(var succeeded, var model) = new ModelGenerator(argumentParser.Path!).GetModel();
 
 if (!succeeded)
 {

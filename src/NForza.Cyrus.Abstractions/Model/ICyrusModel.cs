@@ -10,6 +10,6 @@ public interface ICyrusModel
     IEnumerable<ModelTypeDefinition> Models { get; }
     IEnumerable<ModelTypeDefinition> Events { get; }
     IEnumerable<ModelTypeDefinition> Commands { get; }
-    IEnumerable<ModelTypeDefinition> Queries { get; }
+    IEnumerable<ModelQueryDefinition> Queries { get; }
     IEnumerable<ModelHubDefinition> Hubs { get; }
 }

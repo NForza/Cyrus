@@ -6,7 +6,7 @@
   ],
   [
   	{% for q in Queries -%}
-	  {% include "model-hubquery", query: q %}{% unless forloop.last %}, {% endunless -%}
+	  "{{ q.MethodName }}"{% unless forloop.last %}, {% endunless -%}
 	{%- endfor %}
   ],
   [

@@ -34,7 +34,7 @@
     <EmbeddedResource Include="Commands\Templates\CyrusInitializer.liquid" />
     <EmbeddedResource Include="WebApi\Templates\HttpContextObjectFactoryCommand.liquid" />
     <EmbeddedResource Include="WebApi\Templates\HttpContextObjectFactoryQuery.liquid" />
-    <EmbeddedResource Include="Model\model-hubquery.liquid" />
+    <EmbeddedResource Include="Model\model-query.liquid" />
     <EmbeddedResource Include="Model\model-hub.liquid" />
     <EmbeddedResource Include="Model\model-type.liquid" />
     <EmbeddedResource Include="Model\model-property.liquid" />
