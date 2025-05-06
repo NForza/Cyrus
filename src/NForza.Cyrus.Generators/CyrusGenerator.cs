@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
@@ -19,6 +21,8 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
         DebugThisGenerator(true);
+
+        var templateOverrides = GetTemplateOverridesProvider(context);
 
         var configProvider = ConfigProvider(context);
 
@@ -51,10 +55,11 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
             .Combine(eventProvider)
             .Combine(signalRHubProvider)
             .Combine(validatorProvider)
+            .Combine(templateOverrides)
             .Combine(configProvider)
             .Select((combinedProviders, _) =>
             {
-                var ((((((((((((((compilation, intIds), guidIds), stringIds), commands), commandHandlers), allCommandsAndHandlers), queries), queryHandlers), allQueriesAndHandlers), eventHandlers), events), signalRHubs), validators), generationConfig) = combinedProviders;
+                var (((((((((((((((compilation, intIds), guidIds), stringIds), commands), commandHandlers), allCommandsAndHandlers), queries), queryHandlers), allQueriesAndHandlers), eventHandlers), events), signalRHubs), validators), templateOverrides), generationConfig) = combinedProviders;
                 return new CyrusGenerationContext(
                     compilation: compilation,
                     guidIds: guidIds,
@@ -70,6 +75,7 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
                     allQueriesAndHandlers: allQueriesAndHandlers,
                     signalRHubs: signalRHubs,
                     validators: validators,
+                    templateOverrides: templateOverrides,
                     generationConfig: generationConfig);
             });
 
@@ -96,5 +102,14 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
                 throw;
             }
         });
+    }
+
+    private IncrementalValueProvider<ImmutableDictionary<string, string>> GetTemplateOverridesProvider(IncrementalGeneratorInitializationContext context)
+    {
+        return context.AdditionalTextsProvider
+            .Where(file => file.Path.EndsWith(".liquid", StringComparison.OrdinalIgnoreCase))
+            .Select((file, token) => new KeyValuePair<string, string>(file.Path, file.GetText(token)?.ToString() ?? ""))
+            .Collect()
+            .Select((entries, _) => entries.ToImmutableDictionary(entry => entry.Key, entry => entry.Value));
     }
 }
