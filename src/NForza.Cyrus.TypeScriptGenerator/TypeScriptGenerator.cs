@@ -5,6 +5,7 @@ using Fluid.Values;
 using System.Text.Json;
 using System.Linq;
 using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
 
 
 namespace Cyrus;
@@ -75,6 +76,18 @@ internal static class TypeScriptGenerator
 
     private static string CSharpToTypeScriptType(string input, CyrusMetadata metadata)
     {
+        static bool TypeFoundIn(IEnumerable<ModelTypeDefinition> models, string input, [NotNullWhen(true)] out string? value)
+        {
+            var model = models.FirstOrDefault(m => m.Name == input);
+            if (model != null)
+            {
+                value = model.Name + (model.IsNullable ? "?" : "") + (model.IsCollection ? "[]" : "");
+                return true;
+            }
+            value = null;
+            return false;
+        }
+
         if (string.IsNullOrEmpty(input)) return "";
 
         var typeMapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -101,10 +114,11 @@ internal static class TypeScriptGenerator
             _ when metadata.Guids.Contains(input) => input,
             _ when metadata.Strings.Contains(input) => input,
             _ when metadata.Integers.Contains(input) => input,
-            _ when metadata.Commands.Any(c => c.Name == input) => input,
-            _ when metadata.Queries.Any(c => c.Name == input) => input,
-            _ when metadata.Events.Any(c => c.Name == input) => input,
-            _ when metadata.Models.Any(c => c.Name == input) => input,
+            _ when TypeFoundIn(metadata.Commands, input, out var value) => value,
+            _ when TypeFoundIn(metadata.Queries, input, out var value) => value,
+            _ when TypeFoundIn(metadata.Events, input, out var value) => value,
+            _ when TypeFoundIn(metadata.Models, input, out var value) => value,
+            _ when TypeFoundIn(metadata.Queries.Select(q => q.ReturnType), input, out var value) => value,
             _ => "any"
         };
         return typeScriptType;
@@ -171,11 +185,17 @@ internal static class TypeScriptGenerator
         foreach (var hub in metadata.Hubs)
         {
             IEnumerable<ModelQueryDefinition> queries = hub.Queries.Select(queryName => metadata.Queries.First(q => q.Name == queryName));
-            List<ModelTypeDefinition> queryTypeDefinitions = queries.Cast<ModelTypeDefinition>().ToList();
+            IEnumerable<ModelTypeDefinition> queryTypeDefinitions = queries.Cast<ModelTypeDefinition>();
             IEnumerable<ModelTypeDefinition> commands = hub.Commands.Select(c => metadata.Commands.First(m => m.Name == c));
             IEnumerable<ModelTypeDefinition> events = hub.Events.Select(c => metadata.Events.First(m => m.Name == c));
             IEnumerable<ModelTypeDefinition> queryReturnTypes =queries.Select(q => q.ReturnType);
-            IEnumerable<ModelTypeDefinition> allTypes = queryReturnTypes.Concat(commands).Concat(queryReturnTypes).Concat(events).Distinct(TypeWithPropertiesEqualityComparer.Instance);
+            IEnumerable<ModelTypeDefinition> allTypes = 
+                queryTypeDefinitions
+                    .Concat(queryReturnTypes)
+                    .Concat(commands)
+                    .Concat(queryReturnTypes)
+                    .Concat(events)
+                    .Distinct(TypeWithPropertiesEqualityComparer.Instance);
 
             var imports = allTypes.Select(g => g.Name).ToList();
 
@@ -224,7 +244,12 @@ internal static class TypeScriptGenerator
         }
     }
 
-    private static void GenerateQueries(string outputFolder, CyrusMetadata metadata) => GenerateTypesWithProperties(metadata.Queries.Select(q => q.ReturnType), outputFolder, metadata);
+    private static void GenerateQueries(string outputFolder, CyrusMetadata metadata)
+    {
+        GenerateTypesWithProperties(metadata.Queries, outputFolder, metadata);
+        GenerateTypesWithProperties(metadata.Queries.Select(q => q.ReturnType), outputFolder, metadata);
+    }
+
     private static void GenerateIntegers(string outputFolder, CyrusMetadata metadata)
     {
         foreach (var integerType in metadata.Integers)
