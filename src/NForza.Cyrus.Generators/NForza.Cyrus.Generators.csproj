@@ -30,14 +30,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Commands\Templates\CommandDispatcherExtensions.liquid" />
+    <EmbeddedResource Include="Commands\Templates\CommandDispatcher.liquid" />
     <EmbeddedResource Include="Commands\Templates\CyrusInitializer.liquid" />
     <EmbeddedResource Include="WebApi\Templates\HttpContextObjectFactoryCommand.liquid" />
     <EmbeddedResource Include="WebApi\Templates\HttpContextObjectFactoryQuery.liquid" />
-    <EmbeddedResource Include="Model\model-query.liquid" />
-    <EmbeddedResource Include="Model\model-hub.liquid" />
-    <EmbeddedResource Include="Model\model-type.liquid" />
-    <EmbeddedResource Include="Model\model-property.liquid" />
+    <EmbeddedResource Include="Model\Model-query.liquid" />
+    <EmbeddedResource Include="Model\Model-hub.liquid" />
+    <EmbeddedResource Include="Model\Model-type.liquid" />
+    <EmbeddedResource Include="Model\Model-property.liquid" />
     <EmbeddedResource Include="TypedIds\Templates\ServiceCollectionJsonConverterExtensions.liquid" />
     <EmbeddedResource Include="TypedIds\Templates\GuidIdJsonConverter.liquid" />
     <EmbeddedResource Include="TypedIds\Templates\IntIdJsonConverter.liquid" />

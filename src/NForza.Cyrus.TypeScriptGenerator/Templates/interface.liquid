@@ -4,6 +4,6 @@ import { {{ t.Name }} } from './{{ t.Name }}';
 
 export interface {{ Name }} {
 {%- for prop in Properties %}
-    {{ prop.Name | camel-cased }}{% if prop.IsNullable %}?{% endif %}: {{ prop.Type | to_typescript_type }}{% if prop.IsCollection %}[]{% endif %};
+    {{ prop.Name | camel-cased }}{% if prop.IsNullable %}?{% endif %}: {{ prop.Type | to-tstype }}{% if prop.IsCollection %}[]{% endif %};
 {%- endfor %}
 }

@@ -91,7 +91,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
             }).ToList()
         };
 
-        var resolvedSource = liquidEngine.Render(model, "CommandDispatcherExtensions");
+        var resolvedSource = liquidEngine.Render(model, "CommandDispatcher");
 
         return resolvedSource;
     }

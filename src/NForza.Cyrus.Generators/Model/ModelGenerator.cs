@@ -20,7 +20,7 @@ internal class ModelGenerator
             signalRHub.Events
         };
 
-        return liquidEngine.Render(model, "model-hub");
+        return liquidEngine.Render(model, "Model-hub");
     }
 
     internal static string ForNamedType(ITypeSymbol typeSymbol, LiquidEngine liquidEngine)
@@ -54,7 +54,7 @@ internal class ModelGenerator
 
     private static string GetPropertiesDeclaration(ITypeSymbol typeSymbol, LiquidEngine liquidEngine)
     {
-        var propertyDeclarations = typeSymbol.GetPropertyModels().Select(m => liquidEngine.Render(new { property = m }, "model-property"));
+        var propertyDeclarations = typeSymbol.GetPropertyModels().Select(m => liquidEngine.Render(new { property = m }, "Model-property"));
         return string.Join(",", propertyDeclarations);
     }
 }
