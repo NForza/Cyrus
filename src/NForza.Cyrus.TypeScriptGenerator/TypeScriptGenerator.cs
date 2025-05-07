@@ -3,7 +3,6 @@ using NForza.Cyrus.Templating;
 using NForza.Cyrus.Abstractions.Model;
 using Fluid.Values;
 using System.Text.Json;
-using System.Linq;
 using System.Reflection;
 using System.Diagnostics.CodeAnalysis;
 
@@ -13,7 +12,7 @@ namespace Cyrus;
 internal static class TypeScriptGenerator
 {
     private static LiquidEngine? _liquidEngine = null;
-    private static LiquidEngine liquidEngine => _liquidEngine ??= new LiquidEngine(Assembly.GetExecutingAssembly(), options =>
+    private static LiquidEngine liquidEngine => _liquidEngine ??= new LiquidEngine(Assembly.GetExecutingAssembly(), [], options =>
     {
         options.Filters.AddFilter("to-tstype", (input, arguments, context) =>
         {

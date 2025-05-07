@@ -9,22 +9,22 @@ namespace NForza.Cyrus.Generators.TypedIds;
 
 public class StringIdGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
     {
         var stringIds = cyrusProvider.StringIds;
         foreach (var recordSymbol in stringIds)
         {
-            var sourceText = GenerateCodeForRecordStruct(recordSymbol);
+            var sourceText = GenerateCodeForRecordStruct(recordSymbol, cyrusProvider.LiquidEngine);
             spc.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         };
         if (stringIds.Any())
         {
-            var stringModels = GetPartialModelClass(stringIds.First().ContainingAssembly.Name, "TypedIds", "Strings", "string", stringIds.Select(s => $"\"{s.Name}\""));
+            var stringModels = GetPartialModelClass(stringIds.First().ContainingAssembly.Name, "TypedIds", "Strings", "string", stringIds.Select(s => $"\"{s.Name}\""), cyrusProvider.LiquidEngine);
             spc.AddSource($"model-strings.g.cs", SourceText.From(stringModels, Encoding.UTF8));
         }
     }
 
-    private string GenerateCodeForRecordStruct(INamedTypeSymbol item)
+    private string GenerateCodeForRecordStruct(INamedTypeSymbol item, LiquidEngine liquidEngine)
     {
         (int? min, int? max) = GetMinAndMaxFromType(item);
         var model = new
@@ -39,7 +39,7 @@ public class StringIdGenerator : CyrusGeneratorBase
             HasMaximumAndMinumum = min.HasValue && max.HasValue
         };
 
-        var resolvedSource = LiquidEngine.Render(model, "StringId");
+        var resolvedSource = liquidEngine.Render(model, "StringId");
 
         return resolvedSource;
     }

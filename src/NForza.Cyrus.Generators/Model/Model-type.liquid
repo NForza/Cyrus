@@ -2,7 +2,7 @@
 	"{{ type.Name }}",  
 	[
 		{% for p in type.Properties %}
-			{% include "model-property", property: p %}{% unless forloop.last %}, {% endunless -%}
+			{% include "Model-property", property: p %}{% unless forloop.last %}, {% endunless -%}
 		{% endfor %}
 	],
 	[

@@ -4,13 +4,12 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Roslyn;
-using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.Events;
 
 public class EventHandlerGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
     {
         var eventHandlers = cyrusProvider.EventHandlers;
         if (eventHandlers.Any())
@@ -30,7 +29,7 @@ public class EventHandlerGenerator : CyrusGeneratorBase
                 Name = "EventHandlersRegistration",
                 Initializer = eventHandlerRegistrations
             };
-            var fileContents = LiquidEngine.Render(ctx, "CyrusInitializer");
+            var fileContents = cyrusProvider.LiquidEngine.Render(ctx, "CyrusInitializer");
             spc.AddSource("EventHandlerRegistration.g.cs", SourceText.From(fileContents, Encoding.UTF8));
         }
     }

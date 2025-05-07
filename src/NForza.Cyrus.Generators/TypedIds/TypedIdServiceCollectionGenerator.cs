@@ -12,7 +12,7 @@ namespace NForza.Cyrus.Generators.TypedIds;
 
 public class TypedIdInitializerGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
     {
         var typedIds = cyrusProvider.TypedIds;
         var config = cyrusProvider.GenerationConfig;
@@ -26,12 +26,12 @@ public class TypedIdInitializerGenerator : CyrusGeneratorBase
 
         var allTypedIds = typedIds.Concat(referencedTypedIds).ToArray();
 
-        var sourceText = GenerateServiceCollectionExtensionMethod(allTypedIds);
+        var sourceText = GenerateServiceCollectionExtensionMethod(allTypedIds, cyrusProvider.LiquidEngine);
         spc.AddSource("TypedIdInitializer.g.cs", SourceText.From(sourceText, Encoding.UTF8));
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers", Justification = "<Pending>")]
-    private string GenerateServiceCollectionExtensionMethod(IEnumerable<INamedTypeSymbol> typedIds)
+    private string GenerateServiceCollectionExtensionMethod(IEnumerable<INamedTypeSymbol> typedIds, LiquidEngine liquidEngine)
     {
         var converters = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<JsonConverter, {t.Name}JsonConverter>();"));
 
@@ -54,7 +54,7 @@ public class TypedIdInitializerGenerator : CyrusGeneratorBase
             ["Imports"] = imports.ToList()
         };
 
-        var source = LiquidEngine.Render(model, "ServiceCollectionJsonConverterExtensions");
+        var source = liquidEngine.Render(model, "ServiceCollectionJsonConverterExtensions");
         return source;
     }
 }

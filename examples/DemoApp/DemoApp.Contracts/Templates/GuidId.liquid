@@ -1,0 +1,26 @@
+﻿using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.InteropServices.ComTypes;
+using System.Text.Json.Serialization;
+using NForza.Cyrus.Abstractions;
+
+// Overridden template
+
+namespace {{ Namespace }};
+
+[JsonConverter(typeof({{ Name }}JsonConverter))]
+[TypeConverter(typeof({{ Name }}TypeConverter))]
+[DebuggerDisplay("{Value}")]
+public partial record struct {{ Name }}(Guid Value): IGuidId, IComparable<{{ Name }}>, IComparable
+{
+    public {{ Name }}(): this(Guid.NewGuid()) { }
+    public {{ Name }}(string guid): this(Guid.Parse(guid)) { }
+    public static {{ Name }} Empty => new {{ Name }}({{ Default }});
+    public static implicit operator {{ UnderlyingType }}({{ Name }} typedId) => typedId.Value;
+    public static explicit operator {{ Name }}({{ UnderlyingType }} value) => new(value);    
+    public override string ToString() => Value.ToString();
+    public bool IsValid() => !Value.Equals(Guid.Empty);
+    public int CompareTo({{ Name }} other) => Value.CompareTo(other.Value);
+    public int CompareTo(object obj) => obj is {{ Name }} other ? CompareTo(other) : throw new ArgumentException("Object is not a {{ Name }}");
+}

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using NForza.Cyrus.Abstractions.Model;
+﻿using NForza.Cyrus.Abstractions.Model;
 
 namespace Cyrus.Model;
 

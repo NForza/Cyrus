@@ -10,7 +10,7 @@ using NForza.Cyrus.Templating;
 namespace NForza.Cyrus.Generators.WebApi;
 public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
     {
         var config = cyrusProvider.GenerationConfig;
         if (config != null && config.GenerationTarget.Contains(GenerationTarget.WebApi))
@@ -24,7 +24,7 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
             IEnumerable<INamedTypeSymbol> commands = cyrusProvider.AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToList();
             IEnumerable<IMethodSymbol> validators = cyrusProvider.Validators;
 
-            var contents = AddCommandHandlerMappings(spc, handlers.Where(h => h.HasCommandRoute()), validators, cyrusProvider.Compilation, liquidEngine);
+            var contents = AddCommandHandlerMappings(spc, handlers.Where(h => h.HasCommandRoute()), validators, cyrusProvider.Compilation, cyrusProvider.LiquidEngine);
 
             if (!string.IsNullOrWhiteSpace(contents))
             {
@@ -42,15 +42,15 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
                     StartupCommands = contents
                 };
 
-                var fileContents = LiquidEngine.Render(ctx, "CyrusWebStartup");
+                var fileContents = cyrusProvider.LiquidEngine.Render(ctx, "CyrusWebStartup");
                 spc.AddSource(
                    "CommandHandlerMapping.g.cs",
                    SourceText.From(fileContents, Encoding.UTF8));
             }
 
-            AddHttpContextObjectFactoryMethodsRegistrations(commands, spc, liquidEngine);
+            AddHttpContextObjectFactoryMethodsRegistrations(commands, spc, cyrusProvider.LiquidEngine);
 
-            WebApiContractGenerator.GenerateCommandContracts(handlers, spc, liquidEngine);
+            WebApiContractGenerator.GenerateCommandContracts(handlers, spc, cyrusProvider.LiquidEngine);
         }
     }
 
@@ -66,7 +66,7 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
                     Properties = cmd.GetPublicProperties().Select(p => new { p.Name, Type = p.Type.ToFullName() })
                 })
         };
-        var httpContextObjectFactoryInitialization = LiquidEngine.Render(model, "HttpContextObjectFactoryCommand");
+        var httpContextObjectFactoryInitialization = liquidEngine.Render(model, "HttpContextObjectFactoryCommand");
 
         var initModel = new { 
             Namespace = "WebApi", 

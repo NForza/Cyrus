@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.SignalR;
+using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators;
 
@@ -22,8 +23,10 @@ public class CyrusGenerationContext
         ImmutableArray<IMethodSymbol> eventHandlers,
         ImmutableArray<ISymbol> allQueriesAndHandlers,
         ImmutableArray<IMethodSymbol> validators,
+
         ImmutableArray<SignalRHubClassDefinition> signalRHubs,
-        GenerationConfig generationConfig)
+        GenerationConfig generationConfig, 
+        LiquidEngine liquidEngine)
     {
         Compilation = compilation;
         GuidIds = guidIds;
@@ -40,23 +43,26 @@ public class CyrusGenerationContext
         Validators = validators;
         SignalRHubs = signalRHubs;
         GenerationConfig = generationConfig;
+        LiquidEngine = liquidEngine;
     }
 
-    public Compilation Compilation { get; private set; }
-    public ImmutableArray<INamedTypeSymbol> GuidIds { get; private set; }
-    public ImmutableArray<INamedTypeSymbol> IntIds { get; private set; }
-    public ImmutableArray<INamedTypeSymbol> StringIds { get; private set; }
-    public ImmutableArray<INamedTypeSymbol> Commands { get; private set; }
-    public ImmutableArray<IMethodSymbol> CommandHandlers { get; private set; }
-    public ImmutableArray<ISymbol> AllCommandsAndHandlers { get; private set; }
-    public ImmutableArray<INamedTypeSymbol> Queries { get; private set; }
-    public ImmutableArray<IMethodSymbol> QueryHandlers { get; private set; }
-    public ImmutableArray<ISymbol> AllQueriesAndHandlers { get; private set; }
-    public ImmutableArray<IMethodSymbol> Validators { get; private set; }
-    public ImmutableArray<INamedTypeSymbol> Events { get; private set; }
-    public ImmutableArray<IMethodSymbol> EventHandlers { get; private set; }
-    public ImmutableArray<SignalRHubClassDefinition> SignalRHubs { get; private set; }
-    public GenerationConfig GenerationConfig { get; private set; }
+    public Compilation Compilation { get; }
+    public ImmutableArray<INamedTypeSymbol> GuidIds { get; }
+    public ImmutableArray<INamedTypeSymbol> IntIds { get; set; }
+    public ImmutableArray<INamedTypeSymbol> StringIds { get; }
+    public ImmutableArray<INamedTypeSymbol> Commands { get; }
+    public ImmutableArray<IMethodSymbol> CommandHandlers { get; }
+    public ImmutableArray<ISymbol> AllCommandsAndHandlers { get; }
+    public ImmutableArray<INamedTypeSymbol> Queries { get; }
+    public ImmutableArray<IMethodSymbol> QueryHandlers { get; }
+    public ImmutableArray<ISymbol> AllQueriesAndHandlers { get;  }
+    public ImmutableArray<IMethodSymbol> Validators { get; }
+    public ImmutableArray<INamedTypeSymbol> Events { get; }
+    public ImmutableArray<IMethodSymbol> EventHandlers { get; }
+    public ImmutableArray<SignalRHubClassDefinition> SignalRHubs { get; }
+    public GenerationConfig GenerationConfig { get; }
+    public LiquidEngine LiquidEngine { get; }
+
     public ImmutableArray<INamedTypeSymbol> TypedIds => GuidIds.AddRange(IntIds).AddRange(StringIds);
     public ImmutableArray<INamedTypeSymbol> AllCommands => AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToImmutableArray();
     public ImmutableArray<IMethodSymbol> AllCommandHandlers => AllCommandsAndHandlers.OfType<IMethodSymbol>().ToImmutableArray();

@@ -9,17 +9,17 @@ namespace NForza.Cyrus.Generators.TypedIds;
 
 public class TypedIdJsonConverterGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
     {
         var typedIds = cyrusProvider.TypedIds;
         foreach (var typedId in typedIds)
         {
-            var sourceText = GenerateJsonConverterForTypedId(typedId);
+            var sourceText = GenerateJsonConverterForTypedId(typedId, cyrusProvider.LiquidEngine);
             spc.AddSource($"{typedId.Name}JsonConverter.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         };
     }
 
-    private string GenerateJsonConverterForTypedId(INamedTypeSymbol item)
+    private string GenerateJsonConverterForTypedId(INamedTypeSymbol item, LiquidEngine liquidEngine)
     {
         string fullyQualifiedNamespace = item.ContainingNamespace.ToDisplayString();
         var underlyingTypeName = item.GetUnderlyingTypeOfTypedId();
@@ -37,7 +37,7 @@ public class TypedIdJsonConverterGenerator : CyrusGeneratorBase
             item.Name,
             Namespace = fullyQualifiedNamespace,
         };
-        var source = LiquidEngine.Render(model, templateName);
+        var source = liquidEngine.Render(model, templateName);
         return source;
     }
 }

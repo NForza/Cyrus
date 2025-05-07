@@ -11,12 +11,12 @@ namespace NForza.Cyrus.Generators.Events;
 
 public class EventHandlerDictionaryGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
     {
         var config = cyrusProvider.GenerationConfig;
         if (config.GenerationTarget.Contains(GenerationTarget.WebApi) || config.GenerationTarget.Contains(GenerationTarget.Domain))
         {
-            var contents = CreateEventHandlerRegistrations(cyrusProvider.EventHandlers, cyrusProvider.Compilation);
+            var contents = CreateEventHandlerRegistrations(cyrusProvider.EventHandlers, cyrusProvider.Compilation, cyrusProvider.LiquidEngine);
 
             if (!string.IsNullOrWhiteSpace(contents))
             {
@@ -28,7 +28,7 @@ public class EventHandlerDictionaryGenerator : CyrusGeneratorBase
                     Initializer = contents
                 };
 
-                var fileContents = LiquidEngine.Render(ctx, "CyrusInitializer");
+                var fileContents = cyrusProvider.LiquidEngine.Render(ctx, "CyrusInitializer");
                 spc.AddSource(
                    "EventHandlerDictionary.g.cs",
                    SourceText.From(fileContents, Encoding.UTF8));
@@ -36,7 +36,7 @@ public class EventHandlerDictionaryGenerator : CyrusGeneratorBase
         }
     }
 
-    private string CreateEventHandlerRegistrations(IEnumerable<IMethodSymbol> eventHandlers, Compilation compilation)
+    private string CreateEventHandlerRegistrations(IEnumerable<IMethodSymbol> eventHandlers, Compilation compilation, LiquidEngine liquidEngine)
     {
         INamedTypeSymbol? taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
         if (taskSymbol == null)
@@ -69,6 +69,6 @@ public class EventHandlerDictionaryGenerator : CyrusGeneratorBase
             })
         };
 
-        return LiquidEngine.Render(model, "EventHandlerDictionary");
+        return liquidEngine.Render(model, "EventHandlerDictionary");
     }
 }
