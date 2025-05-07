@@ -16,9 +16,5 @@
     <InternalsVisibleTo Include="DemoApp.WebApi.Tests" />
     <ProjectReference Include="..\DemoApp.Domain\DemoApp.Domain.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include="Templates\**\*.liquid" />
-  </ItemGroup>
   
 </Project>

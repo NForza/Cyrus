@@ -7,12 +7,12 @@ namespace NForza.Cyrus.Templating;
 
 public class LiquidEngine
 {
-    TemplateProvider fileProvider;
+    TemplateFileProvider fileProvider;
     private TemplateOptions options;
 
     public LiquidEngine(Assembly assembly, Dictionary<string, string> templateOverrides, Action<TemplateOptions> configure = null)
     {
-        fileProvider = new TemplateProvider(assembly, templateOverrides);
+        fileProvider = new TemplateFileProvider(assembly, templateOverrides);
         options = new TemplateOptions();
         options.Filters.AddFilter("as-contract", CyrusFilters.ContractName);
         options.Filters.AddFilter("generated-hub-name", CyrusFilters.GeneratedHubName);
