@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Fluid;
 
@@ -6,12 +7,12 @@ namespace NForza.Cyrus.Templating;
 
 public class LiquidEngine
 {
-    TemplateResourceFileProvider fileProvider;
+    TemplateProvider fileProvider;
     private TemplateOptions options;
 
-    public LiquidEngine(Assembly assembly, Action<TemplateOptions> configure = null)
+    public LiquidEngine(Assembly assembly, Dictionary<string, string> templateOverrides, Action<TemplateOptions> configure = null)
     {
-        fileProvider = new TemplateResourceFileProvider(assembly);
+        fileProvider = new TemplateProvider(assembly, templateOverrides);
         options = new TemplateOptions();
         options.Filters.AddFilter("as-contract", CyrusFilters.ContractName);
         options.Filters.AddFilter("generated-hub-name", CyrusFilters.GeneratedHubName);

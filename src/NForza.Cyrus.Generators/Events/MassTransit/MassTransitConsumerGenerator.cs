@@ -11,7 +11,7 @@ namespace NForza.Cyrus.Generators.Events.MassTransit;
 
 public class MassTransitConsumerGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
     {
         var config = cyrusProvider.GenerationConfig;
         var eventHandlers = cyrusProvider.EventHandlers;
@@ -19,13 +19,13 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase
         {
             if (config.EventBus == EventBusType.MassTransit)
             {
-                var sourceText = GenerateEventConsumers(eventHandlers);
+                var sourceText = GenerateEventConsumers(eventHandlers, cyrusProvider.LiquidEngine);
                 spc.AddSource($"EventConsumers.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }
         }
     }
 
-    private string GenerateEventConsumers(ImmutableArray<IMethodSymbol> eventHandlers)
+    private string GenerateEventConsumers(ImmutableArray<IMethodSymbol> eventHandlers, LiquidEngine liquidEngine)
     {
         StringBuilder source = new();
         var model = new
@@ -33,7 +33,7 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase
             Consumers = eventHandlers.Select(h => new { h.Parameters[0].Type.Name, FullName = h.Parameters[0].Type.ToFullName() })
         };
 
-        var resolvedSource = LiquidEngine.Render(model, "EventConsumers");
+        var resolvedSource = liquidEngine.Render(model, "EventConsumers");
 
         return resolvedSource;
     }

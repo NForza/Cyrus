@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
@@ -12,6 +13,7 @@ using NForza.Cyrus.Generators.SignalR;
 using NForza.Cyrus.Generators.TypedIds;
 using NForza.Cyrus.Generators.Validators;
 using NForza.Cyrus.Generators.WebApi;
+using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators;
 
@@ -60,6 +62,7 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
             .Select((combinedProviders, _) =>
             {
                 var (((((((((((((((compilation, intIds), guidIds), stringIds), commands), commandHandlers), allCommandsAndHandlers), queries), queryHandlers), allQueriesAndHandlers), eventHandlers), events), signalRHubs), validators), templateOverrides), generationConfig) = combinedProviders;
+                var liquidEngine = new LiquidEngine(Assembly.GetExecutingAssembly(), new(templateOverrides));
                 return new CyrusGenerationContext(
                     compilation: compilation,
                     guidIds: guidIds,
@@ -75,11 +78,11 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
                     allQueriesAndHandlers: allQueriesAndHandlers,
                     signalRHubs: signalRHubs,
                     validators: validators,
-                    templateOverrides: templateOverrides,
-                    generationConfig: generationConfig);
+                    generationConfig: generationConfig,
+                    liquidEngine: liquidEngine);
             });
 
-        context.RegisterSourceOutput(cyrusProvider, (spc, source) =>
+        context.RegisterSourceOutput(cyrusProvider, (sourceProductionContext, cyrusGenerationContext) =>
         {
             try
             {
@@ -90,12 +93,12 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
                     .ForEach(t =>
                     {
                         var generator = (CyrusGeneratorBase)Activator.CreateInstance(t);
-                        generator.GenerateSource(spc, source, LiquidEngine);
+                        generator.GenerateSource(sourceProductionContext, cyrusGenerationContext);
                     });
             }
             catch (Exception ex)
             {
-                spc.ReportDiagnostic(Diagnostic.Create(
+                sourceProductionContext.ReportDiagnostic(Diagnostic.Create(
                        DiagnosticDescriptors.InternalCyrusError,
                        Location.None,
                        ex.Message + ": " + ex.StackTrace.Replace("\r", "").Replace("\n", ",")));
@@ -108,7 +111,7 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
     {
         return context.AdditionalTextsProvider
             .Where(file => file.Path.EndsWith(".liquid", StringComparison.OrdinalIgnoreCase))
-            .Select((file, token) => new KeyValuePair<string, string>(file.Path, file.GetText(token)?.ToString() ?? ""))
+            .Select((file, token) => new KeyValuePair<string, string>(Path.GetFileName(file.Path), file.GetText(token)?.ToString() ?? ""))
             .Collect()
             .Select((entries, _) => entries.ToImmutableDictionary(entry => entry.Key, entry => entry.Value));
     }

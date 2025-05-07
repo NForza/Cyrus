@@ -9,12 +9,12 @@ namespace NForza.Cyrus.Generators.TypedIds;
 
 public class GuidIdGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
     {
         var guidIds = cyrusProvider.GuidIds;
         foreach (var recordSymbol in guidIds)
         {
-            var sourceText = GenerateGuidId(recordSymbol);
+            var sourceText = GenerateGuidId(recordSymbol, cyrusProvider.LiquidEngine);
             spc.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         };
 
@@ -25,12 +25,13 @@ public class GuidIdGenerator : CyrusGeneratorBase
                 "TypedIds",
                 "Guids",
                 "string",
-                guidIds.Select(guid => $"\"{guid.Name}\""));
+                guidIds.Select(guid => $"\"{guid.Name}\""),
+                cyrusProvider.LiquidEngine);
             spc.AddSource($"model-guids.g.cs", SourceText.From(guidModels, Encoding.UTF8));
         }
     }
 
-    private string GenerateGuidId(INamedTypeSymbol item)
+    private string GenerateGuidId(INamedTypeSymbol item, LiquidEngine liquidEngine)
     {
         var model = new
         {
@@ -40,7 +41,7 @@ public class GuidIdGenerator : CyrusGeneratorBase
             Default = "Guid.Empty"
         };
 
-        var source = LiquidEngine.Render(model, "GuidId");
+        var source = liquidEngine.Render(model, "GuidId");
 
         return source;
     }

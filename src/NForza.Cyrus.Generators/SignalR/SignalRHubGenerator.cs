@@ -14,7 +14,7 @@ namespace NForza.Cyrus.Generators.SignalR;
 
 public class SignalRHubGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
     {
         var signalRHubs = cyrusProvider.SignalRHubs.Select(h => h.Initialize(cyrusProvider));
 
@@ -26,18 +26,18 @@ public class SignalRHubGenerator : CyrusGeneratorBase
 
         if (isWebApi)
         {
-            var registration = GenerateSignalRHubRegistration(signalRHubs, liquidEngine);
+            var registration = GenerateSignalRHubRegistration(signalRHubs, cyrusProvider.LiquidEngine);
             spc.AddSource($"RegisterSignalRHubs.g.cs", SourceText.From(registration, Encoding.UTF8));
 
             foreach (var signalRModel in signalRHubs)
             {
-                var sourceText = GenerateSignalRHub(signalRModel, LiquidEngine);
+                var sourceText = GenerateSignalRHub(signalRModel, cyrusProvider.LiquidEngine);
                 spc.AddSource($"{signalRModel.Symbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }
             if (signalRHubs.Any())
             {
                 string assemblyName = signalRHubs.First().Symbol.ContainingAssembly.Name;
-                var commandModels = GetPartialModelClass(assemblyName, "SignalR", "Hubs", "ModelHubDefinition", signalRHubs.Select(e => ModelGenerator.ForHub(e, LiquidEngine)));
+                var commandModels = GetPartialModelClass(assemblyName, "SignalR", "Hubs", "ModelHubDefinition", signalRHubs.Select(e => ModelGenerator.ForHub(e, cyrusProvider.LiquidEngine)), cyrusProvider.LiquidEngine);
                 spc.AddSource($"model-hubs.g.cs", SourceText.From(commandModels, Encoding.UTF8));
             }
         }

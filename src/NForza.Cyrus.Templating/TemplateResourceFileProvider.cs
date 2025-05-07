@@ -8,21 +8,31 @@ using Microsoft.Extensions.Primitives;
 
 namespace NForza.Cyrus.Templating;
 
-public class TemplateResourceFileProvider : IFileProvider
+public class TemplateProvider : IFileProvider
 {
     IEnumerable<string> resourceNames = Enumerable.Empty<string>();
     private Assembly assembly;
+    private Dictionary<string, string> templateOverrides;
 
-    public TemplateResourceFileProvider(Assembly assembly)
+    public TemplateProvider(Assembly assembly, Dictionary<string, string> templateOverrides)
     {
         resourceNames = assembly
             .GetManifestResourceNames();
         this.assembly = assembly;
+        this.templateOverrides = templateOverrides;
     }
+
 
     public IDirectoryContents GetDirectoryContents(string subpath)
     {
-        return new EnumerableDirectoryContents(resourceNames.Select(x => new EmbeddedResourceFileInfo(assembly, x)));
+        return new VirtualTemplateFolderContents(
+            resourceNames.Select(x => new ResourceFileInfo(assembly, x))
+                .Cast<IFileInfo>()
+                .Concat(
+                    templateOverrides
+                        .Select(x => new TemplateOverrideFileInfo(x.Key, x.Value))
+                        .Cast<IFileInfo>())
+                );
     }
 
     public IFileInfo GetFileInfo(string templateName)
@@ -32,7 +42,7 @@ public class TemplateResourceFileProvider : IFileProvider
             templateName += ".liquid";
         }
         var fullName = resourceNames.SingleOrDefault(rn => rn.EndsWith(templateName)) ?? throw new InvalidOperationException($"Template {templateName} not found.");
-        return new EmbeddedResourceFileInfo(assembly, fullName);
+        return new ResourceFileInfo(assembly, fullName);
     }
 
     public IChangeToken Watch(string filter)
@@ -41,11 +51,11 @@ public class TemplateResourceFileProvider : IFileProvider
     }
 }
 
-public class EnumerableDirectoryContents : IDirectoryContents
+public class VirtualTemplateFolderContents : IDirectoryContents
 {
     private readonly IEnumerable<IFileInfo> _files;
 
-    public EnumerableDirectoryContents(IEnumerable<IFileInfo> files)
+    public VirtualTemplateFolderContents(IEnumerable<IFileInfo> files)
     {
         _files = files;
     }
@@ -58,12 +68,12 @@ public class EnumerableDirectoryContents : IDirectoryContents
 }
 
 
-public class EmbeddedResourceFileInfo : IFileInfo
+public class ResourceFileInfo : IFileInfo
 {
     private readonly Assembly assembly;
     private readonly string resourceName;
 
-    public EmbeddedResourceFileInfo(Assembly assembly, string resourceName)
+    public ResourceFileInfo(Assembly assembly, string resourceName)
     {
         this.assembly = assembly;
         this.resourceName = resourceName;

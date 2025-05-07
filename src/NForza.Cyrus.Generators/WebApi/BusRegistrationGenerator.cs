@@ -8,7 +8,7 @@ namespace NForza.Cyrus.Generators.WebApi;
 
 public class BusRegistrationGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
     {
         if (cyrusProvider.GenerationConfig.GenerationTarget.Contains(GenerationTarget.WebApi))
         {
@@ -24,7 +24,7 @@ public class BusRegistrationGenerator : CyrusGeneratorBase
                     Initializer = contents
                 };
 
-                var fileContents = LiquidEngine.Render(ctx, "CyrusInitializer");
+                var fileContents = cyrusProvider.LiquidEngine.Render(ctx, "CyrusInitializer");
                 spc.AddSource(
                    "BusRegistration.g.cs",
                    SourceText.From(fileContents, Encoding.UTF8));

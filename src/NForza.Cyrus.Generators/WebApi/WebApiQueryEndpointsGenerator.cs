@@ -12,7 +12,7 @@ namespace NForza.Cyrus.Generators.WebApi;
 
 public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
     {
         var config = cyrusProvider.GenerationConfig;
         if (config != null && config.GenerationTarget.Contains(GenerationTarget.WebApi))
@@ -23,7 +23,7 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
                     .AllQueriesAndHandlers
                     .OfType<IMethodSymbol>()
                     .Where(h => h.HasQueryRoute());
-            var contents = AddQueryHandlerMappings(spc, queryHandlers, validators);
+            var contents = AddQueryHandlerMappings(spc, queryHandlers, validators, cyrusProvider.LiquidEngine);
 
             if (!string.IsNullOrWhiteSpace(contents))
             {
@@ -42,7 +42,7 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
                     StartupCommands = contents
                 };
 
-                var fileContents = LiquidEngine.Render(ctx, "CyrusWebStartup");
+                var fileContents = cyrusProvider.LiquidEngine.Render(ctx, "CyrusWebStartup");
                 spc.AddSource(
                    "QueryHandlerMapping.g.cs",
                    SourceText.From(fileContents, Encoding.UTF8));
@@ -52,12 +52,12 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
                 .Where(q => q.IsQuery())
                 .OfType<INamedTypeSymbol>();
 
-            AddHttpContextObjectFactoryMethodsRegistrations(spc, queries);
-            WebApiContractGenerator.GenerateContracts(queries, spc, LiquidEngine);
+            AddHttpContextObjectFactoryMethodsRegistrations(spc, queries, cyrusProvider.LiquidEngine);
+            WebApiContractGenerator.GenerateContracts(queries, spc, cyrusProvider.LiquidEngine);
         }
     }
 
-    private void AddHttpContextObjectFactoryMethodsRegistrations(SourceProductionContext sourceProductionContext, IEnumerable<INamedTypeSymbol> queries)
+    private void AddHttpContextObjectFactoryMethodsRegistrations(SourceProductionContext sourceProductionContext, IEnumerable<INamedTypeSymbol> queries, LiquidEngine liquidEngine)
     {
         var model = new
         {
@@ -69,7 +69,7 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
                     Properties = q.GetPublicProperties().Select(p => new { p.Name, Type = p.Type.ToFullName() })
                 })
         };
-        var httpContextObjectFactoryInitialization = LiquidEngine.Render(model, "HttpContextObjectFactoryQuery");
+        var httpContextObjectFactoryInitialization = liquidEngine.Render(model, "HttpContextObjectFactoryQuery");
 
         var initModel = new { 
             Namespace = "WebApi", 
@@ -77,11 +77,11 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
             Usings = new string[] { "System.Linq" },
             Initializer = httpContextObjectFactoryInitialization 
         };
-        var source = LiquidEngine.Render(initModel, "CyrusInitializer");
+        var source = liquidEngine.Render(initModel, "CyrusInitializer");
         sourceProductionContext.AddSource($"HttpContextObjectFactoryQueries.g.cs", SourceText.From(source, Encoding.UTF8));
     }
 
-    private string AddQueryHandlerMappings(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers, IEnumerable<IMethodSymbol> validators)
+    private string AddQueryHandlerMappings(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers, IEnumerable<IMethodSymbol> validators, LiquidEngine liquidEngine)
     {
         StringBuilder sb = new StringBuilder();
         foreach (var handler in handlers)
@@ -100,7 +100,7 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
                 ReturnType = handler.ReturnsTask(out var taskResultType) ? taskResultType!.ToFullName() : handler.ReturnType.ToFullName(),
                 Attributes = handler.GetAttributes().Select(a => a.ToNewInstanceString()).Where(a => a != null)
             };
-            sb.AppendLine(LiquidEngine.Render(query, "MapQuery"));
+            sb.AppendLine(liquidEngine.Render(query, "MapQuery"));
         }
         return sb.ToString().Trim();
     }

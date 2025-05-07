@@ -37,16 +37,7 @@ public abstract class CyrusSourceGeneratorBase : IncrementalGeneratorBase
 
     public virtual void Initialize(IncrementalGeneratorInitializationContext context) { }
 
-    private static LiquidEngine? liquidEngine = null;
-    protected LiquidEngine LiquidEngine
-    {
-        get
-        {
-            liquidEngine ??= new LiquidEngine(Assembly.GetExecutingAssembly());
-            return liquidEngine;
-        }
-    }
-    public string GetPartialModelClass(string assemblyName, string subNamespace, string propertyName, string propertyType, IEnumerable<string> propertyValues)
+    public string GetPartialModelClass(string assemblyName, string subNamespace, string propertyName, string propertyType, IEnumerable<string> propertyValues, LiquidEngine liquidEngine)
     {
         var model = new 
         {
@@ -55,7 +46,7 @@ public abstract class CyrusSourceGeneratorBase : IncrementalGeneratorBase
             PropertyType = propertyType,
             Properties = string.Join(",", propertyValues)
         };
-        var source = LiquidEngine.Render(model, "CyrusModel");
+        var source = liquidEngine.Render(model, "CyrusModel");
         return source;
     }
 }

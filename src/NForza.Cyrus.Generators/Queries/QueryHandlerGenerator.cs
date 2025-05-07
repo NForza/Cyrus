@@ -11,7 +11,7 @@ namespace NForza.Cyrus.Generators.Queries;
 
 public class QueryHandlerGenerator : CyrusGeneratorBase
 {
-    override public void GenerateSource(SourceProductionContext context, CyrusGenerationContext cyrusProvider, LiquidEngine liquidEngine)
+    override public void GenerateSource(SourceProductionContext context, CyrusGenerationContext cyrusProvider)
     {
         var queryHandlers = cyrusProvider.QueryHandlers;
 
@@ -32,15 +32,15 @@ public class QueryHandlerGenerator : CyrusGeneratorBase
                 Name = "QueryHandlersRegistration",
                 Initializer = queryHandlerRegistrations
             };
-            var fileContents = LiquidEngine.Render(ctx, "CyrusInitializer");
+            var fileContents = cyrusProvider.LiquidEngine.Render(ctx, "CyrusInitializer");
             context.AddSource("QueryHandlerRegistration.g.cs", SourceText.From(fileContents, Encoding.UTF8));
 
-            var sourceText = GenerateQueryProcessorExtensionMethods(queryHandlers, cyrusProvider.Compilation);
+            var sourceText = GenerateQueryProcessorExtensionMethods(queryHandlers, cyrusProvider.Compilation, cyrusProvider.LiquidEngine);
             context.AddSource($"QueryProcessor.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         }
     }
 
-    private string GenerateQueryProcessorExtensionMethods(ImmutableArray<IMethodSymbol> handlers, Compilation compilation)
+    private string GenerateQueryProcessorExtensionMethods(ImmutableArray<IMethodSymbol> handlers, Compilation compilation, LiquidEngine liquidEngine)
     {
         INamedTypeSymbol? taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
         if (taskSymbol == null)
@@ -61,7 +61,7 @@ public class QueryHandlerGenerator : CyrusGeneratorBase
             }).ToList()
         };
 
-        var resolvedSource = LiquidEngine.Render(model, "QueryProcessorExtensions");
+        var resolvedSource = liquidEngine.Render(model, "QueryProcessorExtensions");
 
         return resolvedSource;
     }

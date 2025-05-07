@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.SignalR;
+using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators;
 
@@ -22,9 +23,10 @@ public class CyrusGenerationContext
         ImmutableArray<IMethodSymbol> eventHandlers,
         ImmutableArray<ISymbol> allQueriesAndHandlers,
         ImmutableArray<IMethodSymbol> validators,
-        ImmutableDictionary<string, string> templateOverrides,
+
         ImmutableArray<SignalRHubClassDefinition> signalRHubs,
-        GenerationConfig generationConfig)
+        GenerationConfig generationConfig, 
+        LiquidEngine liquidEngine)
     {
         Compilation = compilation;
         GuidIds = guidIds;
@@ -41,7 +43,7 @@ public class CyrusGenerationContext
         Validators = validators;
         SignalRHubs = signalRHubs;
         GenerationConfig = generationConfig;
-        TemplateOverrides = templateOverrides;
+        LiquidEngine = liquidEngine;
     }
 
     public Compilation Compilation { get; }
@@ -59,7 +61,7 @@ public class CyrusGenerationContext
     public ImmutableArray<IMethodSymbol> EventHandlers { get; }
     public ImmutableArray<SignalRHubClassDefinition> SignalRHubs { get; }
     public GenerationConfig GenerationConfig { get; }
-    public ImmutableDictionary<string, string> TemplateOverrides { get; }
+    public LiquidEngine LiquidEngine { get; }
 
     public ImmutableArray<INamedTypeSymbol> TypedIds => GuidIds.AddRange(IntIds).AddRange(StringIds);
     public ImmutableArray<INamedTypeSymbol> AllCommands => AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToImmutableArray();
