@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
-using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.WebApi;
 

@@ -1,5 +1,4 @@
-﻿using System;
-using Cyrus;
+﻿using Cyrus;
 using Microsoft.Build.Framework;
 using Xunit.Abstractions;
 
