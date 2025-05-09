@@ -9,7 +9,7 @@ namespace DemoApp.Domain.Customer;
 public class UpdateCustomerCommandHandler
 {
     [CommandHandler(Route = "customers/{Id}", Verb = HttpVerb.Put)]
-    public static async Task<(IResult Result, object Events)> Execute(UpdateCustomerCommand command)
+    public static async Task<(IResult Result, object Messages)> Execute(UpdateCustomerCommand command)
     {
         await Task.Delay(1000);
         Console.WriteLine($"Customer updated: {command.Id}, {command.Name}, {command.Address}");

@@ -12,7 +12,7 @@ public class AddCustomerCommandHandler
 {
     [CommandHandler(Route = "customers", Verb = HttpVerb.Post)]
     [ProducesResponseType(202)]
-    public (IResult Result, IEnumerable<object> Events) Handle(AddCustomerCommand command)
+    public (IResult Result, IEnumerable<object> Messages) Handle(AddCustomerCommand command)
     {
         CustomerId id = new CustomerId();
         Console.WriteLine($"Customer created: {id} {command.Name}, {command.Address}");

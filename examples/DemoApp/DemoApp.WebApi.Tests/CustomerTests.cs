@@ -104,7 +104,7 @@ public class CustomerTests
         response.Headers.Location?.ToString().Should().NotBeNullOrEmpty();
         response.Headers.Location!.ToString().Should().StartWith("/customers/");
 
-        var customerAddedEvent = eventBus!.GetEvent<CustomerUpdatedEvent>();
+        var customerAddedEvent = eventBus!.GetMessage<CustomerUpdatedEvent>();
         customerAddedEvent.Should().NotBeNull();
         customerAddedEvent!.Id.Should().Be(customerId);
     }

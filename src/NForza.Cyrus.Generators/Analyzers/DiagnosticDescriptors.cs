@@ -173,10 +173,10 @@ public static class DiagnosticDescriptors
         isEnabledByDefault: true,
         description: "Invalid tuple element name."
     );
-    public static readonly DiagnosticDescriptor EventsTupleElementShouldBeCalledEvents = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor MessagesTupleElementShouldBeCalledMessages = new DiagnosticDescriptor(
         id: "CYRUS014",
-        title: "Events tuple element should be called Events",
-        messageFormat: "Invalid tuple element name {0} for Events",
+        title: "Messages tuple element should be called Messages",
+        messageFormat: "Invalid tuple element name {0} for Messages",
         category: "Cyrus",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,

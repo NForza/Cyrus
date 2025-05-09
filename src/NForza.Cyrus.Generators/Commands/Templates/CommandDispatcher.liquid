@@ -11,12 +11,12 @@ public static class CommandDispatcherExtensions
     public static {% if cmd.ReturnsTask %}async{% endif %} Task{% if cmd.ReturnsVoid == false %}<{{ cmd.ReturnType }}>{% endif %} Handle(this ICommandDispatcher commandDispatcher, {{ cmd.CommandType }} command, CancellationToken cancellationToken = default) 
         {% if cmd.ReturnsVoid %} { {% else %} => {% endif %} 
                 {%- if cmd.ReturnsTask %}await {{ cmd.Invocation }}{% else %}
-                   {% if cmd.ReturnsVoid == false %}
+                   {%- if cmd.ReturnsVoid == false -%}
                       Task.FromResult<{{ cmd.ReturnType }}>({{ cmd.Invocation }})
-                    {% else %}
+                    {%- else -%}
                       {{ cmd.Invocation }}; return Task.CompletedTask
-                    {% endif %}
+                    {%- endif -%}
                 {% endif %};
-           {%- if cmd.ReturnsVoid %} } {% endif %} 
+           {%- if cmd.ReturnsVoid %} } {%- endif %} 
 {% endfor %}
 }
