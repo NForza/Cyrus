@@ -13,6 +13,23 @@ public static class ClassDeclarationSyntaxExtensions
             .Any(attr => attr.Name.ToString() == attributeName);
     }
 
+    public static bool HasBaseType(this ClassDeclarationSyntax classDeclaration, string baseTypeName)
+    {
+        foreach (var baseType in classDeclaration.BaseList?.Types ?? [])
+        {
+            string typeName = baseType.Type.ToString();
+
+            if (typeName == baseTypeName)
+                return true;
+
+            if (typeName.EndsWith($".{baseTypeName}"))
+                return true;
+        }
+
+        return false;
+    }
+
+
     public static GenerationConfig GetConfigFromClass(this ClassDeclarationSyntax classDeclarationSyntax)
     {
         var result = new GenerationConfig();

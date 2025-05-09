@@ -18,7 +18,7 @@ public abstract class CyrusSourceGeneratorBase : IncrementalGeneratorBase
     {
         var configProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: (syntaxNode, _) => syntaxNode is ClassDeclarationSyntax classDeclaration && classDeclaration.Identifier.Text == "CyrusConfiguration",
+                predicate: (syntaxNode, _) => syntaxNode is ClassDeclarationSyntax classDeclaration && classDeclaration.HasBaseType("CyrusConfig"),
                 transform: (context, _) => ((ClassDeclarationSyntax)context.Node).GetConfigFromClass())
             .Collect()
             .Select((cfgs, _) => cfgs.FirstOrDefault() ?? CreateDefaultGenerationConfig());
