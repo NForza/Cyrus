@@ -4,7 +4,7 @@ enum CommandAdapterMethod
 {
     FromVoid,
     FromIResult,
-    FromIResultAndEvent,
-    FromIResultAndEvents,
+    FromIResultAndMessage,
+    FromIResultAndMessages,
     FromObjects
 }

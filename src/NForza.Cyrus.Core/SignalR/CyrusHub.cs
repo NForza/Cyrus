@@ -26,8 +26,7 @@ public class CyrusHub : Hub
 
             var methodName = evt.GetType().Name.ToCamelCase();  
 
-            var sendTask = (broadcast ? Clients.All : Clients.Caller)
-                           .SendAsync(methodName, evt);
+            var sendTask = (broadcast ? Clients.All : Clients.Caller).SendAsync(methodName, evt);
 
             tasks.Add(sendTask);
         }

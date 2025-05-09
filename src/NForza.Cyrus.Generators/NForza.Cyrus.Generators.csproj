@@ -76,5 +76,7 @@
     <ProjectReference Include="..\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj" />
     <ProjectReference Include="..\NForza.Cyrus.Templating\NForza.Cyrus.Templating.csproj" />
   </ItemGroup>
-    
+  <Target Name="DeleteBinBeforeBuild" BeforeTargets="BeforeBuild">
+    <RemoveDir Directories="$(ProjectDir)bin" />
+  </Target>
 </Project>

@@ -9,13 +9,13 @@ namespace DemoApp.WebApi.Tests;
 
 internal class RecordingLocalEventBus(EventHandlerDictionary eventHandlerDictionary, IServiceScopeFactory serviceScopeFactory, ILogger<LocalEventBus> logger) : LocalEventBus(eventHandlerDictionary, serviceScopeFactory, logger)
 {
-    public List<object> Events { get; private set; } = [];
-    public T? GetEvent<T>() => Events.OfType<T>().FirstOrDefault();
-    public IEnumerable<T> GetEvents<T>() => Events.OfType<T>();
+    public List<object> Messages { get; private set; } = [];
+    public T? GetMessage<T>() => Messages.OfType<T>().FirstOrDefault();
+    public IEnumerable<T> GetMessages<T>() => Messages.OfType<T>();
 
-    override public Task Publish(IEnumerable<object> events)
+    override public Task Publish(IEnumerable<object> messages)
     {
-        Events.AddRange(events);
-        return base.Publish(events);
+        Messages.AddRange(messages);
+        return base.Publish(messages);
     }
 }

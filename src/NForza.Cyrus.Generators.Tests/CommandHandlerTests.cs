@@ -242,7 +242,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
             .RunAsync();
 
         compilerOutput.Should().NotHaveErrors();
-        analyzerOutput.Should().ContainDiagnostic(DiagnosticDescriptors.EventsTupleElementShouldBeCalledEvents);
+        analyzerOutput.Should().ContainDiagnostic(DiagnosticDescriptors.MessagesTupleElementShouldBeCalledMessages);
     }
 
     [Fact]
@@ -276,7 +276,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
             .RunAsync();
 
         compilerOutput.Should().NotHaveErrors();
-        analyzerOutput.Should().ContainDiagnostic(DiagnosticDescriptors.EventsTupleElementShouldBeCalledEvents);
+        analyzerOutput.Should().ContainDiagnostic(DiagnosticDescriptors.MessagesTupleElementShouldBeCalledMessages);
     }
 
 }

@@ -96,8 +96,8 @@ public class SignalRHubGenerator : CyrusGeneratorBase
 
     static CommandAdapterMethod[] adapterMethodsWithEvents =
         [
-                            CommandAdapterMethod.FromIResultAndEvents,
-                            CommandAdapterMethod.FromIResultAndEvent
+                            CommandAdapterMethod.FromIResultAndMessages,
+                            CommandAdapterMethod.FromIResultAndMessage
         ];
 
     private string GenerateSignalRHub(SignalRHubClassDefinition classDefinition, LiquidEngine liquidEngine)

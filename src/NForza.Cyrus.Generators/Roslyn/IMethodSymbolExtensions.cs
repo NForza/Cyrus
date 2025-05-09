@@ -158,13 +158,13 @@ internal static class IMethodSymbolExtensions
                     var secondElement = namedTypeSymbol.TupleElements[1];
                     if (secondElement.Type.Name == "Object")
                     {
-                        return CommandAdapterMethod.FromIResultAndEvent;
+                        return CommandAdapterMethod.FromIResultAndMessage;
                     }
-                    return CommandAdapterMethod.FromIResultAndEvents;
+                    return CommandAdapterMethod.FromIResultAndMessages;
                 }
             }
 
-            return CommandAdapterMethod.FromIResultAndEvents;
+            return CommandAdapterMethod.FromIResultAndMessages;
         }
         return CommandAdapterMethod.FromObjects;
     }

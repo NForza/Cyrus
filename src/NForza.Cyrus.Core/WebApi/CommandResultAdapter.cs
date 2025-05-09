@@ -22,27 +22,27 @@ public class CommandResultAdapter(IEventBus eventBus)
         return result;
     }
 
-    public IResult FromObjectAndEvents((object Object, IEnumerable<Object> Events) commandResult)
+    public IResult FromObjectAndMessages((object Object, IEnumerable<object> Messages) commandResult)
     {
-        eventBus.Publish(commandResult.Events);
+        eventBus.Publish(commandResult.Messages);
         return Results.Ok(commandResult.Object);
     }
 
-    public IResult FromEvents(IEnumerable<Object> events)
+    public IResult FromMessages(IEnumerable<object> Messages)
     {
-        eventBus.Publish(events);
+        eventBus.Publish(Messages);
         return Results.Ok();
     }
 
-    public IResult FromIResultAndEvents((IResult Result, IEnumerable<Object> Events) result)
+    public IResult FromIResultAndMessages((IResult Result, IEnumerable<object> Messages) result)
     {
-        eventBus.Publish(result.Events);
+        eventBus.Publish(result.Messages);
         return result.Result;
     }
 
-    public IResult FromIResultAndEvent((IResult Result, object Event) result)
+    public IResult FromIResultAndMessage((IResult Result, object Message) result)
     {
-        eventBus.Publish([result.Event]);
+        eventBus.Publish([result.Message]);
         return result.Result;
     }
 }

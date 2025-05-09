@@ -71,11 +71,11 @@ internal class CommandAnalyzer: CyrusAnalyzerBase
                 }
 
                 if ((te.Type.ToDisplayString() == "object" || te.Type.ToDisplayString() == "System.Collections.Generic.IEnumerable<object>") &&
-                    te.Name != "Events")
+                    te.Name != "Messages")
                 {
                     location = te.Locations.FirstOrDefault() ?? Location.None;
                     var diagnostic = Diagnostic.Create(
-                        DiagnosticDescriptors.EventsTupleElementShouldBeCalledEvents,
+                        DiagnosticDescriptors.MessagesTupleElementShouldBeCalledMessages,
                         location,
                         te.ToDisplayString());
                     context.ReportDiagnostic(diagnostic);
