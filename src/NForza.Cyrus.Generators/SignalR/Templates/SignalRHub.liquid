@@ -21,7 +21,7 @@ public class {{ Name | generated-hub-name }}(IQueryProcessor queryProcessor, ICo
         {       
           {% if cmd.ReturnsEvents %}var cmdResult = {% endif %}await commandDispatcher.Handle(command);
           {% if cmd.ReturnsEvents %}
-          SendEvents(cmdResult.Events);
+          await SendEvents(cmdResult.Events);
           {%- endif %}
         }
     {% endfor %}

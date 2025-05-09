@@ -26,6 +26,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="bin\Debug\netstandard2.0\NForza.Cyrus.Generators.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs/" />
   </ItemGroup>
 
