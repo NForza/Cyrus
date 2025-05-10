@@ -22,7 +22,7 @@ public class {{ Name }}JsonConverter : JsonConverter<{{ Name }}>
         string? raw = reader.GetString();          
         if (!Guid.TryParse(raw, out Guid guid))
             throw new JsonException(
-                $"\"{raw}\" is not a valid GUID for {{ Name }}.");
+                $"\"{raw}\" is not a valid GUID for type {{ Name }}.");
 
         return new {{ Name }}(guid);
     }
