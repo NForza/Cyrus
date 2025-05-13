@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using DemoApp.Contracts;
 using DemoApp.Contracts.Customers;
@@ -23,5 +24,12 @@ public class CustomersQueryHandler
     public static Customer QueryCustomerById(CustomerByIdQuery query)
     {
         return new(query.Id, new($"Customer-{query.Id}"));
+    }
+
+    [QueryHandler(Route = "customers/pdf")]
+    public static (Stream, string) QueryPdfByCustomerId(CustomerTemplateQuery query)
+    {
+        string path = Path.Combine("Content", "sample.pdf");
+        return (new FileStream(path, FileMode.Open, FileAccess.Read), "application/pdf");    
     }
 }

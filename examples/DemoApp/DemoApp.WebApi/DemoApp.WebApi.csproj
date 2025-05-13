@@ -16,5 +16,15 @@
     <InternalsVisibleTo Include="DemoApp.WebApi.Tests" />
     <ProjectReference Include="..\DemoApp.Domain\DemoApp.Domain.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Content\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Content\sample.pdf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   
 </Project>
