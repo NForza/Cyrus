@@ -11,6 +11,8 @@ public partial class GenerateTypeScript : Task
     [Required]
     public string ToolPath { get; set; } = string.Empty;
 
+    public bool CleanOutputFolder { get; set; } = false;
+
     public string ModelFile { get; set; } = string.Empty;
     public string AssemblyPath { get; set; } = string.Empty;
     public string OutputFolder { get; set; } = string.Empty;
@@ -72,7 +74,27 @@ public partial class GenerateTypeScript : Task
                     return false;
                 }
             }
-
+            else
+            {
+                if (CleanOutputFolder)
+                {
+                    Logger.LogMessage(MessageImportance.Normal, $"Cleaning output folder {OutputFolder}.");
+                    try
+                    {
+                        Directory.Delete(OutputFolder, true);
+                        Directory.CreateDirectory(OutputFolder);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogMessage(MessageImportance.High, $"Output folder {OutputFolder} could not be cleaned. {ex.Message}");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Logger.LogMessage(MessageImportance.Normal, $"Output folder {OutputFolder} already exists and skipping cleanup.");
+                }
+            }
             (bool succeeded, string errors, string model) = GenerateTypeScriptFromAssembly();
             if (!succeeded)
             {

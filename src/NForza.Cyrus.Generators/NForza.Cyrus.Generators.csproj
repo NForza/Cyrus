@@ -69,7 +69,7 @@
     <PackageReference Include="Fody" Version="6.9.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.13.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
-    <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.5" />
   </ItemGroup>
 
   <ItemGroup>

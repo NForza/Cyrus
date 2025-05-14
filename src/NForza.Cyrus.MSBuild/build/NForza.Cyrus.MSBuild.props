@@ -9,8 +9,9 @@
 
   <PropertyGroup>
     <Toolpath></Toolpath>
-    <ModelFile Condition="'$(ModelFile)' == ''">metadata.json</ModelFile>
+    <ModelFile Condition="'$(ModelFile)' == ''">cyrus.json</ModelFile>
     <OutputFolder Condition="'$(OutputFolder)' == ''">.</OutputFolder>
+    <CleanOutputFolder Condition="'$(CleanTypeScriptFolder)' == ''">false</CleanOutputFolder>
     <AssemblyPath></AssemblyPath>
   </PropertyGroup>
 </Project>
