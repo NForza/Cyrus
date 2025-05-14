@@ -17,8 +17,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fluid.Core" Version="2.23.0" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="9.0.4" />
+    <PackageReference Include="Fluid.Core" Version="2.24.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="9.0.5" />
   </ItemGroup>
 
 </Project>
