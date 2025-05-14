@@ -47,6 +47,7 @@ public static class WebApiContractGenerator
                     Internal = propertiesFromRoute.Contains(p.Name),
                     Type = p.Type.ToFullName(),
                     IsNullable = p.Type.IsNullable(),
+                    IsValueType = p.Type.IsValueType,   
                     DefaultValue = p.GetDefaultValue(),
                 })
                 .ToList();
