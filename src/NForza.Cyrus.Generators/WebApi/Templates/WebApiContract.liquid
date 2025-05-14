@@ -33,13 +33,13 @@ public class {{ Name | as-contract }}
 	{
 		return new {{ FullName }}(
 			{%- for prop in ConstructorArguments %}
-			this.{{ prop.Name }}{% if prop.IsValueType %}!{% else %}.Value{% endif %}{% unless forloop.last %},{% endunless %}
+			this.{{ prop.Name }}{% if prop.UseExclamation %}!{% else %}.Value{% endif %}{% unless forloop.last %},{% endunless %}
 			{% endfor -%}
 		)
 		{% if ConstructorProperties.size > 0 -%}
 		{
 			{%- for prop in ConstructorProperties %}
-			{{ prop.Name }} = {{ prop.Name }}{% if prop.IsValueType %}!{% else %}.Value{% endif %}{% unless forloop.last %},{% endunless %}
+			{{ prop.Name }} = {{ prop.Name }}{% if prop.UseExclamation %}!{% else %}.Value{% endif %}{% unless forloop.last %},{% endunless %}
 			{%- endfor %}
 		}
 		{%- endif -%}

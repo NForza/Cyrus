@@ -43,6 +43,116 @@ public class WebApiTests(ITestOutputHelper outputWindow)
     }
 
     [Fact]
+    public async Task Generating_Command_Contract_With_String_As_Argument_The_Contract_Should_Use_Bang_Operator()
+    {
+        var source = @"
+                using System;       
+                using NForza.Cyrus.Abstractions;
+                using NForza.Cyrus.SignalR;         
+
+                namespace Test;
+
+                [Command] 
+                public record NewCustomerCommand(string name);
+
+                public static class CustomerCommandHandler
+                {
+                    [CommandHandler(Route = ""/"")]
+                    public static void Handle(NewCustomerCommand cmd)
+                    {
+                    }
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        compilerOutput.Should().NotHaveErrors();
+        analyzerOutput.Should().BeEmpty();
+
+        generatedSyntaxTrees.Should().NotBeEmpty();
+        generatedSyntaxTrees.Should().Contain("NewCustomerCommandContract");
+        generatedSyntaxTrees.Should().ContainMatch("*name!*");
+    }
+
+
+    [Fact]
+    public async Task Generating_Command_Contract_With_Value_Type_As_Argument_The_Contract_Should_Not_Use_Bang_Operator()
+    {
+        var source = @"
+                using System;       
+                using NForza.Cyrus.Abstractions;
+                using NForza.Cyrus.SignalR;         
+
+                namespace Test;
+
+                [Command] 
+                public record NewCustomerCommand(int val);
+
+                public static class CustomerCommandHandler
+                {
+                    [CommandHandler(Route = ""/"")]
+                    public static void Handle(NewCustomerCommand cmd)
+                    {
+                    }
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        compilerOutput.Should().NotHaveErrors();
+        analyzerOutput.Should().BeEmpty();
+
+        generatedSyntaxTrees.Should().NotBeEmpty();
+        generatedSyntaxTrees.Should().Contain("NewCustomerCommandContract");
+        generatedSyntaxTrees.Should().ContainMatch("*val.Value*");
+    }
+
+    [Fact]
+    public async Task Generating_Command_Contract_With_Reference_Type_As_Argument_The_Contract_Should_Not_Use_Bang_Operator()
+    {
+        var source = @"
+                using System;       
+                using NForza.Cyrus.Abstractions;
+                using NForza.Cyrus.SignalR;         
+
+                namespace Test;
+
+                [Command] 
+                public record NewCustomerCommand(object val);
+
+                public static class CustomerCommandHandler
+                {
+                    [CommandHandler(Route = ""/"")]
+                    public static void Handle(NewCustomerCommand cmd)
+                    {
+                    }
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        compilerOutput.Should().NotHaveErrors();
+        analyzerOutput.Should().BeEmpty();
+
+        generatedSyntaxTrees.Should().NotBeEmpty();
+        generatedSyntaxTrees.Should().Contain("NewCustomerCommandContract");
+        generatedSyntaxTrees.Should().ContainMatch("*val!*");
+    }
+
+
+    [Fact]
     public async Task Generating_Command_With_Property_In_Route_The_Contract_Should_Have_That_Property_As_Internal()
     {
         var source = @"
