@@ -47,7 +47,7 @@ public static class WebApiContractGenerator
                     Internal = propertiesFromRoute.Contains(p.Name),
                     Type = p.Type.ToFullName(),
                     IsNullable = p.Type.IsNullable(),
-                    IsValueType = p.Type.IsValueType,   
+                    UseExclamation = p.Type.IsValueType && !p.Type.IsNullable(),
                     DefaultValue = p.GetDefaultValue(),
                 })
                 .ToList();
@@ -61,7 +61,8 @@ public static class WebApiContractGenerator
                     {
                         p.Name,
                         Type = p.Type.ToFullName(),
-                        IsNullable = p.Type.IsNullable()
+                        IsNullable = p.Type.IsNullable(),
+                        UseExclamation = !p.Type.IsValueType && !p.Type.IsNullable(),
                     }).ToList(),
                 Properties = publicProperties,
                 ConstructorProperties = publicProperties.Where(p => !constructorArgumentNames.Contains(p.Name)).ToList()
