@@ -1,4 +1,5 @@
 ﻿using NForza.Cyrus.Abstractions;
+using TracksDemo.Tracks.Query;
 
 namespace CyrusDemo.Tracks.Query;
 
@@ -34,5 +35,13 @@ public class TracksQueryHandler(DemoContext context)
         }
         var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
         return (stream, "audio/mpeg");
+    }
+
+    [QueryHandler(Route = "/tracks/search/{SearchTerms}")]
+    public async Task<IEnumerable<Track>> Search(SearchTracksQuery query)
+    {
+        Console.WriteLine("Searching tracks: " + query.SearchTerms);
+        var searchTerms = query.SearchTerms.ToLower().Split(' ');
+        return context.Tracks.Where(c => searchTerms.Any(term => c.Title.ToString().ToLower().Contains(term) || c.Artist.ToString().ToLower().Contains(term))).ToList();
     }
 };
