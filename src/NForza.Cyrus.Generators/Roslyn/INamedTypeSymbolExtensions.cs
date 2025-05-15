@@ -29,6 +29,20 @@ public static class INamedTypeSymbolExtensions
         return types;
     }
 
+    public static bool IsLocalEvent(this INamedTypeSymbol namedTypeSymbol)
+    {
+        AttributeData? eventAttribute = namedTypeSymbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "EventAttribute");
+        if (eventAttribute != null)
+        {
+            KeyValuePair<string, TypedConstant> localValue = eventAttribute.NamedArguments.FirstOrDefault(na => na.Key == "Local");
+            if (localValue.Value.Kind == TypedConstantKind.Primitive && localValue.Value.Value is bool localValueBool)
+            {
+                return localValueBool;
+            }
+        }
+        return false;
+    }
+
     public static IEnumerable<IPropertySymbol> GetPublicProperties(this INamedTypeSymbol namedTypeSymbol)
     {
         return namedTypeSymbol

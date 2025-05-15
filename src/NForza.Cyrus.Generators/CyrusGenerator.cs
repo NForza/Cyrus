@@ -40,6 +40,7 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
         var signalRHubProvider = new SignalRHubProvider().GetProvider(context, configProvider);
         var allCommandsAndHandlersProvider = new AllCommandsAndHandlersProvider().GetProvider(context, configProvider);
         var allQueriesAndHandlersProvider = new AllQueryAndHandlersProvider().GetProvider(context, configProvider);
+        var allEventsProvider = new AllEventsProvider().GetProvider(context, configProvider);
         var validatorProvider = new ValidatorProvider().GetProvider(context, configProvider);
 
         var cyrusProvider =
@@ -55,13 +56,14 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
             .Combine(allQueriesAndHandlersProvider)
             .Combine(eventHandlerProvider)
             .Combine(eventProvider)
+            .Combine(allEventsProvider)
             .Combine(signalRHubProvider)
             .Combine(validatorProvider)
             .Combine(templateOverrides)
             .Combine(configProvider)
             .Select((combinedProviders, _) =>
             {
-                var (((((((((((((((compilation, intIds), guidIds), stringIds), commands), commandHandlers), allCommandsAndHandlers), queries), queryHandlers), allQueriesAndHandlers), eventHandlers), events), signalRHubs), validators), templateOverrides), generationConfig) = combinedProviders;
+                var ((((((((((((((((compilation, intIds), guidIds), stringIds), commands), commandHandlers), allCommandsAndHandlers), queries), queryHandlers), allQueriesAndHandlers), eventHandlers), events), allEvents), signalRHubs), validators), templateOverrides), generationConfig) = combinedProviders;
                 var liquidEngine = new LiquidEngine(Assembly.GetExecutingAssembly(), new(templateOverrides));
                 return new CyrusGenerationContext(
                     compilation: compilation,
@@ -74,12 +76,13 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
                     queries: queries,
                     queryHandlers: queryHandlers,
                     events: events,
+                    allEvents: allEvents,
                     eventHandlers: eventHandlers,
                     allQueriesAndHandlers: allQueriesAndHandlers,
                     signalRHubs: signalRHubs,
                     validators: validators,
                     generationConfig: generationConfig,
-                    liquidEngine: liquidEngine);
+                    liquidEngine: liquidEngine); ;
             });
 
         context.RegisterSourceOutput(cyrusProvider, (sourceProductionContext, cyrusGenerationContext) =>

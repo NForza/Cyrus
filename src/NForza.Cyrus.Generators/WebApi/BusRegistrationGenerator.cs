@@ -33,6 +33,13 @@ public class BusRegistrationGenerator : CyrusGeneratorBase
 
     private string AddBusRegistrations(GenerationConfig generationConfig)
     {
-        return @$"services.AddTransient<IEventBus, {generationConfig.EventBus}EventBus>();";
+        StringBuilder sb = new();
+        sb.AppendLine(@$"services.AddTransient<IEventBus, {generationConfig.EventBus}EventBus>();");
+        if (generationConfig.EventBus == EventBusType.MassTransit)
+        {
+            sb.AppendLine(@$" services.AddTransient<LocalEventBus>();");
+        }
+
+        return sb.ToString();
     }
 }

@@ -1,0 +1,7 @@
+﻿services.AddSingleton(
+			new LocalEventList()
+			{
+				{% for localEvent in LocalEvents -%}
+					typeof({{localEvent}}){% unless forloop.last %}, {% endunless %}
+				{%- endfor %}
+			});

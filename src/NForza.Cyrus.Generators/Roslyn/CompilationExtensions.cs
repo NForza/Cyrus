@@ -7,6 +7,7 @@ public static class CompilationExtensions
 {
     public static IEnumerable<INamedTypeSymbol> GetAllTypesFromCyrusAssemblies(this Compilation compilation, params string[] assemblySuffixes)
     {
+        //caching/memoization could be added here - multiple calls to this method could be expensive
         var compilationTypes = GetTypesFromCompilation(compilation);
 
         var referencedAssemblyTypes = GetTypesFromReferencedAssemblies(compilation, assemblySuffixes);

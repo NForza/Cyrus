@@ -62,6 +62,7 @@
     <EmbeddedResource Include="WebApi\Templates\MapQuery.liquid" />
     <EmbeddedResource Include="WebApi\Templates\MapCommand.liquid" />
     <EmbeddedResource Include="WebApi\Templates\CyrusWebStartup.liquid" />
+    <EmbeddedResource Include="Events\Templates\LocalEventList.liquid" />
   </ItemGroup>
 
   <ItemGroup>

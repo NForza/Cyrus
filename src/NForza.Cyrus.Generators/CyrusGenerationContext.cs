@@ -20,6 +20,7 @@ public class CyrusGenerationContext
         ImmutableArray<INamedTypeSymbol> queries,
         ImmutableArray<IMethodSymbol> queryHandlers,
         ImmutableArray<INamedTypeSymbol> events,
+        ImmutableArray<INamedTypeSymbol> allEvents,
         ImmutableArray<IMethodSymbol> eventHandlers,
         ImmutableArray<ISymbol> allQueriesAndHandlers,
         ImmutableArray<IMethodSymbol> validators,
@@ -39,6 +40,7 @@ public class CyrusGenerationContext
         QueryHandlers = queryHandlers;
         EventHandlers = eventHandlers;
         Events = events;
+        AllEvents = allEvents;
         AllQueriesAndHandlers = allQueriesAndHandlers;
         Validators = validators;
         SignalRHubs = signalRHubs;
@@ -58,6 +60,7 @@ public class CyrusGenerationContext
     public ImmutableArray<ISymbol> AllQueriesAndHandlers { get;  }
     public ImmutableArray<IMethodSymbol> Validators { get; }
     public ImmutableArray<INamedTypeSymbol> Events { get; }
+    public ImmutableArray<INamedTypeSymbol> AllEvents { get; }
     public ImmutableArray<IMethodSymbol> EventHandlers { get; }
     public ImmutableArray<SignalRHubClassDefinition> SignalRHubs { get; }
     public GenerationConfig GenerationConfig { get; }
