@@ -28,8 +28,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
             var commandHandlerRegistrations = string.Join(Environment.NewLine,
                     cyrusProvider.CommandHandlers
                         .Select(ch => ch.ContainingType)
-                        .Where(x => x != null)
-                        .Where(x => !x.IsStatic)
+                        .Where(x => x != null && !x.IsStatic)
                         .Distinct(SymbolEqualityComparer.Default)
                         .Select(cht => $" services.AddTransient<{cht.ToFullName()}>();"));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers

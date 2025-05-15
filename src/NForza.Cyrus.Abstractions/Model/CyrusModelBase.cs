@@ -12,5 +12,6 @@ public class CyrusModelBase: ICyrusModel
     public virtual IEnumerable<ModelTypeDefinition> Events { get; set; } = Enumerable.Empty<ModelTypeDefinition>();
     public virtual IEnumerable<ModelTypeDefinition> Commands { get; set; } = Enumerable.Empty<ModelTypeDefinition>();
     public virtual IEnumerable<ModelQueryDefinition> Queries { get; set; } = Enumerable.Empty<ModelQueryDefinition>();
+    public virtual IEnumerable<ModelEndpointDefinition> Endpoints { get; set; } = Enumerable.Empty<ModelEndpointDefinition>();
     public virtual IEnumerable<ModelHubDefinition> Hubs { get; set; } = Enumerable.Empty<ModelHubDefinition>();
 }
