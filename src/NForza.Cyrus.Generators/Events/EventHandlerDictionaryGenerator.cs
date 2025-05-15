@@ -44,8 +44,6 @@ public class EventHandlerDictionaryGenerator : CyrusGeneratorBase
             return string.Empty;
         }
 
-        StringBuilder source = new();
-
         var model = new
         {
             EventHandlers = eventHandlers.Select(eventHandler =>

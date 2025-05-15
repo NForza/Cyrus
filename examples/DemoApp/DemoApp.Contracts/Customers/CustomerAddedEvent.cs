@@ -2,6 +2,6 @@
 
 namespace DemoApp.Contracts.Customers;
 
-[Event]
+[Event(Local = true)]
 public record CustomerAddedEvent(CustomerId Id, Name Name, Address Address);
 

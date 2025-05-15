@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -14,7 +15,7 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
     {
         var config = cyrusProvider.GenerationConfig;
-        var eventHandlers = cyrusProvider.EventHandlers;
+        var eventHandlers = cyrusProvider.EventHandlers.Where(eh => !IsEventHandlerForLocalEvent(eh));
         if (eventHandlers.Any())
         {
             if (config.EventBus == EventBusType.MassTransit)
@@ -25,7 +26,12 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase
         }
     }
 
-    private string GenerateEventConsumers(ImmutableArray<IMethodSymbol> eventHandlers, LiquidEngine liquidEngine)
+    private static bool IsEventHandlerForLocalEvent(IMethodSymbol eh)
+    {
+        return ((INamedTypeSymbol)eh.Parameters[0].Type).IsLocalEvent();
+    }
+
+    private string GenerateEventConsumers(IEnumerable<IMethodSymbol> eventHandlers, LiquidEngine liquidEngine)
     {
         StringBuilder source = new();
         var model = new
