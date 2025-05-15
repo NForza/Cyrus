@@ -5,6 +5,7 @@ using Fluid.Values;
 using System.Text.Json;
 using System.Reflection;
 using System.Diagnostics.CodeAnalysis;
+using NForza.Cyrus.Model;
 
 
 namespace Cyrus;
@@ -125,7 +126,7 @@ internal static class TypeScriptGenerator
 
     public static bool Generate(string json, string outputFolder)
     {
-        metadata = JsonSerializer.Deserialize<CyrusMetadata>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web)) ?? throw new InvalidOperationException("Can't read metadata");
+        metadata = JsonSerializer.Deserialize<CyrusMetadata>(json, ModelSerializerOptions.Default) ?? throw new InvalidOperationException("Can't read metadata");
 
         var path = Path.GetFullPath(outputFolder);
         Console.WriteLine("model: " + JsonSerializer.Serialize(metadata));
