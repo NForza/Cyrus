@@ -25,6 +25,7 @@ public static class ModelSerializerOptions
         {
             new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
         },
+        TypeInfoResolver = CyrusMetadataJsonContext.Default,
         TypeInfoResolverChain = { SerializationContext.Default.WithAddedModifier(ContractModifier_Collection) },
     };
 
