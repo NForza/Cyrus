@@ -248,4 +248,4 @@ public class CustomersQueryHandler
 * [Adding validators for commands and queries](adding-validators.md)
 * [Using MassTransit in Cyrus to broadcast events](masstransit.md)
 * Splitting contracts and implementation
-* Generating TypeScript from a Cyrus model
+* [Generating TypeScript from a Cyrus application](generating-typescript.md)
