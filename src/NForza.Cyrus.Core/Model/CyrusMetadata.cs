@@ -1,6 +1,7 @@
 ﻿using NForza.Cyrus.Abstractions.Model;
+using System.Collections.Generic;
 
-namespace Cyrus.Model;
+namespace NForza.Cyrus.Model;
 
 public class CyrusMetadata: ICyrusModel
 {
