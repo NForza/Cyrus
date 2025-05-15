@@ -224,4 +224,39 @@ public class WebApiTests(ITestOutputHelper outputWindow)
         generatedSyntaxTrees.Should().ContainMatch("*public int? Id { get; set; } = 1;*");
     }
 
+    [Fact]
+    public async Task Generating_CommandHandler_With_Route_Should_Generate_Endpoint_In_Model()
+    {
+        var source = @"
+                using System;       
+                using NForza.Cyrus.Abstractions;
+                using NForza.Cyrus.SignalR;         
+
+                namespace Test;
+
+                [Command] 
+                public record NewCustomerCommand(int Id = 1);
+
+                public static class CustomerCommandHandler
+                {
+                    [CommandHandler(Route = ""/"")]
+                    public static void Handle(NewCustomerCommand cmd)
+                    {
+                    }
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        compilerOutput.Should().NotHaveErrors();
+        analyzerOutput.Should().BeEmpty();
+
+        generatedSyntaxTrees.Should().NotBeEmpty();
+        generatedSyntaxTrees.Should().Contain("new ModelEndpointDefinition(");
+    }
+
 }

@@ -60,4 +60,15 @@ internal class ModelGenerator
         var propertyDeclarations = typeSymbol.GetPropertyModels().Select(m => liquidEngine.Render(new { property = m }, "Model-property"));
         return string.Join(",", propertyDeclarations);
     }
+
+    internal static string ForCommandEndpoint((INamedTypeSymbol NamedTypeSymbol, string HttpVerb, string Route) em, LiquidEngine liquidEngine)
+    {
+        return $"new ModelEndpointDefinition(HttpVerb.{em.HttpVerb}, \"{em.Route}\", \"{em.NamedTypeSymbol.Name}\", \"\")";
+    }
+
+    internal static string ForQueryEndpoint((INamedTypeSymbol NamedTypeSymbol, string HttpVerb, string Route) em, LiquidEngine liquidEngine)
+    {
+        return $"new ModelEndpointDefinition(HttpVerb.{em.HttpVerb}, \"{em.Route}\", \"\", \"{em.NamedTypeSymbol.Name}\")";
+    }
+
 }

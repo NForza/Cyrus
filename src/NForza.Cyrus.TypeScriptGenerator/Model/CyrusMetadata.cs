@@ -11,5 +11,6 @@ public class CyrusMetadata: ICyrusModel
     public IEnumerable<ModelTypeDefinition> Events { get; set; } = [];
     public IEnumerable<ModelTypeDefinition> Commands { get; set; } = [];
     public IEnumerable<ModelQueryDefinition> Queries { get; set; } = [];
+    public IEnumerable<ModelEndpointDefinition> Endpoints { get; set; } = [];
     public IEnumerable<ModelHubDefinition> Hubs { get; set; } = [];
 }

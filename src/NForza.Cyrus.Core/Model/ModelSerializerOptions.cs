@@ -10,6 +10,7 @@ namespace NForza.Cyrus.Model;
 [JsonSerializable(typeof(ModelHubDefinition))]
 [JsonSerializable(typeof(ModelPropertyDefinition))]
 [JsonSerializable(typeof(ModelQueryDefinition))]
+[JsonSerializable(typeof(ModelEndpointDefinition))]
 [JsonSerializable(typeof(ModelTypeDefinition))]
 [JsonSourceGenerationOptions(DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
 public partial class SerializationContext : JsonSerializerContext;
@@ -20,6 +21,10 @@ public static class ModelSerializerOptions
     {
         WriteIndented = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Converters =
+        {
+            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+        },
         TypeInfoResolverChain = { SerializationContext.Default.WithAddedModifier(ContractModifier_Collection) },
     };
 
