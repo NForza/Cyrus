@@ -1,4 +1,5 @@
-﻿using NForza.Cyrus.Abstractions;
+﻿using Microsoft.EntityFrameworkCore;
+using NForza.Cyrus.Abstractions;
 using TracksDemo.Tracks.Query;
 
 namespace CyrusDemo.Tracks.Query;
@@ -6,24 +7,24 @@ namespace CyrusDemo.Tracks.Query;
 public class TracksQueryHandler(DemoContext context)
 {
     [QueryHandler(Route = "/tracks")]
-    public IEnumerable<Track> GetAll(AllTracksQuery query)
+    public async Task<IEnumerable<Track>> GetAll(AllTracksQuery query)
     {
         Console.WriteLine("Getting all tracks");
-        return context.Tracks.ToList();
+        return await context.Tracks.ToListAsync();
     }
 
     [QueryHandler(Route = "/tracks/{TrackId}")]
     public async Task<Track?> GetById(TrackInfoByIdQuery query)
     {
         Console.WriteLine("Getting track by Id: " + query.TrackId);
-        return context.Tracks.FirstOrDefault(c => c.Id == query.TrackId);
+        return await context.Tracks.FirstOrDefaultAsync(c => c.Id == query.TrackId);
     }
 
     [QueryHandler(Route = "/tracks/{TrackId}/{AudioFormat}")]
     public async Task<(Stream?, string?)> GetById(TrackStreamQuery query)
     {
         Console.WriteLine("Getting track by Id: " + query.TrackId);
-        var track = context.Tracks.FirstOrDefault(c => c.Id == query.TrackId && c.AudioFormat == query.AudioFormat);
+        var track = await context.Tracks.FirstOrDefaultAsync(c => c.Id == query.TrackId && c.AudioFormat == query.AudioFormat);
         if (track == null)
         {
             return (null, null);
@@ -42,6 +43,9 @@ public class TracksQueryHandler(DemoContext context)
     {
         Console.WriteLine("Searching tracks: " + query.SearchTerms);
         var searchTerms = query.SearchTerms.ToLower().Split(' ');
-        return context.Tracks.Where(c => searchTerms.Any(term => c.Title.ToString().ToLower().Contains(term) || c.Artist.ToString().ToLower().Contains(term))).ToList();
+        return context.Tracks.Where(c => searchTerms.Any(term => 
+            c.Title.ToString().Contains(term, StringComparison.CurrentCultureIgnoreCase) 
+            ||
+            c.Artist.ToString().Contains(term, StringComparison.CurrentCultureIgnoreCase))).ToList();
     }
 };

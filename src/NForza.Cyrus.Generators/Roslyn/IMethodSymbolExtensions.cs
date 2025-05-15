@@ -72,6 +72,16 @@ internal static class IMethodSymbolExtensions
         {
             return namedType.TypeArguments[0];
         }
+
+        if (returnType is INamedTypeSymbol tupleType &&
+            tupleType.IsTupleType &&
+            tupleType.TypeArguments.Length == 2 &&
+            tupleType.TypeArguments[0].ToDisplayString() == "System.IO.Stream" &&
+            tupleType.TypeArguments[1].SpecialType == SpecialType.System_String)
+        {
+            return tupleType.TypeArguments[0]; 
+        }
+
         return returnType;
     }
 

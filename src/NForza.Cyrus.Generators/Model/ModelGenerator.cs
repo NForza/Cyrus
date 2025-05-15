@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Generators.SignalR;
@@ -37,11 +38,14 @@ internal class ModelGenerator
     internal static string ForQueryHandler(IMethodSymbol queryHandler, LiquidEngine liquidEngine)
     {
         var queryModelDefinition = ForNamedType(queryHandler.Parameters[0].Type, liquidEngine);
-        var returnType = queryHandler.GetQueryReturnType();   
-        var returnTypeDefinition = ForNamedType(returnType, liquidEngine);
+        var returnType = queryHandler.GetQueryReturnType();
+        var returnTypeDefinition = returnType.Name == "Stream" ? ForStream(returnType.IsNullable()) : ForNamedType(returnType, liquidEngine);
         string queryName = queryHandler.Parameters[0].Type.Name;
         return $"new ModelQueryDefinition({queryModelDefinition}, {returnTypeDefinition})";
     }
+
+    private static string ForStream(bool isNullable) 
+        => $"new ModelTypeDefinition(\"byte\", [], [], true, {isNullable.ToString().ToLower()})";
 
     private static string GetValuesDeclaration(ITypeSymbol namedType)
     {

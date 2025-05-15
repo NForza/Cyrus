@@ -18,11 +18,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.4" />
-    <PackageReference Include="NForza.Cyrus" Version="1.0.257" />
-    <PackageReference Include="NForza.Cyrus.MassTransit" Version="1.0.257" />
-    <PackageReference Include="NForza.Cyrus.MSBuild" Version="1.0.257" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.5" />
+    <PackageReference Include="NForza.Cyrus" Version="1.0.259" />
+    <PackageReference Include="NForza.Cyrus.MassTransit" Version="1.0.259" />
+    <PackageReference Include="NForza.Cyrus.MSBuild" Version="1.0.259" />
   </ItemGroup>
 
   <ItemGroup>
