@@ -1,7 +1,7 @@
 # Generating TypeScript files from a Cyrus Application
 
 * Add the `NForza.Cyrus.MSBuild` package to the Cyrus application
-* 
+  
 * In the `*.csproj` file, add the following:
 
 ```xml
