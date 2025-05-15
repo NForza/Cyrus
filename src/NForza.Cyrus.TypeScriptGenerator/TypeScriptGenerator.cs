@@ -1,5 +1,4 @@
-﻿using Cyrus.Model;
-using NForza.Cyrus.Templating;
+﻿using NForza.Cyrus.Templating;
 using NForza.Cyrus.Abstractions.Model;
 using Fluid.Values;
 using System.Text.Json;
