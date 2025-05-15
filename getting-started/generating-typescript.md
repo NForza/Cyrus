@@ -11,4 +11,4 @@
 </PropertyGroup>
 ```
 
-* When building, the `./ts` folder will be cleared first (all files and directories are deleted) and then Cyrus will generate TypeScript interfaces, enums and even SignalR hubs in that folder
+* When building, the `./ts` folder will be cleared first (all files and directories are deleted) and then Cyrus will generate TypeScript interfaces, enums and even SignalR hubs in that folder for Queries, Commands and events in your application.
