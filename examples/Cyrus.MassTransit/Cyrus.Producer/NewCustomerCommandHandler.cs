@@ -7,7 +7,7 @@ public class NewCustomerCommandHandler
 {
     [CommandHandler(Route = "/", Verb = HttpVerb.Post)]
     [Tags("Customer")]
-    public (IResult result, object @event) Execute(NewCustomerCommand command)
+    public (IResult Result, object Messages) Execute(NewCustomerCommand command)
     {
         Console.WriteLine("Executing handler for NewCustomerCommand");
         return (Results.Accepted(),  new CustomerCreatedEvent(command.Id));

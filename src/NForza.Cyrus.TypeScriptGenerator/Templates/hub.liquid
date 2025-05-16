@@ -18,9 +18,9 @@ export class {{ Name }}Service {
   private _{{ e | camel-cased }}Subject: Subject<{{ e }}> = new Subject<{{ e }}>();
 {%- endfor %}
 
-  constructor() {
+  constructor(private baseUrl: string) {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:7166/{{ Path | strip-leading-slash }}') 
+      .withUrl(`${this.baseUrl}/{{ Path | strip-leading-slash }}`) 
       .configureLogging(signalR.LogLevel.Information)
       .build();
     {%- for e in Events %}
