@@ -91,14 +91,15 @@ public class AddCustomerCommandHandler
 ```
 
 Command handlers must return one of the following:
-| return type                                     | effects after executing hander                                                |
-|-------------------------------------------------|-------------------------------------------------------------------------------|
-| void                                            | no return value or events                                                     |
-| `IEnumerable<object>`                           | no return value, but returned objects are published to the event bus          |
-| `(object Result, IEnumerable<object> events)`   | return value and events that are published to the event bus                   |
-| `(IResult Result, IEnumerable<object> events)`  | WebApi result and events that are published to the event bus                  |
+| return type                                     | effects after executing handler                                                                           |
+|-------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| void                                            | no return value or events                                                                                |
+| `IEnumerable<object>`                           | no return value, but returned messages (events or commands) are published to the event or command bus    |
+| `(object Result, IEnumerable<object> events)`   | return value and messages (events or commands) that are published to the event or command bus            |
+| `(IResult Result, IEnumerable<object> events)`  | WebApi result and messages (events or commands) that are published to the event or command bus           |
+| `(IResult Result, object message)`              | WebApi result and a single message (events or command) that is published to the event or command bus     |
 
-Returned events are dispatched through the system via an event bus, and you can use a local bus (which is the default) or integrate with an external event bus using [MassTransit](https://masstransit.io/).
+Returned messages are dispatched through the system via an event or command bus, and you can use a local bus (which is the default) or integrate with an external event bus using [MassTransit](https://masstransit.io/).
 
 The requirements for command handlers are as follows:
 
@@ -130,7 +131,7 @@ Event handlers must return `void`. The requirements for command handlers are as 
 - Events must have the `[Event]` attribute
 - Handler methods must have the `[EventHandler]` attribute
 - Handler methods must take one parameter, which is an `Event`
-- Handler methods must return `void`
+- Handler methods must return `void` or `Task`
 
 ### Exposing Commands and Queries in a Web API
 
@@ -159,7 +160,7 @@ app.MapCyrus();
 
 await app.RunAsync();
 ```
-Check the [demo solution](https://github.com/NForza/Cyrus/blob/master/) for more details.
+Check the [Getting Started](https://github.com/NForza/Cyrus/tree/main/examples/GettingStarted/SimpleCyrusWebApi)) for more details.
 
 ### Under the hood
 
