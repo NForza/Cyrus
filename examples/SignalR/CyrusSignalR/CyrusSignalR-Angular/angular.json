@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Cyrus-SignalRAngular": {
+    "CyrusSignalR-Angular": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -15,12 +15,11 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": {
-              "base": "dist/cyrus-signal-rangular"
-            },
+            "outputPath": "dist/cyrus-signal-r-angular",
             "index": "src/index.html",
+            "main": "src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -33,8 +32,7 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": [],
-            "browser": "src/main.ts"
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -53,7 +51,9 @@
               "outputHashing": "all"
             },
             "development": {
+              "buildOptimizer": false,
               "optimization": false,
+              "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
@@ -65,10 +65,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "Cyrus-SignalRAngular:build:production"
+              "browserTarget": "CyrusSignalR-Angular:build:production"
             },
             "development": {
-              "buildTarget": "Cyrus-SignalRAngular:build:development"
+              "browserTarget": "CyrusSignalR-Angular:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -76,7 +76,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "Cyrus-SignalRAngular:build"
+            "browserTarget": "CyrusSignalR-Angular:build"
           }
         },
         "test": {
