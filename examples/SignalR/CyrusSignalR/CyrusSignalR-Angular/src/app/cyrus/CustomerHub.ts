@@ -4,9 +4,6 @@ import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { AddCustomerCommand } from './AddCustomerCommand';
 import { CustomerCreatedEvent } from './CustomerCreatedEvent';
 
-@Injectable({
-  providedIn: 'root',
-})
 export class CustomerHubService {
   private hubConnection: signalR.HubConnection;
   private _customerCreatedEventSubject: Subject<CustomerCreatedEvent> = new Subject<CustomerCreatedEvent>();
