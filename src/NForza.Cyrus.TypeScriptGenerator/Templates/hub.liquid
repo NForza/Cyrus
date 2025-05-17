@@ -5,9 +5,6 @@ import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { {{ i }} } from './{{ i }}';
 {%- endfor %}
 
-@Injectable({
-  providedIn: 'root',
-})
 export class {{ Name }}Service {
   private hubConnection: signalR.HubConnection;
 
