@@ -1,6 +1,6 @@
 ﻿using NForza.Cyrus.Abstractions;
 
-namespace CyrusDemo.Tracks;
+namespace TracksDemo.Tracks;
 
 [GuidId]
 public partial record struct TrackId;

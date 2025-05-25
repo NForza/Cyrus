@@ -1,6 +1,7 @@
 ﻿using NForza.Cyrus.Abstractions;
+using TracksDemo.Tracks;
 
-namespace CyrusDemo.Tracks.Update;
+namespace TracksDemo.Tracks.Update;
 
 public class UpdateTrackCommandHandler(DemoContext context)
 {
@@ -21,4 +22,15 @@ public class UpdateTrackCommandHandler(DemoContext context)
         context.SaveChangesAsync();
         return Results.Accepted();
     }
+
+    public IResult Update2(UpdateTrackCommand command, Track track)
+    {
+        Console.WriteLine("Updating track");
+        track.Artist = command.Artist;
+        track.Title = command.Title;
+        track.FileName = command.FileName;
+        track.AudioFormat = command.AudioFormat;
+        return Results.Accepted();
+    }
+
 }

@@ -1,6 +1,6 @@
 ﻿using NForza.Cyrus.Abstractions;
 
-namespace CyrusDemo.Tracks.Query;
+namespace TracksDemo.Tracks.Query;
 
 [Query]
 public record struct AllTracksQuery;

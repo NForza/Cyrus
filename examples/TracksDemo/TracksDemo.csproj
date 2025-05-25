@@ -9,13 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Tracks\Delete\**" />
-    <Content Remove="Tracks\Delete\**" />
-    <EmbeddedResource Remove="Tracks\Delete\**" />
-    <None Remove="Tracks\Delete\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.5" />
     <PackageReference Include="NForza.Cyrus" Version="1.0.266-beta-20250515-212124" />

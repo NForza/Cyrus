@@ -1,6 +1,8 @@
 ﻿using NForza.Cyrus.Abstractions;
+using TracksDemo;
+using TracksDemo.Tracks;
 
-namespace CyrusDemo.Tracks.Create;
+namespace TracksDemo.Tracks.Create;
 
 public class NewTrackCommandHandler(DemoContext context)
 {

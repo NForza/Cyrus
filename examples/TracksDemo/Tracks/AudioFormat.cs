@@ -1,4 +1,4 @@
-﻿namespace CyrusDemo.Tracks.Create;
+﻿namespace TracksDemo.Tracks;
 
 public enum AudioFormat
 {
