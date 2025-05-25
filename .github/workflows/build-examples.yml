@@ -1,0 +1,42 @@
+name: Build examples
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+env:
+  PROJECT_FOLDER: ./examples/
+
+jobs:
+  build_masstransit:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.PROJECT_FOLDER }}/Cyrus.MassTransit
+    - name: Build
+      run: dotnet build --no-restore ${{ env.PROJECT_FOLDER }}/Cyrus.MassTransit
+    - name: Test
+      run: dotnet test --no-build --verbosity normal ${{ env.PROJECT_FOLDER }}/Cyrus.MassTransit
+  build_signalr:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.PROJECT_FOLDER }}/examples/SignalR/CyrusSignalR
+    - name: Build
+      run: dotnet build --no-restore ${{ env.PROJECT_FOLDER }}/examples/SignalR/CyrusSignalR
+    - name: Test
+      run: dotnet test --no-build --verbosity normal ${{ env.PROJECT_FOLDER }}/SignalR/CyrusSignalR
