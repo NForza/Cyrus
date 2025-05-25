@@ -1,0 +1,9 @@
+<h1>Customer Hub</h1>
+
+<button (click)="onAddCustomer()">
+  Add Customer
+</button>
+
+<p *ngIf="customerCreatedMessage">
+  {{ customerCreatedMessage }}
+</p>

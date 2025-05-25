@@ -1,0 +1,6 @@
+@CyrusSignalR_HostAddress = http://localhost:5105
+
+GET {{CyrusSignalR_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

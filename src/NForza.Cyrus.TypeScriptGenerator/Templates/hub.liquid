@@ -1,13 +1,9 @@
-import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 {%- for i in Imports %}
 import { {{ i }} } from './{{ i }}';
 {%- endfor %}
 
-@Injectable({
-  providedIn: 'root',
-})
 export class {{ Name }}Service {
   private hubConnection: signalR.HubConnection;
 
@@ -21,6 +17,7 @@ export class {{ Name }}Service {
   constructor(private baseUrl: string) {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`${this.baseUrl}/{{ Path | strip-leading-slash }}`) 
+      .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
       .build();
     {%- for e in Events %}
