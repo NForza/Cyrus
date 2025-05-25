@@ -10,7 +10,7 @@ export class CustomerHubService {
 
   constructor(private baseUrl: string) {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`${this.baseUrl}/customerhub`) 
+      .withUrl(`${this.baseUrl}/customer`) 
       .configureLogging(signalR.LogLevel.Information)
       .build();
     this.hubConnection.on('customerCreatedEvent', (data: CustomerCreatedEvent) => {

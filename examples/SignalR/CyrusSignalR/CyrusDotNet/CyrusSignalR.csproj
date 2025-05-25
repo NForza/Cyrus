@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <Cyrus-TypeScriptFolder>../CyrusSignalR-Angular/src/app/cyrus</Cyrus-TypeScriptFolder>
     <Cyrus-CleanTypeScriptFolder>true</Cyrus-CleanTypeScriptFolder>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>./obj/Debug/generated</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

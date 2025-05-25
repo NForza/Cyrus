@@ -17,6 +17,7 @@ export class {{ Name }}Service {
   constructor(private baseUrl: string) {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`${this.baseUrl}/{{ Path | strip-leading-slash }}`) 
+      .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
       .build();
     {%- for e in Events %}

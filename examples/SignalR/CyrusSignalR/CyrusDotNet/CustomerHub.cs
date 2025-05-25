@@ -6,6 +6,7 @@ namespace CyrusSignalR
     {
         public CustomerHub()
         {
+            UsePath("customer");
             Expose<AddCustomerCommand>();
             Emit<CustomerCreatedEvent>();
         }

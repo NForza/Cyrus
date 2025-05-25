@@ -7,6 +7,6 @@ import { CustomerHubService } from './cyrus/CustomerHub'
 export class CustomerService extends CustomerHubService {
 
   constructor() {
-    super('https://localhost:7045/')
+    super('https://localhost:7045')
    }
 }
