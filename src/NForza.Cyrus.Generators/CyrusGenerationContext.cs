@@ -24,7 +24,7 @@ public class CyrusGenerationContext
         ImmutableArray<IMethodSymbol> eventHandlers,
         ImmutableArray<ISymbol> allQueriesAndHandlers,
         ImmutableArray<IMethodSymbol> validators,
-
+        ImmutableArray<INamedTypeSymbol> aggregateRoots,
         ImmutableArray<SignalRHubClassDefinition> signalRHubs,
         GenerationConfig generationConfig, 
         LiquidEngine liquidEngine)
@@ -43,6 +43,7 @@ public class CyrusGenerationContext
         AllEvents = allEvents;
         AllQueriesAndHandlers = allQueriesAndHandlers;
         Validators = validators;
+        AggregateRoots = aggregateRoots;
         SignalRHubs = signalRHubs;
         GenerationConfig = generationConfig;
         LiquidEngine = liquidEngine;
@@ -59,17 +60,16 @@ public class CyrusGenerationContext
     public ImmutableArray<IMethodSymbol> QueryHandlers { get; }
     public ImmutableArray<ISymbol> AllQueriesAndHandlers { get;  }
     public ImmutableArray<IMethodSymbol> Validators { get; }
+    public ImmutableArray<INamedTypeSymbol> AggregateRoots { get; private set; }
     public ImmutableArray<INamedTypeSymbol> Events { get; }
     public ImmutableArray<INamedTypeSymbol> AllEvents { get; }
     public ImmutableArray<IMethodSymbol> EventHandlers { get; }
     public ImmutableArray<SignalRHubClassDefinition> SignalRHubs { get; }
     public GenerationConfig GenerationConfig { get; }
     public LiquidEngine LiquidEngine { get; }
-
     public ImmutableArray<INamedTypeSymbol> TypedIds => GuidIds.AddRange(IntIds).AddRange(StringIds);
     public ImmutableArray<INamedTypeSymbol> AllCommands => AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToImmutableArray();
     public ImmutableArray<IMethodSymbol> AllCommandHandlers => AllCommandsAndHandlers.OfType<IMethodSymbol>().ToImmutableArray();
     public ImmutableArray<IMethodSymbol> AllQueryHandlers => AllQueriesAndHandlers.OfType<IMethodSymbol>().ToImmutableArray();
     public ImmutableArray<IMethodSymbol> AllHandlers => AllCommandsAndHandlers.Concat(AllQueriesAndHandlers).OfType<IMethodSymbol>().ToImmutableArray();
-
 }

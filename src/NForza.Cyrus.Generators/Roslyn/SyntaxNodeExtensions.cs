@@ -10,6 +10,12 @@ public static class SyntaxNodeExtensions
         &&
         methodDeclarationSyntax.HasCommandHandlerAttribute();
 
+    public static bool IsAggregateRoot(this SyntaxNode syntaxNode)
+     => syntaxNode is ClassDeclarationSyntax classDeclarationSyntax
+        &&
+        classDeclarationSyntax.HasAggregateRootAttribute();
+
+
     public static bool IsQueryHandler(this SyntaxNode syntaxNode)
         => syntaxNode is MethodDeclarationSyntax methodDeclarationSyntax
            &&

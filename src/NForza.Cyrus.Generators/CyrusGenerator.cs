@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
+using NForza.Cyrus.Generators.Aggregates;
 using NForza.Cyrus.Generators.Analyzers;
 using NForza.Cyrus.Generators.Commands;
 using NForza.Cyrus.Generators.Events;
@@ -42,6 +43,7 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
         var allQueriesAndHandlersProvider = new AllQueryAndHandlersProvider().GetProvider(context, configProvider);
         var allEventsProvider = new AllEventsProvider().GetProvider(context, configProvider);
         var validatorProvider = new ValidatorProvider().GetProvider(context, configProvider);
+        var aggregateRootProvider = new AggregateRootProvider().GetProvider(context, configProvider);
 
         var cyrusProvider =
             context.CompilationProvider
@@ -57,13 +59,14 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
             .Combine(eventHandlerProvider)
             .Combine(eventProvider)
             .Combine(allEventsProvider)
+            .Combine(aggregateRootProvider)
             .Combine(signalRHubProvider)
             .Combine(validatorProvider)
             .Combine(templateOverrides)
             .Combine(configProvider)
             .Select((combinedProviders, _) =>
             {
-                var ((((((((((((((((compilation, intIds), guidIds), stringIds), commands), commandHandlers), allCommandsAndHandlers), queries), queryHandlers), allQueriesAndHandlers), eventHandlers), events), allEvents), signalRHubs), validators), templateOverrides), generationConfig) = combinedProviders;
+                var (((((((((((((((((compilation, intIds), guidIds), stringIds), commands), commandHandlers), allCommandsAndHandlers), queries), queryHandlers), allQueriesAndHandlers), eventHandlers), events), allEvents), aggregateRoots), signalRHubs), validators), templateOverrides), generationConfig) = combinedProviders;
                 var liquidEngine = new LiquidEngine(Assembly.GetExecutingAssembly(), new(templateOverrides));
                 return new CyrusGenerationContext(
                     compilation: compilation,
@@ -79,6 +82,7 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
                     allEvents: allEvents,
                     eventHandlers: eventHandlers,
                     allQueriesAndHandlers: allQueriesAndHandlers,
+                    aggregateRoots: aggregateRoots,
                     signalRHubs: signalRHubs,
                     validators: validators,
                     generationConfig: generationConfig,
