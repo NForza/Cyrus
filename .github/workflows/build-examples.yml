@@ -1,3 +1,4 @@
+
 name: Build examples
 
 on:
@@ -6,7 +7,10 @@ on:
   workflow_dispatch:
 env:
   PROJECT_FOLDER: ./examples/
-
+  MASSTRANSIT_FOLDER: MassTransit
+  SIGNALR_FOLDER: SignalR/CyrusSignalR
+  TRACKS_FOLDER: TracksDemo
+  
 jobs:
   build_masstransit:
 
@@ -19,11 +23,11 @@ jobs:
       with:
         dotnet-version: 9.0.x
     - name: Restore dependencies
-      run: dotnet restore ${{ env.PROJECT_FOLDER }}/MassTransit
+      run: dotnet restore ${{ env.PROJECT_FOLDER }}/${{ env.MASSTRANSIT_FOLDER }}
     - name: Build
-      run: dotnet build --no-restore ${{ env.PROJECT_FOLDER }}/MassTransit
+      run: dotnet build --no-restore ${{ env.PROJECT_FOLDER }}/${{ env.MASSTRANSIT_FOLDER }}
     - name: Test
-      run: dotnet test --no-build --verbosity normal ${{ env.PROJECT_FOLDER }}/MassTransit
+      run: dotnet test --no-build --verbosity normal ${{ env.PROJECT_FOLDER }}/${{ env.MASSTRANSIT_FOLDER }}
   build_signalr:
 
     runs-on: ubuntu-latest
@@ -35,8 +39,24 @@ jobs:
       with:
         dotnet-version: 9.0.x
     - name: Restore dependencies
-      run: dotnet restore ${{ env.PROJECT_FOLDER }}/examples/SignalR/CyrusSignalR
+      run: dotnet restore ${{ env.PROJECT_FOLDER }}/${{ env.SIGNALR_FOLDER }}
     - name: Build
-      run: dotnet build --no-restore ${{ env.PROJECT_FOLDER }}/examples/SignalR/CyrusSignalR
+      run: dotnet build --no-restore ${{ env.PROJECT_FOLDER }}/${{ env.SIGNALR_FOLDER }}
     - name: Test
-      run: dotnet test --no-build --verbosity normal ${{ env.PROJECT_FOLDER }}/SignalR/CyrusSignalR
+      run: dotnet test --no-build --verbosity normal ${{ env.PROJECT_FOLDER }}/${{ env.SIGNALR_FOLDER }}
+  build_tracks:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.PROJECT_FOLDER }}/${{ env.TRACKS_FOLDER }}
+    - name: Build
+      run: dotnet build --no-restore ${{ env.PROJECT_FOLDER }}/${{ env.TRACKS_FOLDER }}
+    - name: Test
+      run: dotnet test --no-build --verbosity normal ${{ env.PROJECT_FOLDER }}/${{ env.TRACKS_FOLDER }}
