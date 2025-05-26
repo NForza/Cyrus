@@ -1,5 +1,4 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35309.182
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -9,7 +8,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cyrus.Abstractions",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoApp.WebApi", "examples\DemoApp\DemoApp.WebApi\DemoApp.WebApi.csproj", "{239395A0-21EF-4967-BBFB-371BCB9CE1CF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NForza.Cyrus.MassTransit", "src\NForza.Cyrus.MassTransit\NForza.Cyrus.MassTransit.csproj", "{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MassTransit", "src\MassTransit\MassTransit.csproj", "{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoApp.WebApi.Tests", "examples\DemoApp\DemoApp.WebApi.Tests\DemoApp.WebApi.Tests.csproj", "{4EFD0A43-5F57-4EDC-8860-F0BBC590C545}"
 EndProject
@@ -65,12 +64,6 @@ Global
 		{239395A0-21EF-4967-BBFB-371BCB9CE1CF}.DebugGenerator|Any CPU.Build.0 = DebugGenerator|Any CPU
 		{239395A0-21EF-4967-BBFB-371BCB9CE1CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{239395A0-21EF-4967-BBFB-371BCB9CE1CF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.DebugGenerator|Any CPU.ActiveCfg = Debug|Any CPU
-		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.DebugGenerator|Any CPU.Build.0 = Debug|Any CPU
-		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2891E699-8A78-4DCB-9D62-9CECAE6AC91E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4EFD0A43-5F57-4EDC-8860-F0BBC590C545}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4EFD0A43-5F57-4EDC-8860-F0BBC590C545}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EFD0A43-5F57-4EDC-8860-F0BBC590C545}.DebugGenerator|Any CPU.ActiveCfg = Debug|Any CPU

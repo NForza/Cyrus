@@ -19,6 +19,8 @@ builder.Services.AddMassTransit(x =>
     x.UsingInMemory((context, cfg) =>cfg.ConfigureEndpoints(context));
 });
 
+builder.Services.AddTransient<IAggregateRootPersistence<Track, TrackId>, EFAggregateRootPersistence<Track, TrackId, DemoContext>>();
+
 builder.Services.AddCyrus();
 
 var app = builder.Build();

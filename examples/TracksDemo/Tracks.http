@@ -53,6 +53,20 @@ Accept: application/json
 
 ###
 
+PUT {{CyrusDemo_HostAddress}}/tracks2/e03edc36-d5fb-4922-8ead-26a901c509f7
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Pride (In the name of love)",
+  "artist": "U2",
+  "fileName": "in-the-name-of-love.mp3",
+  "audioFormat": 0
+}
+
+
+###
+
 GET {{CyrusDemo_HostAddress}}/tracks/e03edc36-d5fb-4922-8ead-26a901c509f7/mp3
 Content-Type: application/json
 Accept: application/json

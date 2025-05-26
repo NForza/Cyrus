@@ -13,6 +13,9 @@ public static class ClassDeclarationSyntaxExtensions
             .Any(attr => attr.Name.ToString() == attributeName);
     }
 
+    public static bool HasAggregateRootAttribute(this ClassDeclarationSyntax classDeclaration) 
+        => classDeclaration.HasAttribute("AggregateRoot");
+
     public static bool HasBaseType(this ClassDeclarationSyntax classDeclaration, string baseTypeName)
     {
         foreach (var baseType in classDeclaration.BaseList?.Types ?? [])
