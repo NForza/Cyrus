@@ -8,5 +8,6 @@ public class MyCyrusConfiguration : CyrusConfig
     {
         GenerateWebApi();
         UseMassTransit();
+        UseEntityFrameworkPersistence<global::DemoApp.WebApi.DemoDbContext>();
     }
 }

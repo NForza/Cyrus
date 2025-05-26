@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NForza.Cyrus.Generators.Config;
 
@@ -52,8 +53,15 @@ public static class ClassDeclarationSyntaxExtensions
 
                 switch (methodName)
                 {
-                    case "UseEntityFramework":
-                        result.Persistence = PersistenceType.EntityFramework;
+                    case "UseEntityFrameworkPersistence":
+                        if (methodCall.Expression is GenericNameSyntax genericName)
+                        {
+                            foreach (var typeArg in genericName.TypeArgumentList.Arguments)
+                            {
+                                var typeText = typeArg.ToString();
+                                result.PersistenceContextType = typeText;
+                            }
+                        }
                         break;
                     case "UseMassTransit":
                         result.EventBus = EventBusType.MassTransit;
