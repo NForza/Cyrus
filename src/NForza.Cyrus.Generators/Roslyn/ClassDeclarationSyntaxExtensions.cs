@@ -52,6 +52,9 @@ public static class ClassDeclarationSyntaxExtensions
 
                 switch (methodName)
                 {
+                    case "UseEntityFramework":
+                        result.Persistence = PersistenceType.EntityFramework;
+                        break;
                     case "UseMassTransit":
                         result.EventBus = EventBusType.MassTransit;
                         break;
