@@ -1,9 +1,11 @@
-﻿namespace NForza.Cyrus.Aggregates;
+﻿using System.Threading.Tasks;
 
-public interface IAggregateRootPersistence<TAggregate, TAggregateId> 
-    where TAggregate : class
-    where TAggregateId : struct
+namespace NForza.Cyrus.Aggregates;
+
+public interface IAggregateRootPersistence<TAggregateRoot, TAggregateRootId> 
+    where TAggregateRoot : class
+    where TAggregateRootId : struct
 {
-    TAggregate? Load(TAggregateId? id);
-    void Save(TAggregate aggregateRoot);
+    ValueTask<TAggregateRoot?> Load(TAggregateRootId? id);
+    Task Save(TAggregateRoot aggregateRoot);
 }
