@@ -14,7 +14,7 @@ public static class ClassDeclarationSyntaxExtensions
     }
 
     public static bool HasAggregateRootAttribute(this ClassDeclarationSyntax classDeclaration) 
-        => classDeclaration.HasAttribute("AggregateRootAttribute");
+        => classDeclaration.HasAttribute("AggregateRoot");
 
     public static bool HasBaseType(this ClassDeclarationSyntax classDeclaration, string baseTypeName)
     {

@@ -13,18 +13,11 @@ internal class AggregateRootProvider : CyrusProviderBase<ImmutableArray<INamedTy
         var provider = context.SyntaxProvider
                     .CreateSyntaxProvider(
                         predicate: (syntaxNode, _) => syntaxNode.IsAggregateRoot(),
-                        transform: (context, _) => context.GetNamedTypeSymbolFromContext());
+                        transform: (context, _) => context.GetClassSymbolFromContext());
 
-        var aggregateRootProvider = provider.Combine(configProvider)
-            .Where(x =>
-            {
-                var (methodNode, config) = x;
-                if (config == null || !config.GenerationTarget.Contains(GenerationTarget.Domain))
-                    return false;
-                return true;
-            })
-            .Where(x => x.Left != null)
-            .Select((x, _) => x.Left!)
+        var aggregateRootProvider = provider
+            .Where(x => x != null)
+            .Select((x, _) => x!)
             .Collect();
 
         return aggregateRootProvider;
