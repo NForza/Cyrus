@@ -17,7 +17,7 @@ public class AggregateRootTests(ITestOutputHelper outputWindow)
                 namespace Test;
             
                 [AggregateRoot]
-                public class Customer(Guid Id);
+                public record Customer([property: AggregateRootId] Guid Id);
             ";
 
         (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =

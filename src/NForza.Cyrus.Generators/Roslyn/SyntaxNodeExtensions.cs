@@ -12,9 +12,8 @@ public static class SyntaxNodeExtensions
 
     public static bool IsAggregateRoot(this SyntaxNode syntaxNode)
     {
-        bool result = syntaxNode is ClassDeclarationSyntax classDeclarationSyntax
-            &&
-            classDeclarationSyntax.HasAggregateRootAttribute();
+        bool result = (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax && classDeclarationSyntax.HasAggregateRootAttribute()) ||
+            (syntaxNode is RecordDeclarationSyntax recordDeclarationSyntax && recordDeclarationSyntax.HasAggregateRootAttribute());
         return result;
     }
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 
@@ -15,7 +16,7 @@ internal class AggregateRootProvider : CyrusProviderBase<ImmutableArray<Aggregat
                         predicate: (syntaxNode, _) => syntaxNode.IsAggregateRoot(),
                         transform: (context, _) => 
                             {
-                                var classSymbol = context.GetClassSymbolFromContext();
+                                var classSymbol = context.Node is RecordDeclarationSyntax ? context.GetRecordSymbolFromContext() : context.GetClassSymbolFromContext();
                                 var aggregateRootIdProperty = classSymbol?.GetAggregateRootIdProperty();
                                 return new AggregateRootDefinition(classSymbol, aggregateRootIdProperty);
                             }
@@ -30,8 +31,8 @@ internal class AggregateRootProvider : CyrusProviderBase<ImmutableArray<Aggregat
     }
 }
 
-public class AggregateRootDefinition(INamedTypeSymbol symbol, IPropertySymbol? aggregateRootIdProperty)
+public class AggregateRootDefinition(INamedTypeSymbol? symbol, IPropertySymbol? aggregateRootIdProperty)
 {
-    public INamedTypeSymbol Symbol { get; } = symbol;
+    public INamedTypeSymbol? Symbol { get; } = symbol;
     public IPropertySymbol? AggregateRootProperty { get; } = aggregateRootIdProperty;
 }

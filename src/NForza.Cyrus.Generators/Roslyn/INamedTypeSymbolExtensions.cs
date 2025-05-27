@@ -90,6 +90,14 @@ public static class INamedTypeSymbolExtensions
         };
     }
 
-    public static IPropertySymbol? GetAggregateRootIdProperty(this INamedTypeSymbol typeSymbol) 
-        => typeSymbol.GetPublicProperties().FirstOrDefault(p => p.GetAttributes().Any(a => a.AttributeClass?.Name.StartsWith("AggregateRootId") ?? false));
+    public static IPropertySymbol? GetAggregateRootIdProperty(this INamedTypeSymbol typeSymbol)
+    {
+        var properties = typeSymbol.GetPublicProperties();
+        var rootIdProperty = properties.FirstOrDefault(p =>
+        {
+            var attributes = p.GetAttributes();
+            return attributes.Any(a => a.AttributeClass?.Name.StartsWith("AggregateRootId") ?? false);
+        });
+        return rootIdProperty ;
+    }
 }
