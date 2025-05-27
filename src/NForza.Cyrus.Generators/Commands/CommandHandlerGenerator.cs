@@ -18,7 +18,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
         {
             var commandHandlers = cyrusGenerationContext.CommandHandlers;
 
-            var sourceText = GenerateCommandDispatcherExtensionMethods(commandHandlers, cyrusGenerationContext.Compilation, cyrusGenerationContext.LiquidEngine);
+            var sourceText = GenerateCommandDispatcherExtensionMethods(cyrusGenerationContext, cyrusGenerationContext.LiquidEngine);
             if (!string.IsNullOrEmpty(sourceText))
             {
                 spc.AddSource($"CommandDispatcher.g.cs", SourceText.From(sourceText, Encoding.UTF8));
@@ -58,15 +58,9 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
         }
     }
 
-    private static string GenerateCommandDispatcherExtensionMethods(ImmutableArray<IMethodSymbol> handlers, Compilation compilation, LiquidEngine liquidEngine)
+    private static string GenerateCommandDispatcherExtensionMethods(CyrusGenerationContext cyrusGenerationContext, LiquidEngine liquidEngine)
     {
-        INamedTypeSymbol? taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
-        if (taskSymbol == null)
-        {
-            return string.Empty;
-        }
-
-        var commands = handlers.Select(h => new
+        var commands = cyrusGenerationContext.CommandHandlers.Select(h => new
         {
             Handler = h,
             CommandType = h.Parameters[0].Type.ToFullName(),
@@ -82,6 +76,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
             {
                 ReturnTypeOriginal = q.ReturnType,
                 ReturnType = q.ReturnsTask ? q.ReturnType.TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
+                RequiresAggregateRoot = q.Handler.Parameters.Length == 2,
                 Invocation = q.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "commandDispatcher.ServiceProvider"),
                 q.Name,
                 q.ReturnsVoid,
