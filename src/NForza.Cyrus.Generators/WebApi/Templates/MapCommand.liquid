@@ -1,4 +1,4 @@
-﻿    app.Map{{ Verb }}("{{ Path }}", {% if ReturnsTask %}async {% endif %}({% if HasBody %}[FromBody] {{ CommandType | as-contract }} command, {% endif -%} [FromServices] IEventBus eventBus, [FromServices] IHttpContextObjectFactory objectFactory, [FromServices] IHttpContextAccessor ctx) =>    {
+﻿    app.Map{{ Verb }}("{{ Path }}", async ({% if HasBody %}[FromBody] {{ CommandType | as-contract }} command, {% endif -%} [FromServices] IEventBus eventBus, [FromServices] IHttpContextObjectFactory objectFactory, [FromServices] IHttpContextAccessor ctx) =>    {
         {% if HasBody == false %}{{ CommandType | as-contract }} command = new();{% endif %}
         using var scope = app.Services.CreateScope();
         var services = scope.ServiceProvider;
@@ -12,14 +12,14 @@
         {% else %}
         var validator = services.GetRequiredService<{{ ValidatorClass }}>();
         validationErrors = validator.{{ ValidatorMethodName }}(cmd);
-        {% endif %}
+        {%- endif %}
         if (validationErrors.Any())
         {
             return Results.BadRequest(validationErrors);
         }
-        {% endif %}
-
-        {% if HasReturnType %}var commandResult = {% endif %}{% if ReturnsTask %}await {% endif %}{{ CommandInvocation }};
+        {% endif -%}
+        ICommandDispatcher dispatcher = services.GetRequiredService<ICommandDispatcher>();
+        {% if HasReturnType %}var commandResult = {% endif %} await dispatcher.Handle(cmd);
         return new CommandResultAdapter(eventBus).{{ AdapterMethod }}({% if HasReturnType %}commandResult{% endif %});
     })
     .WithOpenApi()
