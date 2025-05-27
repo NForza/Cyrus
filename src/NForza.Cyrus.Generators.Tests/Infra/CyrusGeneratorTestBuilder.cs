@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NForza.Cyrus.Generators.Analyzers;
 
@@ -25,7 +26,8 @@ internal class CyrusGeneratorTestBuilder
             .Split(Path.PathSeparator)
             .Concat([
                 typeof(IServiceCollection).Assembly.Location,
-                typeof(ICyrusWebStartup).Assembly.Location
+                typeof(ICyrusWebStartup).Assembly.Location,
+                typeof(DbContext).Assembly.Location
                 ])
             .Distinct()
             .Select(path => MetadataReference.CreateFromFile(path))

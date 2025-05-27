@@ -90,6 +90,12 @@ public static class INamedTypeSymbolExtensions
         };
     }
 
+    public static bool HasAttribute(this INamedTypeSymbol typeSymbol, string attributeName) 
+        => typeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == attributeName);
+
+    public static bool IsAggregateRoot(this INamedTypeSymbol typeSymbol) 
+        => typeSymbol.HasAttribute("AggregateRootAttribute");
+
     public static IPropertySymbol? GetAggregateRootIdProperty(this INamedTypeSymbol typeSymbol)
     {
         var properties = typeSymbol.GetPublicProperties();

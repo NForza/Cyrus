@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
@@ -11,23 +12,22 @@ internal class AggregateRootProvider : CyrusProviderBase<ImmutableArray<Aggregat
 {
     public override IncrementalValueProvider<ImmutableArray<AggregateRootDefinition>> GetProvider(IncrementalGeneratorInitializationContext context, IncrementalValueProvider<GenerationConfig> configProvider)
     {
-        var provider = context.SyntaxProvider
-                    .CreateSyntaxProvider(
-                        predicate: (syntaxNode, _) => syntaxNode.IsAggregateRoot(),
-                        transform: (context, _) => 
-                            {
-                                var classSymbol = context.Node is RecordDeclarationSyntax ? context.GetRecordSymbolFromContext() : context.GetClassSymbolFromContext();
-                                var aggregateRootIdProperty = classSymbol?.GetAggregateRootIdProperty();
-                                return new AggregateRootDefinition(classSymbol, aggregateRootIdProperty);
-                            }
-                        );
+        var compilationProvider = context.CompilationProvider;
 
-        var aggregateRootProvider = provider
-            .Where(x => x != null && x.Symbol != null)
-            .Select((x, _) => x!)
-            .Collect();
+        var aggregateRootsFromReferencedAssembliesProvider = compilationProvider
+            .SelectMany((compilation, _) =>
+            {
+                var typesFromAssemblies = compilation.GetAllTypesFromCyrusAssemblies();
 
-        return aggregateRootProvider;
+                var aggregateFromAssemblies = typesFromAssemblies
+                    .Where(t => t.IsAggregateRoot())
+                    .ToList();
+                return aggregateFromAssemblies
+                    .Select(t => new AggregateRootDefinition(t, t.GetAggregateRootIdProperty()));
+            })
+           .Collect();
+
+        return aggregateRootsFromReferencedAssembliesProvider;
     }
 }
 

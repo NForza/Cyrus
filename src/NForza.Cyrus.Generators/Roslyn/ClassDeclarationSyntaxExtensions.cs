@@ -49,7 +49,14 @@ public static class ClassDeclarationSyntaxExtensions
 
             foreach (var methodCall in methodCalls)
             {
-                var methodName = methodCall.Expression.ToString();
+                var methodName = methodCall.Expression switch
+                {
+                    GenericNameSyntax genericName => genericName.Identifier.Text,
+                    MemberAccessExpressionSyntax memberAccess when memberAccess.Name is GenericNameSyntax g => g.Identifier.Text,
+                    MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.Text,
+                    IdentifierNameSyntax id => id.Identifier.Text,
+                    _ => methodCall.Expression.ToString()
+                };
 
                 switch (methodName)
                 {

@@ -13,11 +13,25 @@ public class AggregateRootTests(ITestOutputHelper outputWindow)
                 using System;       
                 using NForza.Cyrus.Abstractions;
                 using NForza.Cyrus.Aggregates;
+                using Microsoft.EntityFrameworkCore;
 
                 namespace Test;
             
                 [AggregateRoot]
                 public record Customer([property: AggregateRootId] Guid Id);
+
+                public class DemoContext : DbContext
+                {
+                    public DbSet<Customer> Customers { get; set; } = null!;
+                }
+
+                public class CyrusConfiguration: CyrusConfig
+                {
+                  public CyrusConfiguration()
+                  {
+                    UseEntityFrameworkPersistence<global::Test.DemoContext>();
+                  }   
+                }   
             ";
 
         (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =

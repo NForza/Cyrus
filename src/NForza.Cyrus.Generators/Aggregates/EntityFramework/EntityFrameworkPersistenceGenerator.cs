@@ -9,14 +9,14 @@ using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.EntityFramework;
+namespace NForza.Cyrus.Generators.Aggregates.EntityFramework;
 
 public class EntityFrameworkPersistenceGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
         var config = cyrusGenerationContext.GenerationConfig;
-        if (!string.IsNullOrEmpty(config.PersistenceContextType) && cyrusGenerationContext.AggregateRoots.Any())
+        if (!string.IsNullOrEmpty(config.PersistenceContextType) &&  cyrusGenerationContext.GenerationConfig.GenerationTarget.Contains(GenerationTarget.WebApi) && cyrusGenerationContext.AggregateRoots.Any())
         {
             var sourceText = GenerateEntityFrameworkPersistenceInitializer(cyrusGenerationContext);
             spc.AddSource($"EntityFrameworkPersistenceInitializer.g.cs", SourceText.From(sourceText, Encoding.UTF8));
@@ -27,11 +27,11 @@ public class EntityFrameworkPersistenceGenerator : CyrusGeneratorBase
     {
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
         var persistenceRegistrations = string.Join(Environment.NewLine, cyrusGenerationContext.AggregateRoots.Select(v =>
-                $"services.AddTransient<IAggregateRootPersistence, EntityFrameworkPersistence<{v.Symbol.ToFullName()}, {v.AggregateRootProperty.ToFullName()}, {cyrusGenerationContext.GenerationConfig.PersistenceContextType}>();"));
+                $"services.AddTransient<IAggregateRootPersistence<{v.Symbol.ToFullName()}, {v.AggregateRootProperty.Type.ToFullName()}>, EntityFrameworkPersistence<{v.Symbol.ToFullName()}, {v.AggregateRootProperty.Type.ToFullName()}, {cyrusGenerationContext.GenerationConfig.PersistenceContextType}>>();"));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
         var ctx = new
         {
-            Usings = new string[] { },
+            Usings = new string[] { "NForza.Cyrus.EntityFramework", "NForza.Cyrus.Aggregates" },
             Namespace = "Persistence",
             Name = "PersistenceRegistration",
             Initializer = persistenceRegistrations

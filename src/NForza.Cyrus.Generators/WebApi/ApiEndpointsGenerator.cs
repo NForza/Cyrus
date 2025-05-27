@@ -7,13 +7,13 @@ using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.Commands;
+namespace NForza.Cyrus.Generators.WebApi;
 
 public class ApiEndpointsGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        if (cyrusGenerationContext.GenerationConfig != null && cyrusGenerationContext.GenerationConfig.GenerationTarget.Contains(GenerationTarget.WebApi) && (cyrusGenerationContext.AllHandlers.Any()))
+        if (cyrusGenerationContext.GenerationConfig != null && cyrusGenerationContext.GenerationConfig.GenerationTarget.Contains(GenerationTarget.WebApi) && cyrusGenerationContext.AllHandlers.Any())
         {
             var allCommandHandlers = cyrusGenerationContext.AllCommandHandlers;
             var allQueryHandlers = cyrusGenerationContext.AllQueryHandlers;

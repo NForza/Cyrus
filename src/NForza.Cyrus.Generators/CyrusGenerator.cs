@@ -9,7 +9,7 @@ using NForza.Cyrus.Generators.Aggregates;
 using NForza.Cyrus.Generators.Analyzers;
 using NForza.Cyrus.Generators.Commands;
 using NForza.Cyrus.Generators.Events;
-using NForza.Cyrus.Generators.Generators.Cqrs;
+using NForza.Cyrus.Generators.Queries;
 using NForza.Cyrus.Generators.SignalR;
 using NForza.Cyrus.Generators.TypedIds;
 using NForza.Cyrus.Generators.Validators;
