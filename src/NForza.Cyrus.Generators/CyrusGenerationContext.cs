@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using NForza.Cyrus.Generators.Aggregates;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.SignalR;
 using NForza.Cyrus.Templating;
@@ -24,7 +25,7 @@ public class CyrusGenerationContext
         ImmutableArray<IMethodSymbol> eventHandlers,
         ImmutableArray<ISymbol> allQueriesAndHandlers,
         ImmutableArray<IMethodSymbol> validators,
-        ImmutableArray<INamedTypeSymbol> aggregateRoots,
+        ImmutableArray<AggregateRootDefinition> aggregateRoots,
         ImmutableArray<SignalRHubClassDefinition> signalRHubs,
         GenerationConfig generationConfig, 
         LiquidEngine liquidEngine)
@@ -60,7 +61,7 @@ public class CyrusGenerationContext
     public ImmutableArray<IMethodSymbol> QueryHandlers { get; }
     public ImmutableArray<ISymbol> AllQueriesAndHandlers { get;  }
     public ImmutableArray<IMethodSymbol> Validators { get; }
-    public ImmutableArray<INamedTypeSymbol> AggregateRoots { get; private set; }
+    public ImmutableArray<AggregateRootDefinition> AggregateRoots { get; private set; }
     public ImmutableArray<INamedTypeSymbol> Events { get; }
     public ImmutableArray<INamedTypeSymbol> AllEvents { get; }
     public ImmutableArray<IMethodSymbol> EventHandlers { get; }

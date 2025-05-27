@@ -89,4 +89,7 @@ public static class INamedTypeSymbolExtensions
             _ => "System.Guid"
         };
     }
+
+    public static IPropertySymbol? GetAggregateRootIdProperty(this INamedTypeSymbol typeSymbol) 
+        => typeSymbol.GetPublicProperties().FirstOrDefault(p => p.GetAttributes().Any(a => a.AttributeClass?.Name.StartsWith("AggregateRootId") ?? false));
 }
