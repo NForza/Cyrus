@@ -12,18 +12,18 @@ namespace NForza.Cyrus.Generators.WebApi;
 
 public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var config = cyrusProvider.GenerationConfig;
+        var config = cyrusGenerationContext.GenerationConfig;
         if (config != null && config.GenerationTarget.Contains(GenerationTarget.WebApi))
         {
-            IEnumerable<IMethodSymbol> validators = cyrusProvider.Validators;
+            IEnumerable<IMethodSymbol> validators = cyrusGenerationContext.Validators;
             IEnumerable<IMethodSymbol> queryHandlers = 
-                cyrusProvider
+                cyrusGenerationContext
                     .AllQueriesAndHandlers
                     .OfType<IMethodSymbol>()
                     .Where(h => h.HasQueryRoute());
-            var contents = AddQueryHandlerMappings(spc, queryHandlers, validators, cyrusProvider.LiquidEngine);
+            var contents = AddQueryHandlerMappings(spc, queryHandlers, validators, cyrusGenerationContext.LiquidEngine);
 
             if (!string.IsNullOrWhiteSpace(contents))
             {
@@ -42,18 +42,18 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
                     StartupCommands = contents
                 };
 
-                var fileContents = cyrusProvider.LiquidEngine.Render(ctx, "CyrusWebStartup");
+                var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusWebStartup");
                 spc.AddSource(
                    "QueryHandlerMapping.g.cs",
                    SourceText.From(fileContents, Encoding.UTF8));
             }
 
-            IEnumerable<INamedTypeSymbol> queries = cyrusProvider.AllQueriesAndHandlers
+            IEnumerable<INamedTypeSymbol> queries = cyrusGenerationContext.AllQueriesAndHandlers
                 .Where(q => q.IsQuery())
                 .OfType<INamedTypeSymbol>();
 
-            AddHttpContextObjectFactoryMethodsRegistrations(spc, queries, cyrusProvider.LiquidEngine);
-            WebApiContractGenerator.GenerateContracts(queries, spc, cyrusProvider.LiquidEngine);
+            AddHttpContextObjectFactoryMethodsRegistrations(spc, queries, cyrusGenerationContext.LiquidEngine);
+            WebApiContractGenerator.GenerateContracts(queries, spc, cyrusGenerationContext.LiquidEngine);
         }
     }
 

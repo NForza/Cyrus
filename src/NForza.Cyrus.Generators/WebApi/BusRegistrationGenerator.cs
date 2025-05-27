@@ -7,23 +7,23 @@ namespace NForza.Cyrus.Generators.WebApi;
 
 public class BusRegistrationGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        if (cyrusProvider.GenerationConfig.GenerationTarget.Contains(GenerationTarget.WebApi))
+        if (cyrusGenerationContext.GenerationConfig.GenerationTarget.Contains(GenerationTarget.WebApi))
         {
-            var contents = AddBusRegistrations(cyrusProvider.GenerationConfig);
+            var contents = AddBusRegistrations(cyrusGenerationContext.GenerationConfig);
 
             if (!string.IsNullOrWhiteSpace(contents))
             {
                 var ctx = new
                 {
-                    Usings = cyrusProvider.GenerationConfig.EventBus == EventBusType.MassTransit ? ["NForza.Cyrus.Cqrs", "NForza.Cyrus.MassTransit"] : new string[] { "NForza.Cyrus.Cqrs" },
+                    Usings = cyrusGenerationContext.GenerationConfig.EventBus == EventBusType.MassTransit ? ["NForza.Cyrus.Cqrs", "NForza.Cyrus.MassTransit"] : new string[] { "NForza.Cyrus.Cqrs" },
                     Namespace = "BusRegistration",
                     Name = "BusRegistration",
                     Initializer = contents
                 };
 
-                var fileContents = cyrusProvider.LiquidEngine.Render(ctx, "CyrusInitializer");
+                var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
                 spc.AddSource(
                    "BusRegistration.g.cs",
                    SourceText.From(fileContents, Encoding.UTF8));

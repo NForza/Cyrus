@@ -9,18 +9,18 @@ namespace NForza.Cyrus.Generators.TypedIds;
 
 public class IntIdGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext context, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext context, CyrusGenerationContext cyrusGenerationContext)
     {
-        var recordSymbols = cyrusProvider.IntIds;
+        var recordSymbols = cyrusGenerationContext.IntIds;
             foreach (var recordSymbol in recordSymbols)
             {
-                var sourceText = GenerateIntId(recordSymbol, cyrusProvider.LiquidEngine);
+                var sourceText = GenerateIntId(recordSymbol, cyrusGenerationContext.LiquidEngine);
                 context.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             };
 
             if (recordSymbols.Any())
             {
-                var intModels = GetPartialModelClass(recordSymbols.First().ContainingAssembly.Name, "TypedIds", "Integers", "string", recordSymbols.Select(im => $"\"{im.Name}\""), cyrusProvider.LiquidEngine);
+                var intModels = GetPartialModelClass(recordSymbols.First().ContainingAssembly.Name, "TypedIds", "Integers", "string", recordSymbols.Select(im => $"\"{im.Name}\""), cyrusGenerationContext.LiquidEngine);
                 context.AddSource($"model-ints.g.cs", SourceText.From(intModels, Encoding.UTF8));
             }
     }

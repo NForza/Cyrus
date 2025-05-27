@@ -9,9 +9,9 @@ namespace NForza.Cyrus.Generators.Events;
 
 public class EventHandlerGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var eventHandlers = cyrusProvider.EventHandlers;
+        var eventHandlers = cyrusGenerationContext.EventHandlers;
         if (eventHandlers.Any())
         {
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
@@ -29,7 +29,7 @@ public class EventHandlerGenerator : CyrusGeneratorBase
                 Name = "EventHandlersRegistration",
                 Initializer = eventHandlerRegistrations
             };
-            var fileContents = cyrusProvider.LiquidEngine.Render(ctx, "CyrusInitializer");
+            var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
             spc.AddSource("EventHandlerRegistration.g.cs", SourceText.From(fileContents, Encoding.UTF8));
         }
     }

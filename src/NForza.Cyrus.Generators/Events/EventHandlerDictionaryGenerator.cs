@@ -11,12 +11,12 @@ namespace NForza.Cyrus.Generators.Events;
 
 public class EventHandlerDictionaryGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var config = cyrusProvider.GenerationConfig;
+        var config = cyrusGenerationContext.GenerationConfig;
         if (config.GenerationTarget.Contains(GenerationTarget.WebApi) || config.GenerationTarget.Contains(GenerationTarget.Domain))
         {
-            var contents = CreateEventHandlerRegistrations(cyrusProvider.EventHandlers, cyrusProvider.Compilation, cyrusProvider.LiquidEngine);
+            var contents = CreateEventHandlerRegistrations(cyrusGenerationContext.EventHandlers, cyrusGenerationContext.Compilation, cyrusGenerationContext.LiquidEngine);
 
             if (!string.IsNullOrWhiteSpace(contents))
             {
@@ -28,7 +28,7 @@ public class EventHandlerDictionaryGenerator : CyrusGeneratorBase
                     Initializer = contents
                 };
 
-                var fileContents = cyrusProvider.LiquidEngine.Render(ctx, "CyrusInitializer");
+                var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
                 spc.AddSource(
                    "EventHandlerDictionary.g.cs",
                    SourceText.From(fileContents, Encoding.UTF8));

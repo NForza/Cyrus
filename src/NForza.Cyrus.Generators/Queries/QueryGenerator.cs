@@ -9,9 +9,9 @@ namespace NForza.Cyrus.Generators.Queries;
 
 public class QueryGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var queryHandlers = cyrusProvider.QueryHandlers;
+        var queryHandlers = cyrusGenerationContext.QueryHandlers;
         if (queryHandlers.Any())
         {
             string assemblyName = queryHandlers.First().ContainingAssembly.Name;
@@ -20,12 +20,12 @@ public class QueryGenerator : CyrusGeneratorBase
                 "Queries",
                 "Queries",
                 "ModelQueryDefinition",
-                queryHandlers.Select(e => ModelGenerator.ForQueryHandler(e, cyrusProvider.LiquidEngine)),
-                cyrusProvider.LiquidEngine);
+                queryHandlers.Select(e => ModelGenerator.ForQueryHandler(e, cyrusGenerationContext.LiquidEngine)),
+                cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"model-queries.g.cs", SourceText.From(eventModels, Encoding.UTF8));
 
             var referencedTypes = queryHandlers.Select(q => q.GetQueryReturnType()).SelectMany(cs => cs.GetReferencedTypes());
-            var referencedTypeModels = GetPartialModelClass(assemblyName, "Queries", "Models", "ModelQueryDefinition", referencedTypes.Select(cm => ModelGenerator.ForNamedType(cm, cyrusProvider.LiquidEngine)), cyrusProvider.LiquidEngine);
+            var referencedTypeModels = GetPartialModelClass(assemblyName, "Queries", "Models", "ModelQueryDefinition", referencedTypes.Select(cm => ModelGenerator.ForNamedType(cm, cyrusGenerationContext.LiquidEngine)), cyrusGenerationContext.LiquidEngine);
         }
     }
 }

@@ -7,12 +7,12 @@ namespace NForza.Cyrus.Generators.TypedIds;
 
 public class GuidIdTypeConverterGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var recordSymbols = cyrusProvider.GuidIds;
+        var recordSymbols = cyrusGenerationContext.GuidIds;
         foreach (var recordSymbol in recordSymbols)
         {
-            var sourceText = GenerateGuidIdTypeConverter(recordSymbol, cyrusProvider.LiquidEngine);
+            var sourceText = GenerateGuidIdTypeConverter(recordSymbol, cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"{recordSymbol}TypeConverter.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         };
     }

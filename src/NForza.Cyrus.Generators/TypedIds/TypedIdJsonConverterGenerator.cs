@@ -9,12 +9,12 @@ namespace NForza.Cyrus.Generators.TypedIds;
 
 public class TypedIdJsonConverterGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var typedIds = cyrusProvider.TypedIds;
+        var typedIds = cyrusGenerationContext.TypedIds;
         foreach (var typedId in typedIds)
         {
-            var sourceText = GenerateJsonConverterForTypedId(typedId, cyrusProvider.LiquidEngine);
+            var sourceText = GenerateJsonConverterForTypedId(typedId, cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"{typedId.Name}JsonConverter.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         };
     }

@@ -38,7 +38,7 @@ public record SignalRHubClassDefinition
         SemanticModel = semanticModel;
     }
 
-    public SignalRHubClassDefinition Initialize(CyrusGenerationContext cyrusProvider)
+    public SignalRHubClassDefinition Initialize(CyrusGenerationContext cyrusGenerationContext)
     {
         var constructorBody = Declaration.DescendantNodes()
             .OfType<ConstructorDeclarationSyntax>()
@@ -48,14 +48,14 @@ public record SignalRHubClassDefinition
         if (constructorBody != null)
         {
             SetPath(Symbol, constructorBody);
-            SetCommands(Symbol, constructorBody, cyrusProvider);
-            SetQueries(Symbol, constructorBody, cyrusProvider);
+            SetCommands(Symbol, constructorBody, cyrusGenerationContext);
+            SetQueries(Symbol, constructorBody, cyrusGenerationContext);
             SetEvents(Symbol, constructorBody);
         }
         return this;
     }
 
-    private void SetCommands(INamedTypeSymbol symbol, BlockSyntax constructorBody, CyrusGenerationContext cyrusProvider)
+    private void SetCommands(INamedTypeSymbol symbol, BlockSyntax constructorBody, CyrusGenerationContext cyrusGenerationContext)
     {
         var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "Expose")
                 .Select(ies => ies.Expression)
@@ -73,7 +73,7 @@ public record SignalRHubClassDefinition
                 {
                     MethodName = genericArg.GetText().ToString(),
                     Name = symbol.Name,
-                    Handler = GetCommandHandler(commandSymbol, cyrusProvider),
+                    Handler = GetCommandHandler(commandSymbol, cyrusGenerationContext),
                     FullTypeName = commandSymbol.ToFullName()
                 };
             })
@@ -81,7 +81,7 @@ public record SignalRHubClassDefinition
             .Cast<SignalRCommand>();
     }
 
-    private void SetQueries(INamedTypeSymbol symbol, BlockSyntax constructorBody, CyrusGenerationContext cyrusProvider)
+    private void SetQueries(INamedTypeSymbol symbol, BlockSyntax constructorBody, CyrusGenerationContext cyrusGenerationContext)
     {
         var memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "Expose")
                 .Select(ies => ies.Expression)
@@ -94,7 +94,7 @@ public record SignalRHubClassDefinition
                 var querySymbol = (ITypeSymbol?)SemanticModel.GetSymbolInfo(genericArg).Symbol;
                 if (querySymbol == null || !querySymbol.IsQuery())
                     return null;
-                ITypeSymbol? returnType = GetReturnTypeOfQuery(querySymbol, cyrusProvider);
+                ITypeSymbol? returnType = GetReturnTypeOfQuery(querySymbol, cyrusGenerationContext);
                 (bool isCollection, ITypeSymbol? collectionType) = returnType?.IsCollection() ?? (false, null);
                 var isNullable = returnType?.IsNullable();
                 ITypeSymbol? queryReturnType = isCollection ? collectionType : returnType;
@@ -116,9 +116,9 @@ public record SignalRHubClassDefinition
             .Cast<SignalRQuery>();
     }
 
-    private ITypeSymbol? GetReturnTypeOfQuery(ITypeSymbol symbol, CyrusGenerationContext cyrusProvider)
+    private ITypeSymbol? GetReturnTypeOfQuery(ITypeSymbol symbol, CyrusGenerationContext cyrusGenerationContext)
     {
-        var queryHandler = cyrusProvider.AllQueryHandlers.FirstOrDefault(handler => SymbolEqualityComparer.Default.Equals(handler.Parameters[0].Type, symbol));
+        var queryHandler = cyrusGenerationContext.AllQueryHandlers.FirstOrDefault(handler => SymbolEqualityComparer.Default.Equals(handler.Parameters[0].Type, symbol));
         if (queryHandler != null)
         {
             return queryHandler.GetQueryReturnType();
@@ -127,8 +127,8 @@ public record SignalRHubClassDefinition
         return null;
     }
 
-    private IMethodSymbol? GetCommandHandler(ITypeSymbol symbol, CyrusGenerationContext cyrusProvider)
-        => cyrusProvider.AllCommandHandlers.FirstOrDefault(handler => SymbolEqualityComparer.Default.Equals(handler.Parameters[0].Type, symbol));
+    private IMethodSymbol? GetCommandHandler(ITypeSymbol symbol, CyrusGenerationContext cyrusGenerationContext)
+        => cyrusGenerationContext.AllCommandHandlers.FirstOrDefault(handler => SymbolEqualityComparer.Default.Equals(handler.Parameters[0].Type, symbol));
 
     private void SetEvents(INamedTypeSymbol symbol, BlockSyntax constructorBody)
     {

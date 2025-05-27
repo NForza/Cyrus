@@ -45,7 +45,7 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
         var validatorProvider = new ValidatorProvider().GetProvider(context, configProvider);
         var aggregateRootProvider = new AggregateRootProvider().GetProvider(context, configProvider);
 
-        var cyrusProvider =
+        var cyrusGenerationContext =
             context.CompilationProvider
             .Combine(intIdsProvider)
             .Combine(guidIdsProvider)
@@ -89,7 +89,7 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
                     liquidEngine: liquidEngine); ;
             });
 
-        context.RegisterSourceOutput(cyrusProvider, (sourceProductionContext, cyrusGenerationContext) =>
+        context.RegisterSourceOutput(cyrusGenerationContext, (sourceProductionContext, cyrusGenerationContext) =>
         {
             try
             {

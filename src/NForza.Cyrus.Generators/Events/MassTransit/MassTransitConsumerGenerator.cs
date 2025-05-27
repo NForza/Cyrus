@@ -12,15 +12,15 @@ namespace NForza.Cyrus.Generators.Events.MassTransit;
 
 public class MassTransitConsumerGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var config = cyrusProvider.GenerationConfig;
-        var eventHandlers = cyrusProvider.EventHandlers.Where(eh => !IsEventHandlerForLocalEvent(eh));
+        var config = cyrusGenerationContext.GenerationConfig;
+        var eventHandlers = cyrusGenerationContext.EventHandlers.Where(eh => !IsEventHandlerForLocalEvent(eh));
         if (eventHandlers.Any())
         {
             if (config.EventBus == EventBusType.MassTransit)
             {
-                var sourceText = GenerateEventConsumers(eventHandlers, cyrusProvider.LiquidEngine);
+                var sourceText = GenerateEventConsumers(eventHandlers, cyrusGenerationContext.LiquidEngine);
                 spc.AddSource($"EventConsumers.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }
         }

@@ -14,30 +14,30 @@ namespace NForza.Cyrus.Generators.SignalR;
 
 public class SignalRHubGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var signalRHubs = cyrusProvider.SignalRHubs.Select(h => h.Initialize(cyrusProvider));
+        var signalRHubs = cyrusGenerationContext.SignalRHubs.Select(h => h.Initialize(cyrusGenerationContext));
 
         ReportMissingHandlers(signalRHubs, spc);
 
-        var configuration = cyrusProvider.GenerationConfig;
+        var configuration = cyrusGenerationContext.GenerationConfig;
 
         var isWebApi = configuration.GenerationTarget.Contains(GenerationTarget.WebApi);
 
         if (isWebApi)
         {
-            var registration = GenerateSignalRHubRegistration(signalRHubs, cyrusProvider.LiquidEngine);
+            var registration = GenerateSignalRHubRegistration(signalRHubs, cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"RegisterSignalRHubs.g.cs", SourceText.From(registration, Encoding.UTF8));
 
             foreach (var signalRModel in signalRHubs)
             {
-                var sourceText = GenerateSignalRHub(signalRModel, cyrusProvider.LiquidEngine);
+                var sourceText = GenerateSignalRHub(signalRModel, cyrusGenerationContext.LiquidEngine);
                 spc.AddSource($"{signalRModel.Symbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
             }
             if (signalRHubs.Any())
             {
                 string assemblyName = signalRHubs.First().Symbol.ContainingAssembly.Name;
-                var commandModels = GetPartialModelClass(assemblyName, "SignalR", "Hubs", "ModelHubDefinition", signalRHubs.Select(e => ModelGenerator.ForHub(e, cyrusProvider.LiquidEngine)), cyrusProvider.LiquidEngine);
+                var commandModels = GetPartialModelClass(assemblyName, "SignalR", "Hubs", "ModelHubDefinition", signalRHubs.Select(e => ModelGenerator.ForHub(e, cyrusGenerationContext.LiquidEngine)), cyrusGenerationContext.LiquidEngine);
                 spc.AddSource($"model-hubs.g.cs", SourceText.From(commandModels, Encoding.UTF8));
             }
         }

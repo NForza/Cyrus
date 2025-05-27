@@ -12,13 +12,13 @@ namespace NForza.Cyrus.Generators.Commands;
 
 public class CommandHandlerGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        if (cyrusProvider.GenerationConfig != null && cyrusProvider.CommandHandlers.Any())
+        if (cyrusGenerationContext.GenerationConfig != null && cyrusGenerationContext.CommandHandlers.Any())
         {
-            var commandHandlers = cyrusProvider.CommandHandlers;
+            var commandHandlers = cyrusGenerationContext.CommandHandlers;
 
-            var sourceText = GenerateCommandDispatcherExtensionMethods(commandHandlers, cyrusProvider.Compilation, cyrusProvider.LiquidEngine);
+            var sourceText = GenerateCommandDispatcherExtensionMethods(commandHandlers, cyrusGenerationContext.Compilation, cyrusGenerationContext.LiquidEngine);
             if (!string.IsNullOrEmpty(sourceText))
             {
                 spc.AddSource($"CommandDispatcher.g.cs", SourceText.From(sourceText, Encoding.UTF8));
@@ -26,7 +26,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
 
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
             var commandHandlerRegistrations = string.Join(Environment.NewLine,
-                    cyrusProvider.CommandHandlers
+                    cyrusGenerationContext.CommandHandlers
                         .Select(ch => ch.ContainingType)
                         .Where(x => x != null && !x.IsStatic)
                         .Distinct(SymbolEqualityComparer.Default)
@@ -42,18 +42,18 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                     Initializer = commandHandlerRegistrations
                 };
 
-                var fileContents = cyrusProvider.LiquidEngine.Render(ctx, "CyrusInitializer");
+                var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
                 spc.AddSource("CommandHandlerRegistration.g.cs", SourceText.From(fileContents, Encoding.UTF8));
             }
 
             string assemblyName = commandHandlers.First().ContainingAssembly.Name;
             var commandSymbols = commandHandlers.Select(ch => (INamedTypeSymbol)ch.Parameters[0].Type);
 
-            var commandModels = GetPartialModelClass(assemblyName, "Command", "Commands", "ModelTypeDefinition", commandSymbols.Select(cm => ModelGenerator.ForNamedType(cm, cyrusProvider.LiquidEngine)), cyrusProvider.LiquidEngine);
+            var commandModels = GetPartialModelClass(assemblyName, "Command", "Commands", "ModelTypeDefinition", commandSymbols.Select(cm => ModelGenerator.ForNamedType(cm, cyrusGenerationContext.LiquidEngine)), cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"model-commands.g.cs", SourceText.From(commandModels, Encoding.UTF8));
 
             var referencedTypes = commandSymbols.SelectMany(cs => cs.GetReferencedTypes());
-            var referencedTypeModels = GetPartialModelClass(assemblyName, "Command", "Models", "ModelTypeDefinition", referencedTypes.Select(cm => ModelGenerator.ForNamedType(cm, cyrusProvider.LiquidEngine)), cyrusProvider.LiquidEngine);
+            var referencedTypeModels = GetPartialModelClass(assemblyName, "Command", "Models", "ModelTypeDefinition", referencedTypes.Select(cm => ModelGenerator.ForNamedType(cm, cyrusGenerationContext.LiquidEngine)), cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"model-command-types.g.cs", SourceText.From(referencedTypeModels, Encoding.UTF8));
         }
     }

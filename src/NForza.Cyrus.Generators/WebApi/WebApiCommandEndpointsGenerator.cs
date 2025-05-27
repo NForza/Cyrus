@@ -10,21 +10,21 @@ using NForza.Cyrus.Templating;
 namespace NForza.Cyrus.Generators.WebApi;
 public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var config = cyrusProvider.GenerationConfig;
+        var config = cyrusGenerationContext.GenerationConfig;
         if (config != null && config.GenerationTarget.Contains(GenerationTarget.WebApi))
         {
             IEnumerable<IMethodSymbol> handlers = 
-                cyrusProvider
+                cyrusGenerationContext
                     .AllCommandsAndHandlers
                     .OfType<IMethodSymbol>()                    
                     .ToList();
 
-            IEnumerable<INamedTypeSymbol> commands = cyrusProvider.AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToList();
-            IEnumerable<IMethodSymbol> validators = cyrusProvider.Validators;
+            IEnumerable<INamedTypeSymbol> commands = cyrusGenerationContext.AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToList();
+            IEnumerable<IMethodSymbol> validators = cyrusGenerationContext.Validators;
 
-            var contents = AddCommandHandlerMappings(spc, handlers.Where(h => h.HasCommandRoute()), validators, cyrusProvider.Compilation, cyrusProvider.LiquidEngine);
+            var contents = AddCommandHandlerMappings(spc, handlers.Where(h => h.HasCommandRoute()), validators, cyrusGenerationContext.Compilation, cyrusGenerationContext.LiquidEngine);
 
             if (!string.IsNullOrWhiteSpace(contents))
             {
@@ -42,15 +42,15 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
                     StartupCommands = contents
                 };
 
-                var fileContents = cyrusProvider.LiquidEngine.Render(ctx, "CyrusWebStartup");
+                var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusWebStartup");
                 spc.AddSource(
                    "CommandHandlerMapping.g.cs",
                    SourceText.From(fileContents, Encoding.UTF8));
             }
 
-            AddHttpContextObjectFactoryMethodsRegistrations(commands, spc, cyrusProvider.LiquidEngine);
+            AddHttpContextObjectFactoryMethodsRegistrations(commands, spc, cyrusGenerationContext.LiquidEngine);
 
-            WebApiContractGenerator.GenerateCommandContracts(handlers, spc, cyrusProvider.LiquidEngine);
+            WebApiContractGenerator.GenerateCommandContracts(handlers, spc, cyrusGenerationContext.LiquidEngine);
         }
     }
 

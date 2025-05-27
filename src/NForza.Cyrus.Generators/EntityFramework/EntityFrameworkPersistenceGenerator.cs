@@ -13,12 +13,12 @@ namespace NForza.Cyrus.Generators.EntityFramework;
 
 public class EntityFrameworkPersistenceGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var config = cyrusProvider.GenerationConfig;
-        if (!string.IsNullOrEmpty(config.PersistenceContextType) && cyrusProvider.AggregateRoots.Any())
+        var config = cyrusGenerationContext.GenerationConfig;
+        if (!string.IsNullOrEmpty(config.PersistenceContextType) && cyrusGenerationContext.AggregateRoots.Any())
         {
-            var sourceText = GenerateEntityFrameworkPersistenceInitializer(config.PersistenceContextType, cyrusProvider);
+            var sourceText = GenerateEntityFrameworkPersistenceInitializer(config.PersistenceContextType, cyrusGenerationContext);
             spc.AddSource($"EntityFrameworkPersistenceInitializer.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         }
     }
