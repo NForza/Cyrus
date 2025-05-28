@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
-using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.Aggregates.EntityFramework;
 
@@ -27,7 +24,7 @@ public class EntityFrameworkPersistenceGenerator : CyrusGeneratorBase
     {
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
         var persistenceRegistrations = string.Join(Environment.NewLine, cyrusGenerationContext.AggregateRoots.Select(v =>
-                $"services.AddTransient<IAggregateRootPersistence<{v.Symbol.ToFullName()}, {v.AggregateRootProperty.Type.ToFullName()}>, EntityFrameworkPersistence<{v.Symbol.ToFullName()}, {v.AggregateRootProperty.Type.ToFullName()}, {cyrusGenerationContext.GenerationConfig.PersistenceContextType}>>();"));
+                $"services.AddScoped<IAggregateRootPersistence<{v.Symbol.ToFullName()}, {v.AggregateRootProperty.Type.ToFullName()}>, EntityFrameworkPersistence<{v.Symbol.ToFullName()}, {v.AggregateRootProperty.Type.ToFullName()}, {cyrusGenerationContext.GenerationConfig.PersistenceContextType}>>();"));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
         var ctx = new
         {
