@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using NForza.Cyrus.Aggregates;
 
 namespace NForza.Cyrus.Cqrs;
 
@@ -10,24 +11,25 @@ public static class CommandDispatcherExtensions
 {% for cmd in Commands %}
     public static {% if cmd.ReturnsTask %}async{% endif %} Task{% if cmd.ReturnsVoid == false %}<{{ cmd.ReturnType }}>{% endif %} Handle(this ICommandDispatcher commandDispatcher, {{ cmd.CommandType }} command, CancellationToken cancellationToken = default) 
     { 
-            {% if cmd.RequiresAggregateRoot -%}
-              //fetch AggregateRoot here
-            {% endif -%}
-            {% if cmd.ReturnsVoid == false -%}
-              var result = {% endif -%}
-            {%- if cmd.ReturnsTask %}await {{ cmd.Invocation }}{% else -%}
-                {%- if cmd.ReturnsVoid == false -%}
-                    Task.FromResult<{{ cmd.ReturnType }}>({{ cmd.Invocation }})
-                {%- else -%}
-                    {{ cmd.Invocation }}; return Task.CompletedTask
-                {%- endif -%}
-            {% endif %};
-            {% if cmd.RequiresAggregateRoot -%}
-              //save AggregateRoot here
-            {% endif -%}
-            {% if cmd.ReturnsVoid == false -%}
-              return result;
-            {%- endif %}
+{% if cmd.AggregateRoot -%}
+        var aggregateRootPersistence = commandDispatcher.Services.GetRequiredService<IAggregateRootPersistence<{{ cmd.AggregateRootType }}, {{ cmd.AggregateRootIdPropertyType }}>>();
+        var aggregateRoot = await aggregateRootPersistence.Load(command.{{ cmd.AggregateRootIdPropertyName }});
+{% endif -%}
+{% if cmd.ReturnsVoid == false -%}
+        var result = {% endif -%}
+{%- if cmd.ReturnsTask %}await {{ cmd.Invocation }}{% else -%}
+    {%- if cmd.ReturnsVoid == false -%}
+        Task.FromResult<{{ cmd.ReturnType }}>({{ cmd.Invocation }})
+    {%- else -%}
+        {{ cmd.Invocation }}; return Task.CompletedTask
+    {%- endif -%}
+{% endif %};
+{% if cmd.AggregateRoot -%}
+        await aggregateRootPersistence.Save(aggregateRoot);
+{% endif -%}
+{% if cmd.ReturnsVoid == false -%}
+        return result;
+{%- endif %}
     }
 {% endfor %}
 }

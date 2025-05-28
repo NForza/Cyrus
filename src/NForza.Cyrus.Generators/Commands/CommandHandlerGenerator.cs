@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Generators.Aggregates;
 using NForza.Cyrus.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
@@ -63,6 +64,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
         var commands = cyrusGenerationContext.CommandHandlers.Select(h => new
         {
             Handler = h,
+            AggregateRoot = h.Parameters.Length == 2 ? FindAggregateRoot(cyrusGenerationContext.AggregateRoots, h.Parameters[1].Type) : null,
             CommandType = h.Parameters[0].Type.ToFullName(),
             h.Name,
             h.ReturnsVoid,
@@ -72,16 +74,19 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
 
         var model = new
         {
-            Commands = commands.Select(q => new
+            Commands = commands.Select(cmd => new
             {
-                ReturnTypeOriginal = q.ReturnType,
-                ReturnType = q.ReturnsTask ? q.ReturnType.TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
-                RequiresAggregateRoot = q.Handler.Parameters.Length == 2,
-                Invocation = q.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "commandDispatcher.Services"),
-                q.Name,
-                q.ReturnsVoid,
-                q.CommandType,
-                q.ReturnsTask
+                ReturnTypeOriginal = cmd.ReturnType,
+                ReturnType = cmd.ReturnsTask ? cmd.ReturnType.TypeArguments[0].ToFullName() : cmd.ReturnType.ToFullName(),
+                Invocation = cmd.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "commandDispatcher.Services", aggregateRootVariableName: cmd.AggregateRoot != null ? "aggregateRoot" : null),
+                cmd.Name,
+                cmd.ReturnsVoid,
+                cmd.CommandType,
+                cmd.ReturnsTask,
+                cmd.AggregateRoot,
+                AggregateRootType = cmd.AggregateRoot?.Symbol?.ToFullName() ?? "",
+                AggregateRootIdPropertyType = cmd.AggregateRoot?.AggregateRootProperty?.Type.ToFullName() ?? "",
+                AggregateRootIdPropertyName = cmd.AggregateRoot?.AggregateRootProperty?.Name ?? "",
             }).ToList()
         };
 
@@ -89,4 +94,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
 
         return resolvedSource;
     }
+
+    private static AggregateRootDefinition FindAggregateRoot(IEnumerable<AggregateRootDefinition> aggregateRoots, ITypeSymbol type) 
+        => aggregateRoots.FirstOrDefault(ard => SymbolEqualityComparer.Default.Equals(ard.Symbol, type));
 }
