@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NForza.Cyrus.Abstractions;
-using TracksDemo.Tracks.Query;
+using TracksDemo.Tracks;
 
-namespace CyrusDemo.Tracks.Query;
+namespace TracksDemo.Tracks.Query;
 
 public class TracksQueryHandler(DemoContext context)
 {

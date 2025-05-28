@@ -1,9 +1,9 @@
-﻿using CyrusDemo.Tracks.Create;
+﻿namespace TracksDemo.Tracks;
 
-namespace CyrusDemo.Tracks;
-
+[AggregateRoot]
 public class Track(TrackId id, Title title, Artist artist, FileName fileName, AudioFormat audioFormat)
 {
+    [AggregateRootId]
     public TrackId Id { get; set; } = id;
     public Title Title { get; set; } = title;
     public Artist Artist { get; set; } = artist;

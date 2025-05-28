@@ -9,15 +9,15 @@ namespace NForza.Cyrus.Generators.Validators;
 
 public class ValidatorGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        if (cyrusProvider.Validators.Any())
+        if (cyrusGenerationContext.Validators.Any())
         {
-            var validators = cyrusProvider.Validators;
+            var validators = cyrusGenerationContext.Validators;
 
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
             var validatorRegistrations = string.Join(Environment.NewLine,
-                    cyrusProvider.Validators
+                    cyrusGenerationContext.Validators
                         .Select(ch => ch.ContainingType)
                         .Where(x => x != null)
                         .Where(x => !x.IsStatic)
@@ -34,7 +34,7 @@ public class ValidatorGenerator : CyrusGeneratorBase
                     Initializer = validatorRegistrations
                 };
 
-                var fileContents = cyrusProvider.LiquidEngine.Render(ctx, "CyrusInitializer");
+                var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
                 spc.AddSource("ValidatorRegistration.g.cs", SourceText.From(fileContents, Encoding.UTF8));
             }
         }

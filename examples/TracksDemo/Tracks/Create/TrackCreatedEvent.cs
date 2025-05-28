@@ -1,6 +1,7 @@
 ﻿using NForza.Cyrus.Abstractions;
+using TracksDemo.Tracks;
 
-namespace CyrusDemo.Tracks.Create;
+namespace TracksDemo.Tracks.Create;
 
 [Event]
 public record TrackCreatedEvent(TrackId TrackId, Title Name, FileName Address);

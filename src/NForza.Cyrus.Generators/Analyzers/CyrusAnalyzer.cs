@@ -29,7 +29,9 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
             DiagnosticDescriptors.IncorrectNumberOfArgumentsForValidator,
             DiagnosticDescriptors.ValidatorsShouldReturnIEnumerableOfString,
             DiagnosticDescriptors.IResultTupleElementShouldBeCalledResult,
-            DiagnosticDescriptors.MessagesTupleElementShouldBeCalledMessages
+            DiagnosticDescriptors.MessagesTupleElementShouldBeCalledMessages,
+            DiagnosticDescriptors.CommandHandlerArgumentShouldBeAnAggregateRoot,
+            DiagnosticDescriptors.CommandForCommandHandlerShouldHaveAggregateRootIdProperty,
         ];
 
     public override void Initialize(AnalysisContext context)

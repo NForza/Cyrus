@@ -85,8 +85,9 @@ internal static class IMethodSymbolExtensions
         return returnType;
     }
 
-    public static string GetCommandInvocation(this IMethodSymbol handler, string variableName, string serviceProviderVariable = "services")
+    public static string GetCommandInvocation(this IMethodSymbol handler, string variableName, string serviceProviderVariable = "services", string? aggregateRootVariableName = null)
     {
+        var aggregateRootVariable = aggregateRootVariableName != null ? $", {aggregateRootVariableName}" : "";
         var commandType = handler.Parameters[0].Type.ToFullName();
         var typeSymbol = handler.ContainingType.ToFullName();
         var returnType = handler.ReturnType;
@@ -95,14 +96,14 @@ internal static class IMethodSymbolExtensions
         if (returnsTask)
         {
             return handler.IsStatic
-                ? $"{typeSymbol}.{handler.Name}({variableName})"
-                : $"{serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}({variableName})";
+                ? $"{typeSymbol}.{handler.Name}({variableName}{aggregateRootVariable})"
+                : $"{serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}({variableName}{aggregateRootVariable})";
         }
         else
         {
             return handler.IsStatic
-                ? $"{typeSymbol}.{handler.Name}({variableName})"
-                : $"{serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}({variableName})";
+                ? $"{typeSymbol}.{handler.Name}({variableName}{aggregateRootVariable})"
+                : $"{serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}({variableName}{aggregateRootVariable})";
         }
     }
 

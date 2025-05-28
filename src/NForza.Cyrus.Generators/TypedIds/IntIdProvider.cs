@@ -13,7 +13,7 @@ public class IntIdProvider : CyrusProviderBase<ImmutableArray<INamedTypeSymbol>>
         var incrementalValuesProvider = context.SyntaxProvider
                     .CreateSyntaxProvider(
                         predicate: (syntaxNode, _) => syntaxNode.IsRecordWithIntIdAttribute(),
-                        transform: (context, _) => context.GetNamedTypeSymbolFromContext());
+                        transform: (context, _) => context.GetRecordSymbolFromContext());
 
         var recordStructsWithAttribute = incrementalValuesProvider
             .Where(x => x is not null)

@@ -1,8 +1,12 @@
 ﻿using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NForza.Cyrus.Generators.Roslyn;
 
 public static class RecordDeclarationSyntaxExtensions
 {
+    public static bool HasAggregateRootAttribute(this RecordDeclarationSyntax recordDeclaration)
+        => recordDeclaration.HasAttribute("AggregateRoot");
+
     public static bool HasQueryAttribute(this RecordDeclarationSyntax recordDeclaration)
     {
         return recordDeclaration.AttributeLists

@@ -9,8 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\NForza.Cyrus.EntityFramework\NForza.Cyrus.EntityFramework.csproj" />
     <ProjectReference Include="..\..\..\src\NForza.Cyrus.MassTransit\NForza.Cyrus.MassTransit.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.5" />
     <ProjectReference Include="..\..\..\src\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\src\NForza.Cyrus.Generators\NForza.Cyrus.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <InternalsVisibleTo Include="DemoApp.WebApi.Tests" />

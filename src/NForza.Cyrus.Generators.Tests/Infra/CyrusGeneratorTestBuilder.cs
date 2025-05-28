@@ -2,7 +2,9 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using NForza.Cyrus.EntityFramework;
 using NForza.Cyrus.Generators.Analyzers;
 
 namespace NForza.Cyrus.Generators.Tests.Infra;
@@ -21,11 +23,13 @@ internal class CyrusGeneratorTestBuilder
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source);
 
-        var trustedAssemblies = ((string?)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES"))!
+        var referencedAssemblies = ((string?)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES"))!
             .Split(Path.PathSeparator)
             .Concat([
                 typeof(IServiceCollection).Assembly.Location,
-                typeof(ICyrusWebStartup).Assembly.Location
+                typeof(ICyrusWebStartup).Assembly.Location,
+                typeof(DbContext).Assembly.Location,
+                typeof(EntityFrameworkPersistence<,,>).Assembly.Location
                 ])
             .Distinct()
             .Select(path => MetadataReference.CreateFromFile(path))
@@ -34,7 +38,7 @@ internal class CyrusGeneratorTestBuilder
         var compilation = CSharpCompilation.Create(
             "TestAssembly",
             [syntaxTree],
-            trustedAssemblies,
+            referencedAssemblies,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
 

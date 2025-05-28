@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.Generators.Cqrs;
+namespace NForza.Cyrus.Generators.Queries;
 
 public class QueryProvider : CyrusProviderBase<ImmutableArray<INamedTypeSymbol>>
 {
@@ -13,7 +13,7 @@ public class QueryProvider : CyrusProviderBase<ImmutableArray<INamedTypeSymbol>>
         var queryProvider = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: (syntaxNode, _) => syntaxNode.IsQuery(),
-                transform: (context, _) => context.GetNamedTypeSymbolFromContext());
+                transform: (context, _) => context.GetRecordSymbolFromContext());
 
         var allQueriesProvider = queryProvider
             .Where(x => x is not null)

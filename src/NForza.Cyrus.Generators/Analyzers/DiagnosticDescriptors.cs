@@ -183,4 +183,24 @@ public static class DiagnosticDescriptors
         description: "Invalid tuple element name."
     );
 
+    public static readonly DiagnosticDescriptor CommandHandlerArgumentShouldBeAnAggregateRoot = new DiagnosticDescriptor(
+        id: "CYRUS015",
+        title: "Invalid argument for CommandHandler",
+        messageFormat: "CommandHandler '{0}' should have argument which is marked as [AggregateRoot]",
+        category: "Cyrus",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Additional CommandHandler parameters must be an [AggregateRoot]."
+    );
+
+    public static readonly DiagnosticDescriptor CommandForCommandHandlerShouldHaveAggregateRootIdProperty = new DiagnosticDescriptor(
+        id: "CYRUS016",
+        title: "Invalid argument for CommandHandler",
+        messageFormat: "Command for CommandHandler '{0}' should have a property marked with [AggregateRootId]",
+        category: "Cyrus",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Command used as parameter in a CommandHandler must have a [AggregateRootId] property."
+);
+
 }

@@ -1,14 +1,17 @@
 using System.Reflection;
-using CyrusDemo;
+using TracksDemo.Tracks;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using NForza.Cyrus;
+using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.WebApi;
+using TracksDemo;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<DemoContext>(options =>
-    options.UseInMemoryDatabase("DemoDb"));
+builder.Services.AddDbContext<DemoContext>(o => 
+    o.UseInMemoryDatabase("DemoDb"));
 
 builder.Services.AddMassTransit(x =>
 {

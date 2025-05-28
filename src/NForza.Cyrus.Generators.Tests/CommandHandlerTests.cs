@@ -279,4 +279,114 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().ContainDiagnostic(DiagnosticDescriptors.MessagesTupleElementShouldBeCalledMessages);
     }
 
+    [Fact]
+    public async Task CommandHandler_With_AggregateRoot_Parameter_But_Parameter_Has_No_AggregateRoot_Attribute_Should_Generate_Analyzer_Error()
+    {
+        var source = @"
+                using System;       
+                using System.Collections.Generic;
+                using NForza.Cyrus.Abstractions;
+                using Microsoft.AspNetCore.Http;
+
+                namespace Test;
+            
+                [Command]
+                public record CreateCustomerCommand(Guid Id);
+
+                public class Customer { }
+
+                public class CustomerHandler
+                {
+                    [CommandHandler(Route = ""/"")]
+                    public (IResult Result, IEnumerable<object> Messages) Handle(CreateCustomerCommand command, Customer customer)
+                    {
+                        return (Results.Accepted(), [new object()]);
+                    }
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        analyzerOutput.Should().ContainDiagnostic(DiagnosticDescriptors.CommandHandlerArgumentShouldBeAnAggregateRoot);
+    }
+
+    [Fact]
+    public async Task CommandHandler_With_AggregateRoot_Parameter_But_Parameter_Has_No_AggregateRootID_On_A_Property_Should_Generate_Analyzer_Error()
+    {
+        var source = @"
+                using System;       
+                using System.Collections.Generic;
+                using NForza.Cyrus.Abstractions;
+                using Microsoft.AspNetCore.Http;
+
+                namespace Test;
+            
+                [Command]
+                public record CreateCustomerCommand(Guid Id);
+
+                [AggregateRoot]
+                public class Customer { }
+
+                public class CustomerHandler
+                {
+                    [CommandHandler(Route = ""/"")]
+                    public (IResult Result, IEnumerable<object> Messages) Handle(CreateCustomerCommand command, Customer customer)
+                    {
+                        return (Results.Accepted(), [new object()]);
+                    }
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        analyzerOutput.Should().ContainDiagnostic(DiagnosticDescriptors.CommandForCommandHandlerShouldHaveAggregateRootIdProperty);
+    }
+
+    [Fact]
+    public async Task CommandHandler_With_AggregateRoot_Parameter_And_Parameter_Has_AggregateRootID_On_A_Property_Should_Not_Generate_Analyzer_Error()
+    {
+        var source = @"
+                using System;       
+                using System.Collections.Generic;
+                using NForza.Cyrus.Abstractions;
+                using Microsoft.AspNetCore.Http;
+
+                namespace Test;
+            
+                [Command]
+                public record CreateCustomerCommand([property: AggregateRootId]Guid Id);
+
+                [AggregateRoot]
+                public class Customer 
+                { 
+                    [AggregateRootId]
+                    public Guid CustomerId { get; set; }
+                }
+
+                public class CustomerHandler
+                {
+                    [CommandHandler(Route = ""/"")]
+                    public (IResult Result, IEnumerable<object> Messages) Handle(CreateCustomerCommand command, Customer customer)
+                    {
+                        return (Results.Accepted(), [new object()]);
+                    }
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        analyzerOutput.Should().BeEmpty();
+    }
 }

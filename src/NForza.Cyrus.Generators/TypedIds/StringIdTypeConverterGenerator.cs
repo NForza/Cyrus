@@ -7,12 +7,12 @@ namespace NForza.Cyrus.Generators.TypedIds;
 
 public class StringIdTypeConverterGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var stringIds = cyrusProvider.StringIds;
+        var stringIds = cyrusGenerationContext.StringIds;
         foreach (var recordSymbol in stringIds)
         {
-            var sourceText = GenerateStringIdTypeConverter(recordSymbol, cyrusProvider.LiquidEngine);
+            var sourceText = GenerateStringIdTypeConverter(recordSymbol, cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"{recordSymbol}TypeConverter.g.cs", SourceText.From(sourceText, Encoding.UTF8));
         };
     }

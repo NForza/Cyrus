@@ -13,7 +13,7 @@ public class StringIdProvider : CyrusProviderBase<ImmutableArray<INamedTypeSymbo
         var incrementalValuesProvider = context.SyntaxProvider
                     .CreateSyntaxProvider(
                         predicate: (syntaxNode, _) => syntaxNode.IsRecordWithStringIdAttribute(),
-                        transform: (context, _) => context.GetNamedTypeSymbolFromContext());
+                        transform: (context, _) => context.GetRecordSymbolFromContext());
 
         var recordStructsWithAttribute = incrementalValuesProvider
             .Where(x => x is not null)

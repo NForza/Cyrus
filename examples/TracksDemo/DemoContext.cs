@@ -1,7 +1,7 @@
-﻿using CyrusDemo.Tracks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using TracksDemo.Tracks;
 
-namespace CyrusDemo;
+namespace TracksDemo;
 
 public class DemoContext: DbContext
 {

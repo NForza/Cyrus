@@ -1,7 +1,6 @@
-﻿using CyrusDemo.Tracks.Create;
-using NForza.Cyrus.Abstractions;
+﻿using NForza.Cyrus.Abstractions;
 
-namespace CyrusDemo.Tracks.Query;
+namespace TracksDemo.Tracks.Query;
 
 [Query]
 public record TrackStreamQuery(TrackId TrackId, AudioFormat AudioFormat);

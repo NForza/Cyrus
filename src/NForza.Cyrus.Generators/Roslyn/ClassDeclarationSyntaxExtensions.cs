@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NForza.Cyrus.Generators.Config;
 
@@ -12,6 +13,9 @@ public static class ClassDeclarationSyntaxExtensions
             .SelectMany(attrList => attrList.Attributes)
             .Any(attr => attr.Name.ToString() == attributeName);
     }
+
+    public static bool HasAggregateRootAttribute(this ClassDeclarationSyntax classDeclaration) 
+        => classDeclaration.HasAttribute("AggregateRoot");
 
     public static bool HasBaseType(this ClassDeclarationSyntax classDeclaration, string baseTypeName)
     {
@@ -45,10 +49,27 @@ public static class ClassDeclarationSyntaxExtensions
 
             foreach (var methodCall in methodCalls)
             {
-                var methodName = methodCall.Expression.ToString();
+                var methodName = methodCall.Expression switch
+                {
+                    GenericNameSyntax genericName => genericName.Identifier.Text,
+                    MemberAccessExpressionSyntax memberAccess when memberAccess.Name is GenericNameSyntax g => g.Identifier.Text,
+                    MemberAccessExpressionSyntax memberAccess => memberAccess.Name.Identifier.Text,
+                    IdentifierNameSyntax id => id.Identifier.Text,
+                    _ => methodCall.Expression.ToString()
+                };
 
                 switch (methodName)
                 {
+                    case "UseEntityFrameworkPersistence":
+                        if (methodCall.Expression is GenericNameSyntax genericName)
+                        {
+                            foreach (var typeArg in genericName.TypeArgumentList.Arguments)
+                            {
+                                var typeText = typeArg.ToString();
+                                result.PersistenceContextType = typeText;
+                            }
+                        }
+                        break;
                     case "UseMassTransit":
                         result.EventBus = EventBusType.MassTransit;
                         break;

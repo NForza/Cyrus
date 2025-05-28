@@ -1,7 +1,7 @@
-﻿using CyrusDemo.Tracks.Create;
-using NForza.Cyrus.Abstractions;
+﻿using NForza.Cyrus.Abstractions;
+using TracksDemo.Tracks.Create;
 
-namespace CyrusDemo.Tracks.Events;
+namespace TracksDemo.Tracks.Events;
 
 public class TrackEventHandler
 {

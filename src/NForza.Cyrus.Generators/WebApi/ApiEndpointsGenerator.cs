@@ -7,17 +7,17 @@ using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.Commands;
+namespace NForza.Cyrus.Generators.WebApi;
 
 public class ApiEndpointsGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        if (cyrusProvider.GenerationConfig != null && cyrusProvider.GenerationConfig.GenerationTarget.Contains(GenerationTarget.WebApi) && (cyrusProvider.AllHandlers.Any()))
+        if (cyrusGenerationContext.GenerationConfig != null && cyrusGenerationContext.GenerationConfig.GenerationTarget.Contains(GenerationTarget.WebApi) && cyrusGenerationContext.AllHandlers.Any())
         {
-            var allCommandHandlers = cyrusProvider.AllCommandHandlers;
-            var allQueryHandlers = cyrusProvider.AllQueryHandlers;
-            string assemblyName = cyrusProvider.AllHandlers.First().ContainingAssembly.Name;
+            var allCommandHandlers = cyrusGenerationContext.AllCommandHandlers;
+            var allQueryHandlers = cyrusGenerationContext.AllQueryHandlers;
+            string assemblyName = cyrusGenerationContext.AllHandlers.First().ContainingAssembly.Name;
 
             IEnumerable<(INamedTypeSymbol NamedTypeSymbol, string httpVerb, string? Route)> commandEndpointSymbols = allCommandHandlers
                 .Select(nts => ((INamedTypeSymbol)nts.Parameters[0].Type, nts.GetCommandVerb(), nts.GetCommandRoute()));
@@ -27,14 +27,14 @@ public class ApiEndpointsGenerator : CyrusGeneratorBase
 
             IEnumerable<string> commandEndpoints = commandEndpointSymbols
                   .Where(x => !string.IsNullOrEmpty(x.Route))
-                  .Select(em => ModelGenerator.ForCommandEndpoint(em, cyrusProvider.LiquidEngine));
+                  .Select(em => ModelGenerator.ForCommandEndpoint(em, cyrusGenerationContext.LiquidEngine));
 
             IEnumerable<string> queryEndpoints = queryEndpointSymbols
                   .Where(x => !string.IsNullOrEmpty(x.Route))
-                  .Select(em => ModelGenerator.ForQueryEndpoint(em, cyrusProvider.LiquidEngine));
+                  .Select(em => ModelGenerator.ForQueryEndpoint(em, cyrusGenerationContext.LiquidEngine));
 
             var endpointModels = GetPartialModelClass(assemblyName, "Endpoints", "Endpoints", "ModelEndpointDefinition",
-                commandEndpoints.Concat(queryEndpoints), cyrusProvider.LiquidEngine);
+                commandEndpoints.Concat(queryEndpoints), cyrusGenerationContext.LiquidEngine);
 
             spc.AddSource($"model-endpoints.g.cs", SourceText.From(endpointModels, Encoding.UTF8));
         }

@@ -23,7 +23,7 @@ public static class GeneratorSyntaxContextExtensions
         return symbol;
     }
 
-    public static INamedTypeSymbol? GetNamedTypeSymbolFromContext(this GeneratorSyntaxContext context)
+    public static INamedTypeSymbol? GetRecordSymbolFromContext(this GeneratorSyntaxContext context)
     {
         var classDeclarationSyntax = (RecordDeclarationSyntax)context.Node;
         var model = context.SemanticModel;

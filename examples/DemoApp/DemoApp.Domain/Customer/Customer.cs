@@ -1,6 +1,8 @@
 ﻿using DemoApp.Contracts;
+using NForza.Cyrus.Aggregates;
 
 namespace DemoApp.Domain.Customer;
 
-public record Customer(CustomerId Id, Name Name);
+[AggregateRoot]
+public record Customer([property: AggregateRootId] CustomerId Id, Name Name);
 

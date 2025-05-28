@@ -11,12 +11,12 @@ namespace NForza.Cyrus.Generators.Events;
 
 public class LocalEventListGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var config = cyrusProvider.GenerationConfig;
+        var config = cyrusGenerationContext.GenerationConfig;
         if (config.GenerationTarget.Contains(GenerationTarget.WebApi))
         {
-            var contents = CreateEventHandlerRegistrations(cyrusProvider.AllEvents, cyrusProvider.LiquidEngine);
+            var contents = CreateEventHandlerRegistrations(cyrusGenerationContext.AllEvents, cyrusGenerationContext.LiquidEngine);
 
             if (!string.IsNullOrWhiteSpace(contents))
             {
@@ -28,7 +28,7 @@ public class LocalEventListGenerator : CyrusGeneratorBase
                     Initializer = contents
                 };
 
-                var fileContents = cyrusProvider.LiquidEngine.Render(ctx, "CyrusInitializer");
+                var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
                 spc.AddSource(
                    "LocalEventList.g.cs",
                    SourceText.From(fileContents, Encoding.UTF8));

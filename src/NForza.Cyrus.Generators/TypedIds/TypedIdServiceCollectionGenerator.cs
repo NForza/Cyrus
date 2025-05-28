@@ -12,11 +12,11 @@ namespace NForza.Cyrus.Generators.TypedIds;
 
 public class TypedIdInitializerGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var typedIds = cyrusProvider.TypedIds;
-        var config = cyrusProvider.GenerationConfig;
-        var compilation = cyrusProvider.Compilation;
+        var typedIds = cyrusGenerationContext.TypedIds;
+        var config = cyrusGenerationContext.GenerationConfig;
+        var compilation = cyrusGenerationContext.Compilation;
 
         if (!config.GenerationTarget.Contains(GenerationTarget.WebApi))
             return;
@@ -26,7 +26,7 @@ public class TypedIdInitializerGenerator : CyrusGeneratorBase
 
         var allTypedIds = typedIds.Concat(referencedTypedIds).ToArray();
 
-        var sourceText = GenerateServiceCollectionExtensionMethod(allTypedIds, cyrusProvider.LiquidEngine);
+        var sourceText = GenerateServiceCollectionExtensionMethod(allTypedIds, cyrusGenerationContext.LiquidEngine);
         spc.AddSource("TypedIdInitializer.g.cs", SourceText.From(sourceText, Encoding.UTF8));
     }
 

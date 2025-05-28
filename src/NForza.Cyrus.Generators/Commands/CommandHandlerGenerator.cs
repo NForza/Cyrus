@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Generators.Aggregates;
 using NForza.Cyrus.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
@@ -12,13 +13,13 @@ namespace NForza.Cyrus.Generators.Commands;
 
 public class CommandHandlerGenerator : CyrusGeneratorBase
 {
-    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider)
+    public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        if (cyrusProvider.GenerationConfig != null && cyrusProvider.CommandHandlers.Any())
+        if (cyrusGenerationContext.GenerationConfig != null && cyrusGenerationContext.CommandHandlers.Any())
         {
-            var commandHandlers = cyrusProvider.CommandHandlers;
+            var commandHandlers = cyrusGenerationContext.CommandHandlers;
 
-            var sourceText = GenerateCommandDispatcherExtensionMethods(commandHandlers, cyrusProvider.Compilation, cyrusProvider.LiquidEngine);
+            var sourceText = GenerateCommandDispatcherExtensionMethods(cyrusGenerationContext, cyrusGenerationContext.LiquidEngine);
             if (!string.IsNullOrEmpty(sourceText))
             {
                 spc.AddSource($"CommandDispatcher.g.cs", SourceText.From(sourceText, Encoding.UTF8));
@@ -26,7 +27,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
 
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
             var commandHandlerRegistrations = string.Join(Environment.NewLine,
-                    cyrusProvider.CommandHandlers
+                    cyrusGenerationContext.CommandHandlers
                         .Select(ch => ch.ContainingType)
                         .Where(x => x != null && !x.IsStatic)
                         .Distinct(SymbolEqualityComparer.Default)
@@ -42,33 +43,28 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                     Initializer = commandHandlerRegistrations
                 };
 
-                var fileContents = cyrusProvider.LiquidEngine.Render(ctx, "CyrusInitializer");
+                var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
                 spc.AddSource("CommandHandlerRegistration.g.cs", SourceText.From(fileContents, Encoding.UTF8));
             }
 
             string assemblyName = commandHandlers.First().ContainingAssembly.Name;
             var commandSymbols = commandHandlers.Select(ch => (INamedTypeSymbol)ch.Parameters[0].Type);
 
-            var commandModels = GetPartialModelClass(assemblyName, "Command", "Commands", "ModelTypeDefinition", commandSymbols.Select(cm => ModelGenerator.ForNamedType(cm, cyrusProvider.LiquidEngine)), cyrusProvider.LiquidEngine);
+            var commandModels = GetPartialModelClass(assemblyName, "Command", "Commands", "ModelTypeDefinition", commandSymbols.Select(cm => ModelGenerator.ForNamedType(cm, cyrusGenerationContext.LiquidEngine)), cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"model-commands.g.cs", SourceText.From(commandModels, Encoding.UTF8));
 
             var referencedTypes = commandSymbols.SelectMany(cs => cs.GetReferencedTypes());
-            var referencedTypeModels = GetPartialModelClass(assemblyName, "Command", "Models", "ModelTypeDefinition", referencedTypes.Select(cm => ModelGenerator.ForNamedType(cm, cyrusProvider.LiquidEngine)), cyrusProvider.LiquidEngine);
+            var referencedTypeModels = GetPartialModelClass(assemblyName, "Command", "Models", "ModelTypeDefinition", referencedTypes.Select(cm => ModelGenerator.ForNamedType(cm, cyrusGenerationContext.LiquidEngine)), cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"model-command-types.g.cs", SourceText.From(referencedTypeModels, Encoding.UTF8));
         }
     }
 
-    private static string GenerateCommandDispatcherExtensionMethods(ImmutableArray<IMethodSymbol> handlers, Compilation compilation, LiquidEngine liquidEngine)
+    private static string GenerateCommandDispatcherExtensionMethods(CyrusGenerationContext cyrusGenerationContext, LiquidEngine liquidEngine)
     {
-        INamedTypeSymbol? taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
-        if (taskSymbol == null)
-        {
-            return string.Empty;
-        }
-
-        var commands = handlers.Select(h => new
+        var commands = cyrusGenerationContext.CommandHandlers.Select(h => new
         {
             Handler = h,
+            AggregateRoot = h.Parameters.Length == 2 ? FindAggregateRoot(cyrusGenerationContext.AggregateRoots, h.Parameters[1].Type) : null,
             CommandType = h.Parameters[0].Type.ToFullName(),
             h.Name,
             h.ReturnsVoid,
@@ -78,15 +74,19 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
 
         var model = new
         {
-            Commands = commands.Select(q => new
+            Commands = commands.Select(cmd => new
             {
-                ReturnTypeOriginal = q.ReturnType,
-                ReturnType = q.ReturnsTask ? q.ReturnType.TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
-                Invocation = q.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "commandDispatcher.ServiceProvider"),
-                q.Name,
-                q.ReturnsVoid,
-                q.CommandType,
-                q.ReturnsTask
+                ReturnTypeOriginal = cmd.ReturnType,
+                ReturnType = cmd.ReturnsTask ? cmd.ReturnType.TypeArguments[0].ToFullName() : cmd.ReturnType.ToFullName(),
+                Invocation = cmd.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "commandDispatcher.Services", aggregateRootVariableName: cmd.AggregateRoot != null ? "aggregateRoot" : null),
+                cmd.Name,
+                cmd.ReturnsVoid,
+                cmd.CommandType,
+                cmd.ReturnsTask,
+                cmd.AggregateRoot,
+                AggregateRootType = cmd.AggregateRoot?.Symbol?.ToFullName() ?? "",
+                AggregateRootIdPropertyType = cmd.AggregateRoot?.AggregateRootProperty?.Type.ToFullName() ?? "",
+                AggregateRootIdPropertyName = cmd.AggregateRoot?.AggregateRootProperty?.Name ?? "",
             }).ToList()
         };
 
@@ -94,4 +94,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
 
         return resolvedSource;
     }
+
+    private static AggregateRootDefinition FindAggregateRoot(IEnumerable<AggregateRootDefinition> aggregateRoots, ITypeSymbol type) 
+        => aggregateRoots.FirstOrDefault(ard => SymbolEqualityComparer.Default.Equals(ard.Symbol, type));
 }

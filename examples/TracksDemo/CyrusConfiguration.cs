@@ -1,6 +1,6 @@
 ﻿using NForza.Cyrus.Abstractions;
 
-namespace CyrusDemo;
+namespace TracksDemo;
 
 public class MyCyrusConfiguration : CyrusConfig
 {

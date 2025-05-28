@@ -6,7 +6,7 @@ namespace NForza.Cyrus.Generators;
 
 public abstract class CyrusGeneratorBase
 {
-    public abstract void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusProvider);
+    public abstract void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext);
 
     public string GetPartialModelClass(string assemblyName, string subNamespace, string propertyName, string propertyType, IEnumerable<string> propertyValues, LiquidEngine liquidEngine)
     {

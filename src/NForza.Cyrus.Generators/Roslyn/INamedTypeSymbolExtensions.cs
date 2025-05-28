@@ -89,4 +89,24 @@ public static class INamedTypeSymbolExtensions
             _ => "System.Guid"
         };
     }
+
+    public static bool HasAttribute(this INamedTypeSymbol typeSymbol, string attributeName) 
+        => typeSymbol
+                .GetAttributes()
+                .Select(a => a.AttributeClass?.Name ?? "")
+                .Any(name => name == attributeName || name == attributeName + "Attribute");
+
+    public static bool IsAggregateRoot(this INamedTypeSymbol typeSymbol) 
+        => typeSymbol.HasAttribute("AggregateRoot");
+
+    public static IPropertySymbol? GetAggregateRootIdProperty(this INamedTypeSymbol typeSymbol)
+    {
+        var properties = typeSymbol.GetPublicProperties();
+        var rootIdProperty = properties.FirstOrDefault(p =>
+        {
+            var attributes = p.GetAttributes();
+            return attributes.Any(a => a.AttributeClass?.Name.StartsWith("AggregateRootId") ?? false);
+        });
+        return rootIdProperty ;
+    }
 }
