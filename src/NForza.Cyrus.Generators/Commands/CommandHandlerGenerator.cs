@@ -77,7 +77,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                 ReturnTypeOriginal = q.ReturnType,
                 ReturnType = q.ReturnsTask ? q.ReturnType.TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
                 RequiresAggregateRoot = q.Handler.Parameters.Length == 2,
-                Invocation = q.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "commandDispatcher.ServiceProvider"),
+                Invocation = q.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "commandDispatcher.Services"),
                 q.Name,
                 q.ReturnsVoid,
                 q.CommandType,

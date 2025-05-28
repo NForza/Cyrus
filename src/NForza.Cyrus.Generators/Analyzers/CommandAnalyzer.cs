@@ -38,7 +38,19 @@ internal class CommandAnalyzer: CyrusAnalyzerBase
             {
                 var diagnostic = Diagnostic.Create(
                     DiagnosticDescriptors.CommandHandlerArgumentShouldBeAnAggregateRoot,
-                    location,
+                    secondParameter.Locations.FirstOrDefault() ?? location,
+                    methodSymbol.ToDisplayString());
+                context.ReportDiagnostic(diagnostic);
+                return;
+            }
+
+            var firstParameter = methodSymbol.Parameters[0];
+            var commandHasAggregateRootId = firstParameter.Type is INamedTypeSymbol parameterType && parameterType.GetAggregateRootIdProperty() != null;
+            if (!commandHasAggregateRootId)
+            {
+                var diagnostic = Diagnostic.Create(
+                    DiagnosticDescriptors.CommandForCommandHandlerShouldHaveAggregateRootIdProperty,
+                    firstParameter.Locations.FirstOrDefault() ?? location,
                     methodSymbol.ToDisplayString());
                 context.ReportDiagnostic(diagnostic);
                 return;

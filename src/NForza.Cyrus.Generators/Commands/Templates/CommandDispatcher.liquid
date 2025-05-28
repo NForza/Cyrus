@@ -14,8 +14,7 @@ public static class CommandDispatcherExtensions
               //fetch AggregateRoot here
             {% endif -%}
             {% if cmd.ReturnsVoid == false -%}
-              var result =
-            {%- endif -%}
+              var result = {% endif -%}
             {%- if cmd.ReturnsTask %}await {{ cmd.Invocation }}{% else -%}
                 {%- if cmd.ReturnsVoid == false -%}
                     Task.FromResult<{{ cmd.ReturnType }}>({{ cmd.Invocation }})
@@ -28,7 +27,7 @@ public static class CommandDispatcherExtensions
             {% endif -%}
             {% if cmd.ReturnsVoid == false -%}
               return result;
-            {% endif -%}
+            {%- endif %}
     }
 {% endfor %}
 }

@@ -4,5 +4,5 @@ namespace NForza.Cyrus.Cqrs;
 
 public interface ICommandDispatcher
 {
-    IServiceProvider ServiceProvider { get; }
+    IServiceProvider Services { get; }
 }
