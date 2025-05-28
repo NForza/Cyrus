@@ -6,7 +6,7 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 env:
-  PROJECT_FOLDER: ./examples/
+  PROJECT_FOLDER: ./examples
   MASSTRANSIT_FOLDER: Cyrus.MassTransit
   SIGNALR_FOLDER: SignalR/CyrusSignalR
   TRACKS_FOLDER: TracksDemo
