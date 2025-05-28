@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
 env:
   PROJECT_FOLDER: ./examples
-  MASSTRANSIT_FOLDER: Cyrus.MassTransit/Cyrus.MassTransit.sln
-  SIGNALR_FOLDER: SignalR/CyrusSignalR
-  TRACKS_FOLDER: TracksDemo
+  MASSTRANSIT_FOLDER: MassTransit/MassTransit.sln
+  SIGNALR_FOLDER: SignalR/CyrusSignalR/CyrusSignalR.sln
+  TRACKS_FOLDER: TracksDemo/TracksDemo.sln
   
 jobs:
   build_masstransit:
