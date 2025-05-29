@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\NForza.Cyrus.EntityFramework\NForza.Cyrus.EntityFramework.csproj" />
+    <ProjectReference Include="..\NForza.Cyrus.EntityFramework\NForza.Cyrus.EntityFramework.csproj" />
     <ProjectReference Include="..\NForza.Cyrus.Core\NForza.Cyrus.Core.csproj" />
     <ProjectReference Include="..\NForza.Cyrus.Generators\NForza.Cyrus.Generators.csproj" />
   </ItemGroup>
