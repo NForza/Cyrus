@@ -84,6 +84,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                 cmd.CommandType,
                 cmd.ReturnsTask,
                 cmd.AggregateRoot,
+                RequiresAsync = cmd.ReturnsTask || cmd.AggregateRoot != null,
                 AggregateRootType = cmd.AggregateRoot?.Symbol?.ToFullName() ?? "",
                 AggregateRootIdPropertyType = cmd.AggregateRoot?.AggregateRootProperty?.Type.ToFullName() ?? "",
                 AggregateRootIdPropertyName = cmd.AggregateRoot?.AggregateRootProperty?.Name ?? "",

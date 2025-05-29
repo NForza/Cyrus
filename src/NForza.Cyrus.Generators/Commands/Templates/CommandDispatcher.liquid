@@ -9,7 +9,7 @@ namespace NForza.Cyrus.Cqrs;
 public static class CommandDispatcherExtensions
 {
 {% for cmd in Commands %}
-    public static {% if cmd.ReturnsTask %}async{% endif %} Task{% if cmd.ReturnsVoid == false %}<{{ cmd.ReturnType }}>{% endif %} Handle(this ICommandDispatcher commandDispatcher, {{ cmd.CommandType }} command, CancellationToken cancellationToken = default) 
+    public static {% if cmd.RequiresAsync %}async{% endif %} Task{% if cmd.ReturnsVoid == false %}<{{ cmd.ReturnType }}>{% endif %} Handle(this ICommandDispatcher commandDispatcher, {{ cmd.CommandType }} command, CancellationToken cancellationToken = default) 
     { 
 {% if cmd.AggregateRoot -%}
         var aggregateRootPersistence = commandDispatcher.Services.GetRequiredService<IAggregateRootPersistence<{{ cmd.AggregateRootType }}, {{ cmd.AggregateRootIdPropertyType }}>>();
@@ -18,10 +18,10 @@ public static class CommandDispatcherExtensions
 {% if cmd.ReturnsVoid == false -%}
         var result = {% endif -%}
 {%- if cmd.ReturnsTask %}await {{ cmd.Invocation }}{% else -%}
-    {%- if cmd.ReturnsVoid == false -%}
+    {%- if cmd.ReturnsVoid == false and cmd.RequiresAsync == false -%}
         Task.FromResult<{{ cmd.ReturnType }}>({{ cmd.Invocation }})
     {%- else -%}
-        {{ cmd.Invocation }}; return Task.CompletedTask
+        {{ cmd.Invocation }};
     {%- endif -%}
 {% endif %};
 {% if cmd.AggregateRoot -%}
