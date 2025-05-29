@@ -17,6 +17,9 @@ public class CyrusHub : Hub
         eventConfig = events.ToDictionary(e => e.Type, e => e.Broadcast);
     }
 
+    protected Task SendEvents(object eventToSend)
+        => SendEvents([eventToSend]);
+
     protected async Task SendEvents(IEnumerable<object> eventsToSend)
     {
         var tasks = new List<Task>();

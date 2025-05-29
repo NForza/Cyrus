@@ -8,9 +8,9 @@ namespace DemoApp.Domain.Customer;
 public class DeleteCustomerCommandHandler
 {
     [CommandHandler(Verb = HttpVerb.Delete, Route = "customers/{Id}")]
-    public IResult Execute(DeleteCustomerCommand command)
+    public (IResult Result, object Messages) Execute(DeleteCustomerCommand command)
     {
         Console.WriteLine($"Customer deleted: {command.Id}");
-        return Results.Accepted();
+        return (Results.Accepted(), new CustomerDeletedEvent(command.Id));
     }
 }

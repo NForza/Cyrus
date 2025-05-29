@@ -44,21 +44,6 @@ builder.Services.AddCyrus();
 
 var app = builder.Build();
 
-app.MapDelete("c2/{Id:guid}", async (Guid Id, [FromBody] global::DemoApp.Contracts.Customers.DeleteCustomerCommandContract command, [FromServices] IEventBus eventBus, [FromServices] IHttpContextObjectFactory objectFactory, [FromServices] IHttpContextAccessor ctx) => {
-
-    using var scope = app.Services.CreateScope();
-    var services = scope.ServiceProvider;
-    var (cmd, validationErrors) = objectFactory
-        .CreateFromHttpContextWithBodyAndRouteParameters<global::DemoApp.Contracts.Customers.DeleteCustomerCommandContract, global::DemoApp.Contracts.Customers.DeleteCustomerCommand>(ctx.HttpContext, command);
-    if (validationErrors.Any())
-        return Results.BadRequest(validationErrors);
-
-    ICommandDispatcher dispatcher = services.GetRequiredService<ICommandDispatcher>();
-    var commandResult = await dispatcher.Handle(cmd);
-    return new CommandResultAdapter(eventBus).FromIResult(commandResult);
-})
-.WithOpenApi();
-
 app.UseCors("AllowAngularApp");
 
 ILogger logger = app.Services.GetRequiredService<ILogger<Program>>();
