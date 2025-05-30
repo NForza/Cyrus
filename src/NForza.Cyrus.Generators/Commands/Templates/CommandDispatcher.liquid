@@ -20,9 +20,8 @@ public static class CommandDispatcherExtensions
 {%- endif -%}
 {%- if cmd.ReturnsTask -%}
     await 
-{%- else -%}
+{% endif -%}
     {{ cmd.Invocation }};
-{% endif %};
 {% if cmd.AggregateRoot -%}
         await aggregateRootPersistence.Save(aggregateRoot);
 {% endif -%}

@@ -1,4 +1,6 @@
 ﻿using FluentAssertions;
+using Microsoft.AspNetCore.Http;
+using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Generators.Analyzers;
 using NForza.Cyrus.Generators.Tests.Infra;
 using Xunit.Abstractions;
@@ -388,5 +390,43 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
             .RunAsync();
 
         analyzerOutput.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Async_CommandHandler_With_Result_And_Messages_Should_Generate_Valid_CommandDispatcher_Method()
+    {
+        var source = @"
+                using System;
+                using System.Collections.Generic;
+                using System.Threading.Tasks;
+                using Microsoft.AspNetCore.Http;
+                using NForza.Cyrus.Abstractions;                
+
+                namespace Test;
+
+                [Command]
+                public record struct NewTrackCommand(Guid TrackId);
+
+                [Event]
+                public record TrackCreatedEvent(Guid TrackId);
+
+                public class NewTrackCommandHandler
+                {
+                    [CommandHandler]
+                    public async Task<(IResult Result, IEnumerable<object> Messages)> Handle(NewTrackCommand command)
+                    {
+                        return (Results.Accepted(), [new TrackCreatedEvent(command.TrackId)]);
+                    }
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        analyzerOutput.Should().BeEmpty();
+        compilerOutput.Should().NotHaveErrors();
     }
 }
