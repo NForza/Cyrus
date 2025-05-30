@@ -11,9 +11,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.5" />
-    <PackageReference Include="NForza.Cyrus" Version="1.0.276-beta-20250530-075312" />
-    <PackageReference Include="NForza.Cyrus.MassTransit" Version="1.0.276-beta-20250530-075312" />
-    <PackageReference Include="NForza.Cyrus.MSBuild" Version="1.0.276-beta-20250530-075312" />
+    <PackageReference Include="NForza.Cyrus" Version="1.0.277-beta-20250530-083624" />
+    <PackageReference Include="NForza.Cyrus.MassTransit" Version="1.0.277-beta-20250530-083624" />
+    <PackageReference Include="NForza.Cyrus.MSBuild" Version="1.0.277-beta-20250530-083624" />
   </ItemGroup>
 
   <ItemGroup>
