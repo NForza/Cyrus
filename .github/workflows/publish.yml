@@ -69,6 +69,9 @@ jobs:
     - name: Pack the TypeScriptGenerator project
       run: dotnet pack --configuration ${CONFIGURATION} --output "./src/NForza.Cyrus.NForza.Cyrus.TypeScriptGenerator/bin/${CONFIGURATION}/net9.0/publish/" "./src/NForza.Cyrus.TypeScriptGenerator/NForza.Cyrus.TypeScriptGenerator.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
 
+    - name: Pack the EF Persistence project
+      run: dotnet pack --configuration ${CONFIGURATION} --output "./src/NForza.Cyrus.NForza.Cyrus.NForza.Cyrus.EntityFramework/bin/${CONFIGURATION}/net9.0/publish/" "./src/NForza.Cyrus.EntityFramework/NForza.Cyrus.EntityFramework.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
+
     - name: List files
       run: |
         cd "./src/NForza.Cyrus.TypeScriptGenerator/bin/${CONFIGURATION}/net9.0/publish/"
