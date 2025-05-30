@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.35906.104
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TracksDemo", "TracksDemo.csproj", "{710A4066-4C4A-4A89-A581-48936C0A556B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TracksDemo", "TracksDemo\TracksDemo.csproj", "{710A4066-4C4A-4A89-A581-48936C0A556B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TracksDemo.Tests", "TracksDemo.Tests\TracksDemo.Tests.csproj", "{0F63E01A-44A4-46A3-A23D-5896905FC1FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{710A4066-4C4A-4A89-A581-48936C0A556B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{710A4066-4C4A-4A89-A581-48936C0A556B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{710A4066-4C4A-4A89-A581-48936C0A556B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F63E01A-44A4-46A3-A23D-5896905FC1FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F63E01A-44A4-46A3-A23D-5896905FC1FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F63E01A-44A4-46A3-A23D-5896905FC1FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F63E01A-44A4-46A3-A23D-5896905FC1FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,10 +1,7 @@
 using System.Reflection;
-using TracksDemo.Tracks;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
 using NForza.Cyrus;
-using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.WebApi;
 using TracksDemo;
 
@@ -26,3 +23,5 @@ var app = builder.Build();
 app.MapCyrus();
 
 await app.RunAsync();
+
+public partial class Program { }
