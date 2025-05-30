@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
         var registrarTypes = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => !a.IsFrameworkAssembly())
             .SelectMany(a => a.GetTypes())
+            .Distinct()
             .Where(t => typeof(ICyrusInitializer).IsAssignableFrom(t) && t.IsClass && !t.IsAbstract);
 
         foreach (var type in registrarTypes)

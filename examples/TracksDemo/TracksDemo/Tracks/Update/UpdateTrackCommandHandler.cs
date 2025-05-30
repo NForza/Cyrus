@@ -1,9 +1,8 @@
 ﻿using NForza.Cyrus.Abstractions;
-using TracksDemo.Tracks;
 
 namespace TracksDemo.Tracks.Update;
 
-public class UpdateTrackCommandHandler(DemoContext context)
+public class UpdateTrackCommandHandler
 {
     [CommandHandler(Route = "/tracks/{TrackId}", Verb = HttpVerb.Put)]
     public IResult Update(UpdateTrackCommand command, Track? track)
