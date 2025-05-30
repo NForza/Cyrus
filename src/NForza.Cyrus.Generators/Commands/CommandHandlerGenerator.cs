@@ -66,6 +66,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
             Handler = h,
             AggregateRoot = h.Parameters.Length == 2 ? FindAggregateRoot(cyrusGenerationContext.AggregateRoots, h.Parameters[1].Type) : null,
             CommandType = h.Parameters[0].Type.ToFullName(),
+            CommandAggregateRootIdPropertyName = h.Parameters[0].Type is INamedTypeSymbol namedTypeSymbol ? namedTypeSymbol.GetAggregateRootIdProperty()?.Name ?? null : null,
             h.Name,
             h.ReturnsVoid,
             ReturnType = (INamedTypeSymbol)h.ReturnType,
@@ -84,9 +85,10 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                 cmd.CommandType,
                 cmd.ReturnsTask,
                 cmd.AggregateRoot,
+                RequiresAsync = cmd.ReturnsTask || cmd.AggregateRoot != null,
                 AggregateRootType = cmd.AggregateRoot?.Symbol?.ToFullName() ?? "",
                 AggregateRootIdPropertyType = cmd.AggregateRoot?.AggregateRootProperty?.Type.ToFullName() ?? "",
-                AggregateRootIdPropertyName = cmd.AggregateRoot?.AggregateRootProperty?.Name ?? "",
+                AggregateRootIdPropertyName = cmd.CommandAggregateRootIdPropertyName,
             }).ToList()
         };
 

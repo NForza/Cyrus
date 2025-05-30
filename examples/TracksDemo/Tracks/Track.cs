@@ -1,4 +1,6 @@
-﻿namespace TracksDemo.Tracks;
+﻿using NForza.Cyrus.Aggregates;
+
+namespace TracksDemo.Tracks;
 
 [AggregateRoot]
 public class Track(TrackId id, Title title, Artist artist, FileName fileName, AudioFormat audioFormat)

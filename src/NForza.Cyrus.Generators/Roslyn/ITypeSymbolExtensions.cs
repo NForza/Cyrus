@@ -125,7 +125,7 @@ internal static class ITypeSymbolExtensions
             return false;
 
         return namedType.Name == "Task" &&
-                namedType.ContainingNamespace.ToDisplayString() == "System.Threading.Tasks";
+                namedType.OriginalDefinition.Name.StartsWith("Task");
     }
 
     public static (bool isTaskType, ITypeSymbol? typeSymbol) GetTaskType(this ITypeSymbol typeSymbol)
