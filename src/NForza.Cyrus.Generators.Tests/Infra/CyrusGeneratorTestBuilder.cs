@@ -13,6 +13,7 @@ internal class CyrusGeneratorTestBuilder
 {
     private string? source;
     private Action<string> logAction = s => { };
+    Dictionary<string, string> globalOptions = [];
 
     public async Task<(ImmutableArray<Diagnostic> compilerOutput, ImmutableArray<Diagnostic> analyzerOutput, IEnumerable<SyntaxTree> generatedSource)> RunAsync()
     {
@@ -44,7 +45,11 @@ internal class CyrusGeneratorTestBuilder
 
         IIncrementalGenerator generator = new CyrusGenerator();
 
-        GeneratorDriver driver = CSharpGeneratorDriver.Create([generator]);
+        var analyzerConfigOptionsProvider = new TestAnalyzerConfigOptionsProvider(globalOptions);
+
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(
+            generators: [generator.AsSourceGenerator()], 
+            optionsProvider: analyzerConfigOptionsProvider);
 
         var updatedDriver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
         var runResult = updatedDriver.GetRunResult(); 
@@ -71,6 +76,12 @@ internal class CyrusGeneratorTestBuilder
         });
 
         return (compileDiagnostics, analyzerDiagnostics, generatedSyntaxTrees);
+    }
+
+    internal CyrusGeneratorTestBuilder InTestProject()
+    {
+        globalOptions.Add("build_property.IsTestProject", "true");
+        return this;
     }
 
     internal CyrusGeneratorTestBuilder LogGeneratedSource(Action<string> value)

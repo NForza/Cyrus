@@ -27,9 +27,9 @@ public class TypedIdTests
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().Contain("partial record struct CustomerId(Guid Value): IGuidId, IComparable<CustomerId>, IComparable");
-        generatedSyntaxTrees.Should().Contain("JsonConverter<CustomerId>");
-        generatedSyntaxTrees.Should().Contain("CustomerIdTypeConverter");
+        generatedSyntaxTrees.Should().ContainSource("partial record struct CustomerId(Guid Value): IGuidId, IComparable<CustomerId>, IComparable");
+        generatedSyntaxTrees.Should().ContainSource("JsonConverter<CustomerId>");
+        generatedSyntaxTrees.Should().ContainSource("CustomerIdTypeConverter");
     }
 
     [Fact]

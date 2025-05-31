@@ -38,7 +38,7 @@ public class WebApiTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().Contain("NewCustomerCommandContract");
+        generatedSyntaxTrees.Should().ContainSource("NewCustomerCommandContract");
         generatedSyntaxTrees.Should().ContainMatch("*Id*= 1;*");
     }
 
@@ -74,7 +74,7 @@ public class WebApiTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().Contain("NewCustomerCommandContract");
+        generatedSyntaxTrees.Should().ContainSource("NewCustomerCommandContract");
         generatedSyntaxTrees.Should().ContainMatch("*name!*");
     }
 
@@ -111,7 +111,7 @@ public class WebApiTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().Contain("NewCustomerCommandContract");
+        generatedSyntaxTrees.Should().ContainSource("NewCustomerCommandContract");
         generatedSyntaxTrees.Should().ContainMatch("*val.Value*");
     }
 
@@ -147,7 +147,7 @@ public class WebApiTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().Contain("NewCustomerCommandContract");
+        generatedSyntaxTrees.Should().ContainSource("NewCustomerCommandContract");
         generatedSyntaxTrees.Should().ContainMatch("*val!*");
     }
 
@@ -184,7 +184,7 @@ public class WebApiTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().Contain("NewCustomerCommandContract");
+        generatedSyntaxTrees.Should().ContainSource("NewCustomerCommandContract");
         generatedSyntaxTrees.Should().ContainMatch("*internal int? Id { get; set; } = 1;*");
     }
 
@@ -220,7 +220,7 @@ public class WebApiTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().Contain("NewCustomerCommandContract");
+        generatedSyntaxTrees.Should().ContainSource("NewCustomerCommandContract");
         generatedSyntaxTrees.Should().ContainMatch("*public int? Id { get; set; } = 1;*");
     }
 
@@ -256,7 +256,7 @@ public class WebApiTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().Contain("new ModelEndpointDefinition(");
+        generatedSyntaxTrees.Should().ContainSource("new ModelEndpointDefinition(");
     }
 
 }

@@ -39,9 +39,9 @@ public class QueryHandlerTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().Contain("ServiceCollectionJsonConverterExtensions: ICyrusInitializer");
-        generatedSyntaxTrees.Should().Contain("Task<string> Query(this IQueryProcessor queryProcessor, global::Test.GetCustomerByIdQuery query");
-        generatedSyntaxTrees.Should().Contain("QueryHandlersRegistration");
+        generatedSyntaxTrees.Should().ContainSource("ServiceCollectionJsonConverterExtensions: ICyrusInitializer");
+        generatedSyntaxTrees.Should().ContainSource("Task<string> Query(this IQueryProcessor queryProcessor, global::Test.GetCustomerByIdQuery query");
+        generatedSyntaxTrees.Should().ContainSource("QueryHandlersRegistration");
         generatedSyntaxTrees.Should().NotContainSource("AddTransient<global::Test.CustomerQuery>()");
     }
 
@@ -141,7 +141,7 @@ public class QueryHandlerTests(ITestOutputHelper outputWindow)
         compilerOutput.Should().NotHaveErrors();
         analyzerOutput.Should().BeEmpty();
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().Contain("MapGet");
+        generatedSyntaxTrees.Should().ContainSource("MapGet");
     }
 
 }
