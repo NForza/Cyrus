@@ -28,7 +28,8 @@ public class CyrusGenerationContext
         ImmutableArray<AggregateRootDefinition> aggregateRoots,
         ImmutableArray<SignalRHubClassDefinition> signalRHubs,
         GenerationConfig generationConfig, 
-        LiquidEngine liquidEngine)
+        LiquidEngine liquidEngine,
+        bool isTestProject)
     {
         Compilation = compilation;
         GuidIds = guidIds;
@@ -48,6 +49,7 @@ public class CyrusGenerationContext
         SignalRHubs = signalRHubs;
         GenerationConfig = generationConfig;
         LiquidEngine = liquidEngine;
+        IsTestProject = isTestProject;
     }
 
     public Compilation Compilation { get; }
@@ -68,6 +70,8 @@ public class CyrusGenerationContext
     public ImmutableArray<SignalRHubClassDefinition> SignalRHubs { get; }
     public GenerationConfig GenerationConfig { get; }
     public LiquidEngine LiquidEngine { get; }
+    public bool IsTestProject { get; }
+
     public ImmutableArray<INamedTypeSymbol> TypedIds => GuidIds.AddRange(IntIds).AddRange(StringIds);
     public ImmutableArray<INamedTypeSymbol> AllCommands => AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToImmutableArray();
     public ImmutableArray<IMethodSymbol> AllCommandHandlers => AllCommandsAndHandlers.OfType<IMethodSymbol>().ToImmutableArray();

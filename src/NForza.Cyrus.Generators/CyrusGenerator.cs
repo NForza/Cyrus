@@ -25,6 +25,12 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
     {
         DebugThisGenerator(true);
 
+        var isTestProjectProvider = context.AnalyzerConfigOptionsProvider
+            .Select((options, _) =>
+                options.GlobalOptions.TryGetValue("build_property.IsTestProject", out var value)
+                && value.Equals("true", StringComparison.OrdinalIgnoreCase)
+            );
+
         var templateOverrides = GetTemplateOverridesProvider(context);
 
         var configProvider = ConfigProvider(context);
@@ -64,9 +70,10 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
             .Combine(validatorProvider)
             .Combine(templateOverrides)
             .Combine(configProvider)
+            .Combine(isTestProjectProvider)
             .Select((combinedProviders, _) =>
             {
-                var (((((((((((((((((compilation, intIds), guidIds), stringIds), commands), commandHandlers), allCommandsAndHandlers), queries), queryHandlers), allQueriesAndHandlers), eventHandlers), events), allEvents), aggregateRoots), signalRHubs), validators), templateOverrides), generationConfig) = combinedProviders;
+                var ((((((((((((((((((compilation, intIds), guidIds), stringIds), commands), commandHandlers), allCommandsAndHandlers), queries), queryHandlers), allQueriesAndHandlers), eventHandlers), events), allEvents), aggregateRoots), signalRHubs), validators), templateOverrides), generationConfig), isTestProject) = combinedProviders;
                 var liquidEngine = new LiquidEngine(Assembly.GetExecutingAssembly(), new(templateOverrides));
                 return new CyrusGenerationContext(
                     compilation: compilation,
@@ -86,13 +93,17 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
                     signalRHubs: signalRHubs,
                     validators: validators,
                     generationConfig: generationConfig,
-                    liquidEngine: liquidEngine); ;
+                    liquidEngine: liquidEngine,
+                    isTestProject: isTestProject);
             });
 
         context.RegisterSourceOutput(cyrusGenerationContext, (sourceProductionContext, cyrusGenerationContext) =>
         {
             try
             {
+                if (cyrusGenerationContext.IsTestProject)
+                    return;
+
                 Assembly.GetExecutingAssembly()
                     .GetTypes()
                     .Where(t => t.IsClass && t.IsSubclassOf(typeof(CyrusGeneratorBase)) && !t.IsAbstract)
