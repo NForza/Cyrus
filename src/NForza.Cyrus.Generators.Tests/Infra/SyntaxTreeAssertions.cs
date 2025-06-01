@@ -6,7 +6,7 @@ namespace NForza.Cyrus.Generators.Tests.Infra;
 
 public static class SyntaxTreeAssertions
 {
-    public static void Contain(this GenericCollectionAssertions<SyntaxTree> syntaxTrees, string source)
+    public static void ContainSource(this GenericCollectionAssertions<SyntaxTree> syntaxTrees, string source)
     {
         syntaxTrees.Subject.Should().Contain(tree => tree.ToString().Contains(source), $"Expected generated syntax tree to contain source: {source}");
     }

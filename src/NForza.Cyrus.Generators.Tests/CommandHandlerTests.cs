@@ -40,11 +40,11 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().Contain("ServiceCollectionJsonConverterExtensions: ICyrusInitializer");
-        generatedSyntaxTrees.Should().Contain("CommandDispatcherExtensions");
-        generatedSyntaxTrees.Should().Contain("Handle(this ICommandDispatcher commandDispatcher, global::Test.CreateCustomerCommand command");
-        generatedSyntaxTrees.Should().Contain("CommandHandlersRegistration");
-        generatedSyntaxTrees.Should().Contain("AddTransient<global::Test.Customer>()");
+        generatedSyntaxTrees.Should().ContainSource("ServiceCollectionJsonConverterExtensions: ICyrusInitializer");
+        generatedSyntaxTrees.Should().ContainSource("CommandDispatcherExtensions");
+        generatedSyntaxTrees.Should().ContainSource("Handle(this ICommandDispatcher commandDispatcher, global::Test.CreateCustomerCommand command");
+        generatedSyntaxTrees.Should().ContainSource("CommandHandlersRegistration");
+        generatedSyntaxTrees.Should().ContainSource("AddTransient<global::Test.Customer>()");
     }
 
     [Fact]
@@ -78,9 +78,9 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().Contain("ServiceCollectionJsonConverterExtensions: ICyrusInitializer");
-        generatedSyntaxTrees.Should().Contain("CommandDispatcherExtensions");
-        generatedSyntaxTrees.Should().Contain("Handle(this ICommandDispatcher commandDispatcher, global::Test.CreateCustomerCommand command");
+        generatedSyntaxTrees.Should().ContainSource("ServiceCollectionJsonConverterExtensions: ICyrusInitializer");
+        generatedSyntaxTrees.Should().ContainSource("CommandDispatcherExtensions");
+        generatedSyntaxTrees.Should().ContainSource("Handle(this ICommandDispatcher commandDispatcher, global::Test.CreateCustomerCommand command");
         generatedSyntaxTrees.Should().NotContainSource("CommandHandlersRegistration");
         generatedSyntaxTrees.Should().NotContainSource("AddTransient<global::Test.Customer>()");
     }
@@ -178,7 +178,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
         compilerOutput.Should().NotHaveErrors();
         analyzerOutput.Should().BeEmpty();
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().Contain("MapPost");
+        generatedSyntaxTrees.Should().ContainSource("MapPost");
     }
 
     [Fact]
@@ -428,5 +428,6 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
 
         analyzerOutput.Should().BeEmpty();
         compilerOutput.Should().NotHaveErrors();
+        generatedSyntaxTrees.Should().ContainSource("Handle(this ICommandDispatcher");
     }
 }

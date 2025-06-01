@@ -11,8 +11,10 @@ namespace NForza.Cyrus.Generators.Tests.Infra;
 
 internal class CyrusGeneratorTestBuilder
 {
+    private const string enableCyrusBuildPropertyKey = "build_property.EnableCyrusGeneration";
     private string? source;
     private Action<string> logAction = s => { };
+    Dictionary<string, string> globalOptions = new() { [enableCyrusBuildPropertyKey] = "true" };
 
     public async Task<(ImmutableArray<Diagnostic> compilerOutput, ImmutableArray<Diagnostic> analyzerOutput, IEnumerable<SyntaxTree> generatedSource)> RunAsync()
     {
@@ -44,7 +46,11 @@ internal class CyrusGeneratorTestBuilder
 
         IIncrementalGenerator generator = new CyrusGenerator();
 
-        GeneratorDriver driver = CSharpGeneratorDriver.Create([generator]);
+        var analyzerConfigOptionsProvider = new TestAnalyzerConfigOptionsProvider(globalOptions);
+
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(
+            generators: [generator.AsSourceGenerator()], 
+            optionsProvider: analyzerConfigOptionsProvider);
 
         var updatedDriver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
         var runResult = updatedDriver.GetRunResult(); 
@@ -71,6 +77,12 @@ internal class CyrusGeneratorTestBuilder
         });
 
         return (compileDiagnostics, analyzerDiagnostics, generatedSyntaxTrees);
+    }
+
+    internal CyrusGeneratorTestBuilder InTestProject()
+    {
+        globalOptions.Remove(enableCyrusBuildPropertyKey);
+        return this;
     }
 
     internal CyrusGeneratorTestBuilder LogGeneratedSource(Action<string> value)
