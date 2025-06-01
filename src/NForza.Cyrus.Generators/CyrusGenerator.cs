@@ -14,6 +14,7 @@ using NForza.Cyrus.Generators.SignalR;
 using NForza.Cyrus.Generators.TypedIds;
 using NForza.Cyrus.Generators.Validators;
 using NForza.Cyrus.Generators.WebApi;
+using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators;
@@ -25,11 +26,7 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
     {
         DebugThisGenerator(true);
 
-        var isTestProjectProvider = context.AnalyzerConfigOptionsProvider
-            .Select((options, _) =>
-                options.GlobalOptions.TryGetValue("build_property.IsTestProject", out var value)
-                && value.Equals("true", StringComparison.OrdinalIgnoreCase)
-            );
+        var isTestProjectProvider = context.CodeGenerationSuppressed();
 
         var templateOverrides = GetTemplateOverridesProvider(context);
 

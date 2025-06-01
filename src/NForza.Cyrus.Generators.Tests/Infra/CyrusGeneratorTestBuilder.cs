@@ -11,9 +11,10 @@ namespace NForza.Cyrus.Generators.Tests.Infra;
 
 internal class CyrusGeneratorTestBuilder
 {
+    private const string enableCyrusBuildPropertyKey = "build_property.EnableCyrusGeneration";
     private string? source;
     private Action<string> logAction = s => { };
-    Dictionary<string, string> globalOptions = [];
+    Dictionary<string, string> globalOptions = new() { [enableCyrusBuildPropertyKey] = "true" };
 
     public async Task<(ImmutableArray<Diagnostic> compilerOutput, ImmutableArray<Diagnostic> analyzerOutput, IEnumerable<SyntaxTree> generatedSource)> RunAsync()
     {
@@ -80,7 +81,7 @@ internal class CyrusGeneratorTestBuilder
 
     internal CyrusGeneratorTestBuilder InTestProject()
     {
-        globalOptions.Add("build_property.IsTestProject", "true");
+        globalOptions.Remove(enableCyrusBuildPropertyKey);
         return this;
     }
 
