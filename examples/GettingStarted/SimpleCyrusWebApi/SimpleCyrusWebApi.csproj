@@ -9,11 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="11.11.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.4" />
-    <PackageReference Include="NForza.Cyrus" Version="1.0.202" />
-    <PackageReference Include="NForza.Cyrus.MassTransit" Version="1.0.202" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.5" />
+    <PackageReference Include="NForza.Cyrus" Version="1.0.287" />
+    <PackageReference Include="NForza.Cyrus.MassTransit" Version="1.0.287" />
   </ItemGroup>
 
 </Project>
