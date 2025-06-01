@@ -1,4 +1,3 @@
-import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { AddCustomerCommand } from './AddCustomerCommand';
@@ -11,6 +10,7 @@ export class CustomerHubService {
   constructor(private baseUrl: string) {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`${this.baseUrl}/customer`) 
+      .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
       .build();
     this.hubConnection.on('customerCreatedEvent', (data: CustomerCreatedEvent) => {

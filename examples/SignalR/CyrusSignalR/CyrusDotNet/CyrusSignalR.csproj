@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -10,8 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NForza.Cyrus" Version="1.0.270-beta-20250517-065240" />
-    <PackageReference Include="NForza.Cyrus.MSBuild" Version="1.0.270-beta-20250517-065240" />
+    <PackageReference Include="NForza.Cyrus" Version="1.0.287" />
+    <PackageReference Include="NForza.Cyrus.MSBuild" Version="1.0.287" />
   </ItemGroup>
 
 </Project>

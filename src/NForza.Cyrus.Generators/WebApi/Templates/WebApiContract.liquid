@@ -39,7 +39,7 @@ public class {{ Name | as-contract }}
 		{% if ConstructorProperties.size > 0 -%}
 		{
 			{%- for prop in ConstructorProperties %}
-			{{ prop.Name }} = {{ prop.Name }}{% if prop.UseExclamation %}!{% else %}.Value{% endif %}{% unless forloop.last %},{% endunless %}
+			{{ prop.Name }} = {% if prop.UseExclamation %}({{ prop.Type }}){% endif %}{{ prop.Name }}{% if prop.UseExclamation %}!{% else %}.Value{% endif %}{% unless forloop.last %},{% endunless %}
 			{%- endfor %}
 		}
 		{%- endif -%}

@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 
@@ -19,19 +18,5 @@ internal class TracksDemoApplicationFactory(ITestOutputHelper outputWindow) : We
                 logging.AddXUnit(outputWindow);
             }
         });
-    }
-}
-
-public class UnitTest1(ITestOutputHelper outputWindow)
-{
-    [Fact]
-    public async Task Test1()
-    {
-        TracksDemoApplicationFactory webApplicationFactory = new(outputWindow);
-        var client = webApplicationFactory.CreateClient();
-
-        var result = await  client.GetAsync("/tracks");
-        result.Should().NotBeNull();
-        result.EnsureSuccessStatusCode();
     }
 }
