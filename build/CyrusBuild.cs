@@ -51,8 +51,7 @@ class CyrusBuild : NukeBuild
 
                 DotNetTasks.DotNetBuild(s => s
                     .SetProjectFile(project)
-                    .SetConfiguration(Configuration)
-                    .EnableNoRestore());
+                    .SetConfiguration(Configuration));
             }
         });
 
