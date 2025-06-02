@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tools.DotNet;
@@ -34,18 +35,20 @@ class CyrusBuild : NukeBuild
         .DependsOn(Restore)
         .Executes(() =>
         {
-            DotNetTasks.DotNetBuild(s => s
-                .SetProjectFile(cyrusSolutionPath)
-                .SetConfiguration(Configuration)
-                .EnableNoRestore());
+            var projects = new[]
+            {
+                cyrusSolutionPath,
+                massTransitExamplePath,
+                signalRExamplePath
+            };
 
-            DotNetTasks.DotNetBuild(s => s
-                .SetProjectFile(massTransitExamplePath)
-                .SetConfiguration(Configuration));
-
-            DotNetTasks.DotNetBuild(s => s
-                .SetProjectFile(signalRExamplePath)
-                .SetConfiguration(Configuration));
+            Parallel.ForEach(projects, project =>
+            {
+                DotNetTasks.DotNetBuild(s => s
+                    .SetProjectFile(project)
+                    .SetConfiguration(Configuration)
+                    .EnableNoRestore());
+            });
         });
 
     Target Test => _ => _
