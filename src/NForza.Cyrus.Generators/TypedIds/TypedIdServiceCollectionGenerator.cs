@@ -36,7 +36,8 @@ public class TypedIdInitializerGenerator : CyrusGeneratorBase
         var converters = string.Join(Environment.NewLine, typedIds.Select(t => $"services.AddTransient<JsonConverter, {t.Name}JsonConverter>();"));
 
         var imports = typedIds
-            .Select(t => t.ContainingNamespace.ToDisplayString())
+            .Select(t => t.ContainingNamespace.GetNameOrEmpty())
+            .Where(s => !string.IsNullOrEmpty(s))
             .Concat(["System", "System.Collections.Generic"])
             .Distinct();
 

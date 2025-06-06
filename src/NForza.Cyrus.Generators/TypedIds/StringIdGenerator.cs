@@ -30,7 +30,7 @@ public class StringIdGenerator : CyrusGeneratorBase
         var model = new
         {
             item.Name,
-            Namespace = item.ContainingNamespace.ToDisplayString(),
+            Namespace = item.ContainingNamespace.GetNameOrEmpty(),
             UnderlyingType = item.GetUnderlyingTypeOfTypedId(),
             Minimum = min,
             HasMinimum = min.HasValue,

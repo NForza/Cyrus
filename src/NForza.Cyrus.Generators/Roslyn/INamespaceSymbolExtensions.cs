@@ -5,6 +5,12 @@ namespace NForza.Cyrus.Generators.Roslyn;
 
 public static class INamespaceSymbolExtensions
 {
+
+    public static string GetNameOrEmpty(this INamespaceSymbol symbol)
+    {
+        return symbol.IsGlobalNamespace ? string.Empty : symbol.ToDisplayString();
+    }
+
     public static IEnumerable<INamedTypeSymbol> GetAllTypes(this INamespaceSymbol namespaceSymbol)
     {
         foreach (var member in namespaceSymbol.GetMembers())

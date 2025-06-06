@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.TypedIds;
@@ -19,11 +20,10 @@ public class StringIdTypeConverterGenerator : CyrusGeneratorBase
 
     private string GenerateStringIdTypeConverter(INamedTypeSymbol item, LiquidEngine liquidEngine)
     {
-        string fullyQualifiedNamespace = item.ContainingNamespace.ToDisplayString();
         var model = new
         {
             item.Name,
-            Namespace = fullyQualifiedNamespace
+            Namespace = item.ContainingNamespace.GetNameOrEmpty()
         };
         var resolvedSource = liquidEngine.Render(model, "StringIdTypeConverter");
         return resolvedSource;

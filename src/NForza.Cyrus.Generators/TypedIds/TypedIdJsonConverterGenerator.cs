@@ -21,7 +21,7 @@ public class TypedIdJsonConverterGenerator : CyrusGeneratorBase
 
     private string GenerateJsonConverterForTypedId(INamedTypeSymbol item, LiquidEngine liquidEngine)
     {
-        string fullyQualifiedNamespace = item.ContainingNamespace.ToDisplayString();
+        string fullyQualifiedNamespace = item.ContainingNamespace.GetNameOrEmpty();
         var underlyingTypeName = item.GetUnderlyingTypeOfTypedId();
 
         string? templateName = underlyingTypeName switch
