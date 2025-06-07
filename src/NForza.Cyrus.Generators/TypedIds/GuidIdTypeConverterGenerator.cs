@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.TypedIds;
@@ -22,7 +23,7 @@ public class GuidIdTypeConverterGenerator : CyrusGeneratorBase
         var model = new
         {
             TypedIdName = item.Name,
-            NamespaceName = item.ContainingNamespace.ToDisplayString()
+            NamespaceName = item.ContainingNamespace.GetNameOrEmpty()
         };
 
         string source = liquidEngine.Render(model, "GuidIdTypeConverter");

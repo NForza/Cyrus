@@ -1,6 +1,4 @@
 ﻿using NForza.Cyrus.Abstractions;
-using TracksDemo;
-using TracksDemo.Tracks;
 
 namespace TracksDemo.Tracks.Create;
 
@@ -9,13 +7,13 @@ public class NewTrackCommandHandler(DemoContext context)
     [Validator]
     public static IEnumerable<string> Validate(NewTrackCommand command)
     {
-        if (string.IsNullOrWhiteSpace(command.Title))
+        if (command.Title.IsEmpty())
         {
-            yield return "Name cannot be empty.";
+            yield return "Title cannot be empty.";
         }
-        if (string.IsNullOrWhiteSpace(command.FileName))
+        if (command.FileName.IsEmpty())
         {
-            yield return "Address cannot be empty.";
+            yield return "FileName cannot be empty.";
         }
     }
 

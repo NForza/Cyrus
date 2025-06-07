@@ -2,7 +2,9 @@ using System;
 
 #nullable enable
 
+{% if NamespaceName != "" %}
 namespace {{ NamespaceName }};
+{% endif -%}
 
 public partial class {{ TypedIdName }}TypeConverter : System.ComponentModel.TypeConverter
 {

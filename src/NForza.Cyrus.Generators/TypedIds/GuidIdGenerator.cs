@@ -36,7 +36,7 @@ public class GuidIdGenerator : CyrusGeneratorBase
         var model = new
         {
             item.Name,
-            Namespace = item.ContainingNamespace.ToDisplayString(),
+            Namespace = item.ContainingNamespace.GetNameOrEmpty(),
             UnderlyingType = item.GetUnderlyingTypeOfTypedId(),
             Default = "Guid.Empty"
         };

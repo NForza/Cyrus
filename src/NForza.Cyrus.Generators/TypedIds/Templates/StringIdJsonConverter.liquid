@@ -2,7 +2,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+{% if Namespace != "" %}
 namespace {{ Namespace }};
+{% endif -%}
 
 public class {{ Name }}JsonConverter : JsonConverter<{{ Name }}>
 {

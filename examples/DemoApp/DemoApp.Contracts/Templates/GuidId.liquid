@@ -5,9 +5,11 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Text.Json.Serialization;
 using NForza.Cyrus.Abstractions;
 
-// Overridden template
+// template override
 
+{% if Namespace != "" %}
 namespace {{ Namespace }};
+{% endif %}
 
 [JsonConverter(typeof({{ Name }}JsonConverter))]
 [TypeConverter(typeof({{ Name }}TypeConverter))]

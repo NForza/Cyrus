@@ -8,6 +8,7 @@ using NForza.Cyrus;
 using NForza.Cyrus.WebApi;
 using DemoApp.WebApi;
 using Microsoft.EntityFrameworkCore;
+using NForza.Cyrus.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,3 +47,6 @@ ILogger logger = app.Services.GetRequiredService<ILogger<Program>>();
 app.MapCyrus(logger);
 
 await app.RunAsync();
+
+//[GuidId]
+//public partial record struct SomeId;

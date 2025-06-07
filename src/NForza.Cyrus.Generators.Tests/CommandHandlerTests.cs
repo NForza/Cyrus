@@ -430,4 +430,35 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
         compilerOutput.Should().NotHaveErrors();
         generatedSyntaxTrees.Should().ContainSource("Handle(this ICommandDispatcher");
     }
+
+    [Fact]
+    public async Task Command_And_CommandHandler_Without_Namespace_Should_Generate_Valid_Code()
+    {
+        var source = @"
+                using System;
+                using System.Collections.Generic;
+                using System.Threading.Tasks;
+                using Microsoft.AspNetCore.Http;
+                using NForza.Cyrus.Abstractions;                
+
+                [Command]
+                public record struct NewTrackCommand(Guid TrackId);
+
+                public class NewTrackCommandHandler
+                {
+                    [CommandHandler]
+                    public async Task<IResult> Handle(NewTrackCommand command) => Results.Accepted();
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        analyzerOutput.Should().BeEmpty();
+        compilerOutput.Should().NotHaveErrors();
+    }
+
 }
