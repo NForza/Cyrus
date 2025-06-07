@@ -15,13 +15,24 @@ await app.RunAsync();
 [Command]
 public partial record struct HelloCommand;
 
-public partial class HelloCommandHandler
+public static class HelloCommandHandler
 {
     [CommandHandler(Route = "hello-cyrus")]
-    public ValueTask HandleAsync(HelloCommand command)
+    public static void HandleAsync(HelloCommand command)
     {
         Console.WriteLine("Hello, Cyrus!");
-        return ValueTask.CompletedTask;
+    }
+}
+
+[Query]
+public partial record struct AreYouOkQuery;
+
+public static class AreYouOkQueryHandler
+{
+    [QueryHandler(Route = "are-you-ok")]
+    public static string HandleAsync(AreYouOkQuery query)
+    {
+        return "yes";
     }
 }
 
