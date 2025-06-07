@@ -2,7 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
+{% if Namespace != "" -%}
 namespace {{ Namespace }};
+{% endif -%}
 
 [JsonSerializable(typeof({{ Name | as-contract }}))]
 public class {{ Name | as-contract }}

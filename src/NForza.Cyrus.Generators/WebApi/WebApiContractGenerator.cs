@@ -53,7 +53,7 @@ public static class WebApiContractGenerator
                 .ToList();
             var model = new
             {
-                Namespace = contract.ContainingNamespace,
+                Namespace = contract.ContainingNamespace.GetNameOrEmpty(),
                 contract.Name,
                 FullName = contract.ToFullName(),
                 ConstructorArguments = constructorArguments.Select(p =>
