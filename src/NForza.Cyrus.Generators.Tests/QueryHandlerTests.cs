@@ -144,4 +144,34 @@ public class QueryHandlerTests(ITestOutputHelper outputWindow)
         generatedSyntaxTrees.Should().ContainSource("MapGet");
     }
 
+    [Fact]
+    public async Task Generating_Query_And_QueryHandler_Without_Namespace_Should_Generate_Valid_Code()
+    {
+        var source = @"
+                using System;       
+                using NForza.Cyrus.Abstractions;
+
+                [Query]
+                public record GetCustomerByIdQuery(Guid Id);
+
+                public static class CustomerQuery
+                {
+                    [QueryHandler(Route = ""/"")]
+                    public static string Handle(GetCustomerByIdQuery query)
+                    {
+                        return query.Id.ToString();
+                    }
+                }
+             ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        compilerOutput.Should().NotHaveErrors();
+        analyzerOutput.Should().BeEmpty();
+        generatedSyntaxTrees.Should().NotBeEmpty();
+    }
 }
