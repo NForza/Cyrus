@@ -460,5 +460,34 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
         compilerOutput.Should().NotHaveErrors();
     }
+    [Fact]
+    public async Task CommandHandler_With_CancellationToken_Should_Generate_Valid_Code()
+    {
+        var source = @"
+                using System;
+                using System.Collections.Generic;
+                using System.Threading;
+                using System.Threading.Tasks;
+                using Microsoft.AspNetCore.Http;
+                using NForza.Cyrus.Abstractions;                
 
+                [Command]
+                public record struct NewTrackCommand(Guid TrackId);
+
+                public class NewTrackCommandHandler
+                {
+                    [CommandHandler]
+                    public async Task<IResult> Handle(NewTrackCommand command, CancellationToken cancellationToken) => Results.Accepted();
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        analyzerOutput.Should().BeEmpty();
+        compilerOutput.Should().NotHaveErrors();
+    }
 }

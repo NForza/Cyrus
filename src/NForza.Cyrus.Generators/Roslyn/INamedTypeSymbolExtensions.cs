@@ -96,6 +96,10 @@ public static class INamedTypeSymbolExtensions
                 .Select(a => a.AttributeClass?.Name ?? "")
                 .Any(name => name == attributeName || name == attributeName + "Attribute");
 
+    public static bool IsCancellationToken(this INamedTypeSymbol typeSymbol)
+        => typeSymbol.Name == "CancellationToken" 
+           && typeSymbol.ContainingNamespace.ToDisplayString() == "System.Threading";
+
     public static bool IsAggregateRoot(this INamedTypeSymbol typeSymbol) 
         => typeSymbol.HasAttribute("AggregateRoot");
 
