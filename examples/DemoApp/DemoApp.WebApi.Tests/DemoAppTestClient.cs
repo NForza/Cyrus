@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading.Tasks;
+using Alba;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -10,26 +12,17 @@ using Xunit.Abstractions;
 
 namespace DemoApp.WebApi.Tests;
 
-internal class DemoAppTestClient
+internal static class DemoAppTestClient
 {
-    private readonly WebApplicationFactory<Program> factory;
-
-    public DemoAppTestClient(ITestOutputHelper testOutput)
+    public static async Task<IAlbaHost> GetHostAsync(ITestOutputHelper testOutput)
     {
-        factory = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder =>
+        return await AlbaHost.For<Program>(builder =>
+        {
+            builder.ConfigureTestServices(services =>
             {
-                builder.ConfigureTestServices(services =>
-                {
-                    services.AddSingleton<IEventBus, RecordingLocalEventBus>();
-                });
-                builder.ConfigureLogging((ILoggingBuilder logging) => logging.AddXUnit(testOutput));
+                services.AddSingleton<IEventBus, RecordingLocalEventBus>();
             });
-    }
-
-    public HttpClient CreateClient() => factory.CreateClient();
-    public (HttpClient, IServiceProvider) CreateClientAndServiceProvider()
-    {
-        return (factory.CreateClient(), factory.Services);
+            builder.ConfigureLogging((ILoggingBuilder logging) => logging.AddXUnit(testOutput));
+        });
     }
 }
