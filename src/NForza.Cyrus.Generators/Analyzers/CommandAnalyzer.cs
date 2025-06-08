@@ -65,8 +65,9 @@ internal class CommandAnalyzer : CyrusAnalyzerBase
                 }
                 aggregateRootFound = true;
 
+                // We need to check if the command has an AggregateRootId property.
                 var firstParameter = methodSymbol.Parameters[0];
-                var commandHasAggregateRootId = firstParameter.Type is INamedTypeSymbol parameterType && parameterType.GetAggregateRootIdProperty() != null;
+                var commandHasAggregateRootId = firstParameter.Type is INamedTypeSymbol commandParameterType && commandParameterType.GetAggregateRootIdProperty() != null;
                 if (!commandHasAggregateRootId)
                 {
                     var diagnostic = Diagnostic.Create(
@@ -76,10 +77,22 @@ internal class CommandAnalyzer : CyrusAnalyzerBase
                     context.ReportDiagnostic(diagnostic);
                     return;
                 }
+
+                // We need to check if the AggregateRoot itself has an AggregateRootId property.
+                var aggregateRootHasAggregateRootId = param.Type is INamedTypeSymbol parameterType && parameterType.GetAggregateRootIdProperty() != null;
+                if (!aggregateRootHasAggregateRootId)
+                {
+                    var diagnostic = Diagnostic.Create(
+                        DiagnosticDescriptors.AggregateRootShouldHaveAggregateRootIdProperty,
+                        firstParameter.Locations.FirstOrDefault() ?? location,
+                        methodSymbol.ToDisplayString());
+                    context.ReportDiagnostic(diagnostic);
+                    return;
+                }
             }
 
             var cancellationToken = param.Type is INamedTypeSymbol cancellationTokenTypeSymbol && cancellationTokenTypeSymbol.IsCancellationToken();
-            if (cancellationTokenFound)
+            if (cancellationToken)
             {
                 if (cancellationTokenFound)
                 {
@@ -102,32 +115,56 @@ internal class CommandAnalyzer : CyrusAnalyzerBase
                 context.ReportDiagnostic(diagnostic);
                 return;
             }
+        }
 
-            if (methodSymbol.ReturnType is INamedTypeSymbol t && t.IsTupleType)
+        void ReportUnrecognizedParameter()
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DiagnosticDescriptors.UnrecognizedParameterForCommandHandler,
+                location,
+                methodSymbol.ToDisplayString()));
+        }
+
+        var extraParams = parameters.Count;
+        if (extraParams == 2)
+        {
+            if (aggregateRootFound ^ cancellationTokenFound)
             {
-                foreach (var te in t.TupleElements)
-                {
-                    if (te.Type.ToDisplayString() == "Microsoft.AspNetCore.Http.IResult" &&
-                        te.Name != "Result")
-                    {
-                        location = te.Locations.FirstOrDefault() ?? Location.None;
-                        var diagnostic = Diagnostic.Create(
-                            DiagnosticDescriptors.IResultTupleElementShouldBeCalledResult,
-                            location,
-                            te.ToDisplayString());
-                        context.ReportDiagnostic(diagnostic);
-                    }
+                ReportUnrecognizedParameter();
+            }
+        }
+        else if (extraParams == 1)
+        {
+            if (!aggregateRootFound && !cancellationTokenFound)
+            {
+                ReportUnrecognizedParameter();
+            }
+        }
 
-                    if ((te.Type.ToDisplayString() == "object" || te.Type.ToDisplayString() == "System.Collections.Generic.IEnumerable<object>") &&
-                        te.Name != "Messages")
-                    {
-                        location = te.Locations.FirstOrDefault() ?? Location.None;
-                        var diagnostic = Diagnostic.Create(
-                            DiagnosticDescriptors.MessagesTupleElementShouldBeCalledMessages,
-                            location,
-                            te.ToDisplayString());
-                        context.ReportDiagnostic(diagnostic);
-                    }
+        if (methodSymbol.ReturnType is INamedTypeSymbol t && t.IsTupleType)
+        {
+            foreach (var te in t.TupleElements)
+            {
+                if (te.Type.ToDisplayString() == "Microsoft.AspNetCore.Http.IResult" &&
+                    te.Name != "Result")
+                {
+                    location = te.Locations.FirstOrDefault() ?? Location.None;
+                    var diagnostic = Diagnostic.Create(
+                        DiagnosticDescriptors.IResultTupleElementShouldBeCalledResult,
+                        location,
+                        te.ToDisplayString());
+                    context.ReportDiagnostic(diagnostic);
+                }
+
+                if ((te.Type.ToDisplayString() == "object" || te.Type.ToDisplayString() == "System.Collections.Generic.IEnumerable<object>") &&
+                    te.Name != "Messages")
+                {
+                    location = te.Locations.FirstOrDefault() ?? Location.None;
+                    var diagnostic = Diagnostic.Create(
+                        DiagnosticDescriptors.MessagesTupleElementShouldBeCalledMessages,
+                        location,
+                        te.ToDisplayString());
+                    context.ReportDiagnostic(diagnostic);
                 }
             }
         }

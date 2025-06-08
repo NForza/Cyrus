@@ -32,6 +32,8 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
             DiagnosticDescriptors.MessagesTupleElementShouldBeCalledMessages,
             DiagnosticDescriptors.CommandHandlerArgumentShouldBeAnAggregateRoot,
             DiagnosticDescriptors.CommandForCommandHandlerShouldHaveAggregateRootIdProperty,
+            DiagnosticDescriptors.UnrecognizedParameterForCommandHandler,
+            DiagnosticDescriptors.AggregateRootShouldHaveAggregateRootIdProperty,
         ];
 
     public override void Initialize(AnalysisContext context)

@@ -313,7 +313,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
             .LogGeneratedSource(outputWindow.WriteLine)
             .RunAsync();
 
-        analyzerOutput.Should().ContainDiagnostic(DiagnosticDescriptors.CommandHandlerArgumentShouldBeAnAggregateRoot);
+        analyzerOutput.Should().ContainDiagnostic(DiagnosticDescriptors.UnrecognizedParameterForCommandHandler);
     }
 
     [Fact]
@@ -460,6 +460,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
         compilerOutput.Should().NotHaveErrors();
     }
+
     [Fact]
     public async Task CommandHandler_With_CancellationToken_Should_Generate_Valid_Code()
     {
@@ -478,6 +479,45 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 {
                     [CommandHandler]
                     public async Task<IResult> Handle(NewTrackCommand command, CancellationToken cancellationToken) => Results.Accepted();
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        analyzerOutput.Should().BeEmpty();
+        compilerOutput.Should().NotHaveErrors();
+    }
+
+    [Fact]
+    public async Task CommandHandler_With_AggregateRoot_And_CancellationToken_Should_Generate_Valid_Code()
+    {
+        var source = @"
+                using System;
+                using System.Collections.Generic;
+                using System.Threading;
+                using System.Threading.Tasks;
+                using Microsoft.AspNetCore.Http;
+                using NForza.Cyrus.Abstractions;   
+                using NForza.Cyrus.Aggregates;
+
+                [Command]
+                public record struct NewTrackCommand([property:AggregateRootId]Guid TrackId);
+
+                [AggregateRoot]
+                public class Track
+                {
+                    [AggregateRootId]
+                    public Guid TrackId { get; set; }
+                }
+
+                public class NewTrackCommandHandler
+                {
+                    [CommandHandler]
+                    public async Task<IResult> Handle(NewTrackCommand command, Track track, CancellationToken cancellationToken) => Results.Accepted();
                 }
             ";
 
