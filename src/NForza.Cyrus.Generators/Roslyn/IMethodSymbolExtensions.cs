@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using Microsoft.CodeAnalysis;
 
 namespace NForza.Cyrus.Generators.Roslyn;
@@ -85,9 +86,12 @@ internal static class IMethodSymbolExtensions
         return returnType;
     }
 
-    public static string GetCommandInvocation(this IMethodSymbol handler, string variableName, string serviceProviderVariable = "services", string? aggregateRootVariableName = null)
+    public static string GetCommandInvocation(this IMethodSymbol handler, string variableName, string serviceProviderVariable = "services", string? aggregateRootVariableName = null, string cancellationTokenVariableName = "cancellationToken")
     {
+        var hasCancellationToken = handler.Parameters.Any(p => p.Type.IsCancellationToken());
         var aggregateRootVariable = aggregateRootVariableName != null ? $", {aggregateRootVariableName}" : "";
+        var cancellationTokenVariable = hasCancellationToken ? $", {cancellationTokenVariableName}" : "";
+        var additionalParameters = aggregateRootVariable + cancellationTokenVariable;
         var commandType = handler.Parameters[0].Type.ToFullName();
         var typeSymbol = handler.ContainingType.ToFullName();
         var returnType = handler.ReturnType;
@@ -96,14 +100,14 @@ internal static class IMethodSymbolExtensions
         if (returnsTask)
         {
             return handler.IsStatic
-                ? $"{typeSymbol}.{handler.Name}({variableName}{aggregateRootVariable})"
-                : $"{serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}({variableName}{aggregateRootVariable})";
+                ? $"{typeSymbol}.{handler.Name}({variableName}{additionalParameters})"
+                : $"{serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}({variableName}{additionalParameters})";
         }
         else
         {
             return handler.IsStatic
-                ? $"{typeSymbol}.{handler.Name}({variableName}{aggregateRootVariable})"
-                : $"{serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}({variableName}{aggregateRootVariable})";
+                ? $"{typeSymbol}.{handler.Name}({variableName}{additionalParameters})"
+                : $"{serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}({variableName}{additionalParameters})";
         }
     }
 
@@ -114,18 +118,20 @@ internal static class IMethodSymbolExtensions
         var typeSymbol = handler.ContainingType.ToFullName();
         var returnType = handler.ReturnType;
         var returnsTask = handler.ReturnsTask();
+        var cancellationTokenVariable = handler.Parameters.Any(p => p.Type.IsCancellationToken()) ? ", cancellationToken" : string.Empty;
+        var handlerParameters = $"query{cancellationTokenVariable}";
 
         if (returnsTask)
         {
             return handler.IsStatic
-                ? $"{handlerClass}.{handler.Name}(query)"
-                : $"{serviceProviderVariable}.GetRequiredService<{handlerClass}>().{handler.Name}(query)";
+                ? $"{handlerClass}.{handler.Name}({handlerParameters})"
+                : $"{serviceProviderVariable}.GetRequiredService<{handlerClass}>().{handler.Name}({handlerParameters})";
         }
         else
         {
             return handler.IsStatic
-                ? $"{handlerClass}.{handler.Name}(query)"
-                : $"{serviceProviderVariable}.GetRequiredService<{handlerClass}>().{handler.Name}(query)";
+                ? $"{handlerClass}.{handler.Name}({handlerParameters})"
+                : $"{serviceProviderVariable}.GetRequiredService<{handlerClass}>().{handler.Name}({handlerParameters})";
         }
     }
 

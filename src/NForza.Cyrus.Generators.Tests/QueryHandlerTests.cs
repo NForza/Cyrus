@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using FluentAssertions.Execution;
 using NForza.Cyrus.Generators.Analyzers;
 using NForza.Cyrus.Generators.Tests.Infra;
 using Xunit.Abstractions;
@@ -173,5 +174,40 @@ public class QueryHandlerTests(ITestOutputHelper outputWindow)
         compilerOutput.Should().NotHaveErrors();
         analyzerOutput.Should().BeEmpty();
         generatedSyntaxTrees.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task Generating_QueryHandler_With_CancellationToken_Should_Generate_Valid_Code()
+    {
+        var source = @"
+                using System;       
+                using System.Threading;
+                using NForza.Cyrus.Abstractions;
+
+                [Query]
+                public record GetCustomerByIdQuery(Guid Id);
+
+                public static class CustomerQuery
+                {
+                    [QueryHandler(Route = ""/"")]
+                    public static string Handle(GetCustomerByIdQuery query, CancellationToken cancellationToken)
+                    {
+                        return query.Id.ToString();
+                    }
+                }
+             ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        using (new AssertionScope())
+        {
+            compilerOutput.Should().NotHaveErrors();
+            analyzerOutput.Should().BeEmpty();
+            generatedSyntaxTrees.Should().NotBeEmpty();
+        }
     }
 }

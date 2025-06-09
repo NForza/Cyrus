@@ -5,7 +5,7 @@ using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Generators.Analyzers;
 
-internal class CommandAnalyzer: CyrusAnalyzerBase
+internal class CommandAnalyzer : CyrusAnalyzerBase
 {
     public override void AnalyzeMethodSymbol(SymbolAnalysisContext context, IMethodSymbol methodSymbol)
     {
@@ -29,44 +29,6 @@ internal class CommandAnalyzer: CyrusAnalyzerBase
             return;
         }
 
-        location = methodSymbol.Parameters[0].Locations.FirstOrDefault() ?? Location.None;
-
-        if (methodSymbol.Parameters.Length  == 2)
-        {
-            var secondParameter = methodSymbol.Parameters[1];
-            if (secondParameter.Type is INamedTypeSymbol namedTypeSymbol && !namedTypeSymbol.IsAggregateRoot())
-            {
-                var diagnostic = Diagnostic.Create(
-                    DiagnosticDescriptors.CommandHandlerArgumentShouldBeAnAggregateRoot,
-                    secondParameter.Locations.FirstOrDefault() ?? location,
-                    methodSymbol.ToDisplayString());
-                context.ReportDiagnostic(diagnostic);
-                return;
-            }
-
-            var firstParameter = methodSymbol.Parameters[0];
-            var commandHasAggregateRootId = firstParameter.Type is INamedTypeSymbol parameterType && parameterType.GetAggregateRootIdProperty() != null;
-            if (!commandHasAggregateRootId)
-            {
-                var diagnostic = Diagnostic.Create(
-                    DiagnosticDescriptors.CommandForCommandHandlerShouldHaveAggregateRootIdProperty,
-                    firstParameter.Locations.FirstOrDefault() ?? location,
-                    methodSymbol.ToDisplayString());
-                context.ReportDiagnostic(diagnostic);
-                return;
-            }
-        }
-
-        if (methodSymbol.Parameters.Length > 2)
-        {
-            var diagnostic = Diagnostic.Create(
-                DiagnosticDescriptors.TooManyArgumentsForCommandHandler,
-                location,
-                methodSymbol.ToDisplayString());
-            context.ReportDiagnostic(diagnostic);
-            return;
-        }
-
         var commandParam = methodSymbol.Parameters[0].Type;
         var hasCommandAttr = commandParam.GetAttributes()
             .Any(attr => attr.AttributeClass?.Name == "CommandAttribute"
@@ -79,6 +41,104 @@ internal class CommandAnalyzer: CyrusAnalyzerBase
                 location,
                 commandParam.Name);
             context.ReportDiagnostic(diagnostic);
+        }
+
+        var parameters = methodSymbol.Parameters.Skip(1).ToList();
+
+        var aggregateRootFound = false;
+        var cancellationTokenFound = false;
+        foreach (var param in parameters)
+        {
+            location = param.Locations.FirstOrDefault() ?? Location.None;
+
+            var isAggregateRoot = param.Type is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.IsAggregateRoot();
+            if (isAggregateRoot)
+            {
+                if (aggregateRootFound)
+                {
+                    var diagnostic = Diagnostic.Create(
+                        DiagnosticDescriptors.CommandHandlerCantHaveMultipleAggregateRootParameters,
+                        param.Locations.FirstOrDefault() ?? location,
+                        methodSymbol.ToDisplayString());
+                    context.ReportDiagnostic(diagnostic);
+                    return;
+                }
+                aggregateRootFound = true;
+
+                // We need to check if the command has an AggregateRootId property.
+                var firstParameter = methodSymbol.Parameters[0];
+                var commandHasAggregateRootId = firstParameter.Type is INamedTypeSymbol commandParameterType && commandParameterType.GetAggregateRootIdProperty() != null;
+                if (!commandHasAggregateRootId)
+                {
+                    var diagnostic = Diagnostic.Create(
+                        DiagnosticDescriptors.CommandForCommandHandlerShouldHaveAggregateRootIdProperty,
+                        firstParameter.Locations.FirstOrDefault() ?? location,
+                        methodSymbol.ToDisplayString());
+                    context.ReportDiagnostic(diagnostic);
+                    return;
+                }
+
+                // We need to check if the AggregateRoot itself has an AggregateRootId property.
+                var aggregateRootHasAggregateRootId = param.Type is INamedTypeSymbol parameterType && parameterType.GetAggregateRootIdProperty() != null;
+                if (!aggregateRootHasAggregateRootId)
+                {
+                    var diagnostic = Diagnostic.Create(
+                        DiagnosticDescriptors.AggregateRootShouldHaveAggregateRootIdProperty,
+                        firstParameter.Locations.FirstOrDefault() ?? location,
+                        methodSymbol.ToDisplayString());
+                    context.ReportDiagnostic(diagnostic);
+                    return;
+                }
+            }
+
+            var cancellationToken = param.Type is INamedTypeSymbol cancellationTokenTypeSymbol && cancellationTokenTypeSymbol.IsCancellationToken();
+            if (cancellationToken)
+            {
+                if (cancellationTokenFound)
+                {
+                    var diagnostic = Diagnostic.Create(
+                        DiagnosticDescriptors.CommandHandlerCantHaveMultipleCancellationTokenParameters,
+                        param.Locations.FirstOrDefault() ?? location,
+                        methodSymbol.ToDisplayString());
+                    context.ReportDiagnostic(diagnostic);
+                    return;
+                }
+                cancellationTokenFound = true;
+            }
+
+            if (methodSymbol.Parameters.Length > 3)
+            {
+                var diagnostic = Diagnostic.Create(
+                    DiagnosticDescriptors.TooManyArgumentsForCommandHandler,
+                    location,
+                    methodSymbol.ToDisplayString());
+                context.ReportDiagnostic(diagnostic);
+                return;
+            }
+        }
+
+        void ReportUnrecognizedParameter()
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DiagnosticDescriptors.UnrecognizedParameterForCommandHandler,
+                location,
+                methodSymbol.ToDisplayString()));
+        }
+
+        var extraParams = parameters.Count;
+        if (extraParams == 2)
+        {
+            if (aggregateRootFound ^ cancellationTokenFound)
+            {
+                ReportUnrecognizedParameter();
+            }
+        }
+        else if (extraParams == 1)
+        {
+            if (!aggregateRootFound && !cancellationTokenFound)
+            {
+                ReportUnrecognizedParameter();
+            }
         }
 
         if (methodSymbol.ReturnType is INamedTypeSymbol t && t.IsTupleType)

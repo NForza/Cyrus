@@ -1,4 +1,4 @@
-﻿    app.MapGet("{{ Path }}", {% if ReturnsTask %}async {% endif %}( {{ RouteParameters }} [FromServices] IHttpContextObjectFactory objectFactory, [FromServices] IHttpContextAccessor ctx) =>
+﻿    app.MapGet("{{ Path }}", {% if ReturnsTask %}async {% endif %}( {{ RouteParameters }} [FromServices] IHttpContextObjectFactory objectFactory, [FromServices] IHttpContextAccessor ctx, CancellationToken cancellationToken) =>
     {
         using var scope = app.Services.CreateScope();
         var services = scope.ServiceProvider;

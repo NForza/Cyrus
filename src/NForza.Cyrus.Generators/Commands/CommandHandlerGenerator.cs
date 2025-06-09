@@ -61,16 +61,20 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
 
     private static string GenerateCommandDispatcherExtensionMethods(CyrusGenerationContext cyrusGenerationContext, LiquidEngine liquidEngine)
     {
-        var commands = cyrusGenerationContext.CommandHandlers.Select(h => new
+        var commands = cyrusGenerationContext.CommandHandlers.Select(h =>
         {
-            Handler = h,
-            AggregateRoot = h.Parameters.Length == 2 ? FindAggregateRoot(cyrusGenerationContext.AggregateRoots, h.Parameters[1].Type) : null,
-            CommandType = h.Parameters[0].Type.ToFullName(),
-            CommandAggregateRootIdPropertyName = h.Parameters[0].Type is INamedTypeSymbol namedTypeSymbol ? namedTypeSymbol.GetAggregateRootIdProperty()?.Name ?? null : null,
-            h.Name,
-            h.ReturnsVoid,
-            ReturnType = (INamedTypeSymbol)h.ReturnType,
-            ReturnsTask = h.ReturnType.IsTaskType()
+            ITypeSymbol? aggregateRootSymbol = h.Parameters.Skip(1).FirstOrDefault(p => p.Type.IsAggregateRoot())?.Type;
+            return new
+            {
+                Handler = h,
+                AggregateRoot = FindAggregateRoot(cyrusGenerationContext.AggregateRoots, aggregateRootSymbol),
+                CommandType = h.Parameters[0].Type.ToFullName(),
+                CommandAggregateRootIdPropertyName = h.Parameters[0].Type is INamedTypeSymbol namedTypeSymbol ? namedTypeSymbol.GetAggregateRootIdProperty()?.Name ?? null : null,
+                h.Name,
+                h.ReturnsVoid,
+                ReturnType = (INamedTypeSymbol)h.ReturnType,
+                ReturnsTask = h.ReturnType.IsTaskType()
+            };
         }).ToList();
 
         var model = new
@@ -97,6 +101,6 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
         return resolvedSource;
     }
 
-    private static AggregateRootDefinition FindAggregateRoot(IEnumerable<AggregateRootDefinition> aggregateRoots, ITypeSymbol type) 
+    private static AggregateRootDefinition? FindAggregateRoot(IEnumerable<AggregateRootDefinition> aggregateRoots, ITypeSymbol? type) 
         => aggregateRoots.FirstOrDefault(ard => SymbolEqualityComparer.Default.Equals(ard.Symbol, type));
 }

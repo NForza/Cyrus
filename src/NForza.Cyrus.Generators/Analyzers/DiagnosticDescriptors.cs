@@ -27,11 +27,11 @@ public static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor TooManyArgumentsForCommandHandler = new DiagnosticDescriptor(
         id: "CYRUS002",
         title: "Too many arguments for CommandHandler",
-        messageFormat: "CommandHandler '{0}' should have 1 argument",
+        messageFormat: "CommandHandler '{0}' should have 3 arguments max. (Command, Aggregate, CancellationToken).",
         category: "Cyrus",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "Command handlers must have 1 parameter which is a [Command] object."
+        description: "Command handlers have a maximum of 3 arguments: a required Command, optionally an Aggregate that the command runs on and optionally a CancellationToken."
     );
 
     public static readonly DiagnosticDescriptor CommandHandlerShouldHaveACommandParameter = new DiagnosticDescriptor(
@@ -201,6 +201,47 @@ public static class DiagnosticDescriptors
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
         description: "Command used as parameter in a CommandHandler must have a [AggregateRootId] property."
-);
+    );
+
+    public static readonly DiagnosticDescriptor CommandHandlerCantHaveMultipleAggregateRootParameters = new DiagnosticDescriptor(
+        id: "CYRUS017",
+        title: "Invalids arguments for CommandHandler",
+        messageFormat: "Command for CommandHandler '{0}' can't have multiple parameters that are defined as [AggregateRoot]",
+        category: "Cyrus",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Command for CommandHandler '{0}' can't have multiple parameters that are defined as [AggregateRoot]."
+    );
+
+    public static readonly DiagnosticDescriptor CommandHandlerCantHaveMultipleCancellationTokenParameters = new DiagnosticDescriptor(
+        id: "CYRUS017",
+        title: "Invalid arguments for CommandHandler",
+        messageFormat: "Command for CommandHandler '{0}' can't have multiple parameters of type CancellationToken",
+        category: "Cyrus",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Command for CommandHandler '{0}' can't have multiple parameters  of type CancellationToken."
+    );
+
+    public static DiagnosticDescriptor UnrecognizedParameterForCommandHandler= new DiagnosticDescriptor(
+        id: "CYRUS018",
+        title: "Invalid parameter type for CommandHandler",
+        messageFormat: "CommandHandler '{0}' has additional parameters that are not an [AggregateRoot] or a CancellationToken",
+        category: "Cyrus",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "CommandHandler '{0}' has additional parameters that are not an [AggregateRoot] or a CancellationToken."
+    );
+
+    public static readonly DiagnosticDescriptor AggregateRootShouldHaveAggregateRootIdProperty = new DiagnosticDescriptor(
+        id: "CYRUS019",
+        title: "AggregateRoot should have [AggregateRootId]",
+        messageFormat: "AggregateRoot '{0}' should have a property marked with [AggregateRootId]",
+        category: "Cyrus",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "AggregateRoots must have a [AggregateRootId] property."
+    );
+
 
 }

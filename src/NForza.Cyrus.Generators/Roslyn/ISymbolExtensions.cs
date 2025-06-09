@@ -15,6 +15,16 @@ public static class ISymbolExtensions
         return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "QueryAttribute");
     }
 
+    public static bool IsCancellationToken(this ISymbol symbol)
+    {
+        if (symbol is INamedTypeSymbol namedTypeSymbol)
+        {
+            return namedTypeSymbol.ContainingNamespace?.ToDisplayString() == "System.Threading" &&
+                   namedTypeSymbol.Name == "CancellationToken";
+        }
+        return false;
+    }
+
     public static string? GetCommandRoute(this ISymbol methodSymbol)
         => GetRouteFromAttribute(methodSymbol, "CommandHandlerAttribute");
 

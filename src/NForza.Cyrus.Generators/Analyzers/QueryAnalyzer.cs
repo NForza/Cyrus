@@ -5,7 +5,7 @@ using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Generators.Analyzers;
 
-internal class QueryAnalyzer: CyrusAnalyzerBase
+internal class QueryAnalyzer : CyrusAnalyzerBase
 {
     public override void AnalyzeMethodSymbol(SymbolAnalysisContext context, IMethodSymbol methodSymbol)
     {
@@ -14,24 +14,19 @@ internal class QueryAnalyzer: CyrusAnalyzerBase
         if (!isQueryHandler)
             return;
 
-        var location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax()?.GetLocation()
-                       ?? Location.None;
-
         if (methodSymbol.Parameters.Length == 0)
         {
-            location = methodSymbol.Parameters[0].Locations.FirstOrDefault()
-                       ?? Location.None;
             var diagnostic = Diagnostic.Create(
                 DiagnosticDescriptors.TooManyArgumentsForQueryHandler,
-                location,
+                methodSymbol.Parameters[0].Locations.FirstOrDefault() ?? Location.None,
                 methodSymbol.ToDisplayString());
             context.ReportDiagnostic(diagnostic);
             return;
         }
 
-        location = methodSymbol.Parameters[0].Locations.FirstOrDefault() ?? Location.None;
+        var location = methodSymbol.Parameters[0].Locations.FirstOrDefault() ?? Location.None;
 
-        if (methodSymbol.Parameters.Length > 1)
+        if (methodSymbol.Parameters.Length > 1 && !methodSymbol.Parameters[1].Type.IsCancellationToken())
         {
             var diagnostic = Diagnostic.Create(
                 DiagnosticDescriptors.TooManyArgumentsForQueryHandler,
@@ -48,7 +43,6 @@ internal class QueryAnalyzer: CyrusAnalyzerBase
 
         if (!hasQueryAttr)
         {
-
             var diagnostic = Diagnostic.Create(
                 DiagnosticDescriptors.MissingQueryAttribute,
                 location,
@@ -56,6 +50,5 @@ internal class QueryAnalyzer: CyrusAnalyzerBase
 
             context.ReportDiagnostic(diagnostic);
         }
-
     }
 }

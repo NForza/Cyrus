@@ -90,13 +90,17 @@ public static class INamedTypeSymbolExtensions
         };
     }
 
-    public static bool HasAttribute(this INamedTypeSymbol typeSymbol, string attributeName) 
+    public static bool HasAttribute(this ISymbol typeSymbol, string attributeName) 
         => typeSymbol
                 .GetAttributes()
                 .Select(a => a.AttributeClass?.Name ?? "")
                 .Any(name => name == attributeName || name == attributeName + "Attribute");
 
-    public static bool IsAggregateRoot(this INamedTypeSymbol typeSymbol) 
+    public static bool IsCancellationToken(this INamedTypeSymbol typeSymbol)
+        => typeSymbol.Name == "CancellationToken" 
+           && typeSymbol.ContainingNamespace.ToDisplayString() == "System.Threading";
+
+    public static bool IsAggregateRoot(this ISymbol typeSymbol) 
         => typeSymbol.HasAttribute("AggregateRoot");
 
     public static IPropertySymbol? GetAggregateRootIdProperty(this INamedTypeSymbol typeSymbol)
