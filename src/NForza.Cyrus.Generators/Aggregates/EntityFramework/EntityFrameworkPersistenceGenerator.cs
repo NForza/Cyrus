@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 
@@ -16,7 +14,7 @@ public class EntityFrameworkPersistenceGenerator : CyrusGeneratorBase
         if (!string.IsNullOrEmpty(config.PersistenceContextType) &&  cyrusGenerationContext.GenerationConfig.GenerationTarget.Contains(GenerationTarget.WebApi) && cyrusGenerationContext.AggregateRoots.Any())
         {
             var sourceText = GenerateEntityFrameworkPersistenceInitializer(cyrusGenerationContext);
-            spc.AddSource($"EntityFrameworkPersistenceInitializer.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            spc.AddSource($"EntityFrameworkPersistenceInitializer.g.cs", sourceText);
         }
     }
 

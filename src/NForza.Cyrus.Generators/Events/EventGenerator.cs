@@ -21,11 +21,11 @@ public class EventGenerator : CyrusGeneratorBase
                 "Events",
                 "ModelTypeDefinition",
                 events.Select(e => ModelGenerator.ForNamedType(e, cyrusGenerationContext.LiquidEngine)), cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"model-events.g.cs", SourceText.From(eventModels, Encoding.UTF8));
+            spc.AddSource($"model-events.g.cs", eventModels);
 
             var referencedTypes = events.SelectMany(cs => cs.GetReferencedTypes());
             var referencedTypeModels = GetPartialModelClass(assemblyName, "Events", "Models", "ModelTypeDefinition", referencedTypes.Select(cm => ModelGenerator.ForNamedType(cm, cyrusGenerationContext.LiquidEngine)), cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"model-event-types.g.cs", SourceText.From(referencedTypeModels, Encoding.UTF8));
+            spc.AddSource($"model-event-types.g.cs", referencedTypeModels);
         }
     }
 }

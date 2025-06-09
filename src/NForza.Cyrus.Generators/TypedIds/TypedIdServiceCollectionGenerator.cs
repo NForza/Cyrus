@@ -27,7 +27,7 @@ public class TypedIdInitializerGenerator : CyrusGeneratorBase
         var allTypedIds = typedIds.Concat(referencedTypedIds).ToArray();
 
         var sourceText = GenerateServiceCollectionExtensionMethod(allTypedIds, cyrusGenerationContext.LiquidEngine);
-        spc.AddSource("TypedIdInitializer.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+        spc.AddSource("TypedIdInitializer.g.cs", sourceText);
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers", Justification = "<Pending>")]

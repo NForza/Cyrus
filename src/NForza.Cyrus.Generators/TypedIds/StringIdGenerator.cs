@@ -15,12 +15,12 @@ public class StringIdGenerator : CyrusGeneratorBase
         foreach (var recordSymbol in stringIds)
         {
             var sourceText = GenerateCodeForRecordStruct(recordSymbol, cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            spc.AddSource($"{recordSymbol.Name}.g.cs", sourceText);
         };
         if (stringIds.Any())
         {
             var stringModels = GetPartialModelClass(stringIds.First().ContainingAssembly.Name, "TypedIds", "Strings", "string", stringIds.Select(s => $"\"{s.Name}\""), cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"model-strings.g.cs", SourceText.From(stringModels, Encoding.UTF8));
+            spc.AddSource($"model-strings.g.cs", stringModels);
         }
     }
 

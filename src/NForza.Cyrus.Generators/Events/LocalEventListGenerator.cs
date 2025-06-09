@@ -29,9 +29,7 @@ public class LocalEventListGenerator : CyrusGeneratorBase
                 };
 
                 var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
-                spc.AddSource(
-                   "LocalEventList.g.cs",
-                   SourceText.From(fileContents, Encoding.UTF8));
+                spc.AddSource("LocalEventList.g.cs", fileContents);
             }
         }
     }

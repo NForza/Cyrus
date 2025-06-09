@@ -15,10 +15,10 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
         var config = cyrusGenerationContext.GenerationConfig;
         if (config != null && config.GenerationTarget.Contains(GenerationTarget.WebApi))
         {
-            IEnumerable<IMethodSymbol> handlers = 
+            IEnumerable<IMethodSymbol> handlers =
                 cyrusGenerationContext
                     .AllCommandsAndHandlers
-                    .OfType<IMethodSymbol>()                    
+                    .OfType<IMethodSymbol>()
                     .ToList();
 
             IEnumerable<INamedTypeSymbol> commands = cyrusGenerationContext.AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToList();
@@ -43,9 +43,7 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
                 };
 
                 var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusWebStartup");
-                spc.AddSource(
-                   "CommandHandlerMapping.g.cs",
-                   SourceText.From(fileContents, Encoding.UTF8));
+                spc.AddSource("CommandHandlerMapping.g.cs", fileContents);
             }
 
             AddHttpContextObjectFactoryMethodsRegistrations(commands, spc, cyrusGenerationContext.LiquidEngine);
@@ -68,11 +66,13 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
         };
         var httpContextObjectFactoryInitialization = liquidEngine.Render(model, "HttpContextObjectFactoryCommand");
 
-        var initModel = new { 
-            Namespace = "WebApi", 
-            Name = "HttpContextObjectFactoryCommandInitializer", 
+        var initModel = new
+        {
+            Namespace = "WebApi",
+            Name = "HttpContextObjectFactoryCommandInitializer",
             Usings = new string[] { "System.Linq" },
-            Initializer = httpContextObjectFactoryInitialization };
+            Initializer = httpContextObjectFactoryInitialization
+        };
         var source = liquidEngine.Render(initModel, "CyrusInitializer");
         sourceProductionContext.AddSource($"HttpContextObjectFactoryCommands.g.cs", SourceText.From(source, Encoding.UTF8));
     }

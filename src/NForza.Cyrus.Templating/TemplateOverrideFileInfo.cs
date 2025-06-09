@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using Microsoft.Extensions.FileProviders;
 
 namespace NForza.Cyrus.Templating;
@@ -27,5 +28,5 @@ internal class TemplateOverrideFileInfo: IFileInfo
 
     public bool IsDirectory => false;
 
-    public Stream CreateReadStream() => new MemoryStream(System.Text.Encoding.UTF8.GetBytes(template));
+    public Stream CreateReadStream() => new MemoryStream(Encoding.UTF8.GetBytes(template));
 }

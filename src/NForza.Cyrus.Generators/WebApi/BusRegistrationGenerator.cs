@@ -24,9 +24,7 @@ public class BusRegistrationGenerator : CyrusGeneratorBase
                 };
 
                 var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
-                spc.AddSource(
-                   "BusRegistration.g.cs",
-                   SourceText.From(fileContents, Encoding.UTF8));
+                spc.AddSource("BusRegistration.g.cs", fileContents);
             }
         }
     }

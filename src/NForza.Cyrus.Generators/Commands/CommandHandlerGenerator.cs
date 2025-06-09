@@ -22,7 +22,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
             var sourceText = GenerateCommandDispatcherExtensionMethods(cyrusGenerationContext, cyrusGenerationContext.LiquidEngine);
             if (!string.IsNullOrEmpty(sourceText))
             {
-                spc.AddSource($"CommandDispatcher.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                spc.AddSource($"CommandDispatcher.g.cs", sourceText);
             }
 
 #pragma warning disable RS1035 // Do not use APIs banned for analyzers
@@ -44,18 +44,18 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                 };
 
                 var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
-                spc.AddSource("CommandHandlerRegistration.g.cs", SourceText.From(fileContents, Encoding.UTF8));
+                spc.AddSource("CommandHandlerRegistration.g.cs", fileContents);
             }
 
             string assemblyName = commandHandlers.First().ContainingAssembly.Name;
             var commandSymbols = commandHandlers.Select(ch => (INamedTypeSymbol)ch.Parameters[0].Type);
 
             var commandModels = GetPartialModelClass(assemblyName, "Command", "Commands", "ModelTypeDefinition", commandSymbols.Select(cm => ModelGenerator.ForNamedType(cm, cyrusGenerationContext.LiquidEngine)), cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"model-commands.g.cs", SourceText.From(commandModels, Encoding.UTF8));
+            spc.AddSource($"model-commands.g.cs", commandModels);
 
             var referencedTypes = commandSymbols.SelectMany(cs => cs.GetReferencedTypes());
             var referencedTypeModels = GetPartialModelClass(assemblyName, "Command", "Models", "ModelTypeDefinition", referencedTypes.Select(cm => ModelGenerator.ForNamedType(cm, cyrusGenerationContext.LiquidEngine)), cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"model-command-types.g.cs", SourceText.From(referencedTypeModels, Encoding.UTF8));
+            spc.AddSource($"model-command-types.g.cs", referencedTypeModels);
         }
     }
 

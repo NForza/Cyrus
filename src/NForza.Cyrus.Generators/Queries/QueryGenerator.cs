@@ -22,7 +22,7 @@ public class QueryGenerator : CyrusGeneratorBase
                 "ModelQueryDefinition",
                 queryHandlers.Select(e => ModelGenerator.ForQueryHandler(e, cyrusGenerationContext.LiquidEngine)),
                 cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"model-queries.g.cs", SourceText.From(eventModels, Encoding.UTF8));
+            spc.AddSource($"model-queries.g.cs", eventModels);
 
             var referencedTypes = queryHandlers.Select(q => q.GetQueryReturnType()).SelectMany(cs => cs.GetReferencedTypes());
             var referencedTypeModels = GetPartialModelClass(assemblyName, "Queries", "Models", "ModelQueryDefinition", referencedTypes.Select(cm => ModelGenerator.ForNamedType(cm, cyrusGenerationContext.LiquidEngine)), cyrusGenerationContext.LiquidEngine);

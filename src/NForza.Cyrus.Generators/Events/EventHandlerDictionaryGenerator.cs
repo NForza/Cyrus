@@ -29,9 +29,7 @@ public class EventHandlerDictionaryGenerator : CyrusGeneratorBase
                 };
 
                 var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
-                spc.AddSource(
-                   "EventHandlerDictionary.g.cs",
-                   SourceText.From(fileContents, Encoding.UTF8));
+                spc.AddSource("EventHandlerDictionary.g.cs", fileContents);
             }
         }
     }

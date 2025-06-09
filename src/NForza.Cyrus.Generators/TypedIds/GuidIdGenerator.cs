@@ -15,7 +15,7 @@ public class GuidIdGenerator : CyrusGeneratorBase
         foreach (var recordSymbol in guidIds)
         {
             var sourceText = GenerateGuidId(recordSymbol, cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            spc.AddSource($"{recordSymbol.Name}.g.cs", sourceText);
         };
 
         if (guidIds.Any())
@@ -27,7 +27,7 @@ public class GuidIdGenerator : CyrusGeneratorBase
                 "string",
                 guidIds.Select(guid => $"\"{guid.Name}\""),
                 cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"model-guids.g.cs", SourceText.From(guidModels, Encoding.UTF8));
+            spc.AddSource($"model-guids.g.cs", guidModels);
         }
     }
 

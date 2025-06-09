@@ -15,13 +15,13 @@ public class IntIdGenerator : CyrusGeneratorBase
             foreach (var recordSymbol in recordSymbols)
             {
                 var sourceText = GenerateIntId(recordSymbol, cyrusGenerationContext.LiquidEngine);
-                context.AddSource($"{recordSymbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                context.AddSource($"{recordSymbol.Name}.g.cs", sourceText);
             };
 
             if (recordSymbols.Any())
             {
                 var intModels = GetPartialModelClass(recordSymbols.First().ContainingAssembly.Name, "TypedIds", "Integers", "string", recordSymbols.Select(im => $"\"{im.Name}\""), cyrusGenerationContext.LiquidEngine);
-                context.AddSource($"model-ints.g.cs", SourceText.From(intModels, Encoding.UTF8));
+                context.AddSource($"model-ints.g.cs", intModels);
             }
     }
 
