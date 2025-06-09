@@ -32,6 +32,7 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
                     Usings = new string[] {
                         "System.Collections.Generic",
                         "System.Linq",
+                        "System.Threading",
                         "Microsoft.AspNetCore.Builder",
                         "Microsoft.AspNetCore.Mvc",
                         "Microsoft.AspNetCore.Http",

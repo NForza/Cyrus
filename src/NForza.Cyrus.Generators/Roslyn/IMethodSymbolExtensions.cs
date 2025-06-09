@@ -118,18 +118,20 @@ internal static class IMethodSymbolExtensions
         var typeSymbol = handler.ContainingType.ToFullName();
         var returnType = handler.ReturnType;
         var returnsTask = handler.ReturnsTask();
+        var cancellationTokenVariable = handler.Parameters.Any(p => p.Type.IsCancellationToken()) ? ", cancellationToken" : string.Empty;
+        var handlerParameters = $"query{cancellationTokenVariable}";
 
         if (returnsTask)
         {
             return handler.IsStatic
-                ? $"{handlerClass}.{handler.Name}(query)"
-                : $"{serviceProviderVariable}.GetRequiredService<{handlerClass}>().{handler.Name}(query)";
+                ? $"{handlerClass}.{handler.Name}({handlerParameters})"
+                : $"{serviceProviderVariable}.GetRequiredService<{handlerClass}>().{handler.Name}({handlerParameters})";
         }
         else
         {
             return handler.IsStatic
-                ? $"{handlerClass}.{handler.Name}(query)"
-                : $"{serviceProviderVariable}.GetRequiredService<{handlerClass}>().{handler.Name}(query)";
+                ? $"{handlerClass}.{handler.Name}({handlerParameters})"
+                : $"{serviceProviderVariable}.GetRequiredService<{handlerClass}>().{handler.Name}({handlerParameters})";
         }
     }
 
