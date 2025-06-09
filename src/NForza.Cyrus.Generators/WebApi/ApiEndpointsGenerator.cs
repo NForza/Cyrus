@@ -36,7 +36,7 @@ public class ApiEndpointsGenerator : CyrusGeneratorBase
             var endpointModels = GetPartialModelClass(assemblyName, "Endpoints", "Endpoints", "ModelEndpointDefinition",
                 commandEndpoints.Concat(queryEndpoints), cyrusGenerationContext.LiquidEngine);
 
-            spc.AddSource($"model-endpoints.g.cs", SourceText.From(endpointModels, Encoding.UTF8));
+            spc.AddSource($"model-endpoints.g.cs", endpointModels);
         }
     }
 }

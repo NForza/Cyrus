@@ -30,7 +30,7 @@ public class EventHandlerGenerator : CyrusGeneratorBase
                 Initializer = eventHandlerRegistrations
             };
             var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
-            spc.AddSource("EventHandlerRegistration.g.cs", SourceText.From(fileContents, Encoding.UTF8));
+            spc.AddSource("EventHandlerRegistration.g.cs", fileContents);
         }
     }
 }

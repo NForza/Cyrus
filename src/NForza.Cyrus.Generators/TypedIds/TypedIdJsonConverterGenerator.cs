@@ -15,7 +15,7 @@ public class TypedIdJsonConverterGenerator : CyrusGeneratorBase
         foreach (var typedId in typedIds)
         {
             var sourceText = GenerateJsonConverterForTypedId(typedId, cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"{typedId.Name}JsonConverter.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            spc.AddSource($"{typedId.Name}JsonConverter.g.cs", sourceText);
         };
     }
 

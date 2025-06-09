@@ -44,9 +44,7 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
                 };
 
                 var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusWebStartup");
-                spc.AddSource(
-                   "QueryHandlerMapping.g.cs",
-                   SourceText.From(fileContents, Encoding.UTF8));
+                spc.AddSource("QueryHandlerMapping.g.cs", fileContents);
             }
 
             IEnumerable<INamedTypeSymbol> queries = cyrusGenerationContext.AllQueriesAndHandlers
@@ -79,7 +77,7 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
             Initializer = httpContextObjectFactoryInitialization 
         };
         var source = liquidEngine.Render(initModel, "CyrusInitializer");
-        sourceProductionContext.AddSource($"HttpContextObjectFactoryQueries.g.cs", SourceText.From(source, Encoding.UTF8));
+        sourceProductionContext.AddSource($"HttpContextObjectFactoryQueries.g.cs", source);
     }
 
     private string AddQueryHandlerMappings(SourceProductionContext sourceProductionContext, IEnumerable<IMethodSymbol> handlers, IEnumerable<IMethodSymbol> validators, LiquidEngine liquidEngine)

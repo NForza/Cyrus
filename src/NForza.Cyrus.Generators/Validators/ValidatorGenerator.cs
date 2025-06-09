@@ -35,7 +35,7 @@ public class ValidatorGenerator : CyrusGeneratorBase
                 };
 
                 var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
-                spc.AddSource("ValidatorRegistration.g.cs", SourceText.From(fileContents, Encoding.UTF8));
+                spc.AddSource("ValidatorRegistration.g.cs", fileContents);
             }
         }
     }

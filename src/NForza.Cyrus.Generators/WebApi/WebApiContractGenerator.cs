@@ -70,9 +70,7 @@ public static class WebApiContractGenerator
 
             var fileContents = liquidEngine.Render(model, "WebApiContract");
 
-            sourceProductionContext.AddSource(
-               $"{contract.Name}Contract.g.cs",
-               SourceText.From(fileContents, Encoding.UTF8));
+            sourceProductionContext.AddSource($"{contract.Name}Contract.g.cs", fileContents);
         }
     }
 }

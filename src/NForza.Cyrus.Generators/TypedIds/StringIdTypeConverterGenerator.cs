@@ -14,7 +14,7 @@ public class StringIdTypeConverterGenerator : CyrusGeneratorBase
         foreach (var recordSymbol in stringIds)
         {
             var sourceText = GenerateStringIdTypeConverter(recordSymbol, cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"{recordSymbol}TypeConverter.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            spc.AddSource($"{recordSymbol}TypeConverter.g.cs", sourceText);
         };
     }
 

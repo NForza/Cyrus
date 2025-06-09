@@ -14,7 +14,7 @@ public class GuidIdTypeConverterGenerator : CyrusGeneratorBase
         foreach (var recordSymbol in recordSymbols)
         {
             var sourceText = GenerateGuidIdTypeConverter(recordSymbol, cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"{recordSymbol}TypeConverter.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            spc.AddSource($"{recordSymbol}TypeConverter.g.cs", sourceText);
         };
     }
 

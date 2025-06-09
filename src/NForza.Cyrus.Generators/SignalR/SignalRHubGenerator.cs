@@ -27,18 +27,18 @@ public class SignalRHubGenerator : CyrusGeneratorBase
         if (isWebApi)
         {
             var registration = GenerateSignalRHubRegistration(signalRHubs, cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"RegisterSignalRHubs.g.cs", SourceText.From(registration, Encoding.UTF8));
+            spc.AddSource($"RegisterSignalRHubs.g.cs", registration);
 
             foreach (var signalRModel in signalRHubs)
             {
                 var sourceText = GenerateSignalRHub(signalRModel, cyrusGenerationContext.LiquidEngine);
-                spc.AddSource($"{signalRModel.Symbol.Name}.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+                spc.AddSource($"{signalRModel.Symbol.Name}.g.cs", sourceText);
             }
             if (signalRHubs.Any())
             {
                 string assemblyName = signalRHubs.First().Symbol.ContainingAssembly.Name;
                 var commandModels = GetPartialModelClass(assemblyName, "SignalR", "Hubs", "ModelHubDefinition", signalRHubs.Select(e => ModelGenerator.ForHub(e, cyrusGenerationContext.LiquidEngine)), cyrusGenerationContext.LiquidEngine);
-                spc.AddSource($"model-hubs.g.cs", SourceText.From(commandModels, Encoding.UTF8));
+                spc.AddSource($"model-hubs.g.cs", commandModels);
             }
         }
     }

@@ -33,10 +33,10 @@ public class QueryHandlerGenerator : CyrusGeneratorBase
                 Initializer = queryHandlerRegistrations
             };
             var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
-            context.AddSource("QueryHandlerRegistration.g.cs", SourceText.From(fileContents, Encoding.UTF8));
+            context.AddSource("QueryHandlerRegistration.g.cs", fileContents);
 
             var sourceText = GenerateQueryProcessorExtensionMethods(queryHandlers, cyrusGenerationContext.Compilation, cyrusGenerationContext.LiquidEngine);
-            context.AddSource($"QueryProcessor.g.cs", SourceText.From(sourceText, Encoding.UTF8));
+            context.AddSource($"QueryProcessor.g.cs", sourceText);
         }
     }
 

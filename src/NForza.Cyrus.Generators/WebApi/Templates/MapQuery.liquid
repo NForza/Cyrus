@@ -1,4 +1,4 @@
-﻿    app.MapGet("{{ Path }}", {% if ReturnsTask %}async {% endif %}( {{ RouteParameters }} [FromServices] IHttpContextObjectFactory objectFactory, [FromServices] IHttpContextAccessor ctx, CancellationToken cancellationToken) =>
+﻿    app.MapGet("{{ Path }}", async ( {{ RouteParameters }} [FromServices] IHttpContextObjectFactory objectFactory, [FromServices] IHttpContextAccessor ctx, CancellationToken cancellationToken) =>
     {
         using var scope = app.Services.CreateScope();
         var services = scope.ServiceProvider;
@@ -17,7 +17,8 @@
             Results.BadRequest(validationErrors);
         }
         {% endif %}
-        var queryResult = {% if ReturnsTask %}await {% endif %}{{ QueryInvocation }};
+        IQueryProcessor queryProcessor = services.GetRequiredService<IQueryProcessor>();
+        var queryResult = await queryProcessor.Query(query);
         return QueryResultAdapter.FromObject(queryResult);
     })
     .WithOpenApi()
