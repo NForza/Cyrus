@@ -70,12 +70,12 @@
     <PackageReference Include="Fody" Version="6.9.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.14.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
-    <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.6" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj" />
-    <ProjectReference Include="..\NForza.Cyrus.Templating\NForza.Cyrus.Templating.csproj"/>
+    <ProjectReference Include="..\NForza.Cyrus.Templating\NForza.Cyrus.Templating.csproj" />
   </ItemGroup>
   <Target Name="DeleteBinBeforeBuild" BeforeTargets="BeforeBuild">
     <RemoveDir Directories="$(ProjectDir)bin" />

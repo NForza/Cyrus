@@ -9,10 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MassTransit" Version="8.4.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.5" />
     <PackageReference Include="NForza.Cyrus" Version="1.0.295" />
-    <PackageReference Include="NForza.Cyrus.MassTransit" Version="1.0.295" />
   </ItemGroup>
 
 </Project>

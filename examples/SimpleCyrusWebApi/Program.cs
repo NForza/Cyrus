@@ -1,5 +1,4 @@
 using System.Reflection;
-using MassTransit;
 using NForza.Cyrus;
 using NForza.Cyrus.WebApi;
 using SimpleCyrusWebApi.Storage;
@@ -11,16 +10,6 @@ builder.Logging.AddFilter("Microsoft", LogLevel.Warning);
 
 //Add in-memory EF Core database
 builder.Services.AddDbContext<DemoContext>();
-
-//Add in-memory MassTransit bus
-builder.Services.AddMassTransit(cfg =>
-{
-    cfg.AddConsumers(Assembly.GetExecutingAssembly());
-    cfg.UsingInMemory((context, cfg) =>
-    {
-        cfg.ConfigureEndpoints(context);
-    });
-});
 
 builder.Services.AddCyrus();
 
