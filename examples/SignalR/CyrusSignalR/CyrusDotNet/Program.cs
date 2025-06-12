@@ -3,10 +3,13 @@ using Microsoft.Extensions.DependencyInjection;
 using NForza.Cyrus;
 using NForza.Cyrus.WebApi;
 
+// This is the Cyrus SignalR server application.
+// The Angular client app is located in ../CyrusSignalR-Angular
+// npm install && ng serve to start it.
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCyrus();
-
 
 builder.Services.AddCors(options =>
 {
