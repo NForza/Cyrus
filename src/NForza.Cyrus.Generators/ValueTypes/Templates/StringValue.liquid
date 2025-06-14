@@ -11,7 +11,7 @@ namespace {{ Namespace }};
 [JsonConverter(typeof({{ Name }}JsonConverter))]
 [TypeConverter(typeof({{ Name }}TypeConverter))]
 [DebuggerDisplay("{Value}")]
-public partial record struct {{ Name }}(string Value): IStringId
+public partial record struct {{ Name }}(string Value): IStringValue
 {
     public static {{ Name }} Empty => new {{ Name }}(string.Empty);
     public bool IsEmpty() => string.IsNullOrEmpty(Value);

@@ -152,7 +152,7 @@ internal static class ITypeSymbolExtensions
         return typeSymbol.IsQuery() || typeSymbol.IsCommand() || typeSymbol.IsEvent() || typeSymbol.IsTypedId();
     }
 
-    private static string[] typedIdAttributes = ["StringIdAttribute", "GuidIdAttribute", "IntIdAttribute"];
+    private static string[] typedIdAttributes = ["StringValueAttribute", "GuidValueAttribute", "IntValueAttribute"];
 
     public static bool IsTypedId(this ITypeSymbol symbol)
     {

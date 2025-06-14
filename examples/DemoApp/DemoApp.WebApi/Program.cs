@@ -48,5 +48,5 @@ app.MapCyrus(logger);
 
 await app.RunAsync();
 
-//[GuidId]
+//[GuidValue]
 //public partial record struct SomeId;

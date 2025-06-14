@@ -5,16 +5,16 @@ using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.TypedIds;
+namespace NForza.Cyrus.Generators.ValueTypes;
 
-public class IntIdGenerator : CyrusGeneratorBase
+public class IntValueGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext context, CyrusGenerationContext cyrusGenerationContext)
     {
-        var recordSymbols = cyrusGenerationContext.IntIds;
+        var recordSymbols = cyrusGenerationContext.IntValues;
             foreach (var recordSymbol in recordSymbols)
             {
-                var sourceText = GenerateIntId(recordSymbol, cyrusGenerationContext.LiquidEngine);
+                var sourceText = GenerateIntValue(recordSymbol, cyrusGenerationContext.LiquidEngine);
                 context.AddSource($"{recordSymbol.Name}.g.cs", sourceText);
             };
 
@@ -25,14 +25,14 @@ public class IntIdGenerator : CyrusGeneratorBase
             }
     }
 
-    private string GenerateIntId(INamedTypeSymbol item, LiquidEngine liquidEngine)
+    private string GenerateIntValue(INamedTypeSymbol item, LiquidEngine liquidEngine)
     {
         (int? min, int? max) = GetMinAndMaxFromType(item);
         var model = new
         {
             item.Name,
             Namespace = item.ContainingNamespace.GetNameOrEmpty(),
-            UnderlyingType = item.GetUnderlyingTypeOfTypedId(),
+            UnderlyingType = item.GetUnderlyingTypeOfValueType(),
             Minimum = min,
             HasMinimum = min.HasValue,
             Maximum = max,
@@ -40,7 +40,7 @@ public class IntIdGenerator : CyrusGeneratorBase
             HasMaximumAndMinumum = min.HasValue && max.HasValue,
             HasMaximumOrMinumum = min.HasValue || max.HasValue
         };
-        var source = liquidEngine.Render(model, "IntId");
+        var source = liquidEngine.Render(model, "IntValue");
 
         return source;
     }

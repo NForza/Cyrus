@@ -2,5 +2,5 @@
 
 namespace DemoApp.Contracts;
 
-[StringId(3, 200)]
+[StringValue(3, 200)]
 public partial record struct Street;

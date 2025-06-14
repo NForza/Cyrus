@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace NForza.Cyrus.Generators.Analyzers;
 
-internal class TypedIdAnalyzer
+internal class ValueTypeAnalyzer
 {
     internal void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext context)
     {
@@ -13,7 +13,7 @@ internal class TypedIdAnalyzer
         if (structDeclaration.Kind() != SyntaxKind.RecordStructDeclaration)
         {
             var diagnostic = Diagnostic.Create(
-                DiagnosticDescriptors.TypedIdMustBeARecordStruct,
+                DiagnosticDescriptors.ValueTypeMustBeARecordStruct,
                 structDeclaration.GetLocation(),
                 structDeclaration.Identifier.Text);
 

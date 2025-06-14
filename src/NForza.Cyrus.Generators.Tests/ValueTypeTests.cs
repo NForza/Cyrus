@@ -5,17 +5,17 @@ using Xunit.Abstractions;
 
 namespace NForza.Cyrus.Generators.Tests;
 
-public class TypedIdTests(ITestOutputHelper outputWindow)
+public class ValueTypeTests(ITestOutputHelper outputWindow)
 {
     [Fact]
-    public async Task Generating_GuidId_Should_Compile_And_Generate_Partial_Record_Struct_And_Converters()
+    public async Task Generating_GuidValue_Should_Compile_And_Generate_Partial_Record_Struct_And_Converters()
     {
         var source = @"
                 using NForza.Cyrus.Abstractions;
 
                 namespace Test;
             
-                [GuidId]
+                [GuidValue]
                 public partial record struct CustomerId; 
             ";
 
@@ -29,20 +29,20 @@ public class TypedIdTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().ContainSource("partial record struct CustomerId(Guid Value): IGuidId, IComparable<CustomerId>, IComparable");
+        generatedSyntaxTrees.Should().ContainSource("partial record struct CustomerId(Guid Value): IGuidValue, IComparable<CustomerId>, IComparable");
         generatedSyntaxTrees.Should().ContainSource("JsonConverter<CustomerId>");
         generatedSyntaxTrees.Should().ContainSource("CustomerIdTypeConverter");
     }
 
     [Fact]
-    public async Task Generating_GuidId_For_Struct_Which_Is_Not_A_Record_Should_Not_Generate_Analyzer_Error()
+    public async Task Generating_GuidValue_For_Struct_Which_Is_Not_A_Record_Should_Not_Generate_Analyzer_Error()
     {
         var source = @"
                 using NForza.Cyrus.Abstractions;
 
                 namespace Test;
             
-                [GuidId]
+                [GuidValue]
                 public partial struct CustomerId; 
             ";
 
@@ -53,16 +53,16 @@ public class TypedIdTests(ITestOutputHelper outputWindow)
             .RunAsync();
 
         analyzerOutput.Should().HaveErrorCount(1);
-        analyzerOutput.Should().ContainError(DiagnosticDescriptors.TypedIdMustBeARecordStruct);
+        analyzerOutput.Should().ContainError(DiagnosticDescriptors.ValueTypeMustBeARecordStruct);
     }
 
     [Fact]
-    public async Task Generating_GuidId_For_Struct_In_Global_Namespace_Should_Not_Generate_Compiler_Error()
+    public async Task Generating_GuidValue_For_Struct_In_Global_Namespace_Should_Not_Generate_Compiler_Error()
     {
         var source = @"
                 using NForza.Cyrus.Abstractions;
 
-                [GuidId]
+                [GuidValue]
                 public partial record struct CustomerId; 
             ";
 
@@ -77,12 +77,12 @@ public class TypedIdTests(ITestOutputHelper outputWindow)
     }
 
     [Fact]
-    public async Task Generating_StringId_For_Struct_In_Global_Namespace_Should_Not_Generate_Compiler_Error()
+    public async Task Generating_StringValue_For_Struct_In_Global_Namespace_Should_Not_Generate_Compiler_Error()
     {
         var source = @"
                 using NForza.Cyrus.Abstractions;
 
-                [StringId]
+                [StringValue]
                 public partial record struct Name; 
             ";
 
@@ -97,12 +97,12 @@ public class TypedIdTests(ITestOutputHelper outputWindow)
     }
 
     [Fact]
-    public async Task Generating_IntId_For_Struct_In_Global_Namespace_Should_Not_Generate_Compiler_Error()
+    public async Task Generating_IntValue_For_Struct_In_Global_Namespace_Should_Not_Generate_Compiler_Error()
     {
         var source = @"
                 using NForza.Cyrus.Abstractions;
 
-                [IntId]
+                [IntValue]
                 public partial record struct Amount; 
             ";
 

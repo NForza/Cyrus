@@ -37,7 +37,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
             {
                 var ctx = new
                 {
-                    Usings = new string[] { "NForza.Cyrus.Cqrs" },
+                    Usings = new string[] { "NForza.Cyrus.Cqrs", "NForza.Cyrus.Abstractions" },
                     Namespace = "CommandHandlers",
                     Name = "CommandHandlersRegistration",
                     Initializer = commandHandlerRegistrations

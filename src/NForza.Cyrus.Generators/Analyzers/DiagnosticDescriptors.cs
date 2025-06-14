@@ -114,14 +114,14 @@ public static class DiagnosticDescriptors
         description: "Project must reference NForza.Cyrus.MassTransit."
     );
 
-    public static readonly DiagnosticDescriptor TypedIdMustBeARecordStruct = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor ValueTypeMustBeARecordStruct = new DiagnosticDescriptor(
         id: "CYRUS008",
-        title: "TypedIds",
-        messageFormat: "TypedId {0} must be a record struct",
+        title: "ValueTypes",
+        messageFormat: "ValueType {0} must be a record struct",
         category: "Cyrus",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "TypedIds must be record structs."
+        description: "ValueTypes must be record structs."
     );
 
     public static readonly DiagnosticDescriptor IncorrectNumberOfArgumentsForValidator = new DiagnosticDescriptor(

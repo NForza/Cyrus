@@ -25,7 +25,7 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
             DiagnosticDescriptors.IncorrectNumberOfArgumentsForEventHandler,
             DiagnosticDescriptors.EventHandlerShouldHaveAEventParameter,
             DiagnosticDescriptors.ProjectShouldReferenceCyrusMassTransit,
-            DiagnosticDescriptors.TypedIdMustBeARecordStruct,
+            DiagnosticDescriptors.ValueTypeMustBeARecordStruct,
             DiagnosticDescriptors.IncorrectNumberOfArgumentsForValidator,
             DiagnosticDescriptors.ValidatorsShouldReturnIEnumerableOfString,
             DiagnosticDescriptors.IResultTupleElementShouldBeCalledResult,
@@ -46,7 +46,7 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
 
     private static void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext context)
     {
-        new TypedIdAnalyzer().AnalyzeSyntaxNode(context);
+        new ValueTypeAnalyzer().AnalyzeSyntaxNode(context);
     }
 
     private void AnalyzeMethodSymbol(SymbolAnalysisContext context)
