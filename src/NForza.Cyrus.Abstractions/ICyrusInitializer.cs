@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace NForza.Cyrus;
+namespace NForza.Cyrus.Abstractions;
 
 public interface ICyrusInitializer
 {

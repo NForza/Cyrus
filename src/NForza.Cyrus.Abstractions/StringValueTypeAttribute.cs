@@ -3,18 +3,18 @@
 namespace NForza.Cyrus.Abstractions;
 
 [AttributeUsage(AttributeTargets.Struct)]
-public class StringIdAttribute : Attribute
+public class StringValueAttribute : Attribute
 {
-    public StringIdAttribute(int minimumLength, int maximumLength)
+    public StringValueAttribute(int minimumLength, int maximumLength)
     {
         MinimumLength = minimumLength;
         MaximumLength = maximumLength;
     }
 
-    public StringIdAttribute() : this(-1, -1)
+    public StringValueAttribute() : this(-1, -1)
     {
     }
-    public StringIdAttribute(int minimumLength) : this(minimumLength, -1)
+    public StringValueAttribute(int minimumLength) : this(minimumLength, -1)
     {
     }
 

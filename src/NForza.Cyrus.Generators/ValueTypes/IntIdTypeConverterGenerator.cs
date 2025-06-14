@@ -4,21 +4,21 @@ using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.TypedIds;
+namespace NForza.Cyrus.Generators.ValueTypes;
 
-public class IntIdTypeConverterGenerator : CyrusGeneratorBase
+public class IntValueTypeConverterGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var recordSymbols = cyrusGenerationContext.IntIds;
+        var recordSymbols = cyrusGenerationContext.IntValues;
         foreach (var recordSymbol in recordSymbols)
         {
-            var sourceText = GenerateGuidIdTypeConverter(recordSymbol, cyrusGenerationContext.LiquidEngine);
+            var sourceText = GenerateGuidValueTypeConverter(recordSymbol, cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"{recordSymbol}TypeConverter.g.cs", sourceText);
         };
     }
 
-    private string GenerateGuidIdTypeConverter(INamedTypeSymbol item, LiquidEngine liquidEngine)
+    private string GenerateGuidValueTypeConverter(INamedTypeSymbol item, LiquidEngine liquidEngine)
     {
         var model = new
         {
@@ -26,7 +26,7 @@ public class IntIdTypeConverterGenerator : CyrusGeneratorBase
             Namespace = item.ContainingNamespace.GetNameOrEmpty()
         };
 
-        string source = liquidEngine.Render(model, "IntIdTypeConverter");
+        string source = liquidEngine.Render(model, "IntValueTypeConverter");
 
         return source;
     }

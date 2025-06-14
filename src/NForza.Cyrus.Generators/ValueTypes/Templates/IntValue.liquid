@@ -12,7 +12,7 @@ namespace {{ Namespace }};
 [JsonConverter(typeof({{ Name }}JsonConverter))]
 [TypeConverter(typeof({{ Name }}TypeConverter))]
 [DebuggerDisplay("{Value}")]
-public partial record struct {{ Name }}(int Value): IIntId, IComparable, IComparable<{{ Name }}>, IEquatable<{{ Name }}>
+public partial record struct {{ Name }}(int Value): IIntValue, IComparable, IComparable<{{ Name }}>, IEquatable<{{ Name }}>
 {
     public int CompareTo(object other) => other is {{ Name }} ? Value.CompareTo((({{Name}})other).Value) : -1;
     public int CompareTo({{ Name }} other) => Value.CompareTo(other.Value);

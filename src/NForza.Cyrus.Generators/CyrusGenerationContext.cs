@@ -12,9 +12,9 @@ public class CyrusGenerationContext
 {
     public CyrusGenerationContext(
         Compilation compilation,
-        ImmutableArray<INamedTypeSymbol> guidIds,
-        ImmutableArray<INamedTypeSymbol> intIds,
-        ImmutableArray<INamedTypeSymbol> stringIds,
+        ImmutableArray<INamedTypeSymbol> guidValues,
+        ImmutableArray<INamedTypeSymbol> intValues,
+        ImmutableArray<INamedTypeSymbol> stringValues,
         ImmutableArray<INamedTypeSymbol> commands,
         ImmutableArray<IMethodSymbol> commandHandlers,
         ImmutableArray<ISymbol> allCommandsAndHandlers,
@@ -32,9 +32,9 @@ public class CyrusGenerationContext
         bool isTestProject)
     {
         Compilation = compilation;
-        GuidIds = guidIds;
-        IntIds = intIds;
-        StringIds = stringIds;
+        GuidValues = guidValues;
+        IntValues = intValues;
+        StringValues = stringValues;
         Commands = commands;
         CommandHandlers = commandHandlers;
         AllCommandsAndHandlers = allCommandsAndHandlers;
@@ -53,9 +53,9 @@ public class CyrusGenerationContext
     }
 
     public Compilation Compilation { get; }
-    public ImmutableArray<INamedTypeSymbol> GuidIds { get; }
-    public ImmutableArray<INamedTypeSymbol> IntIds { get; set; }
-    public ImmutableArray<INamedTypeSymbol> StringIds { get; }
+    public ImmutableArray<INamedTypeSymbol> GuidValues { get; }
+    public ImmutableArray<INamedTypeSymbol> IntValues { get; set; }
+    public ImmutableArray<INamedTypeSymbol> StringValues { get; }
     public ImmutableArray<INamedTypeSymbol> Commands { get; }
     public ImmutableArray<IMethodSymbol> CommandHandlers { get; }
     public ImmutableArray<ISymbol> AllCommandsAndHandlers { get; }
@@ -72,7 +72,7 @@ public class CyrusGenerationContext
     public LiquidEngine LiquidEngine { get; }
     public bool IsTestProject { get; }
 
-    public ImmutableArray<INamedTypeSymbol> TypedIds => GuidIds.AddRange(IntIds).AddRange(StringIds);
+    public ImmutableArray<INamedTypeSymbol> ValueTypes => GuidValues.AddRange(IntValues).AddRange(StringValues);
     public ImmutableArray<INamedTypeSymbol> AllCommands => AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToImmutableArray();
     public ImmutableArray<IMethodSymbol> AllCommandHandlers => AllCommandsAndHandlers.OfType<IMethodSymbol>().ToImmutableArray();
     public ImmutableArray<IMethodSymbol> AllQueryHandlers => AllQueriesAndHandlers.OfType<IMethodSymbol>().ToImmutableArray();

@@ -1,6 +1,6 @@
 ﻿namespace NForza.Cyrus.Abstractions;
 
-public interface ITypedId
+public interface ICustomValueType
 {
     bool IsValid();
 }

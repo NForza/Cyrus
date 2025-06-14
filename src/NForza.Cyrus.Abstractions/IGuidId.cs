@@ -1,5 +1,5 @@
 ﻿namespace NForza.Cyrus.Abstractions;
 
-public interface IGuidId : ITypedId
+public interface IGuidValue : ICustomValueType
 {
 }

@@ -27,7 +27,7 @@ public class QueryHandlerGenerator : CyrusGeneratorBase
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
             var ctx = new
             {
-                Usings = new string[] { "NForza.Cyrus.Cqrs" },
+                Usings = new string[] { "NForza.Cyrus.Cqrs", "NForza.Cyrus.Abstractions" },
                 Namespace = "QueryHandlers",
                 Name = "QueryHandlersRegistration",
                 Initializer = queryHandlerRegistrations

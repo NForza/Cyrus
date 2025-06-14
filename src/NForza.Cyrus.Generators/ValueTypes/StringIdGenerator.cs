@@ -1,25 +1,23 @@
 ﻿using System.Linq;
-using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.TypedIds;
+namespace NForza.Cyrus.Generators.ValueTypes;
 
-public class StringIdGenerator : CyrusGeneratorBase
+public class StringValueGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var stringIds = cyrusGenerationContext.StringIds;
-        foreach (var recordSymbol in stringIds)
+        var StringValues = cyrusGenerationContext.StringValues;
+        foreach (var recordSymbol in StringValues)
         {
             var sourceText = GenerateCodeForRecordStruct(recordSymbol, cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"{recordSymbol.Name}.g.cs", sourceText);
         };
-        if (stringIds.Any())
+        if (StringValues.Any())
         {
-            var stringModels = GetPartialModelClass(stringIds.First().ContainingAssembly.Name, "TypedIds", "Strings", "string", stringIds.Select(s => $"\"{s.Name}\""), cyrusGenerationContext.LiquidEngine);
+            var stringModels = GetPartialModelClass(StringValues.First().ContainingAssembly.Name, "TypedIds", "Strings", "string", StringValues.Select(s => $"\"{s.Name}\""), cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"model-strings.g.cs", stringModels);
         }
     }
@@ -31,7 +29,7 @@ public class StringIdGenerator : CyrusGeneratorBase
         {
             item.Name,
             Namespace = item.ContainingNamespace.GetNameOrEmpty(),
-            UnderlyingType = item.GetUnderlyingTypeOfTypedId(),
+            UnderlyingType = item.GetUnderlyingTypeOfValueType(),
             Minimum = min,
             HasMinimum = min.HasValue,
             Maximum = max,
@@ -39,14 +37,14 @@ public class StringIdGenerator : CyrusGeneratorBase
             HasMaximumAndMinumum = min.HasValue && max.HasValue
         };
 
-        var resolvedSource = liquidEngine.Render(model, "StringId");
+        var resolvedSource = liquidEngine.Render(model, "StringValue");
 
         return resolvedSource;
     }
 
     private (int? min, int? max) GetMinAndMaxFromType(INamedTypeSymbol item)
     {
-        var attribute = item.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "StringIdAttribute");
+        var attribute = item.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "StringValueAttribute");
         if (attribute == null)
         {
             return (null, null);

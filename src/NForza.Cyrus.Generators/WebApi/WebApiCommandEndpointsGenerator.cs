@@ -70,7 +70,7 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
         {
             Namespace = "WebApi",
             Name = "HttpContextObjectFactoryCommandInitializer",
-            Usings = new string[] { "System.Linq" },
+            Usings = new string[] { "System.Linq", "NForza.Cyrus.Abstractions" },
             Initializer = httpContextObjectFactoryInitialization
         };
         var source = liquidEngine.Render(initModel, "CyrusInitializer");
