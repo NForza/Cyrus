@@ -28,7 +28,7 @@ public class ValidatorGenerator : CyrusGeneratorBase
             {
                 var ctx = new
                 {
-                    Usings = new string[] { "NForza.Cyrus.Cqrs" },
+                    Usings = new string[] { "NForza.Cyrus.Cqrs", "NForza.Cyrus.Abstractions" },
                     Namespace = "Validators",
                     Name = "ValidatorRegistration",
                     Initializer = validatorRegistrations

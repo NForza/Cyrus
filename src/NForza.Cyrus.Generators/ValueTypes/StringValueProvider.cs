@@ -4,15 +4,15 @@ using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.TypedIds;
+namespace NForza.Cyrus.Generators.ValueTypes;
 
-public class StringIdProvider : CyrusProviderBase<ImmutableArray<INamedTypeSymbol>>
+public class StringValueProvider : CyrusProviderBase<ImmutableArray<INamedTypeSymbol>>
 {
     public override IncrementalValueProvider<ImmutableArray<INamedTypeSymbol>> GetProvider(IncrementalGeneratorInitializationContext context, IncrementalValueProvider<GenerationConfig> configProvider)
     {
         var incrementalValuesProvider = context.SyntaxProvider
                     .CreateSyntaxProvider(
-                        predicate: (syntaxNode, _) => syntaxNode.IsRecordWithStringIdAttribute(),
+                        predicate: (syntaxNode, _) => syntaxNode.IsRecordWithStringValueAttribute(),
                         transform: (context, _) => context.GetRecordSymbolFromContext());
 
         var recordStructsWithAttribute = incrementalValuesProvider

@@ -78,14 +78,14 @@ public static class INamedTypeSymbolExtensions
         return hasEqualityOperators;
     }
 
-    public static string GetUnderlyingTypeOfTypedId(this INamedTypeSymbol typeSymbol)
+    public static string GetUnderlyingTypeOfValueType(this INamedTypeSymbol typeSymbol)
     {
         return typeSymbol.GetAttributes()
             .Select(a => a.AttributeClass?.Name)
-            .FirstOrDefault(name => name is "StringIdAttribute" or "IntIdAttribute" or "GuidIdAttribute") switch
+            .FirstOrDefault(name => name is "StringValueAttribute" or "IntValueAttribute" or "GuidValueAttribute") switch
         {
-            "StringIdAttribute" => "string",
-            "IntIdAttribute" => "int",
+            "StringValueAttribute" => "string",
+            "IntValueAttribute" => "int",
             _ => "System.Guid"
         };
     }

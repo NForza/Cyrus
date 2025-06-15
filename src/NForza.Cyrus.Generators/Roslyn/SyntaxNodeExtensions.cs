@@ -64,13 +64,13 @@ public static class SyntaxNodeExtensions
         return isRecordWithAttribute;
     }
 
-    public static bool IsRecordWithGuidIdAttribute(this SyntaxNode syntaxNode)
-        => IsRecordWithAttribute(syntaxNode, "GuidId");
+    public static bool IsRecordWithGuidValueAttribute(this SyntaxNode syntaxNode)
+        => IsRecordWithAttribute(syntaxNode, "GuidValue");
 
-    public static bool IsRecordWithIntIdAttribute(this SyntaxNode syntaxNode)
-        => IsRecordWithAttribute(syntaxNode, "IntId");
+    public static bool IsRecordWithIntValueAttribute(this SyntaxNode syntaxNode)
+        => IsRecordWithAttribute(syntaxNode, "IntValue");
 
-    public static bool IsRecordWithStringIdAttribute(this SyntaxNode syntaxNode)
-        => IsRecordWithAttribute(syntaxNode, "StringId");
+    public static bool IsRecordWithStringValueAttribute(this SyntaxNode syntaxNode)
+        => IsRecordWithAttribute(syntaxNode, "StringValue");
 
 }

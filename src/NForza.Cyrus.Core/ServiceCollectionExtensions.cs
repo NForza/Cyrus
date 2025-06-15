@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using NForza.Cyrus.Abstractions;
 
 namespace NForza.Cyrus;
 
