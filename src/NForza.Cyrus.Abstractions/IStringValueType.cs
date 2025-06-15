@@ -1,5 +1,5 @@
 ﻿namespace NForza.Cyrus.Abstractions;
 
-public interface IStringValue : ICustomValueType
+public interface IStringValueType : ICustomValueType
 {
 }

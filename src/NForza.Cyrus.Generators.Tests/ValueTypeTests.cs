@@ -29,7 +29,7 @@ public class ValueTypeTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().ContainSource("partial record struct CustomerId(Guid Value): IGuidValue, IComparable<CustomerId>, IComparable");
+        generatedSyntaxTrees.Should().ContainSource("partial record struct CustomerId(Guid Value): IGuidValueType, IComparable<CustomerId>, IComparable");
         generatedSyntaxTrees.Should().ContainSource("JsonConverter<CustomerId>");
         generatedSyntaxTrees.Should().ContainSource("CustomerIdTypeConverter");
     }

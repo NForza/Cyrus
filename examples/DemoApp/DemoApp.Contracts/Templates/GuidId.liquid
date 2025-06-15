@@ -14,7 +14,7 @@ namespace {{ Namespace }};
 [JsonConverter(typeof({{ Name }}JsonConverter))]
 [TypeConverter(typeof({{ Name }}TypeConverter))]
 [DebuggerDisplay("{Value}")]
-public partial record struct {{ Name }}(Guid Value): IGuidValue, IComparable<{{ Name }}>, IComparable
+public partial record struct {{ Name }}(Guid Value): IGuidValueType, IComparable<{{ Name }}>, IComparable
 {
     public {{ Name }}(): this(Guid.NewGuid()) { }
     public {{ Name }}(string guid): this(Guid.Parse(guid)) { }

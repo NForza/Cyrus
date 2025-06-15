@@ -6,24 +6,24 @@ Cyrus is a CQRS framework that focuses on ease of use, simplicity, and minimizin
 
 Cyrus generates code for the following components:
 
-- [Strongly Typed IDs](#strongly-typed-ids)
+- [Custom Value Types](#custom-value-types)
 - [Queries and Query Handlers](#queries-and-query-handlers)
 - [Commands and Command Handlers](#commands-and-command-handlers)
 - [Exposing Commands and Queries in a Web API](#exposing-commands-and-queries-in-a-web-api)
 - [Application Startup](#application-startup)
 
-### Strongly Typed IDs
+### Custom Value Types
 
-Cyrus allows you to define strongly typed IDs by defining a `partial record struct` like this:
+Cyrus allows you to define custom value types by defining a `partial record struct` like this:
 
 ```csharp
-[StringId(3, 200)]
+[StringValue(3, 200)]
 public partial record struct Address;
 
-[IntId]
+[IntValue]
 public partial record struct Amount;
 
-[GuidId]
+[GuidValue]
 public partial record struct CustomerId;
 ```
 These becomes a new datatype that can be used in type definitions:
@@ -166,20 +166,20 @@ Check the [Getting Started](https://github.com/NForza/Cyrus/tree/main/examples/G
 
 Cyrus uses a small amount of Reflection when the app is starting up, but **none** when the application is running. Cyrus generates a lot of source code at compile time to glue all the different parts together using [C# Source Generators]. This greatly simplifies development by reducing boilerplate code.
 
-### Generated code for TypedIds
+### Generated code for Custom Value Types
 
-For every TypedIds Cyrus generates additional code that simplifies using this type in your code, including a custom `JsonConverter`, a `TypeConverter`, casting operators, validation and other methods.
+For every Custom Value Type Cyrus generates additional code that simplifies using this type in your code, including a custom `JsonConverter`, a `TypeConverter`, casting operators, validation and other methods.
 
 ```csharp
 [JsonConverter(typeof(AddressJsonConverter))]
 [TypeConverter(typeof(AddressTypeConverter))]
-public partial record struct Address(string Value) : ITypedId
+public partial record struct Address(string Value) : ICustomValueType
 {
     public static Address Empty => new Address(string.Empty);
     
     public bool IsEmpty() => string.IsNullOrEmpty(Value);
     
-    public static implicit operator string(DemoApp.Contracts.Address typedId) => typedId.Value;
+    public static implicit operator string(DemoApp.Contracts.Address valueType) => valueType.Value;
     public static explicit operator DemoApp.Contracts.Address(string value) => new(value);
     
     public bool IsValid() => !string.IsNullOrEmpty(Value) && Value.Length >= 3 && Value.Length <= 200;
@@ -188,24 +188,24 @@ public partial record struct Address(string Value) : ITypedId
 }
 ```
 
-For GUID-based strongly typed IDs, you can use the `GuidId` attribute:
+For GUID-based Custom Value Types, you can use the `GuidValue` attribute:
 
 ```csharp
-[GuidId]
+[GuidValue]
 public partial record struct CustomerId;
 ```
 
-The generated code for a `Guid`-based ID looks like this:
+The generated code for a `Guid`-based value type looks like this:
 
 ```csharp
 [JsonConverter(typeof(CustomerIdJsonConverter))]
 [TypeConverter(typeof(CustomerIdTypeConverter))]
-public partial record struct CustomerId(Guid Value) : ITypedId
+public partial record struct CustomerId(Guid Value) : ICustomValueType
 {
     public CustomerId() : this(Guid.NewGuid()) { }
     public static CustomerId Empty => new CustomerId(Guid.Empty);
     
-    public static implicit operator System.Guid(DemoApp.Contracts.CustomerId typedId) => typedId.Value;
+    public static implicit operator System.Guid(DemoApp.Contracts.CustomerId valueType) => valueType.Value;
     public static explicit operator DemoApp.Contracts.CustomerId(System.Guid value) => new(value);
     
     public override string ToString() => Value.ToString();
