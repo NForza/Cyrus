@@ -10,7 +10,7 @@ using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.ValueTypes;
 
-public class TypedIdInitializerGenerator : CyrusGeneratorBase
+public class ValueTypeInitializerGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {

@@ -47,7 +47,7 @@ public class IntValueGenerator : CyrusGeneratorBase
 
     private (int? min, int? max) GetMinAndMaxFromType(INamedTypeSymbol item)
     {
-        var attribute = item.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "IntIdAttribute");
+        var attribute = item.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "IntValueAttribute");
         if (attribute == null)
         {
             return (null, null);
