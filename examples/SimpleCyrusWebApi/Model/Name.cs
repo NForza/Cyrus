@@ -2,5 +2,5 @@
 
 namespace SimpleCyrusWebApi;
 
-[StringId]
+[StringValue]
 public partial record struct Name;

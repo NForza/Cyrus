@@ -2,5 +2,5 @@ using NForza.Cyrus.Abstractions;
 
 namespace CyrusSignalR;
 
-[GuidId]
+[GuidValue]
 public partial record struct CustomerId;

@@ -2,5 +2,5 @@
 
 namespace TracksDemo.Tracks;
 
-[GuidId]
+[GuidValue]
 public partial record struct TrackId;
