@@ -160,7 +160,7 @@ app.MapCyrus();
 
 await app.RunAsync();
 ```
-Check the [Getting Started](https://github.com/NForza/Cyrus/tree/main/examples/GettingStarted/SimpleCyrusWebApi)) for more details.
+Check the [HelloCyrus](https://github.com/NForza/Cyrus/tree/main/examples/HelloCyrus) or [SimpleCyrusWebApi](https://github.com/NForza/Cyrus/tree/main/examples/SimpleCyrusWebApi) for more details.
 
 ### Under the hood
 

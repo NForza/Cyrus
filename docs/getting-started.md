@@ -31,16 +31,16 @@ await app.RunAsync();
 
 * Change the LaunchUrl to `/swagger` in LaunchSettings.json.
 
-* Add a new c# file `Types.cs` to the project and add some strongly typed IDs:
+* Add some custom ValueTypes in the program.cs or a separate file:
 
 ```csharp
-[GuidId]
+[GuidValue]
 public partial record struct CustomerId;
 
-[StringId(1, 50)]
+[StringValue(1, 50)]
 public partial record struct Name;
 
-[StringId(1, 100)]
+[StringValue(1, 100)]
 public partial record struct Address;
 ```
 
