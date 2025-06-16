@@ -22,7 +22,7 @@ public class LocalEventListGenerator : CyrusGeneratorBase
             {
                 var ctx = new
                 {
-                    Usings = new string[] { "NForza.Cyrus.Cqrs" },
+                    Usings = new string[] { "NForza.Cyrus.Cqrs", "NForza.Cyrus.Abstractions" },
                     Namespace = "LocalEvents",
                     Name = "LocalEventListInitializer",
                     Initializer = contents

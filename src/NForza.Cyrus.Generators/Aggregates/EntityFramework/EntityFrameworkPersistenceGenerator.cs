@@ -26,7 +26,7 @@ public class EntityFrameworkPersistenceGenerator : CyrusGeneratorBase
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
         var ctx = new
         {
-            Usings = new string[] { "NForza.Cyrus.EntityFramework", "NForza.Cyrus.Aggregates" },
+            Usings = new string[] { "NForza.Cyrus.EntityFramework", "NForza.Cyrus.Aggregates", "NForza.Cyrus.Abstractions"},
             Namespace = "Persistence",
             Name = "PersistenceRegistration",
             Initializer = persistenceRegistrations

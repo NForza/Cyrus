@@ -73,7 +73,7 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
         var initModel = new { 
             Namespace = "WebApi", 
             Name = "HttpContextObjectFactoryQueryInitializer",
-            Usings = new string[] { "System.Linq" },
+            Usings = new string[] { "System.Linq", "NForza.Cyrus.Abstractions" },
             Initializer = httpContextObjectFactoryInitialization 
         };
         var source = liquidEngine.Render(initModel, "CyrusInitializer");

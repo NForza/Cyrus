@@ -40,13 +40,13 @@ internal static class TypeAnnotations
 
             var attributes = namedType.GetAttributes();
 
-            if (attributes.Any(a => a.AttributeClass?.Name == "GuidIdAttribute"))
+            if (attributes.Any(a => a.AttributeClass?.Name == "GuidValueAttribute"))
                 return "guid";
 
-            if (attributes.Any(a => a.AttributeClass?.Name == "IntIdAttribute"))
+            if (attributes.Any(a => a.AttributeClass?.Name == "IntValueAttribute"))
                 return "int";
 
-            if (attributes.Any(a => a.AttributeClass?.Name == "StringIdAttribute"))
+            if (attributes.Any(a => a.AttributeClass?.Name == "StringValueAttribute"))
                 return null;
 
             var typeName = namedType.ToDisplayString();

@@ -74,7 +74,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase
             .Distinct(SymbolEqualityComparer.Default)
             .Select(u => u?.ToFullName())
             .Where(u => !string.IsNullOrWhiteSpace(u))
-            .Concat(["Microsoft.Extensions.DependencyInjection"]);
+            .Concat(["Microsoft.Extensions.DependencyInjection", "NForza.Cyrus.Abstractions" ]);
 
         var hubs = signalRDefinitions
             .Select(s => new

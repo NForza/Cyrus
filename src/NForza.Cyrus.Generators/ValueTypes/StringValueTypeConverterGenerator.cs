@@ -4,28 +4,28 @@ using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.TypedIds;
+namespace NForza.Cyrus.Generators.ValueTypes;
 
-public class StringIdTypeConverterGenerator : CyrusGeneratorBase
+public class StringValueTypeConverterGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var stringIds = cyrusGenerationContext.StringIds;
-        foreach (var recordSymbol in stringIds)
+        var StringValues = cyrusGenerationContext.StringValues;
+        foreach (var recordSymbol in StringValues)
         {
-            var sourceText = GenerateStringIdTypeConverter(recordSymbol, cyrusGenerationContext.LiquidEngine);
+            var sourceText = GenerateStringValueTypeConverter(recordSymbol, cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"{recordSymbol}TypeConverter.g.cs", sourceText);
         };
     }
 
-    private string GenerateStringIdTypeConverter(INamedTypeSymbol item, LiquidEngine liquidEngine)
+    private string GenerateStringValueTypeConverter(INamedTypeSymbol item, LiquidEngine liquidEngine)
     {
         var model = new
         {
             item.Name,
             Namespace = item.ContainingNamespace.GetNameOrEmpty()
         };
-        var resolvedSource = liquidEngine.Render(model, "StringIdTypeConverter");
+        var resolvedSource = liquidEngine.Render(model, "StringValueTypeConverter");
         return resolvedSource;
     }
 }

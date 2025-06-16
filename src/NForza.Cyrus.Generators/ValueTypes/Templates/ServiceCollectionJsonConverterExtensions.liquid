@@ -12,7 +12,7 @@ public class ServiceCollectionJsonConverterExtensions: ICyrusInitializer
 {
     public void RegisterServices(IServiceCollection services)
     {
-        services.AddSingleton(sp => new TypedIdDictionary(allTypes));
+        services.AddSingleton(sp => new ValueTypeDictionary(allTypes));
         {% for t in Types %}        
           services.AddTransient<JsonConverter, {{ t.Name }}JsonConverter>();
         {% endfor %}
@@ -23,5 +23,4 @@ public class ServiceCollectionJsonConverterExtensions: ICyrusInitializer
         [typeof({{ t.Name }})] = typeof({{ t.UnderlyingType }}){% unless forloop.last %}, {% endunless -%}
     {% endfor -%}
     };
-
 }

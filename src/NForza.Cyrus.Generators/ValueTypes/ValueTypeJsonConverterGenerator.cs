@@ -5,13 +5,13 @@ using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.TypedIds;
+namespace NForza.Cyrus.Generators.ValueTypes;
 
-public class TypedIdJsonConverterGenerator : CyrusGeneratorBase
+public class ValueTypeJsonConverterGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var typedIds = cyrusGenerationContext.TypedIds;
+        var typedIds = cyrusGenerationContext.ValueTypes;
         foreach (var typedId in typedIds)
         {
             var sourceText = GenerateJsonConverterForTypedId(typedId, cyrusGenerationContext.LiquidEngine);
@@ -22,13 +22,13 @@ public class TypedIdJsonConverterGenerator : CyrusGeneratorBase
     private string GenerateJsonConverterForTypedId(INamedTypeSymbol item, LiquidEngine liquidEngine)
     {
         string fullyQualifiedNamespace = item.ContainingNamespace.GetNameOrEmpty();
-        var underlyingTypeName = item.GetUnderlyingTypeOfTypedId();
+        var underlyingTypeName = item.GetUnderlyingTypeOfValueType();
 
         string? templateName = underlyingTypeName switch
         {
-            "System.Guid" => "GuidIdJsonConverter",
-            "string" => "StringIdJsonConverter",
-            "int" => "IntIdJsonConverter",
+            "System.Guid" => "GuidValueJsonConverter",
+            "string" => "StringValueJsonConverter",
+            "int" => "IntValueJsonConverter",
             _ => throw new NotSupportedException($"Underlying type {underlyingTypeName} is not supported.")
         };
 

@@ -2,5 +2,5 @@
 
 namespace DemoApp.Contracts;
 
-[GuidId]
+[GuidValue]
 public partial record struct CustomerId;

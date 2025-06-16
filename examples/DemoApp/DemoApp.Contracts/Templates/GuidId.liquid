@@ -14,12 +14,12 @@ namespace {{ Namespace }};
 [JsonConverter(typeof({{ Name }}JsonConverter))]
 [TypeConverter(typeof({{ Name }}TypeConverter))]
 [DebuggerDisplay("{Value}")]
-public partial record struct {{ Name }}(Guid Value): IGuidId, IComparable<{{ Name }}>, IComparable
+public partial record struct {{ Name }}(Guid Value): IGuidValueType, IComparable<{{ Name }}>, IComparable
 {
     public {{ Name }}(): this(Guid.NewGuid()) { }
     public {{ Name }}(string guid): this(Guid.Parse(guid)) { }
     public static {{ Name }} Empty => new {{ Name }}({{ Default }});
-    public static implicit operator {{ UnderlyingType }}({{ Name }} typedId) => typedId.Value;
+    public static implicit operator {{ UnderlyingType }}({{ Name }} valueType) => valueType.Value;
     public static explicit operator {{ Name }}({{ UnderlyingType }} value) => new(value);    
     public override string ToString() => Value.ToString();
     public bool IsValid() => !Value.Equals(Guid.Empty);
