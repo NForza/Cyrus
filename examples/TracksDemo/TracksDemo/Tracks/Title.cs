@@ -2,5 +2,5 @@
 
 namespace TracksDemo.Tracks;
 
-[StringId(1, 50)]
+[StringValue(1, 50)]
 public partial record struct Title;

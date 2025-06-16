@@ -2,5 +2,5 @@ using NForza.Cyrus.Abstractions;
 
 namespace CyrusSignalR;
 
-[StringId]
+[StringValue]
 public partial record struct Name;

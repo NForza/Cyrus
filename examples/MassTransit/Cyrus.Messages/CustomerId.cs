@@ -2,5 +2,5 @@
 
 namespace Cyrus.Messages;
 
-[GuidId]
+[GuidValue]
 public partial record struct CustomerId;

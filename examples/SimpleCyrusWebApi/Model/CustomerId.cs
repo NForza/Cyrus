@@ -2,5 +2,5 @@
 
 namespace SimpleCyrusWebApi;
 
-[GuidId]
+[GuidValue]
 public partial record struct CustomerId;
