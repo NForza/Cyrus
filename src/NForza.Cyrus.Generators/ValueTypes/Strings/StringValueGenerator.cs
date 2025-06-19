@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.ValueTypes;
+namespace NForza.Cyrus.Generators.ValueTypes.Strings;
 
 public class StringValueGenerator : CyrusGeneratorBase
 {

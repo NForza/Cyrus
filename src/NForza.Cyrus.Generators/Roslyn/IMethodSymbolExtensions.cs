@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
 using Microsoft.CodeAnalysis;
 
 namespace NForza.Cyrus.Generators.Roslyn;

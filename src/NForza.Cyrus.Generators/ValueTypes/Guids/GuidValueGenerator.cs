@@ -1,11 +1,9 @@
 ﻿using System.Linq;
-using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.ValueTypes;
+namespace NForza.Cyrus.Generators.ValueTypes.Guids;
 
 public class GuidValueGenerator : CyrusGeneratorBase
 {
