@@ -14,6 +14,7 @@ public class CyrusGenerationContext
         Compilation compilation,
         ImmutableArray<INamedTypeSymbol> guidValues,
         ImmutableArray<INamedTypeSymbol> intValues,
+        ImmutableArray<INamedTypeSymbol> doubleValues,
         ImmutableArray<INamedTypeSymbol> stringValues,
         ImmutableArray<INamedTypeSymbol> commands,
         ImmutableArray<IMethodSymbol> commandHandlers,
@@ -34,6 +35,7 @@ public class CyrusGenerationContext
         Compilation = compilation;
         GuidValues = guidValues;
         IntValues = intValues;
+        DoubleValues = doubleValues;
         StringValues = stringValues;
         Commands = commands;
         CommandHandlers = commandHandlers;
@@ -54,7 +56,8 @@ public class CyrusGenerationContext
 
     public Compilation Compilation { get; }
     public ImmutableArray<INamedTypeSymbol> GuidValues { get; }
-    public ImmutableArray<INamedTypeSymbol> IntValues { get; set; }
+    public ImmutableArray<INamedTypeSymbol> IntValues { get; }
+    public ImmutableArray<INamedTypeSymbol> DoubleValues { get; }
     public ImmutableArray<INamedTypeSymbol> StringValues { get; }
     public ImmutableArray<INamedTypeSymbol> Commands { get; }
     public ImmutableArray<IMethodSymbol> CommandHandlers { get; }
@@ -63,7 +66,7 @@ public class CyrusGenerationContext
     public ImmutableArray<IMethodSymbol> QueryHandlers { get; }
     public ImmutableArray<ISymbol> AllQueriesAndHandlers { get;  }
     public ImmutableArray<IMethodSymbol> Validators { get; }
-    public ImmutableArray<AggregateRootDefinition> AggregateRoots { get; private set; }
+    public ImmutableArray<AggregateRootDefinition> AggregateRoots { get; }
     public ImmutableArray<INamedTypeSymbol> Events { get; }
     public ImmutableArray<INamedTypeSymbol> AllEvents { get; }
     public ImmutableArray<IMethodSymbol> EventHandlers { get; }
@@ -72,7 +75,7 @@ public class CyrusGenerationContext
     public LiquidEngine LiquidEngine { get; }
     public bool IsTestProject { get; }
 
-    public ImmutableArray<INamedTypeSymbol> ValueTypes => GuidValues.AddRange(IntValues).AddRange(StringValues);
+    public ImmutableArray<INamedTypeSymbol> ValueTypes => GuidValues.AddRange(IntValues).AddRange(StringValues).AddRange(DoubleValues);
     public ImmutableArray<INamedTypeSymbol> AllCommands => AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToImmutableArray();
     public ImmutableArray<IMethodSymbol> AllCommandHandlers => AllCommandsAndHandlers.OfType<IMethodSymbol>().ToImmutableArray();
     public ImmutableArray<IMethodSymbol> AllQueryHandlers => AllQueriesAndHandlers.OfType<IMethodSymbol>().ToImmutableArray();

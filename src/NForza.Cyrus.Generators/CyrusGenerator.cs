@@ -33,7 +33,8 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
         var configProvider = ConfigProvider(context);
 
         var intValuesProvider = new IntValueProvider().GetProvider(context, configProvider);
-        var GuidValuesProvider = new GuidValueProvider().GetProvider(context, configProvider);
+        var doubleValuesProvider = new DoubleValueProvider().GetProvider(context, configProvider);
+        var guidValuesProvider = new GuidValueProvider().GetProvider(context, configProvider);
         var stringValuesProvider = new StringValueProvider().GetProvider(context, configProvider);
         var commandProvider = new CommandProvider().GetProvider(context, configProvider);
         var commandHandlerProvider = new CommandHandlerProvider().GetProvider(context, configProvider);
@@ -51,7 +52,8 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
         var cyrusGenerationContext =
             context.CompilationProvider
             .Combine(intValuesProvider)
-            .Combine(GuidValuesProvider)
+            .Combine(doubleValuesProvider)
+            .Combine(guidValuesProvider)
             .Combine(stringValuesProvider)
             .Combine(commandProvider)
             .Combine(commandHandlerProvider)
@@ -70,12 +72,13 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
             .Combine(isTestProjectProvider)
             .Select((combinedProviders, _) =>
             {
-                var ((((((((((((((((((compilation, intValues), GuidValues), StringValues), commands), commandHandlers), allCommandsAndHandlers), queries), queryHandlers), allQueriesAndHandlers), eventHandlers), events), allEvents), aggregateRoots), signalRHubs), validators), templateOverrides), generationConfig), isTestProject) = combinedProviders;
+                var (((((((((((((((((((compilation, intValues), doubleValues), guidValues), StringValues), commands), commandHandlers), allCommandsAndHandlers), queries), queryHandlers), allQueriesAndHandlers), eventHandlers), events), allEvents), aggregateRoots), signalRHubs), validators), templateOverrides), generationConfig), isTestProject) = combinedProviders;
                 var liquidEngine = new LiquidEngine(Assembly.GetExecutingAssembly(), new(templateOverrides));
                 return new CyrusGenerationContext(
                     compilation: compilation,
-                    guidValues: GuidValues,
+                    guidValues: guidValues,
                     intValues: intValues,
+                    doubleValues: doubleValues,
                     stringValues: StringValues,
                     commands: commands,
                     commandHandlers: commandHandlers,
