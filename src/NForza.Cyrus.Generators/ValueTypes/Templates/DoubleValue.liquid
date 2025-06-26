@@ -1,0 +1,40 @@
+﻿using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.InteropServices.ComTypes;
+using System.Text.Json.Serialization;
+using NForza.Cyrus.Abstractions;
+
+{% if Namespace != "" %}
+namespace {{ Namespace }};
+{% endif -%}
+
+[JsonConverter(typeof({{ Name }}JsonConverter))]
+[TypeConverter(typeof({{ Name }}TypeConverter))]
+[DebuggerDisplay("{Value}")]
+public partial record struct {{ Name }}(double Value): IDoubleValueType, IComparable, IComparable<{{ Name }}>, IEquatable<{{ Name }}>
+{
+    public int CompareTo(object other) => other is {{ Name }} ? Value.CompareTo((({{Name}})other).Value) : -1;
+    public int CompareTo({{ Name }} other) => Value.CompareTo(other.Value);
+    public static bool operator <({{ Name }} left, {{ Name }} right) => left.CompareTo(right) < 0;
+    public static bool operator <=({{ Name }} left, {{ Name }} right) => left.CompareTo(right) <= 0;
+    public static bool operator >({{ Name }} left, {{ Name }} right) => left.CompareTo(right) > 0;
+    public static bool operator >=({{ Name }} left, {{ Name }} right) => left.CompareTo(right) >= 0;
+
+    public static implicit operator {{ UnderlyingType }}({{ Name }} typedId) => typedId.Value;
+    public static explicit operator {{ Name }}({{ UnderlyingType }} value) => new(value);
+    public bool IsValid() => {% if HasMaximumOrMinumum == false -%}
+            true
+        {%- else -%}
+            {% if HasMinimum -%}
+                Value >= {{ Minimum }}
+            {%- endif -%}
+            {% if HasMaximumAndMinumum -%}
+                && 
+            {%- endif %}
+            {%- if HasMaximum -%}
+            Value < {{ Maximum }}
+            {%- endif -%}
+        {% endif %};
+    public override string ToString() => Value.ToString();
+}

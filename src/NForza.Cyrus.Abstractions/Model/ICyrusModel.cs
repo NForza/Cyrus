@@ -6,6 +6,7 @@ public interface ICyrusModel
 {
     IEnumerable<string> Guids { get; }
     IEnumerable<string> Integers { get; }
+    IEnumerable<string> Doubles { get; }
     IEnumerable<string> Strings { get; }
     IEnumerable<ModelTypeDefinition> Models { get; }
     IEnumerable<ModelTypeDefinition> Events { get; }

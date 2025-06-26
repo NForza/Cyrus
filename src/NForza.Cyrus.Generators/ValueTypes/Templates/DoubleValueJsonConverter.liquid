@@ -1,0 +1,51 @@
+﻿using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+{% if Namespace != "" %}
+namespace {{ Namespace }};
+{% endif -%}
+
+public class {{ Name }}JsonConverter : JsonConverter<{{ Name }}>
+{
+    public override {{ Name }} Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Null)
+            return default;
+
+        double number;
+
+        if (reader.TokenType == JsonTokenType.Number)
+        {
+            if (!reader.TryGetDouble(out number))
+                throw new JsonException(
+                    $"Number is outside Double range for {{ Name }}.");
+        }
+
+        else if (reader.TokenType == JsonTokenType.String)
+        {
+            var raw = reader.GetString();
+            if (!double.TryParse(raw, out number))
+                throw new JsonException(
+                    $"\"{raw}\" is not a valid integer for {{ Name }}.");
+        }
+        else
+        {
+            throw new JsonException(
+                $"Expected number or numeric string, found {reader.TokenType}.");
+        }
+
+        return new {{ Name }}(number);
+    }
+
+    public override void Write(
+        Utf8JsonWriter writer,
+        {{ Name }} value,
+        JsonSerializerOptions options)
+    {
+        writer.WriteNumberValue(value.Value);
+    }
+}

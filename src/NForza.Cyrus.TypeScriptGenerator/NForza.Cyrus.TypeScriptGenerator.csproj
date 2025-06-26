@@ -10,7 +10,7 @@
     <EmbeddedResource Include="Templates\enum.liquid" />
     <EmbeddedResource Include="Templates\guid.liquid" />
     <EmbeddedResource Include="Templates\hub.liquid" />
-    <EmbeddedResource Include="Templates\integer.liquid" />
+    <EmbeddedResource Include="Templates\number.liquid" />
     <EmbeddedResource Include="Templates\interface.liquid" />
     <EmbeddedResource Include="Templates\string.liquid" />
     <EmbeddedResource Include="Templates\type-defaults.liquid" />
