@@ -70,6 +70,9 @@ public static class SyntaxNodeExtensions
     public static bool IsRecordWithIntValueAttribute(this SyntaxNode syntaxNode)
         => IsRecordWithAttribute(syntaxNode, "IntValue");
 
+    public static bool IsRecordWithDoubleValueAttribute(this SyntaxNode syntaxNode)
+        => IsRecordWithAttribute(syntaxNode, "DoubleValue");
+
     public static bool IsRecordWithStringValueAttribute(this SyntaxNode syntaxNode)
         => IsRecordWithAttribute(syntaxNode, "StringValue");
 

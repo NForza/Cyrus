@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 
-namespace NForza.Cyrus.Generators.ValueTypes;
+namespace NForza.Cyrus.Generators.ValueTypes.Strings;
 
 public class StringValueProvider : CyrusProviderBase<ImmutableArray<INamedTypeSymbol>>
 {

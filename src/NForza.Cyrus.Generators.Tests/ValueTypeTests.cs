@@ -115,4 +115,24 @@ public class ValueTypeTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().NotHaveErrors();
         compilerOutput.Should().NotHaveErrors();
     }
+
+    [Fact]
+    public async Task Generating_DoubleValue_For_Struct_In_Global_Namespace_Should_Not_Generate_Compiler_Error()
+    {
+        var source = @"
+                using NForza.Cyrus.Abstractions;
+
+                [DoubleValue]
+                public partial record struct Amount; 
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        analyzerOutput.Should().NotHaveErrors();
+        compilerOutput.Should().NotHaveErrors();
+    }
 }

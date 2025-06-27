@@ -36,6 +36,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Commands\Templates\CommandDispatcher.liquid" />
     <EmbeddedResource Include="Commands\Templates\CyrusInitializer.liquid" />
+    <EmbeddedResource Include="ValueTypes\Templates\DoubleValue.liquid" />
+    <EmbeddedResource Include="ValueTypes\Templates\DoubleValueJsonConverter.liquid" />
+    <EmbeddedResource Include="ValueTypes\Templates\DoubleValueTypeConverter.liquid" />
     <EmbeddedResource Include="WebApi\Templates\HttpContextObjectFactoryCommand.liquid" />
     <EmbeddedResource Include="WebApi\Templates\HttpContextObjectFactoryQuery.liquid" />
     <EmbeddedResource Include="Model\Model-query.liquid" />

@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NForza.Cyrus.Generators.Roslyn;
 
 public static class RecordDeclarationSyntaxExtensions
 {

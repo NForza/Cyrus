@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -82,11 +83,13 @@ public static class INamedTypeSymbolExtensions
     {
         return typeSymbol.GetAttributes()
             .Select(a => a.AttributeClass?.Name)
-            .FirstOrDefault(name => name is "StringValueAttribute" or "IntValueAttribute" or "GuidValueAttribute") switch
+            .FirstOrDefault(name => name is "StringValueAttribute" or "IntValueAttribute" or "DoubleValueAttribute" or "GuidValueAttribute") switch
         {
             "StringValueAttribute" => "string",
             "IntValueAttribute" => "int",
-            _ => "System.Guid"
+            "DoubleValueAttribute" => "double",
+            "GuidValueAttribute" => "System.Guid",
+            _ => throw new InvalidOperationException($"Unknown value type for {typeSymbol.Name}. Expected one of: StringValueAttribute, IntValueAttribute, DoubleValueAttribute, GuidValueAttribute.")
         };
     }
 

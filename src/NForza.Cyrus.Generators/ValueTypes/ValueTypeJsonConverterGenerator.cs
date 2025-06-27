@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
@@ -29,6 +27,7 @@ public class ValueTypeJsonConverterGenerator : CyrusGeneratorBase
             "System.Guid" => "GuidValueJsonConverter",
             "string" => "StringValueJsonConverter",
             "int" => "IntValueJsonConverter",
+            "double" => "DoubleValueJsonConverter",
             _ => throw new NotSupportedException($"Underlying type {underlyingTypeName} is not supported.")
         };
 
