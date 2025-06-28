@@ -24,7 +24,7 @@ public class StringValueGenerator : CyrusGeneratorBase
 
     private string GenerateCodeForRecordStruct(INamedTypeSymbol item, LiquidEngine liquidEngine)
     {
-        (int? min, int? max) = GetMinAndMaxFromType(item);
+        (int? min, int? max, string? validationRegex) = GetValidationProperties(item);
         var model = new
         {
             item.Name,
@@ -34,7 +34,8 @@ public class StringValueGenerator : CyrusGeneratorBase
             HasMinimum = min.HasValue,
             Maximum = max,
             HasMaximum = max.HasValue,
-            HasMaximumAndMinumum = min.HasValue && max.HasValue
+            HasMaximumAndMinumum = min.HasValue && max.HasValue,
+            ValidationRegex = validationRegex,
         };
 
         var resolvedSource = liquidEngine.Render(model, "StringValue");
@@ -42,16 +43,17 @@ public class StringValueGenerator : CyrusGeneratorBase
         return resolvedSource;
     }
 
-    private (int? min, int? max) GetMinAndMaxFromType(INamedTypeSymbol item)
+    private (int? min, int? max, string? validationRegex) GetValidationProperties(INamedTypeSymbol item)
     {
         var attribute = item.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "StringValueAttribute");
         if (attribute == null)
         {
-            return (null, null);
+            return (null, null, null);
         }
-        var args = attribute.ConstructorArguments.Select(a => int.Parse(a.Value?.ToString())).ToList();
-        int? min = args.Count > 0 ? args[0] : null;
-        int? max = args.Count > 1 ? args[1] : null;
-        return (min, max);
+        var args = attribute.ConstructorArguments.Select(a => a.Value?.ToString()).ToList();
+        int? min = args.Count > 0 ? int.Parse(args[0]) : null;
+        int? max = args.Count > 1 ? int.Parse(args[1]) : null;
+        string? validationRegex = args.Count > 2 ? args[2] : null;
+        return (min, max, validationRegex);
     }
 }
