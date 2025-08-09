@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -74,7 +75,7 @@ public record SignalRHubClassDefinition
                     MethodName = genericArg.GetText().ToString(),
                     Name = symbol.Name,
                     Handler = GetCommandHandler(commandSymbol, cyrusGenerationContext),
-                    FullTypeName = commandSymbol.ToFullName()
+                    ClrTypeName = commandSymbol.ToFullName()
                 };
             })
             .Where(command => command != null)
@@ -97,15 +98,15 @@ public record SignalRHubClassDefinition
                 ITypeSymbol? returnType = GetReturnTypeOfQuery(querySymbol, cyrusGenerationContext);
                 (bool isCollection, ITypeSymbol? collectionType) = returnType?.IsCollection() ?? (false, null);
                 var isNullable = returnType?.IsNullable();
-                ITypeSymbol? queryReturnType = isCollection ? collectionType : returnType;
-                var propertyModelsOfReturnType = queryReturnType!.GetPropertyModels();
+                ITypeSymbol queryReturnType = (isCollection ? collectionType : returnType) ?? throw new InvalidOperationException($"Can't determine return type for {querySymbol.Name}");
+                var propertyModelsOfReturnType = queryReturnType.GetPropertyModels();
                 return
                     new SignalRQuery
                     {
                         MethodName = genericArg.GetText().ToString(),
                         Name = querySymbol.Name,
-                        FullTypeName = querySymbol.ToFullName(),
-                        ReturnType = new(queryReturnType!.Name, propertyModelsOfReturnType, [], isCollection, isNullable ?? false) //, [])
+                        ClrTypeName = querySymbol.ToFullName(),
+                        ReturnType = new(queryReturnType!.Name, querySymbol.ToFullName(), propertyModelsOfReturnType, [], isCollection, isNullable ?? false) //, [])
                     };
             })
             .Where(query => query != null)
@@ -139,7 +140,7 @@ public record SignalRHubClassDefinition
         var callerEvents = callerEventTypes.Select(genericArg =>
         {
             var symbol = SemanticModel.GetSymbolInfo(genericArg).Symbol!;
-            return new SignalREvent { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, FullTypeName = symbol.ToFullName(), Broadcast = false };
+            return new SignalREvent { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, ClrTypeName = symbol.ToFullName(), Broadcast = false };
         });
 
         memberAccessExpressionSyntaxes = GetMethodCallsOf(constructorBody, "Broadcast")
@@ -149,7 +150,7 @@ public record SignalRHubClassDefinition
         var broadcastEvents = broadcastEventTypes.Select(genericArg =>
         {
             var symbol = SemanticModel.GetSymbolInfo(genericArg).Symbol!;
-            return new SignalREvent { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, FullTypeName = symbol.ToFullName(), Broadcast = true };
+            return new SignalREvent { MethodName = genericArg.GetText().ToString(), Name = symbol.Name, ClrTypeName = symbol.ToFullName(), Broadcast = true };
         });
 
         Events = callerEvents.Concat(broadcastEvents);

@@ -1,5 +1,6 @@
 ﻿new ModelTypeDefinition(
 	"{{ type.Name }}",  
+	"{{ type.ClrName }}",  
 	[
 		{% for p in type.Properties %}
 			{% include "Model-property", property: p %}{% unless forloop.last %}, {% endunless -%}

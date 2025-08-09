@@ -31,7 +31,7 @@ internal class ModelGenerator
         }
         string properties = GetPropertiesDeclaration(typeSymbol, liquidEngine);
         string values = GetValuesDeclaration(typeSymbol);
-        return $"new ModelTypeDefinition(\"{typeSymbol.Name}\", [{properties}], [{values}], {isCollection.ToString().ToLower()}, {typeSymbol.IsNullable().ToString().ToLower()})";
+        return $"new ModelTypeDefinition(\"{typeSymbol.Name}\", \"{typeSymbol.ToFullName()}\", [{properties}], [{values}], {isCollection.ToString().ToLower()}, {typeSymbol.IsNullable().ToString().ToLower()})";
     }
 
     internal static string ForQueryHandler(IMethodSymbol queryHandler, LiquidEngine liquidEngine)
@@ -44,7 +44,7 @@ internal class ModelGenerator
     }
 
     private static string ForStream(bool isNullable) 
-        => $"new ModelTypeDefinition(\"byte\", [], [], true, {isNullable.ToString().ToLower()})";
+        => $"new ModelTypeDefinition(\"byte\", \"System.Byte\", [], [], true, {isNullable.ToString().ToLower()})";
 
     private static string GetValuesDeclaration(ITypeSymbol namedType)
     {
