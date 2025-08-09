@@ -9,66 +9,101 @@ namespace NForza.Cyrus.MassTransit;
 
 public static class CyrusModelExtensions
 {
-    public static string AsAsyncApiYaml(this ICyrusModel model, IPublishTopology publishTopology)
+    public static string AsAsyncApiYaml(this ICyrusModel model, IBus bus)
     {
-        ArgumentNullException.ThrowIfNull(publishTopology);
+        if (model is null) throw new ArgumentNullException(nameof(model));
+        if (bus is null) throw new ArgumentNullException(nameof(bus));
 
-        //var messageTopology = bus.Topology.Message; // IMessageTopology
-        //var events = model.Events;
         var sb = new StringBuilder();
 
-        //sb.AppendLine("asyncapi: 2.6.0");
-        //sb.AppendLine("info:");
-        //sb.AppendLine("  title: Event Documentation");
-        //sb.AppendLine("  version: 1.0.0");
-        //sb.AppendLine();
-        //sb.AppendLine("channels:");
+        sb.AppendLine("asyncapi: 2.6.0");
+        sb.AppendLine("info:");
+        sb.AppendLine("  title: Event Documentation");
+        sb.AppendLine("  version: 1.0.0");
+        sb.AppendLine();
+        sb.AppendLine("channels:");
 
-        //foreach (var e in events)
-        //{
-        //    var messageType = e.Type ?? throw new InvalidOperationException("Event Type is null");
-        //    var msgTopo = messageTopology.GetMessageTopology(messageType);
-        //    var entityName = msgTopo?.EntityName ?? messageType.FullName!;
-        //    var channel = string.IsNullOrWhiteSpace(e.Channel) ? entityName : e.Channel;
+        foreach (var e in model.Events)
+        {
+            var messageType = Type.GetType(e.ClrTypeName) ?? throw new InvalidOperationException("Event Type is null");
+            var entityName = !string.IsNullOrWhiteSpace(e.Channel)
+                ? e.Channel
+                : GetEntityNameFromBusTopology(bus, messageType);
 
-        //    sb.AppendLine($"  {channel}:");
-        //    sb.AppendLine("    publish:");
-        //    if (!string.IsNullOrWhiteSpace(e.Summary))
-        //        sb.AppendLine($"      summary: {Escape(e.Summary)}");
+            sb.AppendLine($"  {entityName}:");
+            sb.AppendLine("    publish:");
+            //if (!string.IsNullOrWhiteSpace(e.Summary))
+            //    sb.AppendLine($"      summary: {YamlEscapeInline(e.Summary)}");
 
-        //    sb.AppendLine("      message:");
-        //    sb.AppendLine($"        name: {messageType.Name}");
-        //    sb.AppendLine("        contentType: application/json");
-        //    sb.AppendLine("        payload:");
-        //    sb.AppendLine("          type: object");
+            sb.AppendLine("      message:");
+            sb.AppendLine($"        name: {messageType.Name}");
+            sb.AppendLine("        contentType: application/json");
+            sb.AppendLine("        payload:");
+            sb.AppendLine("          type: object");
 
-        //    var props = messageType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        //    if (props.Length > 0)
-        //    {
-        //        sb.AppendLine("          properties:");
-        //        foreach (var prop in props)
-        //        {
-        //            var (jsonType, format, items) = MapToJsonType(prop.PropertyType);
-        //            sb.AppendLine($"            {ToCamelCase(prop.Name)}:");
-        //            sb.AppendLine($"              type: {jsonType}");
-        //            if (format is not null)
-        //                sb.AppendLine($"              format: {format}");
-        //            if (items is not null)
-        //                sb.AppendLine($"              items:\n                type: {items}");
-        //        }
-        //    }
-        //}
+            var props = messageType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            if (props.Length > 0)
+            {
+                sb.AppendLine("          properties:");
+                foreach (var prop in props)
+                {
+                    var (jsonType, format, itemsType) = MapToJsonType(prop.PropertyType);
+                    sb.AppendLine($"            {ToCamelCase(prop.Name)}:");
+                    sb.AppendLine($"              type: {jsonType}");
+                    if (format is not null)
+                        sb.AppendLine($"              format: {format}");
+                    if (itemsType is not null)
+                    {
+                        sb.AppendLine("              items:");
+                        sb.AppendLine($"                type: {itemsType}");
+                    }
+                }
+            }
+        }
 
         return sb.ToString();
     }
 
-    private static string Escape(string s) =>
+    // --- helpers ---
+
+    // Reflect: bus.Topology.GetMessageTopology<T>().EntityName
+    private static string GetEntityNameFromBusTopology(IBus bus, Type messageType)
+    {
+        var topology = bus.Topology; // IBusTopology (runtime type depends on transport)
+
+        // Find generic method GetMessageTopology<T>() with no parameters
+        var getMsgTopoMethod = topology.GetType()
+            .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+            .FirstOrDefault(m =>
+                m.Name == "GetMessageTopology" &&
+                m.IsGenericMethodDefinition &&
+                m.GetParameters().Length == 0);
+
+        if (getMsgTopoMethod == null)
+            return messageType.FullName ?? messageType.Name;
+
+        var closed = getMsgTopoMethod.MakeGenericMethod(messageType);
+        var msgTopology = closed.Invoke(topology, null); // returns some IMessageTopology<T> or transport-specific type
+        if (msgTopology == null)
+            return messageType.FullName ?? messageType.Name;
+
+        // Read EntityName property
+        var entityNameProp = msgTopology.GetType().GetProperty("EntityName",
+            BindingFlags.Instance | BindingFlags.Public);
+        var value = entityNameProp?.GetValue(msgTopology) as string;
+
+        return string.IsNullOrWhiteSpace(value)
+            ? (messageType.FullName ?? messageType.Name)
+            : value!;
+    }
+
+    private static string YamlEscapeInline(string s) =>
         s.Replace("\r", " ").Replace("\n", " ").Replace(":", "\\:");
 
     private static string ToCamelCase(string s)
     {
         if (string.IsNullOrEmpty(s) || char.IsLower(s[0])) return s;
-        return char.ToLowerInvariant(s[0]) + s.Substring(1);
+        return char.ToLowerInvariant(s[0]) + s[1..];
     }
 
     private static (string type, string? format, string? itemsType) MapToJsonType(Type t)
@@ -76,30 +111,37 @@ public static class CyrusModelExtensions
         // unwrap Nullable<T>
         if (Nullable.GetUnderlyingType(t) is Type u) t = u;
 
-        // arrays / IEnumerable<T>
+        // arrays
         if (t.IsArray)
             return ("array", null, MapToJsonType(t.GetElementType()!).type);
 
-        var ienumT = t.GetInterfaces()
-            .Concat(new[] { t })
+        // IEnumerable<T> (not string/char)
+        var ienumT = t.GetInterfaces().Concat(new[] { t })
             .FirstOrDefault(it => it.IsGenericType && it.GetGenericTypeDefinition() == typeof(System.Collections.Generic.IEnumerable<>));
-        if (ienumT != null && ienumT.GetGenericArguments()[0] != typeof(char))
+        if (ienumT != null)
         {
             var elem = ienumT.GetGenericArguments()[0];
-            return ("array", null, MapToJsonType(elem).type);
+            if (elem != typeof(char))
+                return ("array", null, MapToJsonType(elem).type);
         }
 
-        // primitives
+        // primitives / common CLR types
         if (t == typeof(string)) return ("string", null, null);
         if (t == typeof(bool)) return ("boolean", null, null);
         if (t == typeof(Guid)) return ("string", "uuid", null);
         if (t == typeof(DateTime) || t == typeof(DateTimeOffset)) return ("string", "date-time", null);
         if (t == typeof(TimeSpan)) return ("string", "duration", null);
-        if (t == typeof(byte) || t == typeof(sbyte) || t == typeof(short) || t == typeof(ushort) || t == typeof(int) || t == typeof(uint) || t == typeof(long))
+
+        if (t == typeof(byte) || t == typeof(sbyte) ||
+            t == typeof(short) || t == typeof(ushort) ||
+            t == typeof(int) || t == typeof(uint) ||
+            t == typeof(long) || t == typeof(ulong))
             return ("integer", null, null);
-        if (t == typeof(ulong)) return ("integer", "int64", null);
+
         if (t == typeof(float) || t == typeof(double) || t == typeof(decimal))
             return ("number", null, null);
+
+        if (t.IsEnum) return ("string", null, null);
 
         // fallback: nested object
         return ("object", null, null);

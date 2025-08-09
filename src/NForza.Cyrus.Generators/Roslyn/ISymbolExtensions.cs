@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace NForza.Cyrus.Generators.Roslyn;
@@ -9,6 +10,27 @@ public static class ISymbolExtensions
 
     public static string ToFullName(this ISymbol symbol)
         => symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+    public static string ToAssemblyQualifiedName(this ITypeSymbol symbol)
+    {
+        if (symbol == null)
+            throw new ArgumentNullException(nameof(symbol));
+
+        var fullName = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                             .Replace("global::", "");
+
+        if (symbol is INamedTypeSymbol named && named.IsGenericType)
+        {
+            var typeDefName = $"{named.ContainingNamespace}.{named.MetadataName}";
+            var genericArgs = string.Join(",", named.TypeArguments
+                .Select(t => $"[{t.ToAssemblyQualifiedName()}]"));
+            fullName = $"{typeDefName}[{genericArgs}]";
+        }
+
+        var assemblyName = symbol.ContainingAssembly.Name;
+        return $"{fullName}, {assemblyName}";
+    }
+
 
     public static bool IsQuery(this ISymbol methodSymbol)
     {

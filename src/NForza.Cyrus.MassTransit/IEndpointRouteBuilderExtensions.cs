@@ -12,18 +12,15 @@ public static class IEndpointRouteBuilderExtensions
 {
     public static IEndpointRouteBuilder MapAsyncApi(this IEndpointRouteBuilder endpoints)
     {
-        IPublishTopology publishTopology = endpoints.ServiceProvider.GetRequiredService<IPublishTopology>();
+        IBus bus = endpoints.ServiceProvider.GetRequiredService<IBus>();
         endpoints
             .MapGet("/asyncapi", () =>
             {
                 ICyrusModel model = CyrusModel.Aggregate(endpoints.ServiceProvider);
-                string yaml = model.AsAsyncApiYaml(publishTopology);
+                string yaml = model.AsAsyncApiYaml(bus);
                 return Results.Content(yaml, "text/yaml");
             })
             .ExcludeFromDescription();
-        endpoints.MapGet("/swagger", () => Results.Redirect("/scalar/v1", permanent: true)).ExcludeFromDescription();
-        endpoints.MapGet("/swagger/index.html", () => Results.Redirect("/scalar/v1", permanent: true)).ExcludeFromDescription();
-
         return endpoints;
     }
 }

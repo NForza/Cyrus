@@ -9,6 +9,7 @@ using NForza.Cyrus.WebApi;
 using DemoApp.WebApi;
 using Microsoft.EntityFrameworkCore;
 using NForza.Cyrus.Abstractions;
+using NForza.Cyrus.MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,7 +45,7 @@ app.UseCors("AllowAngularApp");
 
 ILogger logger = app.Services.GetRequiredService<ILogger<Program>>();
 
-app.MapCyrus(logger);
+app.MapCyrus(logger).MapAsyncApi();
 
 await app.RunAsync();
 
