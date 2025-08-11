@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using MassTransit;
+using MassTransit.RabbitMqTransport.Topology;
 using NForza.Cyrus.Abstractions.Model;
 
 namespace NForza.Cyrus.MassTransit;
@@ -69,32 +70,13 @@ public static class CyrusModelExtensions
     // Reflect: bus.Topology.GetMessageTopology<T>().EntityName
     private static string GetEntityNameFromBusTopology(IBus bus, Type messageType)
     {
-        var topology = bus.Topology; // IBusTopology (runtime type depends on transport)
+        var topology = bus.Topology.PublishTopology.GetMessageTopology(messageType); 
+        //RabbitMQ only!
+        Exchange exchange = topology.GetType().GetProperty("Exchange")?.GetValue(topology) as Exchange ?? throw new InvalidOperationException("Exchange property is null");
 
-        // Find generic method GetMessageTopology<T>() with no parameters
-        var getMsgTopoMethod = topology.GetType()
-            .GetMethods(BindingFlags.Instance | BindingFlags.Public)
-            .FirstOrDefault(m =>
-                m.Name == "GetMessageTopology" &&
-                m.IsGenericMethodDefinition &&
-                m.GetParameters().Length == 0);
-
-        if (getMsgTopoMethod == null)
-            return messageType.FullName ?? messageType.Name;
-
-        var closed = getMsgTopoMethod.MakeGenericMethod(messageType);
-        var msgTopology = closed.Invoke(topology, null); // returns some IMessageTopology<T> or transport-specific type
-        if (msgTopology == null)
-            return messageType.FullName ?? messageType.Name;
-
-        // Read EntityName property
-        var entityNameProp = msgTopology.GetType().GetProperty("EntityName",
-            BindingFlags.Instance | BindingFlags.Public);
-        var value = entityNameProp?.GetValue(msgTopology) as string;
-
-        return string.IsNullOrWhiteSpace(value)
+        return string.IsNullOrWhiteSpace(exchange.ExchangeName)
             ? (messageType.FullName ?? messageType.Name)
-            : value!;
+            : exchange.ExchangeName;
     }
 
     private static string ToCamelCase(string s)
