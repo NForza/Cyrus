@@ -97,9 +97,6 @@ public static class CyrusModelExtensions
             : value!;
     }
 
-    private static string YamlEscapeInline(string s) =>
-        s.Replace("\r", " ").Replace("\n", " ").Replace(":", "\\:");
-
     private static string ToCamelCase(string s)
     {
         if (string.IsNullOrEmpty(s) || char.IsLower(s[0])) return s;
@@ -108,24 +105,20 @@ public static class CyrusModelExtensions
 
     private static (string type, string? format, string? itemsType) MapToJsonType(Type t)
     {
-        // unwrap Nullable<T>
         if (Nullable.GetUnderlyingType(t) is Type u) t = u;
 
-        // arrays
         if (t.IsArray)
             return ("array", null, MapToJsonType(t.GetElementType()!).type);
 
-        // IEnumerable<T> (not string/char)
-        var ienumT = t.GetInterfaces().Concat(new[] { t })
+        var enumOfT = t.GetInterfaces().Concat(new[] { t })
             .FirstOrDefault(it => it.IsGenericType && it.GetGenericTypeDefinition() == typeof(System.Collections.Generic.IEnumerable<>));
-        if (ienumT != null)
+        if (enumOfT != null)
         {
-            var elem = ienumT.GetGenericArguments()[0];
+            var elem = enumOfT.GetGenericArguments()[0];
             if (elem != typeof(char))
                 return ("array", null, MapToJsonType(elem).type);
         }
 
-        // primitives / common CLR types
         if (t == typeof(string)) return ("string", null, null);
         if (t == typeof(bool)) return ("boolean", null, null);
         if (t == typeof(Guid)) return ("string", "uuid", null);
@@ -143,7 +136,6 @@ public static class CyrusModelExtensions
 
         if (t.IsEnum) return ("string", null, null);
 
-        // fallback: nested object
         return ("object", null, null);
     }
 }
