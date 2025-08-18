@@ -1,10 +1,14 @@
-﻿namespace NForza.Cyrus.Abstractions.Model;
+﻿using System;
+
+namespace NForza.Cyrus.Abstractions.Model;
 
 public class ModelTypeDefinition
 {
-    public ModelTypeDefinition(string name, ModelPropertyDefinition[] properties, string[] values, bool isCollection, bool isNullable)
+    public ModelTypeDefinition(string name, string clrTypeName, string description, ModelPropertyDefinition[] properties, string[] values, bool isCollection, bool isNullable)
     {
         Name = name;
+        ClrTypeName = clrTypeName;
+        Description = description;
         Properties = properties;
         IsCollection = isCollection;
         IsNullable = isNullable;
@@ -16,4 +20,8 @@ public class ModelTypeDefinition
 
     public ModelPropertyDefinition[] Properties { get; set; } = [];
     public string[] Values { get; set; } = [];
+
+    public string Channel { get; set; } = string.Empty;
+    public string ClrTypeName { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
 }

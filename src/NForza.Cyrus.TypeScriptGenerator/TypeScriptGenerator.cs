@@ -234,11 +234,11 @@ internal static class TypeScriptGenerator
 
     private static void GenerateTypesWithProperties(IEnumerable<ModelTypeDefinition> typesWithProperties, string outputFolder, CyrusMetadata metadata)
     {
-        foreach (var command in typesWithProperties)
+        foreach (var type in typesWithProperties)
         {
-            var model = new { Imports = GetImportsFor(command, false, metadata).ToList(), command.Name, command.Properties };
+            var model = new { Imports = GetImportsFor(type, false, metadata).ToList(), type.Name, type.Properties };
             var result = liquidEngine.Render(model, "interface");
-            string fileName = Path.ChangeExtension(Path.Combine(outputFolder, command.Name), ".ts");
+            string fileName = Path.ChangeExtension(Path.Combine(outputFolder, type.Name), ".ts");
             File.WriteAllText(fileName, result);
         }
     }

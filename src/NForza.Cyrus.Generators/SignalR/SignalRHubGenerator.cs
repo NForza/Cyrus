@@ -108,7 +108,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase
                 .Select(c => new
                 {
                     c.MethodName,
-                    c.FullTypeName,
+                    c.ClrTypeName,
                     c.Handler.ReturnType,
                     ReturnsVoid = c.Handler.ReturnType.IsVoid(),
                     Invocation = c.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "services"),
@@ -121,14 +121,14 @@ public class SignalRHubGenerator : CyrusGeneratorBase
                 .Select(c => new
                 {
                     c.MethodName,
-                    c.FullTypeName,
+                    c.ClrTypeName,
                 })
                 .ToList(),
             Events = classDefinition.Events
                 .Select(c => new
                 {
                     c.MethodName,
-                    c.FullTypeName,
+                    c.ClrTypeName,
                     c.Broadcast
                 })
                 .ToList(),
