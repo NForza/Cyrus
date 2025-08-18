@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -6,9 +7,7 @@ using MassTransit;
 using MassTransit.RabbitMqTransport.Topology;
 using NForza.Cyrus.Abstractions.Model;
 
-namespace NForza.Cyrus.MassTransit;
-
-public static class CyrusModelExtensions
+public static class AsyncApiWriter
 {
     public static string AsAsyncApiYaml(this ICyrusModel model, IBus bus)
     {
@@ -16,61 +15,78 @@ public static class CyrusModelExtensions
         if (bus is null) throw new ArgumentNullException(nameof(bus));
 
         var sb = new StringBuilder();
+        var indent = new Indent();
+
+        var eventInfos = model.Events
+            .Select(e =>
+            {
+                var messageType = Type.GetType(e.ClrTypeName)
+                                  ?? throw new InvalidOperationException($"Event Type is null for '{e.ClrTypeName}'.");
+                var entityName = !string.IsNullOrWhiteSpace(e.Channel)
+                    ? e.Channel!
+                    : GetEntityNameFromBusTopology(bus, messageType);
+
+                return new
+                {
+                    e.Description,
+                    EntityName = entityName,
+                    MessageType = messageType,
+                    MessageName = messageType.Name
+                };
+            })
+            .ToList();
+
+        var registry = new LocalSchemaRegistry();
+        foreach (var ev in eventInfos)
+            registry.EnsureSchema(ev.MessageType);
 
         sb.AppendLine("asyncapi: 2.6.0");
         sb.AppendLine("info:");
         sb.AppendLine("  title: Event Documentation");
         sb.AppendLine("  version: 1.0.0");
         sb.AppendLine();
+
         sb.AppendLine("channels:");
-
-        foreach (var e in model.Events)
+        foreach (var ev in eventInfos.OrderBy(x => x.EntityName, StringComparer.Ordinal))
         {
-            var messageType = Type.GetType(e.ClrTypeName) ?? throw new InvalidOperationException("Event Type is null");
-            var entityName = !string.IsNullOrWhiteSpace(e.Channel)
-                ? e.Channel
-                : GetEntityNameFromBusTopology(bus, messageType);
+            indent.Level = 1;
+            sb.AppendLine($"{indent}{YamlKey(ev.EntityName)}:");
+            indent.Level = 2;
+            sb.AppendLine($"{indent}publish:");
+            if (!string.IsNullOrWhiteSpace(ev.Description))
+                sb.AppendLine($"{indent}  summary: {YamlEscapeInline(ev.Description!)}");
+            sb.AppendLine($"{indent}  message:");
+            sb.AppendLine($"{indent}    $ref: '#/components/messages/{ev.MessageName}'");
+        }
 
-            sb.AppendLine($"  {entityName}:");
-            sb.AppendLine("    publish:");
-            //if (!string.IsNullOrWhiteSpace(e.Summary))
-            //    sb.AppendLine($"      summary: {YamlEscapeInline(e.Summary)}");
+        sb.AppendLine();
+        sb.AppendLine("components:");
 
-            sb.AppendLine("      message:");
-            sb.AppendLine($"        name: {messageType.Name}");
-            sb.AppendLine("        contentType: application/json");
-            sb.AppendLine("        payload:");
-            sb.AppendLine("          type: object");
+        sb.AppendLine("  messages:");
+        indent.Level = 2;
+        foreach (var ev in eventInfos.OrderBy(x => x.MessageName, StringComparer.Ordinal))
+        {
+            sb.AppendLine($"{indent}{ev.MessageName}:");
+            sb.AppendLine($"{indent}  name: {ev.MessageName}");
+            sb.AppendLine($"{indent}  contentType: application/json");
+            sb.AppendLine($"{indent}  payload:");
+            sb.AppendLine($"{indent}    $ref: '#/components/schemas/{registry.GetSchemaName(ev.MessageType)}'");
+        }
 
-            var props = messageType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            if (props.Length > 0)
-            {
-                sb.AppendLine("          properties:");
-                foreach (var prop in props)
-                {
-                    var (jsonType, format, itemsType) = MapToJsonType(prop.PropertyType);
-                    sb.AppendLine($"            {ToCamelCase(prop.Name)}:");
-                    sb.AppendLine($"              type: {jsonType}");
-                    if (format is not null)
-                        sb.AppendLine($"              format: {format}");
-                    if (itemsType is not null)
-                    {
-                        sb.AppendLine("              items:");
-                        sb.AppendLine($"                type: {itemsType}");
-                    }
-                }
-            }
+        sb.AppendLine("  schemas:");
+        indent.Level = 2;
+        foreach (var schema in registry.EmitSchemasInDependencyOrder())
+        {
+            sb.Append(schema.ToYaml(indent));
         }
 
         return sb.ToString();
     }
 
-    // --- helpers ---
 
-    // Reflect: bus.Topology.GetMessageTopology<T>().EntityName
     private static string GetEntityNameFromBusTopology(IBus bus, Type messageType)
     {
-        var topology = bus.Topology.PublishTopology.GetMessageTopology(messageType); 
+        var topology = bus.Topology.PublishTopology.GetMessageTopology(messageType);
         //RabbitMQ only!
         Exchange exchange = topology.GetType().GetProperty("Exchange")?.GetValue(topology) as Exchange ?? throw new InvalidOperationException("Exchange property is null");
 
@@ -82,42 +98,422 @@ public static class CyrusModelExtensions
     private static string ToCamelCase(string s)
     {
         if (string.IsNullOrEmpty(s) || char.IsLower(s[0])) return s;
+        if (s.Length == 1) return s.ToLowerInvariant();
         return char.ToLowerInvariant(s[0]) + s[1..];
     }
 
-    private static (string type, string? format, string? itemsType) MapToJsonType(Type t)
+    private static string YamlEscapeInline(string value)
     {
-        if (Nullable.GetUnderlyingType(t) is Type u) t = u;
-
-        if (t.IsArray)
-            return ("array", null, MapToJsonType(t.GetElementType()!).type);
-
-        var enumOfT = t.GetInterfaces().Concat(new[] { t })
-            .FirstOrDefault(it => it.IsGenericType && it.GetGenericTypeDefinition() == typeof(System.Collections.Generic.IEnumerable<>));
-        if (enumOfT != null)
+        var v = value.Replace("\"", "\"\"");
+        var needsQuotes = v.Any(ch => char.IsControl(ch) || ":{}[],-&*#?|\t".Contains(ch) || v.Contains('\n'));
+        if (v.Contains('\n'))
         {
-            var elem = enumOfT.GetGenericArguments()[0];
-            if (elem != typeof(char))
-                return ("array", null, MapToJsonType(elem).type);
+            return "|\n" + string.Join("\n", v.Split('\n').Select(l => "        " + l));
+        }
+        return needsQuotes ? $"\"{v}\"" : v;
+    }
+
+    private static string YamlKey(string raw) =>
+        raw.Any(ch => ch == '.' || ch == '/' || ch == ':' || ch == ' ')
+            ? $"\"{raw.Replace("\"", "\\\"")}\""
+            : raw;
+
+    private sealed class Indent
+    {
+        public int Level { get; set; }
+        public override string ToString() => new string(' ', Level * 2);
+    }
+
+    private sealed class LocalSchemaRegistry
+    {
+        private readonly Dictionary<Type, SchemaNode> _schemas = new();
+        private readonly NullabilityInfoContext _nullCtx = new();
+
+        public string GetSchemaName(Type t) => _schemas[t].Name;
+
+        public void EnsureSchema(Type t)
+        {
+            if (_schemas.ContainsKey(t)) return;
+
+            if (TryWriteInline(t, out _)) 
+            {
+                _schemas[t] = SchemaNode.ForInline(NameFor(t), t);
+                return;
+            }
+
+            var node = SchemaNode.ForObject(NameFor(t), t);
+            _schemas[t] = node;
+
+            foreach (var p in GetSerializableProperties(t))
+            {
+                var pt = p.PropertyType;
+                VisitTypeRecursive(pt);
+            }
         }
 
-        if (t == typeof(string)) return ("string", null, null);
-        if (t == typeof(bool)) return ("boolean", null, null);
-        if (t == typeof(Guid)) return ("string", "uuid", null);
-        if (t == typeof(DateTime) || t == typeof(DateTimeOffset)) return ("string", "date-time", null);
-        if (t == typeof(TimeSpan)) return ("string", "duration", null);
+        public IEnumerable<SchemaNode> EmitSchemasInDependencyOrder()
+        {
+            return _schemas.Values.OrderBy(s => s.Name, StringComparer.Ordinal);
+        }
 
-        if (t == typeof(byte) || t == typeof(sbyte) ||
-            t == typeof(short) || t == typeof(ushort) ||
-            t == typeof(int) || t == typeof(uint) ||
-            t == typeof(long) || t == typeof(ulong))
-            return ("integer", null, null);
+        private void VisitTypeRecursive(Type t)
+        {
+            if (TryUnwrapNullable(t, out var underlying))
+                t = underlying;
 
-        if (t == typeof(float) || t == typeof(double) || t == typeof(decimal))
-            return ("number", null, null);
+            if (TryWriteInline(t, out _))
+                return;
 
-        if (t.IsEnum) return ("string", null, null);
+            if (t.IsEnum)
+            {
+                if (!_schemas.ContainsKey(t))
+                    _schemas[t] = SchemaNode.ForEnum(NameFor(t), t);
+                return;
+            }
 
-        return ("object", null, null);
+            if (IsArrayLike(t, out var itemType))
+            {
+                VisitTypeRecursive(itemType);
+                if (!_schemas.ContainsKey(t))
+                    _schemas[t] = SchemaNode.ForArray(NameFor(t), t, itemType);
+                return;
+            }
+
+            if (IsDictionaryLike(t, out var valueType))
+            {
+                VisitTypeRecursive(valueType);
+                if (!_schemas.ContainsKey(t))
+                    _schemas[t] = SchemaNode.ForDictionary(NameFor(t), t, valueType);
+                return;
+            }
+
+            EnsureSchema(t);
+        }
+
+        private static string NameFor(Type t)
+        {
+            if (!t.IsGenericType) return t.Name;
+            var def = t.GetGenericTypeDefinition().Name;
+            def = def[..def.IndexOf('`')];
+            var args = string.Join("", t.GetGenericArguments().Select(a => a.Name));
+            return def + args;
+        }
+
+        private static bool TryUnwrapNullable(Type t, out Type underlying)
+        {
+            if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                underlying = t.GetGenericArguments()[0];
+                return true;
+            }
+            underlying = t;
+            return false;
+        }
+
+        private static bool IsArrayLike(Type t, out Type itemType)
+        {
+            if (t.IsArray)
+            {
+                itemType = t.GetElementType()!;
+                return true;
+            }
+
+            if (t != typeof(string) &&
+                t.GetInterfaces().Concat(new[] { t })
+                 .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
+            {
+                itemType = t.GetGenericArguments().FirstOrDefault()
+                           ?? t.GetInterfaces().First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>)).GetGenericArguments()[0];
+                return true;
+            }
+
+            itemType = typeof(void);
+            return false;
+        }
+
+        private static bool IsDictionaryLike(Type t, out Type valueType)
+        {
+            var dictIface = t.GetInterfaces().Concat(new[] { t })
+                .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+
+            if (dictIface is not null)
+            {
+                var keyType = dictIface.GetGenericArguments()[0];
+                valueType = dictIface.GetGenericArguments()[1];
+                if (keyType == typeof(string))
+                    return true;
+            }
+
+            valueType = typeof(void);
+            return false;
+        }
+
+        private static IEnumerable<PropertyInfo> GetSerializableProperties(Type t) =>
+            t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+             .Where(p => p.CanRead && p.GetMethod is { IsStatic: false });
+
+        private static (string type, string? format) MapPrimitive(Type t)
+        {
+            if (t == typeof(string)) return ("string", null);
+            if (t == typeof(bool)) return ("boolean", null);
+            if (t == typeof(byte) || t == typeof(sbyte) || t == typeof(short) || t == typeof(ushort) || t == typeof(int)) return ("integer", "int32");
+            if (t == typeof(uint) || t == typeof(long)) return ("integer", "int64");
+            if (t == typeof(ulong)) return ("integer", null);
+            if (t == typeof(float)) return ("number", "float");
+            if (t == typeof(double) || t == typeof(decimal)) return ("number", "double");
+            if (t == typeof(Guid)) return ("string", "uuid");
+            if (t == typeof(DateTime) || t == typeof(DateTimeOffset)) return ("string", "date-time");
+            if (t == typeof(TimeSpan)) return ("string", "duration"); // RFC 3339 duration-ish
+            if (t == typeof(Uri)) return ("string", "uri");
+            return ("string", null); 
+        }
+
+        private static bool TryWriteInline(Type t, out InlineSchema inline)
+        {
+            inline = default;
+
+            if (t.IsEnum) return false;
+
+            if (t == typeof(string) || t.IsPrimitive || t == typeof(decimal) || t == typeof(Guid) ||
+                t == typeof(DateTime) || t == typeof(DateTimeOffset) || t == typeof(TimeSpan) || t == typeof(Uri))
+            {
+                var (type, format) = MapPrimitive(t);
+                inline = new InlineSchema(type, format);
+                return true;
+            }
+
+            if (IsArrayLike(t, out _) || IsDictionaryLike(t, out _))
+                return false;
+
+            return false;
+        }
+
+        private readonly struct InlineSchema(string type, string? format)
+        {
+            public string Type { get; } = type;
+            public string? Format { get; } = format;
+        }
+
+        public abstract class SchemaNode
+        {
+            public string Name { get; }
+            public Type ClrType { get; }
+
+            protected SchemaNode(string name, Type clrType)
+            {
+                Name = name;
+                ClrType = clrType;
+            }
+
+            public abstract string ToYaml(Indent indent);
+
+            public static SchemaNode ForInline(string name, Type t) => new InlineNode(name, t);
+            public static SchemaNode ForEnum(string name, Type t) => new EnumNode(name, t);
+            public static SchemaNode ForArray(string name, Type t, Type itemType) => new ArrayNode(name, t, itemType);
+            public static SchemaNode ForDictionary(string name, Type t, Type valueType) => new DictionaryNode(name, t, valueType);
+            public static SchemaNode ForObject(string name, Type t) => new ObjectNode(name, t);
+        }
+
+        private sealed class InlineNode : SchemaNode
+        {
+            public InlineNode(string name, Type t) : base(name, t) { }
+
+            public override string ToYaml(Indent indent)
+            {
+                var (type, format) = MapPrimitive(ClrType);
+                var sb = new StringBuilder();
+                sb.AppendLine($"{indent}{Name}:");
+                sb.AppendLine($"{indent}  type: {type}");
+                if (format is not null)
+                    sb.AppendLine($"{indent}  format: {format}");
+                return sb.ToString();
+            }
+        }
+
+        private sealed class EnumNode : SchemaNode
+        {
+            public EnumNode(string name, Type t) : base(name, t) { }
+
+            public override string ToYaml(Indent indent)
+            {
+                var names = Enum.GetNames(ClrType);
+                var underlying = Enum.GetUnderlyingType(ClrType);
+                var isStringEnum = ClrType.GetCustomAttributes().Any(a => a.GetType().Name is "EnumMemberAttribute" or "JsonStringEnumConverter");
+                var sb = new StringBuilder();
+                sb.AppendLine($"{indent}{Name}:");
+                sb.AppendLine($"{indent}  type: string");
+                sb.AppendLine($"{indent}  enum:");
+                foreach (var n in names)
+                    sb.AppendLine($"{indent}    - {n}");
+                return sb.ToString();
+            }
+        }
+
+        private sealed class ArrayNode : SchemaNode
+        {
+            private readonly Type _itemType;
+
+            public ArrayNode(string name, Type t, Type itemType) : base(name, t)
+            {
+                _itemType = itemType;
+            }
+
+            public override string ToYaml(Indent indent)
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine($"{indent}{Name}:");
+                sb.AppendLine($"{indent}  type: array");
+                sb.AppendLine($"{indent}  items:");
+                EmitTypeRefOrInline(sb, indent, _itemType, 2);
+                return sb.ToString();
+            }
+        }
+
+        private sealed class DictionaryNode : SchemaNode
+        {
+            private readonly Type _valueType;
+
+            public DictionaryNode(string name, Type t, Type valueType) : base(name, t)
+            {
+                _valueType = valueType;
+            }
+
+            public override string ToYaml(Indent indent)
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine($"{indent}{Name}:");
+                sb.AppendLine($"{indent}  type: object");
+                sb.AppendLine($"{indent}  additionalProperties:");
+                EmitTypeRefOrInline(sb, indent, _valueType, 2);
+                return sb.ToString();
+            }
+        }
+
+        private sealed class ObjectNode : SchemaNode
+        {
+            public ObjectNode(string name, Type t) : base(name, t) { }
+
+            public override string ToYaml(Indent indent)
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine($"{indent}{Name}:");
+                sb.AppendLine($"{indent}  type: object");
+
+                var props = GetSerializableProperties(ClrType).ToArray();
+                if (props.Length == 0) return sb.ToString();
+
+                var required = new List<string>();
+                foreach (var p in props)
+                {
+                    var ni = new NullabilityInfoContext().Create(p);
+                    var isNullable = ni.ReadState == NullabilityState.Nullable;
+                    if (!isNullable) required.Add(ToCamelCase(p.Name));
+                }
+
+                if (required.Count > 0)
+                {
+                    sb.AppendLine($"{indent}  required:");
+                    foreach (var r in required.Distinct().OrderBy(x => x, StringComparer.Ordinal))
+                        sb.AppendLine($"{indent}    - {r}");
+                }
+
+                sb.AppendLine($"{indent}  properties:");
+                foreach (var p in props.OrderBy(p => p.Name, StringComparer.Ordinal))
+                {
+                    var propName = ToCamelCase(p.Name);
+                    sb.AppendLine($"{indent}    {propName}:");
+                    EmitTypeRefOrInline(sb, indent, p.PropertyType, 3, includeNullability: true);
+                }
+
+                return sb.ToString();
+            }
+        }
+
+        private static void EmitTypeRefOrInline(
+            StringBuilder sb,
+            Indent indent,
+            Type t,
+            int extraLevels,
+            bool includeNullability = false)
+        {
+            var nullable = false;
+            if (TryUnwrapNullable(t, out var underlying))
+            {
+                t = underlying;
+                nullable = true;
+            }
+
+            var baseIndent = new Indent { Level = indent.Level + extraLevels };
+
+            if (TryWriteInline(t, out var inline))
+            {
+                if (nullable)
+                {
+                    sb.AppendLine($"{baseIndent}type:");
+                    sb.AppendLine($"{baseIndent}  - {inline.Type}");
+                    sb.AppendLine($"{baseIndent}  - \"null\"");
+                    if (inline.Format is not null)
+                        sb.AppendLine($"{baseIndent}format: {inline.Format}");
+                }
+                else
+                {
+                    sb.AppendLine($"{baseIndent}type: {inline.Type}");
+                    if (inline.Format is not null)
+                        sb.AppendLine($"{baseIndent}format: {inline.Format}");
+                }
+                return;
+            }
+
+            if (t.IsEnum)
+            {
+                if (nullable)
+                {
+                    sb.AppendLine($"{baseIndent}$ref: '#/components/schemas/{NameFor(t)}'");
+                    sb.AppendLine($"{baseIndent}nullable: true");
+                }
+                else
+                {
+                    sb.AppendLine($"{baseIndent}$ref: '#/components/schemas/{NameFor(t)}'");
+                }
+
+                return;
+            }
+
+            if (IsArrayLike(t, out var itemType))
+            {
+                if (nullable)
+                {
+                    sb.AppendLine($"{baseIndent}type:");
+                    sb.AppendLine($"{baseIndent}  - array");
+                    sb.AppendLine($"{baseIndent}  - \"null\"");
+                }
+                else
+                {
+                    sb.AppendLine($"{baseIndent}type: array");
+                }
+                sb.AppendLine($"{baseIndent}items:");
+                EmitTypeRefOrInline(sb, indent, itemType, extraLevels + 1);
+                return;
+            }
+
+            if (IsDictionaryLike(t, out var valueType))
+            {
+                if (nullable)
+                {
+                    sb.AppendLine($"{baseIndent}type:");
+                    sb.AppendLine($"{baseIndent}  - object");
+                    sb.AppendLine($"{baseIndent}  - \"null\"");
+                }
+                else
+                {
+                    sb.AppendLine($"{baseIndent}type: object");
+                }
+                sb.AppendLine($"{baseIndent}additionalProperties:");
+                EmitTypeRefOrInline(sb, indent, valueType, extraLevels + 1);
+                return;
+            }
+
+            sb.AppendLine($"{baseIndent}$ref: '#/components/schemas/{NameFor(t)}'");
+        }
     }
 }

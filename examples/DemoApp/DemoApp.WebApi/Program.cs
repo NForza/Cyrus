@@ -17,6 +17,7 @@ builder.Logging.SetMinimumLevel(LogLevel.Debug).AddConsole();
 builder.Services.AddMassTransit(cfg =>
 {
     cfg.AddConsumers(Assembly.GetExecutingAssembly(), typeof(Customer).Assembly);
+    cfg.SetSnakeCaseEndpointNameFormatter();
     cfg.UsingRabbitMq((ctx, cfg) =>
     {
         cfg.Host("rabbitmq://localhost", h =>
@@ -56,6 +57,3 @@ ILogger logger = app.Services.GetRequiredService<ILogger<Program>>();
 app.MapCyrus(logger).MapAsyncApi();
 
 await app.RunAsync();
-
-//[GuidValue]
-//public partial record struct SomeId;

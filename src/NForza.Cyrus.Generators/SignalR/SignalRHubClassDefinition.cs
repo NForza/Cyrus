@@ -106,7 +106,7 @@ public record SignalRHubClassDefinition
                         MethodName = genericArg.GetText().ToString(),
                         Name = querySymbol.Name,
                         ClrTypeName = querySymbol.ToFullName(),
-                        ReturnType = new(queryReturnType!.Name, querySymbol.ToFullName(), propertyModelsOfReturnType, [], isCollection, isNullable ?? false) //, [])
+                        ReturnType = new(queryReturnType!.Name, querySymbol.ToFullName(), queryReturnType.Description(), propertyModelsOfReturnType, [], isCollection, isNullable ?? false) //, [])
                     };
             })
             .Where(query => query != null)

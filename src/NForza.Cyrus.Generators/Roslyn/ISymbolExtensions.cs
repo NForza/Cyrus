@@ -31,6 +31,15 @@ public static class ISymbolExtensions
         return $"{fullName}, {assemblyName}";
     }
 
+    public static string Description(this ISymbol methodSymbol)
+    {
+        var descriptionAttribute =  methodSymbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "DescriptionAttribute");
+        if (descriptionAttribute != null && descriptionAttribute.ConstructorArguments.Length > 0)
+        {
+            return descriptionAttribute?.ConstructorArguments[0].Value?.ToString() ?? string.Empty;
+        }
+        return string.Empty;
+    }
 
     public static bool IsQuery(this ISymbol methodSymbol)
     {
