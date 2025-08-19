@@ -20,7 +20,7 @@ internal static class DemoAppTestClient
         {
             builder.ConfigureTestServices(services =>
             {
-                services.AddSingleton<IEventBus, RecordingLocalEventBus>();
+                services.AddSingleton<IMessageBus, RecordingLocalMessageBus>();
             });
             builder.ConfigureLogging((ILoggingBuilder logging) => logging.AddXUnit(testOutput));
         });

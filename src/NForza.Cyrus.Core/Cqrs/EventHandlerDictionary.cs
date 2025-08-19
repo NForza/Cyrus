@@ -10,6 +10,16 @@ public class EventHandlerDictionary : MultiMap<Type, Action<IServiceProvider, ob
         Add(typeof(T), handler);
     }
 
+    public HashSet<Type> GetEventTypes()
+    {
+        var eventTypes = new HashSet<Type>();
+        foreach (var key in Keys)
+        {
+            eventTypes.Add(key);
+        }
+        return eventTypes;
+    }
+
     public IEnumerable<Action<IServiceProvider, object>> GetEventHandlers<T>()
         => GetValues(typeof(T));
 
