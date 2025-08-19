@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace NForza.Cyrus.Cqrs;
@@ -17,6 +18,8 @@ public class MultiMap<TKey, TValue> : IEnumerable<KeyValuePair<TKey, List<TValue
         }
         list.Add(value);
     }
+
+    public HashSet<TKey> Keys => [.. values.Keys];
 
     public IEnumerator<KeyValuePair<TKey, List<TValue>>> GetEnumerator()
         => values.GetEnumerator();

@@ -5,7 +5,7 @@ using NForza.Cyrus.Cqrs;
 
 namespace NForza.Cyrus.WebApi;
 
-public class CommandResultAdapter(IEventBus eventBus)
+public class CommandResultAdapter(IMessageBus eventBus)
 {
     public IResult FromObjects(object obj)
     {

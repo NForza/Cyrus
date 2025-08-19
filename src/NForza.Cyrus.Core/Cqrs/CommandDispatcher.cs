@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace NForza.Cyrus.Cqrs;
 
-public class CommandDispatcher(IEnumerable<IEventBus> eventBuses, IServiceProvider serviceProvider) : ICommandDispatcher
+public class CommandDispatcher(IEnumerable<IMessageBus> eventBuses, IServiceProvider serviceProvider) : ICommandDispatcher
 {
     public IServiceProvider Services => serviceProvider;
 
