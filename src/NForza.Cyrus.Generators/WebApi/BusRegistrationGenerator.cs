@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Config;
 
@@ -16,7 +17,7 @@ public class BusRegistrationGenerator : CyrusGeneratorBase
             {
                 var ctx = new
                 {
-                    Usings = cyrusGenerationContext.GenerationConfig.EventBus == EventBusType.MassTransit ? ["NForza.Cyrus.Cqrs", "NForza.Cyrus.Abstractions", "NForza.Cyrus.MassTransit"] : new string[] { "NForza.Cyrus.Cqrs", "NForza.Cyrus.Abstractions" },
+                    Usings = new List<string> { "NForza.Cyrus.Cqrs", "NForza.Cyrus.Abstractions", "NForza.Cyrus.MassTransit" },
                     Namespace = "BusRegistration",
                     Name = "BusRegistration",
                     Initializer = contents
@@ -31,12 +32,7 @@ public class BusRegistrationGenerator : CyrusGeneratorBase
     private string AddBusRegistrations(GenerationConfig generationConfig)
     {
         StringBuilder sb = new();
-        sb.AppendLine(@$"services.AddTransient<IEventBus, {generationConfig.EventBus}EventBus>();");
-        if (generationConfig.EventBus == EventBusType.MassTransit)
-        {
-            sb.AppendLine(@$" services.AddTransient<LocalEventBus>();");
-        }
-
+        sb.AppendLine(@$"services.AddTransient<IMessageBus, MassTransitMessageBus>();");
         return sb.ToString();
     }
 }

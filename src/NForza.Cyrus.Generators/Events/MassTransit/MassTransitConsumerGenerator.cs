@@ -16,11 +16,8 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase
         var eventHandlers = cyrusGenerationContext.EventHandlers.Where(eh => !IsEventHandlerForLocalEvent(eh));
         if (eventHandlers.Any())
         {
-            if (config.EventBus == EventBusType.MassTransit)
-            {
-                var sourceText = GenerateEventConsumers(eventHandlers, cyrusGenerationContext.LiquidEngine);
-                spc.AddSource($"EventConsumers.g.cs", sourceText);
-            }
+            var sourceText = GenerateEventConsumers(eventHandlers, cyrusGenerationContext.LiquidEngine);
+            spc.AddSource($"EventConsumers.g.cs", sourceText);
         }
     }
 
