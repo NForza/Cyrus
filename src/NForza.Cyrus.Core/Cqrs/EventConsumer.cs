@@ -5,7 +5,7 @@ using NForza.Cyrus.Cqrs;
 
 namespace NForza.Cyrus.MassTransit;
 
-public class EventConsumer<T>(EventHandlerDictionary eventHandlerDictionary, IServiceScopeFactory serviceScopeFactory) : IConsumer<T>
+public class EventConsumer<T>(IMessageBus messageBus) : IConsumer<T>
     where T : class
 {
     public Task Consume(ConsumeContext<T> context)

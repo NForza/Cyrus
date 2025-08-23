@@ -12,18 +12,12 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var config = cyrusGenerationContext.GenerationConfig;
-        var eventHandlers = cyrusGenerationContext.EventHandlers.Where(eh => !IsEventHandlerForLocalEvent(eh));
+        var eventHandlers = cyrusGenerationContext.EventHandlers;
         if (eventHandlers.Any())
         {
             var sourceText = GenerateEventConsumers(eventHandlers, cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"EventConsumers.g.cs", sourceText);
         }
-    }
-
-    private static bool IsEventHandlerForLocalEvent(IMethodSymbol eh)
-    {
-        return ((INamedTypeSymbol)eh.Parameters[0].Type).IsLocalEvent();
     }
 
     private string GenerateEventConsumers(IEnumerable<IMethodSymbol> eventHandlers, LiquidEngine liquidEngine)
