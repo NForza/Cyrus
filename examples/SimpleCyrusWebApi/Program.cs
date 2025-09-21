@@ -16,4 +16,5 @@ builder.Services.AddCyrus();
 var app = builder.Build();
 
 app.MapCyrus();
+
 await app.RunAsync();
