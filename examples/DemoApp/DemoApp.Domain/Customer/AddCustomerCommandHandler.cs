@@ -9,7 +9,7 @@ using NForza.Cyrus.Cqrs;
 
 namespace DemoApp.Domain.Customer;
 
-public class AddCustomerCommandHandler(ICommandDispatcher commandDispatcher)
+public class AddCustomerCommandHandler
 {
     [CommandHandler(Route = "customers", Verb = HttpVerb.Post)]
     [ProducesResponseType(202)]

@@ -13,19 +13,21 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
         var eventHandlers = cyrusGenerationContext.EventHandlers;
-        if (eventHandlers.Any())
+        foreach (var eventHandler in eventHandlers)
         {
-            var sourceText = GenerateEventConsumers(eventHandlers, cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"EventConsumers.g.cs", sourceText);
+            var sourceText = GenerateEventConsumer(eventHandler, cyrusGenerationContext.LiquidEngine);
+            spc.AddSource($"{eventHandler.Parameters[0].Type.ToFullName().Replace("global::", "")}_EventConsumer.g.cs", sourceText);
         }
     }
 
-    private string GenerateEventConsumers(IEnumerable<IMethodSymbol> eventHandlers, LiquidEngine liquidEngine)
+    private string GenerateEventConsumer(IMethodSymbol eventHandler, LiquidEngine liquidEngine)
     {
         StringBuilder source = new();
         var model = new
         {
-            Consumers = eventHandlers.Select(h => new { h.Parameters[0].Type.Name, FullName = h.Parameters[0].Type.ToFullName() })
+            Name = eventHandler.Parameters[0].Type.Name,
+            FullName = eventHandler.Parameters[0].Type.ToFullName(),
+            InvocationLambda = eventHandler.GetEventLambda("services") 
         };
 
         var resolvedSource = liquidEngine.Render(model, "EventConsumers");

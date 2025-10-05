@@ -110,6 +110,29 @@ internal static class IMethodSymbolExtensions
         }
     }
 
+    public static string GetEventLambda(this IMethodSymbol handler, string serviceProviderVariable = "services", string cancellationTokenVariableName = "cancellationToken")
+    {
+        var hasCancellationToken = handler.Parameters.Any(p => p.Type.IsCancellationToken());
+        var cancellationTokenVariable = hasCancellationToken ? $", {cancellationTokenVariableName}" : "";
+        var eventType = handler.Parameters[0].Type.ToFullName();
+        var typeSymbol = handler.ContainingType.ToFullName();
+        var returnType = handler.ReturnType;
+        var returnsTask = handler.ReturnsTask();
+
+        if (returnsTask)
+        {
+            return handler.IsStatic
+                ? $"async msg => await {typeSymbol}.{handler.Name}(msg)"
+                : $"async msg => await {serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}(msg)";
+        }
+        else
+        {
+            return handler.IsStatic
+                ? $"msg => {typeSymbol}.{handler.Name}(msg)"
+                : $"msg => {serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}(msg)";
+        }
+    }
+
     public static string GetQueryInvocation(this IMethodSymbol handler, string serviceProviderVariable = "services")
     {
         var handlerClass = handler.ContainingType.ToFullName();
