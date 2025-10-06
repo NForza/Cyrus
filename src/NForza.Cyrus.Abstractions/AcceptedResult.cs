@@ -1,6 +1,7 @@
 ﻿namespace NForza.Cyrus.Abstractions;
 
-public class AcceptedResult(string? url = null)
+public class AcceptedResult(string? location = null, object? value = null)
 {
-       public string? Url { get; } = url;
+    public string? Location { get; } = location;
+    public object? Value { get; } = value;
 }
