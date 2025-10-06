@@ -7,40 +7,40 @@ namespace NForza.Cyrus.WebApi;
 
 public class CommandResultAdapter(IMessageBus eventBus)
 {
-    public IResult FromObjects(object obj)
+    public Result FromObjects(object obj)
     {
-        return Results.Ok(obj);
+        return Result.Success(obj);
     }
 
-    public IResult FromVoid()
+    public Result FromVoid()
     {
-        return Results.Ok();
+        return Result.Success();
     }
 
-    public IResult FromIResult(IResult result)
+    public Result FromResult(Result result)
     {
         return result;
     }
 
-    public IResult FromObjectAndMessages((object Object, IEnumerable<object> Messages) commandResult)
+    public Result FromObjectAndMessages((object Object, IEnumerable<object> Messages) commandResult)
     {
         eventBus.Publish(commandResult.Messages);
-        return Results.Ok(commandResult.Object);
+        return Result.Success(commandResult.Object);
     }
 
-    public IResult FromMessages(IEnumerable<object> Messages)
+    public Result FromMessages(IEnumerable<object> Messages)
     {
         eventBus.Publish(Messages);
-        return Results.Ok();
+        return Result.Success();
     }
 
-    public IResult FromIResultAndMessages((IResult Result, IEnumerable<object> Messages) result)
+    public Result FromResultAndMessages((Result Result, IEnumerable<object> Messages) result)
     {
         eventBus.Publish(result.Messages);
         return result.Result;
     }
 
-    public IResult FromIResultAndMessage((IResult Result, object Message) result)
+    public Result FromResultAndMessage((Result Result, object Message) result)
     {
         eventBus.Publish([result.Message]);
         return result.Result;

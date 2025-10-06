@@ -3,8 +3,8 @@
 enum CommandAdapterMethod
 {
     FromVoid,
-    FromIResult,
-    FromIResultAndMessage,
-    FromIResultAndMessages,
+    FromResult,
+    FromResultAndMessage,
+    FromResultAndMessages,
     FromObjects
 }

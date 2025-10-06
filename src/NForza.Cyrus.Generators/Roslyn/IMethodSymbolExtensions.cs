@@ -184,7 +184,7 @@ internal static class IMethodSymbolExtensions
 
         if (returnType.Name == "IResult" &&
                 returnType.ContainingNamespace.ToDisplayString() == "Microsoft.AspNetCore.Http")
-            return CommandAdapterMethod.FromIResult;
+            return CommandAdapterMethod.FromResult;
 
         if (returnType.IsTupleType && returnType is INamedTypeSymbol namedTypeSymbol)
         {
@@ -197,13 +197,13 @@ internal static class IMethodSymbolExtensions
                     var secondElement = namedTypeSymbol.TupleElements[1];
                     if (secondElement.Type.Name == "Object")
                     {
-                        return CommandAdapterMethod.FromIResultAndMessage;
+                        return CommandAdapterMethod.FromResultAndMessage;
                     }
-                    return CommandAdapterMethod.FromIResultAndMessages;
+                    return CommandAdapterMethod.FromResultAndMessages;
                 }
             }
 
-            return CommandAdapterMethod.FromIResultAndMessages;
+            return CommandAdapterMethod.FromResultAndMessages;
         }
         return CommandAdapterMethod.FromObjects;
     }

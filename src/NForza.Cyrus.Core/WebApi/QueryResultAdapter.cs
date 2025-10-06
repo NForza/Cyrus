@@ -5,25 +5,25 @@ namespace NForza.Cyrus.WebApi;
 
 public static class QueryResultAdapter
 {
-    public static IResult FromObject(object obj)
+    public static Result FromObject<T>(object obj)
     {
         if (obj == null)
         {
-            return Results.NotFound();
+            return Result.Failure(ErrorFactory<Result>.NotFound<T>());
         }
-        if (obj is IResult result)
+        if (obj is Result result)
         {
             return result;
         }
         if (obj is Stream stream)
         {
-            return Results.Stream(stream);
+            return Result.Stream(stream);
         }
         if (obj is (Stream, string))
         {
             (Stream file, string contentType) = ((Stream, string))obj;
-            return Results.File(file, contentType);
+            return Result.File(file, contentType);
         }
-        return Results.Ok(obj);
+        return Result.Success(obj);
     }
 }

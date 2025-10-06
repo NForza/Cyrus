@@ -96,8 +96,8 @@ Command handlers must return one of the following:
 | void                                            | no return value or events                                                                                |
 | `IEnumerable<object>`                           | no return value, but returned messages (events or commands) are published to the event or command bus    |
 | `(object Result, IEnumerable<object> events)`   | return value and messages (events or commands) that are published to the event or command bus            |
-| `(IResult Result, IEnumerable<object> events)`  | WebApi result and messages (events or commands) that are published to the event or command bus           |
-| `(IResult Result, object message)`              | WebApi result and a single message (events or command) that is published to the event or command bus     |
+| `(Result Result, IEnumerable<object> events)`   | result and messages (events or commands) that are published to the event or command bus           |
+| `(Result Result, object message)`               | result and a single message (events or command) that is published to the event or command bus     |
 
 Returned messages are dispatched through the system via an event or command bus, and you can use a local bus (which is the default) or integrate with an external event bus using [MassTransit](https://masstransit.io/).
 

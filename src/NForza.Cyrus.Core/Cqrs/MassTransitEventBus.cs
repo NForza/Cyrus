@@ -2,9 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using MassTransit;
-using NForza.Cyrus.Cqrs;
 
-namespace NForza.Cyrus.MassTransit;
+namespace NForza.Cyrus.Cqrs;
 
 public class MassTransitEventBus(IBus bus) : IMessageBus
 {

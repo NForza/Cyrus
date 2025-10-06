@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Framework.Core.Domain.Results;
+namespace NForza.Cyrus;
 
 public sealed class Error
 {

@@ -1,4 +1,4 @@
-﻿namespace Framework.Core.Domain.Results;
+﻿namespace NForza.Cyrus;
 
 public enum ErrorType
 {

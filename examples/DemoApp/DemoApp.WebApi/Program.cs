@@ -8,7 +8,6 @@ using NForza.Cyrus;
 using NForza.Cyrus.WebApi;
 using DemoApp.WebApi;
 using Microsoft.EntityFrameworkCore;
-using NForza.Cyrus.MassTransit;
 using NForza.Cyrus.Cqrs;
 
 var builder = WebApplication.CreateBuilder(args);
