@@ -1,48 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
+using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Cqrs;
 
 namespace NForza.Cyrus.WebApi;
 
 public class CommandResultAdapter(IMessageBus eventBus)
 {
-    public Result FromObjects(object obj)
+    public IResult FromObjects(object obj)
     {
-        return Result.Success(obj);
+        return Result.Success(obj).ToIResult();
     }
 
-    public Result FromVoid()
+    public IResult FromVoid()
     {
-        return Result.Success();
+        return Result.Success().ToIResult();
     }
 
-    public Result FromResult(Result result)
+    public IResult FromResult(Result result)
     {
-        return result;
+        return result.ToIResult();
     }
 
-    public Result FromObjectAndMessages((object Object, IEnumerable<object> Messages) commandResult)
+    public IResult FromObjectAndMessages((object Object, IEnumerable<object> Messages) commandResult)
     {
         eventBus.Publish(commandResult.Messages);
-        return Result.Success(commandResult.Object);
+        return Result.Success(commandResult.Object).ToIResult();
     }
 
-    public Result FromMessages(IEnumerable<object> Messages)
+    public IResult FromMessages(IEnumerable<object> Messages)
     {
         eventBus.Publish(Messages);
-        return Result.Success();
+        return Result.Success().ToIResult();
     }
 
-    public Result FromResultAndMessages((Result Result, IEnumerable<object> Messages) result)
+    public IResult FromResultAndMessages((Result Result, IEnumerable<object> Messages) result)
     {
         eventBus.Publish(result.Messages);
-        return result.Result;
+        return result.Result.ToIResult();
     }
 
-    public Result FromResultAndMessage((Result Result, object Message) result)
+    public IResult FromResultAndMessage((Result Result, object Message) result)
     {
         eventBus.Publish([result.Message]);
-        return result.Result;
+        return result.Result.ToIResult();
     }
 }

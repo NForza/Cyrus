@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using MassTransit;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -31,6 +32,7 @@ internal class CyrusGeneratorTestBuilder
                 typeof(IServiceCollection).Assembly.Location,
                 typeof(ICyrusWebStartup).Assembly.Location,
                 typeof(DbContext).Assembly.Location,
+                typeof(IBus).Assembly.Location,
                 typeof(EntityFrameworkPersistence<,,>).Assembly.Location
                 ])
             .Distinct()
@@ -69,6 +71,16 @@ internal class CyrusGeneratorTestBuilder
         var generatedSyntaxTrees = outputCompilation.SyntaxTrees
             .Skip(1)
             .ToList();
+
+        compileDiagnostics.ToList().ForEach(d =>
+        {
+            logAction.Invoke($"Compilation Diagnostic: {d.Id} - {d.GetMessage()}");
+        }); 
+
+        analyzerDiagnostics.ToList().ForEach(d =>
+        {
+            logAction.Invoke($"Analyzer Diagnostic: {d.Id} - {d.GetMessage()}");
+        });
 
         generatedSyntaxTrees.ToList().ForEach(tree =>
         {

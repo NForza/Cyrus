@@ -182,8 +182,8 @@ internal static class IMethodSymbolExtensions
         if (returnType == null || returnType.SpecialType == SpecialType.System_Void)
             return CommandAdapterMethod.FromVoid;
 
-        if (returnType.Name == "IResult" &&
-                returnType.ContainingNamespace.ToDisplayString() == "Microsoft.AspNetCore.Http")
+        if (returnType.Name == "Result" &&
+                returnType.ContainingNamespace.ToDisplayString() == "NForza.Cyrus.Abstractions")
             return CommandAdapterMethod.FromResult;
 
         if (returnType.IsTupleType && returnType is INamedTypeSymbol namedTypeSymbol)
@@ -191,8 +191,8 @@ internal static class IMethodSymbolExtensions
             if (namedTypeSymbol.TupleElements.Length == 2)
             {
                 var firstElement = namedTypeSymbol.TupleElements[0];
-                if (firstElement.Type.Name == "IResult" &&
-                    firstElement.Type.ContainingNamespace.ToDisplayString() == "Microsoft.AspNetCore.Http")
+                if (firstElement.Type.Name == "Result" &&
+                    firstElement.Type.ContainingNamespace.ToDisplayString() == "NForza.Cyrus.Abstractions")
                 {
                     var secondElement = namedTypeSymbol.TupleElements[1];
                     if (secondElement.Type.Name == "Object")

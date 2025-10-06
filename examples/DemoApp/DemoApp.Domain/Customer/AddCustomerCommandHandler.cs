@@ -4,7 +4,6 @@ using DemoApp.Contracts;
 using DemoApp.Contracts.Customers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NForza.Cyrus;
 using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Cqrs;
 

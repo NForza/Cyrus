@@ -28,7 +28,7 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
             DiagnosticDescriptors.ValueTypeMustBeARecordStruct,
             DiagnosticDescriptors.IncorrectNumberOfArgumentsForValidator,
             DiagnosticDescriptors.ValidatorsShouldReturnIEnumerableOfString,
-            DiagnosticDescriptors.IResultTupleElementShouldBeCalledResult,
+            DiagnosticDescriptors.ResultTupleElementShouldBeCalledResult,
             DiagnosticDescriptors.MessagesTupleElementShouldBeCalledMessages,
             DiagnosticDescriptors.CommandHandlerArgumentShouldBeAnAggregateRoot,
             DiagnosticDescriptors.CommandForCommandHandlerShouldHaveAggregateRootIdProperty,

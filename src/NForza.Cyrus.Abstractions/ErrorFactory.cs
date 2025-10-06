@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
-namespace NForza.Cyrus;
+namespace NForza.Cyrus.Abstractions;
 
 public static class ErrorFactory<T>
 {

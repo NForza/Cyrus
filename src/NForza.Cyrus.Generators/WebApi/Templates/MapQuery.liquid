@@ -19,7 +19,7 @@
         {% endif %}
         IQueryProcessor queryProcessor = services.GetRequiredService<IQueryProcessor>();
         var queryResult = await queryProcessor.Query(query);
-        return QueryResultAdapter.FromObject(queryResult);
+        return QueryResultAdapter.FromObject<{{ Query }}>(queryResult);
     })
     .WithOpenApi()
     {%- if Attributes.size > 0 -%}

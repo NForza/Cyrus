@@ -1,4 +1,4 @@
-﻿namespace NForza.Cyrus;
+﻿namespace NForza.Cyrus.Abstractions;
 
 public enum ErrorType
 {

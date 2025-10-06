@@ -17,7 +17,7 @@ public class BusRegistrationGenerator : CyrusGeneratorBase
             {
                 var ctx = new
                 {
-                    Usings = new List<string> { "NForza.Cyrus.Cqrs", "NForza.Cyrus.Abstractions", "NForza.Cyrus.MassTransit" },
+                    Usings = new List<string> { "NForza.Cyrus.Cqrs", "NForza.Cyrus.Abstractions" },
                     Namespace = "BusRegistration",
                     Name = "BusRegistration",
                     Initializer = contents

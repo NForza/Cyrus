@@ -145,12 +145,12 @@ internal class CommandAnalyzer : CyrusAnalyzerBase
         {
             foreach (var te in t.TupleElements)
             {
-                if (te.Type.ToDisplayString() == "Microsoft.AspNetCore.Http.IResult" &&
+                if (te.Type.ToDisplayString() == "NForza.Cyrus.Abstractions.Result" &&
                     te.Name != "Result")
                 {
                     location = te.Locations.FirstOrDefault() ?? Location.None;
                     var diagnostic = Diagnostic.Create(
-                        DiagnosticDescriptors.IResultTupleElementShouldBeCalledResult,
+                        DiagnosticDescriptors.ResultTupleElementShouldBeCalledResult,
                         location,
                         te.ToDisplayString());
                     context.ReportDiagnostic(diagnostic);

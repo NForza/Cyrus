@@ -182,12 +182,13 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
     }
 
     [Fact]
-    public async Task Generating_CommandHandler_Invalid_IResult_Tuple_Element_Name_Should_Generate_Analyzer_Error()
+    public async Task Generating_CommandHandler_Invalid_Result_Tuple_Element_Name_Should_Generate_Analyzer_Error()
     {
         var source = @"
                 using System;       
                 using NForza.Cyrus.Abstractions;
                 using Microsoft.AspNetCore.Http;
+                using NForza.Cyrus;
 
                 namespace Test;
             
@@ -197,9 +198,9 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 public class Customer
                 {
                     [CommandHandler(Route = ""/"")]
-                    public (IResult wrong_name, object Events) Handle(CreateCustomerCommand command)
+                    public (Result wrong_name, object Events) Handle(CreateCustomerCommand command)
                     {
-                        return (Results.Accepted(), new object());
+                        return (Result.Accepted(), new object());
                     }
                 }
             ";
@@ -211,7 +212,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
             .RunAsync();
 
         compilerOutput.Should().NotHaveErrors();
-        analyzerOutput.Should().ContainDiagnostic(DiagnosticDescriptors.IResultTupleElementShouldBeCalledResult);
+        analyzerOutput.Should().ContainDiagnostic(DiagnosticDescriptors.ResultTupleElementShouldBeCalledResult);
     }
 
     [Fact]
@@ -220,6 +221,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
         var source = @"
                 using System;       
                 using NForza.Cyrus.Abstractions;
+                using NForza.Cyrus;         
                 using Microsoft.AspNetCore.Http;
 
                 namespace Test;
@@ -230,9 +232,9 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 public class Customer
                 {
                     [CommandHandler(Route = ""/"")]
-                    public (IResult Result, object wrong_name) Handle(CreateCustomerCommand command)
+                    public (Result Result, object wrong_name) Handle(CreateCustomerCommand command)
                     {
-                        return (Results.Accepted(), new object());
+                        return (Result.Accepted(), new object());
                     }
                 }
             ";
@@ -254,6 +256,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 using System;       
                 using System.Collections.Generic;
                 using NForza.Cyrus.Abstractions;
+                using NForza.Cyrus;
                 using Microsoft.AspNetCore.Http;
 
                 namespace Test;
@@ -264,9 +267,9 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 public class Customer
                 {
                     [CommandHandler(Route = ""/"")]
-                    public (IResult Result, IEnumerable<object> wrong_name) Handle(CreateCustomerCommand command)
+                    public (Result Result, IEnumerable<object> wrong_name) Handle(CreateCustomerCommand command)
                     {
-                        return (Results.Accepted(), [new object()]);
+                        return (Result.Accepted(), [new object()]);
                     }
                 }
             ";
@@ -288,6 +291,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 using System;       
                 using System.Collections.Generic;
                 using NForza.Cyrus.Abstractions;
+                using NForza.Cyrus.Core;
                 using Microsoft.AspNetCore.Http;
 
                 namespace Test;
@@ -300,9 +304,9 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 public class CustomerHandler
                 {
                     [CommandHandler(Route = ""/"")]
-                    public (IResult Result, IEnumerable<object> Messages) Handle(CreateCustomerCommand command, Customer customer)
+                    public (Result Result, IEnumerable<object> Messages) Handle(CreateCustomerCommand command, Customer customer)
                     {
-                        return (Results.Accepted(), [new object()]);
+                        return (Result.Accepted(), [new object()]);
                     }
                 }
             ";

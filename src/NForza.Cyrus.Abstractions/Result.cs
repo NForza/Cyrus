@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace NForza.Cyrus;
+namespace NForza.Cyrus.Abstractions;
 
 public class Result
 {
@@ -19,7 +19,7 @@ public class Result
 
     protected Result(Error error)
     {
-        ArgumentNullException.ThrowIfNull(error);
+        if (error == null) throw new ArgumentNullException(nameof(error));
 
         if (error.ErrorType == ErrorType.None)
         {
@@ -54,8 +54,7 @@ public class Result<TValue> : Result
 
     internal Result(TValue value) : base()
     {
-        ArgumentNullException.ThrowIfNull(value);
-
+        if (value == null) throw new ArgumentNullException(nameof(value));
         _value = value;
     }
 
