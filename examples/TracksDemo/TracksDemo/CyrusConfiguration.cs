@@ -6,7 +6,6 @@ public class MyCyrusConfiguration : CyrusConfig
 {
     public MyCyrusConfiguration()
     {
-        UseMassTransit();
         UseEntityFrameworkPersistence<global::TracksDemo.DemoContext>();
     }
 }

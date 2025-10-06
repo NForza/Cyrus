@@ -7,10 +7,10 @@ namespace SimpleCyrusWebApi.NewCustomer;
 public class NewCustomerCommandHandler(DemoContext context)
 {
     [CommandHandler(Route = "/")]
-    public async Task<(IResult Result, IEnumerable<object> events)> Execute(NewCustomerCommand command)
+    public async Task<(Result Result, IEnumerable<object> events)> Execute(NewCustomerCommand command)
     {
         context.Customers.Add(new Customer(command.Id, command.Name, command.Address));
         await context.SaveChangesAsync();
-        return (Results.Ok(), [new CustomerCreatedEvent(command.Id)]);
+        return (Result.Success(), [new CustomerCreatedEvent(command.Id)]);
     }
 }

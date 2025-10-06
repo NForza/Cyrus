@@ -9,12 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.6" />
-    <PackageReference Include="NForza.Cyrus" Version="1.0.300" />
-    <PackageReference Include="NForza.Cyrus.EntityFramework" Version="1.0.300" />
-    <PackageReference Include="NForza.Cyrus.MassTransit" Version="1.0.300" />
-    <PackageReference Include="NForza.Cyrus.MSBuild" Version="1.0.300" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.9" />
+    <PackageReference Include="NForza.Cyrus" Version="1.0.305" />
+    <PackageReference Include="NForza.Cyrus.EntityFramework" Version="1.0.305" />
+    <PackageReference Include="NForza.Cyrus.MSBuild" Version="1.0.305" />
     <InternalsVisibleTo Include="TracksDemo.Tests" />
   </ItemGroup>
 

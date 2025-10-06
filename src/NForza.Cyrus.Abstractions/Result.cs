@@ -39,6 +39,8 @@ public class Result
     public static Result File(Stream file, string contentType) => Success(new FileResult(file, contentType));
 
     public static Result Stream(Stream stream) => Success(new StreamResult(stream));
+    public static Result Conflict<T>(string value) where T: class => Failure<T>(ErrorFactory<T>.Conflict(value));
+    public static Result NotFound<T>(string value) where T : class => Failure<T>(ErrorFactory<T>.NotFound(value));
 
     public static Result Accepted(string? url = null) => Success(new AcceptedResult(url));
 }

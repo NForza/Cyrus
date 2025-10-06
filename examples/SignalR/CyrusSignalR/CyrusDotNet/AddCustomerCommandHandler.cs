@@ -7,9 +7,9 @@ namespace CyrusSignalR;
 public class AddCustomerCommandHandler
 {
     [CommandHandler(Route = "/")]
-    public (IResult Result, IEnumerable<object> Messages) AddCustomer(AddCustomerCommand command)
+    public (Result Result, IEnumerable<object> Messages) AddCustomer(AddCustomerCommand command)
     {
-        return (Results.Accepted(), [new CustomerCreatedEvent(command.CustomerId, command.Name)]);
+        return (Result.Accepted(), [new CustomerCreatedEvent(command.CustomerId, command.Name)]);
     }
 
 }
