@@ -16,7 +16,7 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase
         foreach (var eventHandler in eventHandlers)
         {
             var sourceText = GenerateEventConsumer(eventHandler, cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"{eventHandler.Parameters[0].Type.ToFullName().Replace("global::", "")}_EventConsumer.g.cs", sourceText);
+            spc.AddSource($"{eventHandler.ContainingType.ToFullName().Replace("global::", "")}_EventConsumer.g.cs", sourceText);
         }
     }
 
