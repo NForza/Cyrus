@@ -11,8 +11,8 @@ public class DefaultCyrusServices : ICyrusInitializer
 {
     public void RegisterServices(IServiceCollection services)
     {
-        services.AddScoped<ICommandDispatcher, CommandDispatcher>();
         services.AddSingleton<IQueryProcessor, QueryProcessor>();
+        services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
         services.AddHttpContextAccessor();
         services.AddSingleton<IHttpContextObjectFactory, HttpContextObjectFactory>();
         services.AddTransient<IConfigureOptions<JsonOptions>, JsonOptionsConfigurator>();

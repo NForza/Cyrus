@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Model;
 
-namespace NForza.Cyrus.MassTransit;
+namespace NForza.Cyrus.Cqrs;
 
 public static class IEndpointRouteBuilderExtensions
 {

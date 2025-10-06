@@ -110,6 +110,29 @@ internal static class IMethodSymbolExtensions
         }
     }
 
+    public static string GetEventLambda(this IMethodSymbol handler, string serviceProviderVariable = "services", string cancellationTokenVariableName = "cancellationToken")
+    {
+        var hasCancellationToken = handler.Parameters.Any(p => p.Type.IsCancellationToken());
+        var cancellationTokenVariable = hasCancellationToken ? $", {cancellationTokenVariableName}" : "";
+        var eventType = handler.Parameters[0].Type.ToFullName();
+        var typeSymbol = handler.ContainingType.ToFullName();
+        var returnType = handler.ReturnType;
+        var returnsTask = handler.ReturnsTask();
+
+        if (returnsTask)
+        {
+            return handler.IsStatic
+                ? $"async msg => await {typeSymbol}.{handler.Name}(msg)"
+                : $"async msg => await {serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}(msg)";
+        }
+        else
+        {
+            return handler.IsStatic
+                ? $"msg => {typeSymbol}.{handler.Name}(msg)"
+                : $"msg => {serviceProviderVariable}.GetRequiredService<{typeSymbol}>().{handler.Name}(msg)";
+        }
+    }
+
     public static string GetQueryInvocation(this IMethodSymbol handler, string serviceProviderVariable = "services")
     {
         var handlerClass = handler.ContainingType.ToFullName();
@@ -159,28 +182,28 @@ internal static class IMethodSymbolExtensions
         if (returnType == null || returnType.SpecialType == SpecialType.System_Void)
             return CommandAdapterMethod.FromVoid;
 
-        if (returnType.Name == "IResult" &&
-                returnType.ContainingNamespace.ToDisplayString() == "Microsoft.AspNetCore.Http")
-            return CommandAdapterMethod.FromIResult;
+        if (returnType.Name == "Result" &&
+                returnType.ContainingNamespace.ToDisplayString() == "NForza.Cyrus.Abstractions")
+            return CommandAdapterMethod.FromResult;
 
         if (returnType.IsTupleType && returnType is INamedTypeSymbol namedTypeSymbol)
         {
             if (namedTypeSymbol.TupleElements.Length == 2)
             {
                 var firstElement = namedTypeSymbol.TupleElements[0];
-                if (firstElement.Type.Name == "IResult" &&
-                    firstElement.Type.ContainingNamespace.ToDisplayString() == "Microsoft.AspNetCore.Http")
+                if (firstElement.Type.Name == "Result" &&
+                    firstElement.Type.ContainingNamespace.ToDisplayString() == "NForza.Cyrus.Abstractions")
                 {
                     var secondElement = namedTypeSymbol.TupleElements[1];
                     if (secondElement.Type.Name == "Object")
                     {
-                        return CommandAdapterMethod.FromIResultAndMessage;
+                        return CommandAdapterMethod.FromResultAndMessage;
                     }
-                    return CommandAdapterMethod.FromIResultAndMessages;
+                    return CommandAdapterMethod.FromResultAndMessages;
                 }
             }
 
-            return CommandAdapterMethod.FromIResultAndMessages;
+            return CommandAdapterMethod.FromResultAndMessages;
         }
         return CommandAdapterMethod.FromObjects;
     }

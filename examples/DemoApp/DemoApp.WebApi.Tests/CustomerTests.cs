@@ -119,7 +119,7 @@ public class CustomerTests( ITestOutputHelper outputHelper)
         response.Context.Response.Headers.Location.ToString().Should().NotBeNullOrEmpty();
         response.Context.Response.Headers.Location.ToString().Should().StartWith("/customers/");
 
-        var eventBus = host.Services.GetRequiredService<IEventBus>() as RecordingLocalEventBus;
+        var eventBus = host.Services.GetRequiredService<IMessageBus>() as RecordingLocalMessageBus;
         var customerAddedEvent = eventBus!.GetMessage<CustomerUpdatedEvent>();
         customerAddedEvent.Should().NotBeNull();
         customerAddedEvent!.Id.Should().Be(customerId);

@@ -69,9 +69,6 @@ public static class ClassDeclarationSyntaxExtensions
                             }
                         }
                         break;
-                    case "UseMassTransit":
-                        result.EventBus = EventBusType.MassTransit;
-                        break;
                     case "GenerateContracts":
                         result.GenerationTarget.Add(GenerationTarget.Contracts);
                         break;

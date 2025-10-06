@@ -1,29 +1,30 @@
 ﻿using System.IO;
 using Microsoft.AspNetCore.Http;
+using NForza.Cyrus.Abstractions;
 
 namespace NForza.Cyrus.WebApi;
 
 public static class QueryResultAdapter
 {
-    public static IResult FromObject(object obj)
+    public static IResult FromObject<T>(object obj)
     {
         if (obj == null)
         {
-            return Results.NotFound();
+            return Result.Failure(ErrorFactory<Result>.NotFound<T>()).ToIResult();
         }
-        if (obj is IResult result)
+        if (obj is Result result)
         {
-            return result;
+            return result.ToIResult();
         }
         if (obj is Stream stream)
         {
-            return Results.Stream(stream);
+            return Result.Stream(stream).ToIResult();
         }
         if (obj is (Stream, string))
         {
             (Stream file, string contentType) = ((Stream, string))obj;
-            return Results.File(file, contentType);
+            return Result.File(file, contentType).ToIResult();
         }
-        return Results.Ok(obj);
+        return Result.Success(obj).ToIResult();
     }
 }

@@ -29,7 +29,6 @@ public abstract class CyrusSourceGeneratorBase : IncrementalGeneratorBase
         return 
             new GenerationConfig 
             { 
-                EventBus = EventBusType.Local,
                 GenerationTarget = [GenerationTarget.Domain, GenerationTarget.WebApi, GenerationTarget.Contracts]
             };
     }

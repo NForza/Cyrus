@@ -12,29 +12,22 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
-        var config = cyrusGenerationContext.GenerationConfig;
-        var eventHandlers = cyrusGenerationContext.EventHandlers.Where(eh => !IsEventHandlerForLocalEvent(eh));
-        if (eventHandlers.Any())
+        var eventHandlers = cyrusGenerationContext.EventHandlers;
+        foreach (var eventHandler in eventHandlers)
         {
-            if (config.EventBus == EventBusType.MassTransit)
-            {
-                var sourceText = GenerateEventConsumers(eventHandlers, cyrusGenerationContext.LiquidEngine);
-                spc.AddSource($"EventConsumers.g.cs", sourceText);
-            }
+            var sourceText = GenerateEventConsumer(eventHandler, cyrusGenerationContext.LiquidEngine);
+            spc.AddSource($"{eventHandler.ContainingType.ToFullName().Replace("global::", "")}_EventConsumer.g.cs", sourceText);
         }
     }
 
-    private static bool IsEventHandlerForLocalEvent(IMethodSymbol eh)
-    {
-        return ((INamedTypeSymbol)eh.Parameters[0].Type).IsLocalEvent();
-    }
-
-    private string GenerateEventConsumers(IEnumerable<IMethodSymbol> eventHandlers, LiquidEngine liquidEngine)
+    private string GenerateEventConsumer(IMethodSymbol eventHandler, LiquidEngine liquidEngine)
     {
         StringBuilder source = new();
         var model = new
         {
-            Consumers = eventHandlers.Select(h => new { h.Parameters[0].Type.Name, FullName = h.Parameters[0].Type.ToFullName() })
+            Name = eventHandler.Parameters[0].Type.Name,
+            FullName = eventHandler.Parameters[0].Type.ToFullName(),
+            InvocationLambda = eventHandler.GetEventLambda("services") 
         };
 
         var resolvedSource = liquidEngine.Render(model, "EventConsumers");

@@ -1,20 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace NForza.Cyrus.Cqrs;
 
-public class CommandDispatcher(IEnumerable<IEventBus> eventBuses, IServiceProvider serviceProvider) : ICommandDispatcher
+public class CommandDispatcher(IServiceScopeFactory serviceScopeFactory) : ICommandDispatcher
 {
-    public IServiceProvider Services => serviceProvider;
-
-    public Task DispatchEvents(IEnumerable<object> events)
-    {
-        Parallel.ForEach(eventBuses, async eventBus =>
-        {
-            await eventBus.Publish(events.OfType<object>());
-        });
-        return Task.CompletedTask;
-    }
+    public IServiceProvider Services => serviceScopeFactory.CreateScope().ServiceProvider;
 }

@@ -8,7 +8,7 @@ using NForza.Cyrus;
 using NForza.Cyrus.WebApi;
 using DemoApp.WebApi;
 using Microsoft.EntityFrameworkCore;
-using NForza.Cyrus.MassTransit;
+using NForza.Cyrus.Cqrs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,21 +16,21 @@ builder.Logging.SetMinimumLevel(LogLevel.Debug).AddConsole();
 
 builder.Services.AddMassTransit(cfg =>
 {
-    cfg.AddConsumers(Assembly.GetExecutingAssembly(), typeof(Customer).Assembly);
+    cfg.AddConsumers(Assembly.GetExecutingAssembly());
     cfg.SetSnakeCaseEndpointNameFormatter();
-    cfg.UsingRabbitMq((ctx, cfg) =>
-    {
-        cfg.Host("rabbitmq://localhost", h =>
-        {
-            h.Username("guest");
-            h.Password("guest");
-        });
-        cfg.ConfigureEndpoints(ctx);
-    });
-    //cfg.UsingInMemory((context, cfg) =>
+    //cfg.UsingRabbitMq((ctx, cfg) =>
     //{
-    //    cfg.ConfigureEndpoints(context);
+    //    cfg.Host("rabbitmq://localhost", h =>
+    //    {
+    //        h.Username("guest");
+    //        h.Password("guest");
+    //    });
+    //    cfg.ConfigureEndpoints(ctx);
     //});
+    cfg.UsingInMemory((context, cfg) =>
+    {
+        cfg.ConfigureEndpoints(context);
+    });
 });
 
 builder.Services.AddDbContext<DemoDbContext>(o => o.UseInMemoryDatabase("Demo.Webapi"));

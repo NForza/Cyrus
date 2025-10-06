@@ -37,7 +37,7 @@ public class EventHandlerTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().ContainSource("AddEventHandler<global::Test.CustomerCreatedEvent>");
+        generatedSyntaxTrees.Should().ContainSource("EventConsumer<global::Test.CustomerCreatedEvent>");
     }
 
     [Fact]

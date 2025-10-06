@@ -1,4 +1,4 @@
-﻿    app.Map{{ Verb }}("{{ Path }}", async ({% if HasBody %}[FromBody] {{ CommandType | as-contract }} command, {% endif -%} [FromServices] IEventBus eventBus, [FromServices] IHttpContextObjectFactory objectFactory, [FromServices] IHttpContextAccessor ctx) =>    {
+﻿    app.Map{{ Verb }}("{{ Path }}", async ({% if HasBody %}[FromBody] {{ CommandType | as-contract }} command, {% endif -%} [FromServices] IMessageBus messageBus, [FromServices] IHttpContextObjectFactory objectFactory, [FromServices] IHttpContextAccessor ctx) =>    {
         {% if HasBody == false %}{{ CommandType | as-contract }} command = new();{% endif %}
         using var scope = app.Services.CreateScope();
         var services = scope.ServiceProvider;
@@ -20,7 +20,7 @@
         {% endif -%}
         ICommandDispatcher dispatcher = services.GetRequiredService<ICommandDispatcher>();
         {% if HasReturnType %}var commandResult = {% endif %} await dispatcher.Handle(cmd);
-        return new CommandResultAdapter(eventBus).{{ AdapterMethod }}({% if HasReturnType %}commandResult{% endif %});
+        return new CommandResultAdapter(messageBus).{{ AdapterMethod }}({% if HasReturnType %}commandResult{% endif %});
     })
     .WithOpenApi()
     {%- if Attributes.size > 0 -%}

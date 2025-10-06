@@ -2,7 +2,6 @@
 
 public class CyrusConfig
 {
-    public CyrusConfig UseMassTransit() => this;
     public CyrusConfig UseEntityFrameworkPersistence<T>() => this;
     public CyrusConfig GenerateDomain() => this;
     public CyrusConfig GenerateContracts() => this;

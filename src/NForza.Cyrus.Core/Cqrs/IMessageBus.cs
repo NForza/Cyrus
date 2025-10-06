@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace NForza.Cyrus.Cqrs;
 
-public interface IEventBus
+public interface IMessageBus
 {
-    Task Publish(IEnumerable<object> events);
+    Task Publish(params IEnumerable<object> messages);
 }
