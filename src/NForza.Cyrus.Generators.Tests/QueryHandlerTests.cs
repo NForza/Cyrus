@@ -210,4 +210,41 @@ public class QueryHandlerTests(ITestOutputHelper outputWindow)
             generatedSyntaxTrees.Should().NotBeEmpty();
         }
     }
+    
+    [Fact]
+    public async Task Generating_Instance_QueryHandler_Should_Generate_DI_Registration()
+    {
+        var source = @"
+                using System;       
+                using System.Threading;
+                using NForza.Cyrus.Abstractions;
+
+                [Query]
+                public record GetCustomerByIdQuery(Guid Id);
+
+                public class CustomerQuery
+                {
+                    [QueryHandler(Route = ""/"")]
+                    public string Handle(GetCustomerByIdQuery query, CancellationToken cancellationToken)
+                    {
+                        return query.Id.ToString();
+                    }
+                }
+             ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+                .WithSource(source)
+                .LogGeneratedSource(outputWindow.WriteLine)
+                .RunAsync();
+
+        using (new AssertionScope())
+        {
+            compilerOutput.Should().NotHaveErrors();
+            analyzerOutput.Should().BeEmpty();
+            generatedSyntaxTrees.Should().NotBeEmpty();
+            generatedSyntaxTrees.Should().ContainSource("AddTransient<global::CustomerQuery>();");
+        }
+    }
+
 }

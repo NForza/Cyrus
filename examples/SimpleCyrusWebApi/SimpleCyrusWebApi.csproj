@@ -12,7 +12,7 @@
     <PackageReference Include="MassTransit" Version="8.5.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.9" />
-    <PackageReference Include="NForza.Cyrus" Version="1.0.305" />
+    <PackageReference Include="NForza.Cyrus" Version="1.0.306-beta-20251009-073341" />
   </ItemGroup>
 
 </Project>

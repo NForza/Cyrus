@@ -9,7 +9,7 @@ public class UpdateTrackCommandHandler
     {
         if (track == null)
         {
-            return Result.NotFound($"Track with Id {command.TrackId} not found.");
+            return Result.NotFound<Track>($"Track with Id {command.TrackId} not found.");
         }
         track.Artist = command.Artist;
         track.Title = command.Title;
