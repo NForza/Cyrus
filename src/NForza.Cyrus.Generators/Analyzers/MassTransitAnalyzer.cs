@@ -31,38 +31,5 @@ internal class MassTransitAnalyzer : CyrusAnalyzerBase
         {
             return;
         }
-
-       if (methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is ConstructorDeclarationSyntax ctorSyntax
-            && ctorSyntax.Body != null)
-        {
-            (bool shouldUseMassTransitAssembly, Location location) = CallsUseMassTransit(methodSymbol, ctorSyntax);
-            if (!shouldUseMassTransitAssembly)
-            {
-                return;
-            }
-            var referencesCorrectAssembly =
-                ReferencesAssembly(context.Compilation, "NForza.Cyrus.MassTransit");
-
-            if (!referencesCorrectAssembly)
-            {
-                var diagnostic = Diagnostic.Create(
-                    DiagnosticDescriptors.ProjectShouldReferenceCyrusMassTransit,
-                    location,
-                    methodSymbol.ToDisplayString());
-                context.ReportDiagnostic(diagnostic);
-                return;
-            }
-        }
-    }
-
-    private (bool, Location) CallsUseMassTransit(IMethodSymbol ctorSymbol, ConstructorDeclarationSyntax constructorDeclarationSyntax)
-    {
-        foreach (var invocation in constructorDeclarationSyntax.Body!.DescendantNodes().OfType<InvocationExpressionSyntax>())
-        {
-            var identifier = (invocation.Expression as IdentifierNameSyntax)?.Identifier.Text;
-            if (identifier == "UseMassTransit") 
-                return (true, invocation.GetLocation());
-        }
-        return (false, Location.None);
     }
 }

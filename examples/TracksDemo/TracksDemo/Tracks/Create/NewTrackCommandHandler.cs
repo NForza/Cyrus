@@ -18,7 +18,7 @@ public class NewTrackCommandHandler(DemoContext context)
     }
 
     [CommandHandler(Route = "/tracks", Verb = HttpVerb.Post)]
-    public async Task<(IResult Result, IEnumerable<object> Messages)> Handle(NewTrackCommand command)
+    public async Task<(Result Result, IEnumerable<object> Messages)> Handle(NewTrackCommand command)
     {
         Console.WriteLine("Creating a new track");
         Track c = new(command.TrackId, command.Title, command.Artist, command.FileName, command.AudioFormat);
@@ -29,8 +29,8 @@ public class NewTrackCommandHandler(DemoContext context)
         }
         catch (ArgumentException ae) when (ae.Message.Contains("same key"))
         {
-           return (Results.Conflict($"Track with Id {command.TrackId} already exists."), []);
+           return (Result.Conflict<Track>($"Track with Id {command.TrackId} already exists."), []);
         }
-        return (Results.Accepted(), [new TrackCreatedEvent(command.TrackId, command.Title, command.FileName)]);
+        return (Result.Accepted(), [new TrackCreatedEvent(command.TrackId, command.Title, command.FileName)]);
     }
 }

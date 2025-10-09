@@ -104,16 +104,6 @@ public static class DiagnosticDescriptors
         description: "Event handlers must have 1 parameter which is a [Event] object."
     );
 
-    public static readonly DiagnosticDescriptor ProjectShouldReferenceCyrusMassTransit = new DiagnosticDescriptor(
-        id: "CYRUS007",
-        title: "MassTransit reference",
-        messageFormat: "Project must reference NForza.Cyrus.MassTransit",
-        category: "Cyrus",
-        defaultSeverity: DiagnosticSeverity.Error,
-        isEnabledByDefault: true,
-        description: "Project must reference NForza.Cyrus.MassTransit."
-    );
-
     public static readonly DiagnosticDescriptor ValueTypeMustBeARecordStruct = new DiagnosticDescriptor(
         id: "CYRUS008",
         title: "ValueTypes",
