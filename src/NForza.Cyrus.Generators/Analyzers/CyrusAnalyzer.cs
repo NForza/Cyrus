@@ -24,7 +24,6 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
             DiagnosticDescriptors.MissingEventAttribute,
             DiagnosticDescriptors.IncorrectNumberOfArgumentsForEventHandler,
             DiagnosticDescriptors.EventHandlerShouldHaveAEventParameter,
-            DiagnosticDescriptors.ProjectShouldReferenceCyrusMassTransit,
             DiagnosticDescriptors.ValueTypeMustBeARecordStruct,
             DiagnosticDescriptors.IncorrectNumberOfArgumentsForValidator,
             DiagnosticDescriptors.ValidatorsShouldReturnIEnumerableOfString,

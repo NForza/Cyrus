@@ -9,9 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.0" />
-    <PackageReference Include="NForza.Cyrus.MassTransit" Version="1.0.300" />
-    <PackageReference Include="MassTransit" Version="8.5.0" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.4" />
+    <PackageReference Include="NForza.Cyrus" Version="1.0.306-beta-20251009-073341" />
+    <PackageReference Include="MassTransit" Version="8.5.4" />
   </ItemGroup>
 
   <ItemGroup>

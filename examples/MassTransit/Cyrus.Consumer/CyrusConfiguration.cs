@@ -6,7 +6,6 @@ public class CyrusConfiguration : CyrusConfig
 {
     public CyrusConfiguration()
     {
-        UseMassTransit();
         GenerateDomain();
     }
 }
