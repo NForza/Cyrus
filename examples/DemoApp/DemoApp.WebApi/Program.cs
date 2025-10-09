@@ -9,6 +9,8 @@ using NForza.Cyrus.WebApi;
 using DemoApp.WebApi;
 using Microsoft.EntityFrameworkCore;
 using NForza.Cyrus.Cqrs;
+using DemoApp.Contracts.Customers;
+using DemoApp.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,19 +20,19 @@ builder.Services.AddMassTransit(cfg =>
 {
     cfg.AddConsumers(Assembly.GetExecutingAssembly());
     cfg.SetSnakeCaseEndpointNameFormatter();
-    //cfg.UsingRabbitMq((ctx, cfg) =>
-    //{
-    //    cfg.Host("rabbitmq://localhost", h =>
-    //    {
-    //        h.Username("guest");
-    //        h.Password("guest");
-    //    });
-    //    cfg.ConfigureEndpoints(ctx);
-    //});
-    cfg.UsingInMemory((context, cfg) =>
+    cfg.UsingRabbitMq((ctx, cfg) =>
     {
-        cfg.ConfigureEndpoints(context);
+        cfg.Host("rabbitmq://localhost", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+        cfg.ConfigureEndpoints(ctx);
     });
+    //cfg.UsingInMemory((context, cfg) =>
+    //{
+    //    cfg.ConfigureEndpoints(context);
+    //});
 });
 
 builder.Services.AddDbContext<DemoDbContext>(o => o.UseInMemoryDatabase("Demo.Webapi"));
@@ -53,6 +55,8 @@ var app = builder.Build();
 app.UseCors("AllowAngularApp");
 
 ILogger logger = app.Services.GetRequiredService<ILogger<Program>>();
+IBus bus = app.Services.GetRequiredService<IBus>();
+bus.Publish(new AddCustomerCommand(new CustomerId(), new Name("Thomas"), new Address(new Street("TestStreet"), new StreetNumber(1)), CustomerType.Private));
 
 app.MapCyrus(logger).MapAsyncApi();
 
