@@ -58,17 +58,15 @@ public class CustomerTests( ITestOutputHelper outputHelper)
     [InlineData("/customers")]
     public async Task Posting_Add_Customer_Command_Without_A_Name_Should_Return_Bad_Request(string url)
     {
-        var command = new AddCustomerCommand
-        {
-            Id = new CustomerId(),
-            CustomerType = CustomerType.Private,
-            Name = new Name(""),
-            Address = new Address
+        var command = new AddCustomerCommand(
+            new CustomerId(), 
+            new Name(""), 
+            new Address
             {
                 Street = new Street("The Netherlands"),
                 StreetNumber = new(1)
-            }
-        };
+            },
+            CustomerType.Private);
         var host = await DemoAppTestClient.GetHostAsync(outputHelper);
         var response = await host.Scenario(_ =>
           {
@@ -85,7 +83,7 @@ public class CustomerTests( ITestOutputHelper outputHelper)
     [InlineData("/customers")]
     public async Task Posting_Add_Customer_Command_With_Number_Zero_Should_Return_Bad_Request(string url)
     {
-        var command = new AddCustomerCommand { Id = new CustomerId(), CustomerType = CustomerType.Private, Name = new Name("Test"), Address = new Address { Street = new Street("The Netherlands"), StreetNumber = new(0) } };
+        var command = new AddCustomerCommand(Id: new CustomerId(), CustomerType: CustomerType.Private, Name: new Name("Test"), Address: new Address { Street = new Street("The Netherlands"), StreetNumber = new(0) });
         var host = await DemoAppTestClient.GetHostAsync(outputHelper);
         var response = await host.Scenario(_ =>
         {
