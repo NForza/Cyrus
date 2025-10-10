@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore;
 using NForza.Cyrus.Cqrs;
 using DemoApp.Contracts.Customers;
 using DemoApp.Contracts;
+using NForza.Cyrus.Abstractions;
+using System;
+using System.Threading.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,8 +58,16 @@ var app = builder.Build();
 app.UseCors("AllowAngularApp");
 
 ILogger logger = app.Services.GetRequiredService<ILogger<Program>>();
-IBus bus = app.Services.GetRequiredService<IBus>();
-bus.Publish(new AddCustomerCommand(new CustomerId(), new Name("Thomas"), new Address(new Street("TestStreet"), new StreetNumber(1)), CustomerType.Private));
+
+Task.Run(async () =>
+{
+    await Task.Delay(5000); // Wait for the bus to be ready
+    IBus bus = app.Services.GetRequiredService<IBus>();
+    var rc = bus.CreateRequestClient<AddCustomerCommand>();
+    Response<Result> resultResponse = await rc.GetResponse<Result>(new AddCustomerCommand(new CustomerId(), new Name("Thomas"), new Address(new Street("TestStreet"), new StreetNumber(1)), CustomerType.Private));
+    var result = resultResponse.Message;
+    Console.WriteLine(result.IsSuccess);
+});
 
 app.MapCyrus(logger).MapAsyncApi();
 

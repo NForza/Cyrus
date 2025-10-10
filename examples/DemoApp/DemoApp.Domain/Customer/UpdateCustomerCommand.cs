@@ -5,5 +5,5 @@ using NForza.Cyrus.Aggregates;
 namespace DemoApp.Domain.Customer;
 
 [Command]
-public record struct UpdateCustomerCommand([property: AggregateRootId] CustomerId Id, Name Name, Address Address);
+public record UpdateCustomerCommand([property: AggregateRootId] CustomerId Id, Name Name, Address Address);
 

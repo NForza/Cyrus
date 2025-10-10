@@ -30,10 +30,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Commands\Templates\CommandConsumer.liquid" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs/" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Commands\Templates\CommandConsumer.liquid" />
     <EmbeddedResource Include="Commands\Templates\CommandDispatcher.liquid" />
     <EmbeddedResource Include="Commands\Templates\CyrusInitializer.liquid" />
     <EmbeddedResource Include="ValueTypes\Templates\DoubleValue.liquid" />
@@ -56,7 +61,7 @@
     <EmbeddedResource Include="ValueTypes\Templates\GuidValue.liquid" />
     <EmbeddedResource Include="ValueTypes\Templates\GuidValueTypeConverter.liquid" />
     <EmbeddedResource Include="Model\CyrusModel.liquid" />
-    <EmbeddedResource Include="Events\Templates\EventConsumers.liquid" />
+    <EmbeddedResource Include="Events\Templates\EventConsumer.liquid" />
     <EmbeddedResource Include="Queries\Templates\QueryProcessorExtensions.liquid" />
     <EmbeddedResource Include="SignalR\Templates\RegisterSignalRHubs.liquid" />
     <EmbeddedResource Include="SignalR\Templates\SignalRHub.liquid" />
