@@ -1,7 +1,5 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Execution;
-using Microsoft.AspNetCore.Http;
-using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Generators.Analyzers;
 using NForza.Cyrus.Generators.Tests.Infra;
 using Xunit.Abstractions;

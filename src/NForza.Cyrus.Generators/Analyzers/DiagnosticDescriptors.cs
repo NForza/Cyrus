@@ -233,5 +233,14 @@ public static class DiagnosticDescriptors
         description: "AggregateRoots must have a [AggregateRootId] property."
     );
 
+    public static readonly DiagnosticDescriptor CommandsCantBeStructs = new DiagnosticDescriptor(
+        id: "CYRUS020",
+        title: "Commands must be reference types",
+        messageFormat: "Command can't be a struct",
+        category: "Cyrus",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Command '{0}' can't be a struct."
+    );
 
 }

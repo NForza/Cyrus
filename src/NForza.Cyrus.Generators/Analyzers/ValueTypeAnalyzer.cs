@@ -9,15 +9,18 @@ internal class ValueTypeAnalyzer
 {
     internal void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext context)
     {
-        var structDeclaration = (StructDeclarationSyntax)context.Node;
-        if (structDeclaration.Kind() != SyntaxKind.RecordStructDeclaration)
+        var structDeclaration = context.Node as StructDeclarationSyntax;
+        if (structDeclaration != null)
         {
-            var diagnostic = Diagnostic.Create(
-                DiagnosticDescriptors.ValueTypeMustBeARecordStruct,
-                structDeclaration.GetLocation(),
-                structDeclaration.Identifier.Text);
+            if (structDeclaration.Kind() != SyntaxKind.RecordStructDeclaration)
+            {
+                var diagnostic = Diagnostic.Create(
+                    DiagnosticDescriptors.ValueTypeMustBeARecordStruct,
+                    structDeclaration.GetLocation(),
+                    structDeclaration.Identifier.Text);
 
-            context.ReportDiagnostic(diagnostic);
+                context.ReportDiagnostic(diagnostic);
+            }
         }
     }
 }

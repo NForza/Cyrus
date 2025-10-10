@@ -16,7 +16,7 @@ public class TestProjectTests(ITestOutputHelper outputWindow)
                 namespace Test;
 
                 [Command]
-                public record struct NewTrackCommand(Guid TrackId);
+                public record NewTrackCommand(Guid TrackId);
             ";
 
         (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
