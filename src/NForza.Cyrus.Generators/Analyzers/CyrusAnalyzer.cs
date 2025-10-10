@@ -33,6 +33,7 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
             DiagnosticDescriptors.CommandForCommandHandlerShouldHaveAggregateRootIdProperty,
             DiagnosticDescriptors.UnrecognizedParameterForCommandHandler,
             DiagnosticDescriptors.AggregateRootShouldHaveAggregateRootIdProperty,
+            DiagnosticDescriptors.CommandsCantBeStructs,
         ];
 
     public override void Initialize(AnalysisContext context)
@@ -40,12 +41,13 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
         context.RegisterSymbolAction(AnalyzeMethodSymbol, SymbolKind.Method);
-        context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.StructDeclaration);
+        context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.StructDeclaration, SyntaxKind.RecordStructDeclaration, SyntaxKind.RecordDeclaration, SyntaxKind.ClassDeclaration );
     }
 
     private static void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext context)
     {
         new ValueTypeAnalyzer().AnalyzeSyntaxNode(context);
+        new CommandAnalyzer().AnalyzeSyntaxNode(context);
     }
 
     private void AnalyzeMethodSymbol(SymbolAnalysisContext context)
@@ -56,7 +58,7 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
         var methodSymbol = (IMethodSymbol)context.Symbol;
         try
         {
-            new CommandAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
+            new CommandHandlerAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
             new QueryAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
             new EventAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
             new MassTransitAnalyzer().AnalyzeMethodSymbol(context, methodSymbol);
