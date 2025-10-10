@@ -21,11 +21,11 @@ public class CommandConsumerGenerator : CyrusGeneratorBase
         var model = new
         {
             Command = commandHandler.Parameters[0].Type.Name,
-            Namespace = commandHandler.Parameters[0].Type.ContainingNamespace?.ToString() ?? "",
+            Namespace = commandHandler.Parameters[0].Type.ContainingNamespace.GetNameOrEmpty(),
+            HasResult = !commandHandler.ReturnsVoid
         };
 
         var resolvedSource = liquidEngine.Render(model, "CommandConsumer");
-
         return resolvedSource;
     }
 }

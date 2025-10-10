@@ -61,17 +61,6 @@ app.UseCors("AllowAngularApp");
 
 ILogger logger = app.Services.GetRequiredService<ILogger<Program>>();
 
-Task.Run(async () =>
-{
-    await Task.Delay(5000); // Wait for the bus to be ready
-    IMessageBus bus = app.Services.GetRequiredService<IMessageBus>();
-    bus.Publish(new AddCustomerCommand(new CustomerId(), new Name("Thomas"), new Address(new Street("TestStreet"), new StreetNumber(1)), CustomerType.Private));
-    //var rc = bus.CreateRequestClient<AddCustomerCommand>();
-    //Response<AcceptedResult> resultResponse = await rc.GetResponse<AcceptedResult>(new AddCustomerCommand(new CustomerId(), new Name("Thomas"), new Address(new Street("TestStreet"), new StreetNumber(1)), CustomerType.Private));
-    //var result = resultResponse.Message;
-    //Console.WriteLine(JsonSerializer.Serialize(result));
-});
-
 app.MapCyrus(logger).MapAsyncApi();
 
 await app.RunAsync();
