@@ -1,66 +1,39 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System.IO;
+using System.Net;
 
 namespace NForza.Cyrus.Abstractions;
 
-public class Result
+public class Result(HttpStatusCode statusCode)
 {
-    public static implicit operator Result(Error error) => Failure(error);
-
-    public bool IsSuccess { get; }
-    public bool IsFailure => !IsSuccess;
-    public Error Error { get; } = new Error();
-
-    protected Result()
-    {
-        IsSuccess = true;
-    }
-
-    protected Result(Error error)
-    {
-        if (error == null) throw new ArgumentNullException(nameof(error));
-
-        if (error.ErrorType == ErrorType.None)
-        {
-            throw new ArgumentException("Error must have a type.", nameof(error));
-        }
-
-        IsSuccess = false;
-        Error = error;
-    }
-
-    public static Result Success() => new Result();
-    public static Result<TValue> Success<TValue>(TValue value) where TValue : class => new Result<TValue>(value);
-    public static Task<Result<TValue>> SuccessAsync<TValue>(TValue value) where TValue : class => Task.FromResult(new Result<TValue>(value));
-    public static Result Failure(Error error) => new Result(error);
-    public static Result<TValue> Failure<TValue>(Error error) where TValue : class => new Result<TValue>(error);
-
-    public static Result File(Stream file, string contentType) => Success(new FileResult(file, contentType));
-
-    public static Result Stream(Stream stream) => Success(new StreamResult(stream));
-    public static Result Conflict<T>(string value) where T: class => Failure<T>(ErrorFactory<T>.Conflict(value));
-    public static Result NotFound<T>(string value) where T : class => Failure<T>(ErrorFactory<T>.NotFound(value));
-
-    public static Result Accepted(string? url = null) => Success(new AcceptedResult(url));
+    public HttpStatusCode StatusCode { get; } = statusCode;
 }
 
-public class Result<TValue> : Result
-    where TValue : class
+public class SuccessResult<T>(HttpStatusCode statusCode, T value) : Result(statusCode)
 {
-    public static implicit operator Result<TValue>(TValue value) => new(value);
-    public static implicit operator Result<TValue>(Error error) => Failure<TValue>(error);
-
-    private readonly TValue? _value;
-    public TValue? Value => IsFailure ? null : _value ?? throw new InvalidOperationException("Value is null despite the operation being marked as successful.");
-
-    internal Result(TValue value) : base()
-    {
-        if (value == null) throw new ArgumentNullException(nameof(value));
-        _value = value;
-    }
-
-    public Result(Error error) : base(error)
-    {
-    }
+    public T Value { get; } = value;
 }
+
+public class StreamResult(Stream stream) : SuccessResult<Stream>(HttpStatusCode.OK, stream) { }
+
+public class OkResult(object value = null) : SuccessResult<object>(HttpStatusCode.OK, value) { }
+public sealed class AcceptedResultArgs
+{
+    public string Location { get; set; }
+    public object Body { get; set; }
+}
+
+public class AcceptedResult(AcceptedResultArgs value = null)
+    : SuccessResult<AcceptedResultArgs>(HttpStatusCode.Accepted, value ?? new())
+{ }
+public class FileResult(FileResultArgs fileResultArgs) : SuccessResult<FileResultArgs>(HttpStatusCode.OK, fileResultArgs) { }
+
+public class ErrorResult(HttpStatusCode statusCode, Error error = null) : Result(statusCode)
+{
+    public Error Error { get; } = error;
+}
+
+public class BadRequestResult(Error error) : ErrorResult(HttpStatusCode.BadRequest, error) { }
+
+public class NotFoundResult() : ErrorResult(HttpStatusCode.NotFound) { }
+
+public record struct FileResultArgs(Stream Stream, string ContentType) { }

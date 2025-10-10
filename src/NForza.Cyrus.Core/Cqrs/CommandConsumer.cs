@@ -16,12 +16,12 @@ public abstract class CommandConsumer<T>(IMessageBus bus) : IConsumer<T>
         {
             case (Result result, IEnumerable<object> messages):
                 bus.Publish(messages);
-                context.Respond(result);
+                context.Respond((dynamic)result);
                 break;
 
             case (Result result, object message):
                 bus.Publish(message);
-                context.Respond(result);
+                context.Respond((dynamic)result);
                 break;
 
             case (object obj, IEnumerable<object> messages) when obj is not Result:

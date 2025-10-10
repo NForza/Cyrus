@@ -10,12 +10,12 @@ public class CommandResultAdapter(IMessageBus eventBus)
 {
     public IResult FromObjects(object obj)
     {
-        return Result.Success(obj).ToIResult();
+        return new OkResult(obj).ToIResult();
     }
 
     public IResult FromVoid()
     {
-        return Result.Success().ToIResult();
+        return new OkResult().ToIResult();
     }
 
     public IResult FromResult(Result result)
@@ -26,13 +26,13 @@ public class CommandResultAdapter(IMessageBus eventBus)
     public IResult FromObjectAndMessages((object Object, IEnumerable<object> Messages) commandResult)
     {
         eventBus.Publish(commandResult.Messages);
-        return Result.Success(commandResult.Object).ToIResult();
+        return new OkResult(commandResult.Object).ToIResult();
     }
 
     public IResult FromMessages(IEnumerable<object> Messages)
     {
         eventBus.Publish(Messages);
-        return Result.Success().ToIResult();
+        return new OkResult().ToIResult();
     }
 
     public IResult FromResultAndMessages((Result Result, IEnumerable<object> Messages) result)
