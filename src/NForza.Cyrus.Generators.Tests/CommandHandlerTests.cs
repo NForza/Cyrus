@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using FluentAssertions.Execution;
 using Microsoft.AspNetCore.Http;
 using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Generators.Analyzers;
@@ -74,15 +75,18 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
             .LogGeneratedSource(outputWindow.WriteLine)
             .RunAsync();
 
-        compilerOutput.Should().NotHaveErrors();
-        analyzerOutput.Should().BeEmpty();
+        using (new AssertionScope())
+        {
+            compilerOutput.Should().NotHaveErrors();
+            analyzerOutput.Should().BeEmpty();
 
-        generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().ContainSource("ServiceCollectionJsonConverterExtensions: ICyrusInitializer");
-        generatedSyntaxTrees.Should().ContainSource("CommandDispatcherExtensions");
-        generatedSyntaxTrees.Should().ContainSource("Handle(this ICommandDispatcher commandDispatcher, global::Test.CreateCustomerCommand command");
-        generatedSyntaxTrees.Should().NotContainSource("CommandHandlersRegistration");
-        generatedSyntaxTrees.Should().NotContainSource("AddTransient<global::Test.Customer>()");
+            generatedSyntaxTrees.Should().NotBeEmpty();
+            generatedSyntaxTrees.Should().ContainSource("ServiceCollectionJsonConverterExtensions: ICyrusInitializer");
+            generatedSyntaxTrees.Should().ContainSource("CommandDispatcherExtensions");
+            generatedSyntaxTrees.Should().ContainSource("Handle(this ICommandDispatcher commandDispatcher, global::Test.CreateCustomerCommand command");
+            generatedSyntaxTrees.Should().NotContainSource("CommandHandlersRegistration");
+            generatedSyntaxTrees.Should().NotContainSource("AddTransient<global::Test.Customer>()");
+        }
     }
 
     [Fact]
@@ -200,7 +204,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                     [CommandHandler(Route = ""/"")]
                     public (Result wrong_name, object Events) Handle(CreateCustomerCommand command)
                     {
-                        return (Result.Accepted(), new object());
+                        return (new AcceptedResult(), new object());
                     }
                 }
             ";
@@ -234,7 +238,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                     [CommandHandler(Route = ""/"")]
                     public (Result Result, object wrong_name) Handle(CreateCustomerCommand command)
                     {
-                        return (Result.Accepted(), new object());
+                        return (new AcceptedResult(), new object());
                     }
                 }
             ";
@@ -269,7 +273,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                     [CommandHandler(Route = ""/"")]
                     public (Result Result, IEnumerable<object> wrong_name) Handle(CreateCustomerCommand command)
                     {
-                        return (Result.Accepted(), [new object()]);
+                        return (new AcceptedResult(), [new object()]);
                     }
                 }
             ";
@@ -306,7 +310,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                     [CommandHandler(Route = ""/"")]
                     public (Result Result, IEnumerable<object> Messages) Handle(CreateCustomerCommand command, Customer customer)
                     {
-                        return (Result.Accepted(), [new object()]);
+                        return (new AcceptedResult(), [new object()]);
                     }
                 }
             ";
@@ -409,7 +413,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 namespace Test;
 
                 [Command]
-                public record struct NewTrackCommand(Guid TrackId);
+                public record NewTrackCommand(Guid TrackId);
 
                 [Event]
                 public record TrackCreatedEvent(Guid TrackId);
@@ -417,9 +421,9 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 public class NewTrackCommandHandler
                 {
                     [CommandHandler]
-                    public async Task<(IResult Result, IEnumerable<object> Messages)> Handle(NewTrackCommand command)
+                    public async Task<(Result Result, IEnumerable<object> Messages)> Handle(NewTrackCommand command)
                     {
-                        return (Results.Accepted(), [new TrackCreatedEvent(command.TrackId)]);
+                        return (new AcceptedResult(), [new TrackCreatedEvent(command.TrackId)]);
                     }
                 }
             ";
@@ -446,12 +450,12 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 using NForza.Cyrus.Abstractions;                
 
                 [Command]
-                public record struct NewTrackCommand(Guid TrackId);
+                public record NewTrackCommand(Guid TrackId);
 
                 public class NewTrackCommandHandler
                 {
                     [CommandHandler]
-                    public async Task<IResult> Handle(NewTrackCommand command) => Results.Accepted();
+                    public async Task<Result> Handle(NewTrackCommand command) => new AcceptedResult();
                 }
             ";
 
@@ -477,7 +481,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 using NForza.Cyrus.Abstractions;                
 
                 [Command]
-                public record struct NewTrackCommand(Guid TrackId);
+                public record NewTrackCommand(Guid TrackId);
 
                 public class NewTrackCommandHandler
                 {
@@ -509,7 +513,7 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
                 using NForza.Cyrus.Aggregates;
 
                 [Command]
-                public record struct NewTrackCommand([property:AggregateRootId]Guid TrackId);
+                public record NewTrackCommand([property:AggregateRootId]Guid TrackId);
 
                 [AggregateRoot]
                 public class Track

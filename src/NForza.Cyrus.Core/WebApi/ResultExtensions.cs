@@ -14,25 +14,19 @@ public static class ResultExtensions
     {
         if (result is null) throw new ArgumentNullException(nameof(result));
 
-        if (result.IsFailure)
-            return MapError(result.Error);
+        if (result is ErrorResult errorResult)
+            return MapError(errorResult.Error);
 
-        var type = result.GetType();
-        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Result<>))
+        return result switch
         {
-            var valueProp = type.GetProperty("Value");    
-            var value = valueProp!.GetValue(result);
-
-            return value switch
-            {
-                null => Results.NoContent(),
-                FileResult fileResult => Results.File(fileResult.Stream, fileResult.ContentType),
-                StreamResult fileResult => Results.Stream(fileResult.Stream),
-                AcceptedResult acceptedResult => Results.Accepted(acceptedResult.Location, acceptedResult.Value),
-                _ => Results.Ok(value)
-            };
-        }
-        return Results.NoContent();
+            null => Results.NoContent(),
+            FileResult fileResult => Results.File(fileResult.Value.Stream, fileResult.Value.ContentType),
+            StreamResult streamResult => Results.Stream(streamResult.Value),
+            AcceptedResult acceptedResult => Results.Accepted(acceptedResult.Value.Location, acceptedResult.Value.Body),
+            OkResult okResult => Results.Ok(okResult.Value),
+            BadRequestResult badRequestResult => Results.BadRequest(badRequestResult.Error),
+            Result someResult => Results.StatusCode((int)someResult.StatusCode),
+        };
     }
 
     private static IResult MapError(Error error)

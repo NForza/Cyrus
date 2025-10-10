@@ -10,7 +10,7 @@ public static class QueryResultAdapter
     {
         if (obj == null)
         {
-            return Result.Failure(ErrorFactory<Result>.NotFound<T>()).ToIResult();
+            return new NotFoundResult().ToIResult();
         }
         if (obj is Result result)
         {
@@ -18,13 +18,13 @@ public static class QueryResultAdapter
         }
         if (obj is Stream stream)
         {
-            return Result.Stream(stream).ToIResult();
+            return new StreamResult(stream).ToIResult();
         }
         if (obj is (Stream, string))
         {
             (Stream file, string contentType) = ((Stream, string))obj;
-            return Result.File(file, contentType).ToIResult();
+            return new FileResult(new() { Stream = file, ContentType = contentType }).ToIResult();
         }
-        return Result.Success(obj).ToIResult();
+        return new OkResult(obj).ToIResult();
     }
 }

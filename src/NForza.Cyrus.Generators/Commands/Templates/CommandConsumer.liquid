@@ -1,0 +1,14 @@
+﻿using MassTransit;
+using NForza.Cyrus.Cqrs;
+using System.Threading.Tasks;
+{% if Namespace != "" %}
+namespace {{ Namespace }};
+{%- endif %}
+
+public class {{ Command }}Consumer(ICommandDispatcher commandDispatcher, IMessageBus bus) : CommandConsumer<{{ Command }}>(bus)
+{
+    public override async Task Consume(ConsumeContext<{{ Command }}> context) => 
+    {%- if HasResult == true %} HandleCommandResult(context, await commandDispatcher.Handle(context.Message));
+    {%- else %} await commandDispatcher.Handle(context.Message); 
+    {%- endif %}
+}

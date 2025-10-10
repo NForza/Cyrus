@@ -1,14 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using Microsoft.CodeAnalysis;
-using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
-namespace NForza.Cyrus.Generators.Events.MassTransit;
+namespace NForza.Cyrus.Generators.Events;
 
-public class MassTransitConsumerGenerator : CyrusGeneratorBase
+public class EventConsumerGenerator : CyrusGeneratorBase
 {
     public override void GenerateSource(SourceProductionContext spc, CyrusGenerationContext cyrusGenerationContext)
     {
@@ -22,7 +19,6 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase
 
     private string GenerateEventConsumer(IMethodSymbol eventHandler, LiquidEngine liquidEngine)
     {
-        StringBuilder source = new();
         var model = new
         {
             Name = eventHandler.Parameters[0].Type.Name,
@@ -30,7 +26,7 @@ public class MassTransitConsumerGenerator : CyrusGeneratorBase
             InvocationLambda = eventHandler.GetEventLambda("services") 
         };
 
-        var resolvedSource = liquidEngine.Render(model, "EventConsumers");
+        var resolvedSource = liquidEngine.Render(model, "EventConsumer");
 
         return resolvedSource;
     }

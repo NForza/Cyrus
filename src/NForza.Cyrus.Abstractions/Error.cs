@@ -116,9 +116,6 @@ public sealed class Error
         }
     }
 
-    public Result ToResult() => Result.Failure(this);
-    public Result<TValue> ToResult<TValue>() where TValue : class => Result.Failure<TValue>(this);
-
     public static Error Create(string message, ErrorType errorType = ErrorType.Invalid)
     {
         if (string.IsNullOrWhiteSpace(message))

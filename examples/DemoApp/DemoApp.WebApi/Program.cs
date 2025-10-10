@@ -11,6 +11,11 @@ using Microsoft.EntityFrameworkCore;
 using NForza.Cyrus.Cqrs;
 using DemoApp.Contracts.Customers;
 using DemoApp.Contracts;
+using NForza.Cyrus.Abstractions;
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +23,7 @@ builder.Logging.SetMinimumLevel(LogLevel.Debug).AddConsole();
 
 builder.Services.AddMassTransit(cfg =>
 {
-    cfg.AddConsumers(Assembly.GetExecutingAssembly());
+    cfg.AddConsumers(Assembly.GetExecutingAssembly(), typeof(DemoApp.Domain.CyrusConfiguration).Assembly);
     cfg.SetSnakeCaseEndpointNameFormatter();
     cfg.UsingRabbitMq((ctx, cfg) =>
     {
@@ -55,8 +60,6 @@ var app = builder.Build();
 app.UseCors("AllowAngularApp");
 
 ILogger logger = app.Services.GetRequiredService<ILogger<Program>>();
-IBus bus = app.Services.GetRequiredService<IBus>();
-bus.Publish(new AddCustomerCommand(new CustomerId(), new Name("Thomas"), new Address(new Street("TestStreet"), new StreetNumber(1)), CustomerType.Private));
 
 app.MapCyrus(logger).MapAsyncApi();
 
