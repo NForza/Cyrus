@@ -4,7 +4,9 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<CompilerGeneratedFilesOutputPath>./obj/Debug/generated</CompilerGeneratedFilesOutputPath>
+	</PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="NForza.Cyrus" Version="1.0.311" />

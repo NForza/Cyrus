@@ -1,3 +1,4 @@
+using MassTransit;
 using NForza.Cyrus;
 using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.WebApi;
@@ -5,6 +6,14 @@ using NForza.Cyrus.WebApi;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCyrus();
+
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingInMemory((context, cfg) =>
+    {
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 var app = builder.Build();
 
