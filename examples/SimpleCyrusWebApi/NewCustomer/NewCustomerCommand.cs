@@ -3,7 +3,7 @@
 namespace SimpleCyrusWebApi.NewCustomer;
 
 [Command]
-public record struct NewCustomerCommand
+public class NewCustomerCommand
 {
     public CustomerId Id { get; set; }
     public Name Name { get; set; }

@@ -9,12 +9,12 @@ public class UpdateTrackCommandHandler
     {
         if (track == null)
         {
-            return Result.NotFound<Track>($"Track with Id {command.TrackId} not found.");
+            return new NotFoundResult(); // $"Track with Id {command.TrackId} not found.");
         }
         track.Artist = command.Artist;
         track.Title = command.Title;
         track.FileName = command.FileName;
         track.AudioFormat = command.AudioFormat;
-        return Result.Accepted();
+        return new AcceptedResult();
     }
 }
