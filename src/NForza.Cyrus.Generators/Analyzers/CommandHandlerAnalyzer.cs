@@ -29,7 +29,7 @@ internal class CommandHandlerAnalyzer : CyrusAnalyzerBase
             return;
         }
 
-        var commandParam = methodSymbol.Parameters[0].Type;
+        ITypeSymbol commandParam = methodSymbol.Parameters[0].Type;
         var hasCommandAttr = commandParam.GetAttributes()
             .Any(attr => attr.AttributeClass?.Name == "CommandAttribute"
                       || attr.AttributeClass?.ToDisplayString() == "NForza.Cyrus.Abstractions");

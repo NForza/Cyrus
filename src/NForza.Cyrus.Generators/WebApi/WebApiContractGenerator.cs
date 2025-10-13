@@ -34,41 +34,45 @@ public static class WebApiContractGenerator
 
     public static void GenerateContract(INamedTypeSymbol contract, IEnumerable<string> propertiesFromRoute, SourceProductionContext sourceProductionContext, LiquidEngine liquidEngine)
     {
-        if (contract.IsRecordType())
+        var constructorArguments = contract.GetConstructorArguments();
+        var constructorArgumentNames = constructorArguments.Select(p => p.Name).ToList();
+        var publicProperties = contract.GetPublicProperties().Select(p =>
+            new
+            {
+                p.Name,
+                Internal = propertiesFromRoute.Contains(p.Name),
+                Type = p.Type.ToFullName(),
+                IsNullable = p.Type.IsNullable(),
+                UseExclamation = UseNullForgivingOperator(p.Type),
+                DefaultValue = p.GetDefaultValue(),
+                Namespace = p.Type.ContainingNamespace.GetNameOrEmpty()
+            })
+            .ToList();
+        var model = new
         {
-            var constructorArguments = contract.GetConstructorArguments();
-            var constructorArgumentNames = constructorArguments.Select(p => p.Name).ToList();
-            var publicProperties = contract.GetPublicProperties().Select(p =>
+            Namespace = contract.ContainingNamespace.GetNameOrEmpty(),
+            contract.Name,
+            FullName = contract.ToFullName(),
+            ConstructorArguments = constructorArguments.Select(p =>
                 new
                 {
                     p.Name,
-                    Internal = propertiesFromRoute.Contains(p.Name),
                     Type = p.Type.ToFullName(),
                     IsNullable = p.Type.IsNullable(),
-                    UseExclamation = p.Type.IsValueType && !p.Type.IsNullable(),
-                    DefaultValue = p.GetDefaultValue(),
-                })
-                .ToList();
-            var model = new
-            {
-                Namespace = contract.ContainingNamespace.GetNameOrEmpty(),
-                contract.Name,
-                FullName = contract.ToFullName(),
-                ConstructorArguments = constructorArguments.Select(p =>
-                    new
-                    {
-                        p.Name,
-                        Type = p.Type.ToFullName(),
-                        IsNullable = p.Type.IsNullable(),
-                        UseExclamation = !p.Type.IsValueType && !p.Type.IsNullable(),
-                    }).ToList(),
-                Properties = publicProperties,
-                ConstructorProperties = publicProperties.Where(p => !constructorArgumentNames.Contains(p.Name)).ToList()
-            };
+                    UseExclamation = UseNullForgivingOperator(p.Type),
+                }).ToList(),
+            Properties = publicProperties,
+            ConstructorProperties = publicProperties.Where(p => constructorArgumentNames.Contains(p.Name)).ToList(),
+            Namespaces = publicProperties.Select(p => p.Namespace).Where(ns => ns.Length > 0).Distinct()
+        };
 
-            var fileContents = liquidEngine.Render(model, "WebApiContract");
+        var fileContents = liquidEngine.Render(model, "WebApiContract");
 
-            sourceProductionContext.AddSource($"{contract.Name}Contract.g.cs", fileContents);
-        }
+        sourceProductionContext.AddSource($"{contract.Name}Contract.g.cs", fileContents);
+    }
+
+    private static bool UseNullForgivingOperator(ITypeSymbol p)
+    {
+        return p.IsReferenceType || p.SpecialType == SpecialType.System_String;
     }
 }
