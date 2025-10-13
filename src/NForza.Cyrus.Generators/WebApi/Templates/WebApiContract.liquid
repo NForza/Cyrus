@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+{%- for ns in Namespaces %}
+using {{ ns }};
+{% endfor -%}
 
 {% if Namespace != "" -%}
 namespace {{ Namespace }};

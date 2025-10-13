@@ -11,7 +11,7 @@ using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators;
 
-public abstract class CyrusSourceGeneratorBase : IncrementalGeneratorBase
+public abstract class CyrusSourceGeneratorBase 
 {
     protected IncrementalValueProvider<GenerationConfig> ConfigProvider(IncrementalGeneratorInitializationContext context)
     {

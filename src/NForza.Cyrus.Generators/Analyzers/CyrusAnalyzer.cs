@@ -52,9 +52,6 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
 
     private void AnalyzeMethodSymbol(SymbolAnalysisContext context)
     {
-#if DEBUG_ANALYZER
-        Debugger.Launch();
-#endif
         var methodSymbol = (IMethodSymbol)context.Symbol;
         try
         {

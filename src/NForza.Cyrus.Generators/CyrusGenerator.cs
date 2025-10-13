@@ -27,8 +27,6 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
 {
     public override void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        DebugThisGenerator(true);
-
         var isTestProjectProvider = context.CodeGenerationSuppressed();
 
         var templateOverrides = GetTemplateOverridesProvider(context);

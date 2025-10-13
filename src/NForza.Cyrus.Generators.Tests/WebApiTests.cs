@@ -151,7 +151,6 @@ public class WebApiTests(ITestOutputHelper outputWindow)
         generatedSyntaxTrees.Should().ContainMatch("*val!*");
     }
 
-
     [Fact]
     public async Task Generating_Command_With_Property_In_Route_The_Contract_Should_Have_That_Property_As_Internal()
     {
