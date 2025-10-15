@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>12</LangVersion>
+    <LangVersion>14</LangVersion>
     <Configurations>Debug;Release;DebugGenerator</Configurations>
     <IsPackable>true</IsPackable>
     <Title>Opiniated source generation framework for CQRS webapps</Title>

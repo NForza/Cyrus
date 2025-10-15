@@ -11,6 +11,6 @@ public class DeleteCustomerCommandHandler
     public (Result Result, object Messages) Execute(DeleteCustomerCommand command)
     {
         Console.WriteLine($"Customer deleted: {command.Id}");
-        return (new AcceptedResult(), new CustomerDeletedEvent(command.Id));
+        return (Result.Accepted(), new CustomerDeletedEvent(command.Id));
     }
 }

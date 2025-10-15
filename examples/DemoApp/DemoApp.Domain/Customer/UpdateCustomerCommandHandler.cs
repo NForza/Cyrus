@@ -10,6 +10,6 @@ public class UpdateCustomerCommandHandler
     public static (Result Result, object Messages) Execute(UpdateCustomerCommand command, Customer customer)
     {
         Console.WriteLine($"Customer updated: {command.Id}, {command.Name}, {command.Address}");
-        return (new AcceptedResult(new() { Location = "/customers/" + command.Id }), new CustomerUpdatedEvent(command.Id));
+        return (Result.Accepted("/customers/" + command.Id), new CustomerUpdatedEvent(command.Id));
     }
 }

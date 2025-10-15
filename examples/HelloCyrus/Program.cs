@@ -1,3 +1,4 @@
+using MassTransit;
 using NForza.Cyrus;
 using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.WebApi;
@@ -6,6 +7,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCyrus();
 
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingInMemory((context, cfg) =>
+    {
+        cfg.ConfigureEndpoints(context);
+    });
+});
+
 var app = builder.Build();
 
 app.MapCyrus();
@@ -13,7 +22,7 @@ app.MapCyrus();
 await app.RunAsync();
 
 [Command]
-public partial record struct HelloCommand;
+public class HelloCommand;
 
 public static class HelloCommandHandler
 {
@@ -25,7 +34,7 @@ public static class HelloCommandHandler
 }
 
 [Query]
-public partial record struct AreYouOkQuery;
+public record struct AreYouOkQuery;
 
 public static class AreYouOkQueryHandler
 {

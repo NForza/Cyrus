@@ -54,7 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\NForza.Cyrus.TypeScriptGenerator\bin\$(Configuration)\net9.0\publish\**\*.*" Pack="true" PackagePath="tools/net9.0/typescript-generator/" Visible="false" PrivateAssets="all" CopyToOutputDirectory="Never" />
+    <None Include="..\NForza.Cyrus.TypeScriptGenerator\bin\$(Configuration)\net10.0\publish\**\*.*" Pack="true" PackagePath="tools/net10.0/typescript-generator/" Visible="false" PrivateAssets="all" CopyToOutputDirectory="Never" />
   </ItemGroup> 
 
 </Project>

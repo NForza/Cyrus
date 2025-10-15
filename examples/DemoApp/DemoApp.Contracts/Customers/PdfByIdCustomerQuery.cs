@@ -4,5 +4,5 @@ using NForza.Cyrus.Abstractions;
 namespace DemoApp.Domain.Customer
 {
     [Query]
-    public record struct CustomerTemplateQuery(string terms);
+    public record CustomerTemplateQuery(string terms);
 }

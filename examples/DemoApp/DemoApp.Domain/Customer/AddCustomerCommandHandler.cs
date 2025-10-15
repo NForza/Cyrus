@@ -15,6 +15,6 @@ public class AddCustomerCommandHandler
         CustomerId id = new CustomerId();
         Console.WriteLine($"Customer created: {id} {command.Name}, {command.Address}");
 
-        return (new AcceptedResult(new() { Location = "/customers/" + id }), [new CustomerAddedEvent(id, command.Name, command.Address)]);
+        return (Result.Accepted("/customers/" + id), [new CustomerAddedEvent(id, command.Name, command.Address)]);
     }
 }

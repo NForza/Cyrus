@@ -32,8 +32,9 @@ public class ErrorResult(HttpStatusCode statusCode, Error error = null) : Result
     public Error Error { get; } = error;
 }
 
-public class BadRequestResult(Error error) : ErrorResult(HttpStatusCode.BadRequest, error) { }
+public class BadRequestResult(string message) : ErrorResult(HttpStatusCode.BadRequest, Error.Create(message)) { }
 
 public class NotFoundResult() : ErrorResult(HttpStatusCode.NotFound) { }
+public class ConflictResult(string message) : ErrorResult(HttpStatusCode.Conflict, Error.Create(message, ErrorType.Conflict)) { }
 
 public record struct FileResultArgs(Stream Stream, string ContentType) { }

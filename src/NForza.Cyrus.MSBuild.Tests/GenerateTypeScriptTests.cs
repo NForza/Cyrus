@@ -58,7 +58,7 @@ public class GenerateTypeScriptTests(ITestOutputHelper outputWindow)
         // arrange
         var task = new GenerateTypeScript
         {
-            AssemblyPath = @"C:\dev\Cyrus\examples\DemoApp\DemoApp.WebApi\bin\Debug\net9.0\DemoApp.WebApi.dll",
+            AssemblyPath = @"C:\dev\Cyrus\examples\DemoApp\DemoApp.WebApi\bin\Debug\net10.0\DemoApp.WebApi.dll",
             OutputFolder = Path.GetTempPath(),
         };
         task.UseLogger(new XUnitLogger(outputWindow));
