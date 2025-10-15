@@ -68,12 +68,6 @@ jobs:
 
     - name: Pack the EF Persistence project
       run: dotnet pack --configuration ${CONFIGURATION} --output "./output" "./src/NForza.Cyrus.EntityFramework/NForza.Cyrus.EntityFramework.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
-
-    - name: List files
-      run: |
-        cd "./src/NForza.Cyrus.TypeScriptGenerator/bin/${CONFIGURATION}/net9.0/publish/"
-        pwd
-        ls -sla
     
     - name: Pack the MSBuild project
       run: dotnet pack --configuration ${CONFIGURATION} --output ./output "./src/NForza.Cyrus.MSBuild/NForza.Cyrus.MSBuild.csproj" /p:PackageVersion=${{ env.PACKAGE_VERSION }}
