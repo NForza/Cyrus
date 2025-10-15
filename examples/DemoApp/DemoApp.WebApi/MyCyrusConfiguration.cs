@@ -2,9 +2,9 @@
 
 namespace DemoApp.WebApi;
 
-public class MyCyrusConfiguration : CyrusConfig
+public class CyrusConfiguration : CyrusConfig
 {
-    public MyCyrusConfiguration()
+    public CyrusConfiguration()
     {
         GenerateWebApi();
         //Note: the DbContext needs to be a fully qualified name including the namespace
