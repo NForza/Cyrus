@@ -10,6 +10,7 @@ env:
   BASE_VERSION: "1.0"
   NFORZA_CYRUS_NUSPEC: ./src/NForza.Cyrus.nuspec
   CONFIGURATION: Release
+  DOTNET_VERSION: "10.0"
 
 jobs:
   publish:
@@ -36,7 +37,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '10.0'
+        dotnet-version: "${{ env.DOTNET_VERSION }}"
 
     - uses: nuget/setup-nuget@v2
       with:
@@ -71,7 +72,7 @@ jobs:
 
     - name: List files
       run: |
-        cd "./src/NForza.Cyrus.TypeScriptGenerator/bin/${CONFIGURATION}/net9.0/publish/"
+        cd "./src/NForza.Cyrus.TypeScriptGenerator/bin/${CONFIGURATION}/net${{ env.DOTNET_VERSION }}/publish/"
         pwd
         ls -sla
     
