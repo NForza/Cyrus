@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
+using System.Threading;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -143,20 +145,28 @@ public partial class GenerateTypeScript : Task
 
         try
         {
-            using var process = Process.Start(psi);
-            var output = process.StandardOutput.ReadToEnd();
-            var error = process.StandardError.ReadToEnd();
+            var stdout = new StringBuilder();
+            var stderr = new StringBuilder();
 
-            if (!process.WaitForExit(1000))
-                throw new TimeoutException("TypeScript generation timed out after 1 second.");
-
-            var succeeded = process.ExitCode == 0;
-            if (!succeeded)
+            using (var p = new Process { StartInfo = psi, EnableRaisingEvents = true })
             {
-                Logger.LogMessage(MessageImportance.High, $"TypeScript generator exited with code {process.ExitCode}.");
-            }
+                p.OutputDataReceived += (s, e) => { if (e.Data != null) stdout.AppendLine(e.Data); };
+                p.ErrorDataReceived += (s, e) => { if (e.Data != null) stderr.AppendLine(e.Data); };
 
-            return (succeeded, error.Trim(), output.Trim());
+                p.Start();
+                p.BeginOutputReadLine();
+                p.BeginErrorReadLine();
+
+                if (!p.WaitForExit(1000))
+                {
+                    try { p.Kill(); } catch { }
+                    throw new TimeoutException($"Process timed out after 1000 ms.");
+                }
+
+                p.WaitForExit();
+
+                return (p.ExitCode == 0, stderr.ToString(), stdout.ToString());
+            }
         }
         catch (Exception ex)
         {
