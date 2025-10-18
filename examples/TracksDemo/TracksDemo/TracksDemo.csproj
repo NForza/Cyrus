@@ -11,9 +11,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.9" />
-    <PackageReference Include="NForza.Cyrus" Version="1.0.311" />
-    <PackageReference Include="NForza.Cyrus.EntityFramework" Version="1.0.311" />
-    <PackageReference Include="NForza.Cyrus.MSBuild" Version="1.0.311" />
+    <PackageReference Include="NForza.Cyrus" Version="1.0.314" />
+    <PackageReference Include="NForza.Cyrus.EntityFramework" Version="1.0.314" />
+    <PackageReference Include="NForza.Cyrus.MSBuild" Version="1.0.314" />
     <InternalsVisibleTo Include="TracksDemo.Tests" />
   </ItemGroup>
 

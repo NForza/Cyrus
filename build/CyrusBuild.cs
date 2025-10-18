@@ -10,7 +10,6 @@ class CyrusBuild : NukeBuild
 
     private static string cyrusSolutionFileName = "NForza.Cyrus.sln";
     private static AbsolutePath cyrusSolutionPath = RootDirectory / cyrusSolutionFileName;
-    private static AbsolutePath examplesPath = RootDirectory / "examples";
     private static AbsolutePath massTransitExamplePath = examplesPath / "MassTransit" / "MassTransit.sln";
     private static AbsolutePath signalRExamplePath = examplesPath / "SignalR" / "CyrusSignalR" / "CyrusSignalR.sln";
     private static AbsolutePath tracksDemoExamplePath = examplesPath / "TracksDemo" / "TracksDemo.sln";

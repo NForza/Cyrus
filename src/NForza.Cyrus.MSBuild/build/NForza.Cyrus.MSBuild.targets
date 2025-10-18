@@ -4,7 +4,7 @@
   <UsingTask TaskName="Cyrus.GenerateTypeScript"
              AssemblyFile="$(MSBuildThisFileDirectory)tasks\netstandard2.0\NForza.Cyrus.MSBuild.dll" />
 
-  <Target Name="GenerateTypeScript" AfterTargets="Build">
+  <Target Name="GenerateTypeScript" AfterTargets="CopyFilesToOutputDirectory">
     <Message Importance="High" Text="Invoking Cyrus TypeScript generator... " />
     <Cyrus.GenerateTypeScript
       ToolPath="$(MSBuildThisFileDirectory)..\tools\net10.0\typescript-generator\NForza.Cyrus.TypeScriptGenerator.dll"
