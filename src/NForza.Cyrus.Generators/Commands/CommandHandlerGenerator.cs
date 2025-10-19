@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Aggregates;
-using NForza.Cyrus.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
@@ -44,16 +43,6 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                 var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
                 spc.AddSource("CommandHandlerRegistration.g.cs", fileContents);
             }
-
-            string assemblyName = commandHandlers.First().ContainingAssembly.Name;
-            var commandSymbols = commandHandlers.Select(ch => (INamedTypeSymbol)ch.Parameters[0].Type);
-
-            var commandModels = GetPartialModelClass(assemblyName, "Command", "Commands", "ModelTypeDefinition", commandSymbols.Select(cm => ModelGenerator.ForNamedType(cm, cyrusGenerationContext.LiquidEngine)), cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"model-commands.g.cs", commandModels);
-
-            var referencedTypes = commandSymbols.SelectMany(cs => cs.GetReferencedTypes());
-            var referencedTypeModels = GetPartialModelClass(assemblyName, "Command", "Models", "ModelTypeDefinition", referencedTypes.Select(cm => ModelGenerator.ForNamedType(cm, cyrusGenerationContext.LiquidEngine)), cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"model-command-types.g.cs", referencedTypeModels);
         }
     }
 

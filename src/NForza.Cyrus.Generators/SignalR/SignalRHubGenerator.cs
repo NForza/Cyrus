@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Analyzers;
 using NForza.Cyrus.Generators.Config;
-using NForza.Cyrus.Generators.Model;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 
@@ -31,12 +30,6 @@ public class SignalRHubGenerator : CyrusGeneratorBase
             {
                 var sourceText = GenerateSignalRHub(signalRModel, cyrusGenerationContext.LiquidEngine);
                 spc.AddSource($"{signalRModel.Symbol.Name}.g.cs", sourceText);
-            }
-            if (signalRHubs.Any())
-            {
-                string assemblyName = signalRHubs.First().Symbol.ContainingAssembly.Name;
-                var commandModels = GetPartialModelClass(assemblyName, "SignalR", "Hubs", "ModelHubDefinition", signalRHubs.Select(e => ModelGenerator.ForHub(e, cyrusGenerationContext.LiquidEngine)), cyrusGenerationContext.LiquidEngine);
-                spc.AddSource($"model-hubs.g.cs", commandModels);
             }
         }
     }

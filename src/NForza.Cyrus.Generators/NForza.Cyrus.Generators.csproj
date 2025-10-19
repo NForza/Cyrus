@@ -46,10 +46,6 @@
     <EmbeddedResource Include="ValueTypes\Templates\DoubleValueTypeConverter.liquid" />
     <EmbeddedResource Include="WebApi\Templates\HttpContextObjectFactoryCommand.liquid" />
     <EmbeddedResource Include="WebApi\Templates\HttpContextObjectFactoryQuery.liquid" />
-    <EmbeddedResource Include="Model\Model-query.liquid" />
-    <EmbeddedResource Include="Model\Model-hub.liquid" />
-    <EmbeddedResource Include="Model\Model-type.liquid" />
-    <EmbeddedResource Include="Model\Model-property.liquid" />
     <EmbeddedResource Include="ValueTypes\Templates\ServiceCollectionJsonConverterExtensions.liquid" />
     <EmbeddedResource Include="ValueTypes\Templates\GuidValueJsonConverter.liquid" />
     <EmbeddedResource Include="ValueTypes\Templates\IntValueJsonConverter.liquid" />
@@ -74,10 +70,10 @@
 
   <ItemGroup>
     <PackageReference Include="Costura.Fody" Version="6.0.0" PrivateAssets="All" />
-    <PackageReference Include="Fody" Version="6.9.2" PrivateAssets="all" />
+    <PackageReference Include="Fody" Version="6.9.3" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.14.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
-    <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.10" />
   </ItemGroup>
 
   <ItemGroup>
