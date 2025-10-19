@@ -22,14 +22,12 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                 spc.AddSource($"CommandDispatcher.g.cs", sourceText);
             }
 
-#pragma warning disable RS1035 // Do not use APIs banned for analyzers
-            var commandHandlerRegistrations = string.Join(Environment.NewLine,
+            var commandHandlerRegistrations = string.Join("\n",
                     cyrusGenerationContext.CommandHandlers
                         .Select(ch => ch.ContainingType)
                         .Where(x => x != null && !x.IsStatic)
                         .Distinct(SymbolEqualityComparer.Default)
                         .Select(cht => $" services.AddTransient<{cht.ToFullName()}>();"));
-#pragma warning restore RS1035 // Do not use APIs banned for analyzers
             if (!string.IsNullOrEmpty(commandHandlerRegistrations))
             {
                 var ctx = new

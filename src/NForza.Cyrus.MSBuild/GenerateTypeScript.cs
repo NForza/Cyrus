@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using Microsoft.Build.Framework;
@@ -125,48 +127,27 @@ public partial class GenerateTypeScript : Task
     }
 
     private (bool succeeded, string errors, string model) GenerateTypeScriptFromAssembly()
-    {
-        var typeScriptGeneratorPath = Path.GetFullPath(ToolPath);
-        if (!File.Exists(typeScriptGeneratorPath))
+    {                 try
         {
-            Logger.LogMessage(MessageImportance.High, $"TypeScript generator {typeScriptGeneratorPath} does not exist.");
-            return (false, "TypeScript generator not found", string.Empty);
-        }
-
-        var psi = new ProcessStartInfo
-        {
-            FileName = "dotnet",
-            Arguments = $"\"{typeScriptGeneratorPath}\" --path \"{AssemblyPath}\" --output \"{OutputFolder}\"",
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-
-        try
-        {
-            var stdout = new StringBuilder();
-            var stderr = new StringBuilder();
-
-            using (var p = new Process { StartInfo = psi, EnableRaisingEvents = true })
+            var typeScriptGeneratorPath = Path.GetFullPath(ToolPath);
+            if (!File.Exists(typeScriptGeneratorPath))
             {
-                p.OutputDataReceived += (s, e) => { if (e.Data != null) stdout.AppendLine(e.Data); };
-                p.ErrorDataReceived += (s, e) => { if (e.Data != null) stderr.AppendLine(e.Data); };
-
-                p.Start();
-                p.BeginOutputReadLine();
-                p.BeginErrorReadLine();
-
-                if (!p.WaitForExit(1000))
-                {
-                    try { p.Kill(); } catch { }
-                    throw new TimeoutException($"Process timed out after 1000 ms.");
-                }
-
-                p.WaitForExit();
-
-                return (p.ExitCode == 0, stderr.ToString(), stdout.ToString());
+                Logger.LogMessage(MessageImportance.High, $"TypeScript generator {typeScriptGeneratorPath} does not exist.");
+                return (false, "TypeScript generator not found", string.Empty);
             }
+
+            var coreDir = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
+            var coreAssemblies = Directory.GetFiles(coreDir, "*.dll");
+            string assemblyPath = Assembly.GetExecutingAssembly().Location;
+            var resolver = new PathAssemblyResolver(coreAssemblies.Append(assemblyPath));
+
+            using var mlc = new MetadataLoadContext(resolver);
+            var asm = mlc.LoadFromAssemblyPath(assemblyPath);
+
+            var ama = asm.CustomAttributes.FirstOrDefault(at => at.AttributeType.FullName == typeof(AssemblyMetadataAttribute).FullName);
+            var jsonMetadata = ama?.ConstructorArguments[1].Value.ToString().DecompressFromBase64() ?? "";
+
+            return (true, "", jsonMetadata);
         }
         catch (Exception ex)
         {
