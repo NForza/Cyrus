@@ -146,6 +146,7 @@ public partial class GenerateTypeScript : Task
 
             var ama = asm.CustomAttributes.FirstOrDefault(at => at.AttributeType.FullName == typeof(AssemblyMetadataAttribute).FullName);
             var jsonMetadata = ama?.ConstructorArguments[1].Value.ToString().DecompressFromBase64() ?? "";
+            Logger.LogMessage(MessageImportance.High, $"Model JSON: {jsonMetadata}");
 
             return (true, "", jsonMetadata);
         }

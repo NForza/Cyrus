@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NForza.Cyrus.Generators" Version="1.0.314" />
-    <PackageReference Include="NForza.Cyrus.Abstractions" Version="1.0.314" />
+    <PackageReference Include="NForza.Cyrus.Generators" Version="1.0.319-beta-20251019-191940" />
+    <PackageReference Include="NForza.Cyrus.Abstractions" Version="1.0.319-beta-20251019-191940" />
   </ItemGroup>
 
 </Project>
