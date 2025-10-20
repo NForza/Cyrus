@@ -9,7 +9,7 @@
 	</PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NForza.Cyrus" Version="1.0.321-beta-20251020-081334" />
+    <PackageReference Include="NForza.Cyrus" Version="1.0.322-beta-20251020-083044" />
   </ItemGroup>
 
 </Project>

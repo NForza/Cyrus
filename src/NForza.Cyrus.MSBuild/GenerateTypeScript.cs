@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -31,91 +30,40 @@ public partial class GenerateTypeScript : Task
 
     public override bool Execute()
     {
+        Logger.LogMessage(MessageImportance.Normal, "Verifying input parameters");
         if (string.IsNullOrEmpty(OutputFolder))
         {
             Logger.LogMessage(MessageImportance.Normal, "OutputFolder for TypeScript Generation is not specified. Skipping.");
             return true;
         }
-
+        var typeScriptGeneratorPath = Path.GetFullPath(ToolPath);
+        if (!File.Exists(typeScriptGeneratorPath))
+        {
+            Logger.LogMessage(MessageImportance.High, $"TypeScript generator {typeScriptGeneratorPath} does not exist.");
+            return true;
+        }
+        if (!File.Exists(AssemblyPath))
+        {
+            Logger.LogMessage(MessageImportance.High, $"Assembly file {AssemblyPath} does not exist.");
+            return false;
+        }
         Logger.LogMessage(MessageImportance.High, "Starting TypeScript generation...");
 
         try
         {
-            Logger.LogMessage(MessageImportance.Normal, "Verifying input parameters");
-
-            //if (!string.IsNullOrEmpty(AssemblyPath))
-            //{
-            Logger.LogMessage(MessageImportance.Normal, $"Verifying assembly at {AssemblyPath}");
-            if (!File.Exists(AssemblyPath))
+            var prepareSucceeded = PrepareOutputDirectory();
+            if (!prepareSucceeded)
             {
-                Logger.LogMessage(MessageImportance.High, $"Assembly file {AssemblyPath} does not exist.");
                 return false;
             }
-            //}
-            //else
-            //{
-            //    Logger.LogMessage(MessageImportance.Normal, $"No AssemblyPath specified, checking ModelFile");
-            //    ModelFile = Path.GetFullPath(ModelFile);
-            //    if (ModelFile is null || !File.Exists(ModelFile))
-            //    {
-            //        Logger.LogMessage(MessageImportance.High, $"Input file {ModelFile} does not exist.");
-            //        return false;
-            //    }
-            //    Logger.LogMessage(MessageImportance.Normal, $"ModelFile {ModelFile} found.");
-            //    modelStream = File.OpenRead(ModelFile);
-            //}
-            if (!Directory.Exists(OutputFolder))
-            {
-                Logger.LogMessage(MessageImportance.High, $"Output folder {OutputFolder} does not exist. Trying to create now");
-                try
-                {
-                    DirectoryInfo folder = Directory.CreateDirectory(OutputFolder);
-                    Logger.LogMessage(MessageImportance.Normal, $"Output folder {OutputFolder} created.");
-                }
-                catch
-                {
-                    Logger.LogMessage(MessageImportance.High, $"Output folder {OutputFolder} could not be created.");
-                    return false;
-                }
-            }
-            else
-            {
-                if (CleanOutputFolder)
-                {
-                    Logger.LogMessage(MessageImportance.Normal, $"Cleaning output folder {OutputFolder}.");
-                    try
-                    {
-                        Directory.Delete(OutputFolder, true);
-                        Directory.CreateDirectory(OutputFolder);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.LogMessage(MessageImportance.High, $"Output folder {OutputFolder} could not be cleaned. {ex.Message}");
-                        return false;
-                    }
-                }
-                else
-                {
-                    Logger.LogMessage(MessageImportance.Normal, $"Output folder {OutputFolder} already exists and skipping cleanup.");
-                }
-            }
-            (bool succeeded, string errors, string model) = GenerateTypeScriptFromAssembly();
+
+            (bool succeeded, string errors, string model) = GetModelJsonFromAssembly();
             if (!succeeded)
             {
                 Logger.LogMessage(MessageImportance.High, $"Failed to generate model from assembly {AssemblyPath}.");
                 Logger.LogMessage(MessageImportance.High, errors);
                 return false;
             }
-            //if (modelStream != null)
-            //{
-            //    return TypeScriptGenerator.Generate(modelStream, OutputFolder, Logger);
-            //}
-            //else
-            //{
-            //    Logger.LogMessage(MessageImportance.High, $"Unknown Stream.");
-            //    return false;
-            //}
-
             Logger.LogMessage(MessageImportance.Normal, $"TypeScript generation succeeded. Output: {model}");
             return true;
         }
@@ -126,32 +74,54 @@ public partial class GenerateTypeScript : Task
         }
     }
 
-    private (bool succeeded, string errors, string model) GenerateTypeScriptFromAssembly()
+    private bool PrepareOutputDirectory()
+    {
+        if (!Directory.Exists(OutputFolder))
+        {
+            Logger.LogMessage(MessageImportance.High, $"Output folder {OutputFolder} does not exist. Trying to create now");
+            try
+            {
+                DirectoryInfo folder = Directory.CreateDirectory(OutputFolder);
+                Logger.LogMessage(MessageImportance.Normal, $"Output folder {OutputFolder} created.");
+            }
+            catch
+            {
+                Logger.LogMessage(MessageImportance.High, $"Output folder {OutputFolder} could not be created.");
+                return false;
+            }
+        }
+        else
+        {
+            if (CleanOutputFolder)
+            {
+                Logger.LogMessage(MessageImportance.Normal, $"Cleaning output folder {OutputFolder}.");
+                try
+                {
+                    Directory.Delete(OutputFolder, true);
+                    Directory.CreateDirectory(OutputFolder);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogMessage(MessageImportance.High, $"Output folder {OutputFolder} could not be cleaned. {ex.Message}");
+                    return false;
+                }
+            }
+            else
+            {
+                Logger.LogMessage(MessageImportance.Normal, $"Output folder {OutputFolder} already exists and skipping cleanup.");
+            }
+        }
+
+        return true;
+    }
+
+    private (bool succeeded, string errors, string model) GetModelJsonFromAssembly()
     {
         try
         {
-            var typeScriptGeneratorPath = Path.GetFullPath(ToolPath);
-            if (!File.Exists(typeScriptGeneratorPath))
-            {
-                Logger.LogMessage(MessageImportance.High, $"TypeScript generator {typeScriptGeneratorPath} does not exist.");
-                return (false, "TypeScript generator not found", string.Empty);
-            }
-
-            var coreDir = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
-            var coreAssemblies = Directory.GetFiles(coreDir, "*.dll");
-            string assemblyPath = AssemblyPath;
-            Logger.LogMessage(MessageImportance.High, $"Loading Assembly: {assemblyPath}");
-
-            var resolver = new PathAssemblyResolver(coreAssemblies.Append(assemblyPath));
-
-            using var mlc = new MetadataLoadContext(resolver);
-            var asm = mlc.LoadFromAssemblyPath(assemblyPath);
-            Logger.LogMessage(MessageImportance.High, $"Loaded Assembly: {asm.Location}");
-
-            var ama = asm.CustomAttributes.FirstOrDefault(at => at.AttributeType.FullName == typeof(AssemblyMetadataAttribute).FullName);
-            var key = ama == null ? "Not Found" : ama.ConstructorArguments[0].Value.ToString();
-            Logger.LogMessage(MessageImportance.High, $"AssemblyMetadata: {key}");
-            var jsonMetadata = ama?.ConstructorArguments[1].Value.ToString().DecompressFromBase64() ?? "";
+            var jsonMetadata = ReadAssemblyMetadata(AssemblyPath, "cyrus-model")
+                .Select(kv => kv.Value)
+                .FirstOrDefault();
             Logger.LogMessage(MessageImportance.High, $"Model JSON: {jsonMetadata}");
 
             return (true, "", jsonMetadata);
@@ -162,4 +132,69 @@ public partial class GenerateTypeScript : Task
             return (false, ex.Message, string.Empty);
         }
     }
+
+    static IReadOnlyList<(string Key, string Value)> ReadAssemblyMetadata(string assemblyPath, string keyValue)
+    {
+        using var fs = File.OpenRead(assemblyPath);
+        using var pe = new PEReader(fs);
+        var md = pe.GetMetadataReader();
+
+        var asm = md.GetAssemblyDefinition();
+        var result = new List<(string, string)>();
+
+        foreach (var caHandle in asm.GetCustomAttributes())
+        {
+            var ca = md.GetCustomAttribute(caHandle);
+
+            // Get attribute type full name without resolving anything
+            string attrFullName = GetAttributeTypeFullName(md, ca);
+            if (attrFullName != "System.Reflection.AssemblyMetadataAttribute")
+            {
+                continue;
+            }
+
+            // Decode the blob: prolog (0x0001) + SerString key + SerString value
+            var br = md.GetBlobReader(ca.Value);
+            ushort prolog = br.ReadUInt16(); // must be 0x0001
+            if (prolog != 0x0001) continue;
+
+            string key = br.ReadSerializedString();
+            string value = br.ReadSerializedString();
+
+            if (key == keyValue)
+            {
+                result.Add((key, value));
+            }
+        }
+
+        return result;
+
+        static string GetAttributeTypeFullName(MetadataReader md, CustomAttribute ca)
+        {
+            var ctor = ca.Constructor;
+            EntityHandle typeHandle = ctor.Kind switch
+            {
+                HandleKind.MemberReference => md.GetMemberReference((MemberReferenceHandle)ctor).Parent,
+                HandleKind.MethodDefinition => md.GetMethodDefinition((MethodDefinitionHandle)ctor).GetDeclaringType(),
+                _ => default
+            };
+
+            if (typeHandle.Kind == HandleKind.TypeReference)
+            {
+                var tr = md.GetTypeReference((TypeReferenceHandle)typeHandle);
+                var ns = md.GetString(tr.Namespace);
+                var name = md.GetString(tr.Name);
+                return string.IsNullOrEmpty(ns) ? name : $"{ns}.{name}";
+            }
+            else if (typeHandle.Kind == HandleKind.TypeDefinition)
+            {
+                var td = md.GetTypeDefinition((TypeDefinitionHandle)typeHandle);
+                var ns = md.GetString(td.Namespace);
+                var name = md.GetString(td.Name);
+                return string.IsNullOrEmpty(ns) ? name : $"{ns}.{name}";
+            }
+            return "";
+        }
+    }
+
 }
