@@ -1,20 +1,24 @@
-﻿using System.Text.Json;
+﻿using System.Linq;
+using System.Text.Json;
 using Cyrus;
 using Microsoft.CodeAnalysis;
+using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Generators.Model;
 
 public class ModelGenerator : CyrusGeneratorBase
 {
-    override public void GenerateSource(SourceProductionContext context, CyrusGenerationContext cyrusGenerationContext)
+    public static JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = false };
+
+    public override void GenerateSource(SourceProductionContext context, CyrusGenerationContext cyrusGenerationContext)
     {
+        var commands = cyrusGenerationContext.Commands.Select(c => new { c.Name, Properties = c.GetPublicProperties().Select(p => new { p.Name }) });
+
         var model = new
         {
-            Id = 1,
-            Name = "Cyrus Model"
+            Commands = commands
         };
-
-        var modelJson = JsonSerializer.Serialize(model);
+        var modelJson = JsonSerializer.Serialize(model, options);
         var modelAttribute = new
         {
             Key = "cyrus-model",

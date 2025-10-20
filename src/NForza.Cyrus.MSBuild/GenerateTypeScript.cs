@@ -139,12 +139,17 @@ public partial class GenerateTypeScript : Task
             var coreDir = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
             var coreAssemblies = Directory.GetFiles(coreDir, "*.dll");
             string assemblyPath = Assembly.GetExecutingAssembly().Location;
+            Logger.LogMessage(MessageImportance.High, $"Loading Assembly: {assemblyPath}");
+
             var resolver = new PathAssemblyResolver(coreAssemblies.Append(assemblyPath));
 
             using var mlc = new MetadataLoadContext(resolver);
             var asm = mlc.LoadFromAssemblyPath(assemblyPath);
+            Logger.LogMessage(MessageImportance.High, $"Loaded Assembly: {asm.Location}");
 
             var ama = asm.CustomAttributes.FirstOrDefault(at => at.AttributeType.FullName == typeof(AssemblyMetadataAttribute).FullName);
+            var key = ama == null ? "Not Found" : ama.ConstructorArguments[0].Value.ToString();
+            Logger.LogMessage(MessageImportance.High, $"AssemblyMetadata: {key}");
             var jsonMetadata = ama?.ConstructorArguments[1].Value.ToString().DecompressFromBase64() ?? "";
             Logger.LogMessage(MessageImportance.High, $"Model JSON: {jsonMetadata}");
 

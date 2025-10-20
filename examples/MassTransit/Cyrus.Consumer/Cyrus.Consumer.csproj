@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.4" />
-    <PackageReference Include="NForza.Cyrus" Version="1.0.319-beta-20251019-191940" />
+    <PackageReference Include="NForza.Cyrus" Version="1.0.320-beta-20251020-074309" />
   </ItemGroup>
 
   <ItemGroup>
