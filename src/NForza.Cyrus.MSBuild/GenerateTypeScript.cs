@@ -45,12 +45,12 @@ public partial class GenerateTypeScript : Task
 
             //if (!string.IsNullOrEmpty(AssemblyPath))
             //{
-                Logger.LogMessage(MessageImportance.Normal, $"Verifying assembly at {AssemblyPath}");
-                if (!File.Exists(AssemblyPath))
-                {
-                    Logger.LogMessage(MessageImportance.High, $"Assembly file {AssemblyPath} does not exist.");
-                    return false;
-                }
+            Logger.LogMessage(MessageImportance.Normal, $"Verifying assembly at {AssemblyPath}");
+            if (!File.Exists(AssemblyPath))
+            {
+                Logger.LogMessage(MessageImportance.High, $"Assembly file {AssemblyPath} does not exist.");
+                return false;
+            }
             //}
             //else
             //{
@@ -127,7 +127,8 @@ public partial class GenerateTypeScript : Task
     }
 
     private (bool succeeded, string errors, string model) GenerateTypeScriptFromAssembly()
-    {                 try
+    {
+        try
         {
             var typeScriptGeneratorPath = Path.GetFullPath(ToolPath);
             if (!File.Exists(typeScriptGeneratorPath))
@@ -138,7 +139,7 @@ public partial class GenerateTypeScript : Task
 
             var coreDir = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
             var coreAssemblies = Directory.GetFiles(coreDir, "*.dll");
-            string assemblyPath = Assembly.GetExecutingAssembly().Location;
+            string assemblyPath = AssemblyPath;
             Logger.LogMessage(MessageImportance.High, $"Loading Assembly: {assemblyPath}");
 
             var resolver = new PathAssemblyResolver(coreAssemblies.Append(assemblyPath));
