@@ -10,6 +10,13 @@ internal static class ITypeSymbolExtensions
 {
     private static string[] enumerableTypes = ["System.Collections.Generic.IEnumerable<T>", "System.Collections.Generic.List<T>"];
 
+    public static string[] Values(this ITypeSymbol namedType)
+    {
+        return namedType.TypeKind == TypeKind.Enum ? namedType.GetMembers()
+                .OfType<IFieldSymbol>()
+                .Where(f => f.HasConstantValue)
+                .Select(f => f.Name).ToArray() : [];
+    }
     public static (bool IsMatch, ITypeSymbol? ElementType) IsCollection(this ITypeSymbol typeSymbol)
     {
         if (typeSymbol is IArrayTypeSymbol arrayTypeSymbol)

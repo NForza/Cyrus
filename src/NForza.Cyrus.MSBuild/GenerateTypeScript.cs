@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Reflection.PortableExecutable;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -57,7 +53,7 @@ public partial class GenerateTypeScript : Task
                 return false;
             }
 
-            (bool succeeded, string errors, string model) = GetModelJsonFromAssembly();
+            (bool succeeded, string errors, string model) = (true, string.Empty, string.Empty);
             if (!succeeded)
             {
                 Logger.LogMessage(MessageImportance.High, $"Failed to generate model from assembly {AssemblyPath}.");
@@ -114,87 +110,5 @@ public partial class GenerateTypeScript : Task
 
         return true;
     }
-
-    private (bool succeeded, string errors, string model) GetModelJsonFromAssembly()
-    {
-        try
-        {
-            var jsonMetadata = ReadAssemblyMetadata(AssemblyPath, "cyrus-model")
-                .Select(kv => kv.Value)
-                .FirstOrDefault();
-            Logger.LogMessage(MessageImportance.High, $"Model JSON: {jsonMetadata}");
-
-            return (true, "", jsonMetadata);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogMessage(MessageImportance.High, $"Failed to run TypeScript generator: {ex.Message}");
-            return (false, ex.Message, string.Empty);
-        }
-    }
-
-    static IReadOnlyList<(string Key, string Value)> ReadAssemblyMetadata(string assemblyPath, string keyValue)
-    {
-        using var fs = File.OpenRead(assemblyPath);
-        using var pe = new PEReader(fs);
-        var md = pe.GetMetadataReader();
-
-        var asm = md.GetAssemblyDefinition();
-        var result = new List<(string, string)>();
-
-        foreach (var caHandle in asm.GetCustomAttributes())
-        {
-            var ca = md.GetCustomAttribute(caHandle);
-
-            // Get attribute type full name without resolving anything
-            string attrFullName = GetAttributeTypeFullName(md, ca);
-            if (attrFullName != "System.Reflection.AssemblyMetadataAttribute")
-            {
-                continue;
-            }
-
-            // Decode the blob: prolog (0x0001) + SerString key + SerString value
-            var br = md.GetBlobReader(ca.Value);
-            ushort prolog = br.ReadUInt16(); // must be 0x0001
-            if (prolog != 0x0001) continue;
-
-            string key = br.ReadSerializedString();
-            string value = br.ReadSerializedString();
-
-            if (key == keyValue)
-            {
-                result.Add((key, value));
-            }
-        }
-
-        return result;
-
-        static string GetAttributeTypeFullName(MetadataReader md, CustomAttribute ca)
-        {
-            var ctor = ca.Constructor;
-            EntityHandle typeHandle = ctor.Kind switch
-            {
-                HandleKind.MemberReference => md.GetMemberReference((MemberReferenceHandle)ctor).Parent,
-                HandleKind.MethodDefinition => md.GetMethodDefinition((MethodDefinitionHandle)ctor).GetDeclaringType(),
-                _ => default
-            };
-
-            if (typeHandle.Kind == HandleKind.TypeReference)
-            {
-                var tr = md.GetTypeReference((TypeReferenceHandle)typeHandle);
-                var ns = md.GetString(tr.Namespace);
-                var name = md.GetString(tr.Name);
-                return string.IsNullOrEmpty(ns) ? name : $"{ns}.{name}";
-            }
-            else if (typeHandle.Kind == HandleKind.TypeDefinition)
-            {
-                var td = md.GetTypeDefinition((TypeDefinitionHandle)typeHandle);
-                var ns = md.GetString(td.Namespace);
-                var name = md.GetString(td.Name);
-                return string.IsNullOrEmpty(ns) ? name : $"{ns}.{name}";
-            }
-            return "";
-        }
-    }
-
 }
+

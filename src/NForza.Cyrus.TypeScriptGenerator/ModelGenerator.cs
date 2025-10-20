@@ -1,6 +1,6 @@
-﻿
-using System.Reflection;
-using NForza.Cyrus.Model;
+﻿using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
+using Cyrus;
 
 namespace NForza.Cyrus.TypeScriptGenerator;
 
@@ -13,42 +13,85 @@ internal class ModelGenerator(string modelAssemblyFile)
             Console.WriteLine($"Model assembly file not found: {modelAssemblyFile}");
             return (false, null);
         }
+        var modelJson = GetModelJsonFromAssembly();
+        if (string.IsNullOrEmpty(modelJson))
+        {
+            Console.WriteLine($"Model metadata not found in assembly: {modelAssemblyFile}");
+            return (false, null);
+        }
+        return (true, modelJson);
+    }
 
-        var loadContext = new PluginLoadContext(modelAssemblyFile);
-        var appAssembly = loadContext.LoadFromAssemblyPath(modelAssemblyFile);
-        loadContext.LoadAllAssemblies();
-
-        Assembly? coreAssembly = appAssembly.GetReferencedAssemblies()
-            .Where(a => a.Name?.StartsWith("NForza.Cyrus.Core") ?? false)
-            .Select(loadContext.LoadFromAssemblyName)
+    private string GetModelJsonFromAssembly()
+    {
+        var jsonMetadata = ReadAssemblyMetadata(modelAssemblyFile, "cyrus-model")
+            .Select(kv => kv.Value)
             .FirstOrDefault();
 
-        if (coreAssembly is null)
+        return string.IsNullOrEmpty(jsonMetadata) ? "" : jsonMetadata;
+    }
+
+    static IReadOnlyList<(string Key, string Value)> ReadAssemblyMetadata(string assemblyPath, string keyValue)
+    {
+        using var fs = File.OpenRead(assemblyPath);
+        using var pe = new PEReader(fs);
+        var md = pe.GetMetadataReader();
+
+        var asm = md.GetAssemblyDefinition();
+        var result = new List<(string, string)>();
+
+        foreach (var caHandle in asm.GetCustomAttributes())
         {
-            Console.WriteLine("NForza.Cyrus.Core assembly not found in referenced assemblies.");
-            return (false, null);
+            var ca = md.GetCustomAttribute(caHandle);
+
+            // Get attribute type full name without resolving anything
+            string attrFullName = GetAttributeTypeFullName(md, ca);
+            if (attrFullName != "System.Reflection.AssemblyMetadataAttribute")
+            {
+                continue;
+            }
+
+            // Decode the blob: prolog (0x0001) + SerString key + SerString value
+            var br = md.GetBlobReader(ca.Value);
+            ushort prolog = br.ReadUInt16(); // must be 0x0001
+            if (prolog != 0x0001) continue;
+
+            string key = br.ReadSerializedString();
+            string value = br.ReadSerializedString();
+
+            if (key == keyValue)
+            {
+                result.Add((key, value.DecompressFromBase64()));
+            }
         }
 
-        var cyrusModelType = coreAssembly.GetType(typeof(CyrusModel).FullName);
-        if (cyrusModelType is null)
-        {
-            Console.WriteLine("CyrusModel type not found in core assembly.");
-            return (false, null);
-        }
+        return result;
 
-        var getAsJsonMethod = cyrusModelType.GetMethod("GetAsJson", BindingFlags.Public | BindingFlags.Static);
-        if (getAsJsonMethod is null)
+        static string GetAttributeTypeFullName(MetadataReader md, CustomAttribute ca)
         {
-            Console.WriteLine("GetAsJson method not found in CyrusModel type.");
-            return (false, null);
-        }
+            var ctor = ca.Constructor;
+            EntityHandle typeHandle = ctor.Kind switch
+            {
+                HandleKind.MemberReference => md.GetMemberReference((MemberReferenceHandle)ctor).Parent,
+                HandleKind.MethodDefinition => md.GetMethodDefinition((MethodDefinitionHandle)ctor).GetDeclaringType(),
+                _ => default
+            };
 
-        var json = getAsJsonMethod.Invoke(null, null);
-        if (json is null)
-        {
-            Console.WriteLine("GetAsJson returned null.");
-            return (false, null);
+            if (typeHandle.Kind == HandleKind.TypeReference)
+            {
+                var tr = md.GetTypeReference((TypeReferenceHandle)typeHandle);
+                var ns = md.GetString(tr.Namespace);
+                var name = md.GetString(tr.Name);
+                return string.IsNullOrEmpty(ns) ? name : $"{ns}.{name}";
+            }
+            else if (typeHandle.Kind == HandleKind.TypeDefinition)
+            {
+                var td = md.GetTypeDefinition((TypeDefinitionHandle)typeHandle);
+                var ns = md.GetString(td.Namespace);
+                var name = md.GetString(td.Name);
+                return string.IsNullOrEmpty(ns) ? name : $"{ns}.{name}";
+            }
+            return "";
         }
-        return (true, json.ToString());
     }
 }
