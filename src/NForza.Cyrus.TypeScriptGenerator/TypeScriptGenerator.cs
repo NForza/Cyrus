@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Diagnostics.CodeAnalysis;
 using NForza.Cyrus.Model;
 
-
 namespace Cyrus;
 
 internal static class TypeScriptGenerator

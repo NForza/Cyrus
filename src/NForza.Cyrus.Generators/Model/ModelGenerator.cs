@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Text.Json;
 using Cyrus;
 using Microsoft.CodeAnalysis;
@@ -15,7 +18,11 @@ public class ModelGenerator : CyrusGeneratorBase
     {
         var model = new CyrusMetadata
         {
-            Commands = GetCommands(cyrusGenerationContext)
+            Commands = GetCommands(cyrusGenerationContext),
+            Integers = GetInts(cyrusGenerationContext.IntValues),
+            Doubles = GetDoubles(cyrusGenerationContext.DoubleValues),
+            Guids = GetGuids(cyrusGenerationContext.GuidValues),
+            Strings = GetStrings(cyrusGenerationContext.StringValues)
         };
         var modelJson = JsonSerializer.Serialize(model, options);
         var modelAttribute = new
@@ -26,6 +33,14 @@ public class ModelGenerator : CyrusGeneratorBase
         var source = cyrusGenerationContext.LiquidEngine.Render(modelAttribute, "ModelAttribute");
         context.AddSource("cyrus-model.g.cs", source);
     }
+
+    private IEnumerable<string> GetStrings(ImmutableArray<INamedTypeSymbol> stringValues) => stringValues.Select(s => s.Name);
+
+    private IEnumerable<string> GetGuids(ImmutableArray<INamedTypeSymbol> guidValues) => guidValues.Select(g => g.Name);
+
+    private IEnumerable<string> GetDoubles(ImmutableArray<INamedTypeSymbol> doubleValues) => doubleValues.Select(s => s.Name);
+
+    private IEnumerable<string> GetInts(ImmutableArray<INamedTypeSymbol> intValues) => intValues.Select(i => i.Name);
 
     private static System.Collections.Generic.IEnumerable<ModelTypeDefinition> GetCommands(CyrusGenerationContext cyrusGenerationContext)
     {
