@@ -24,7 +24,7 @@ public class ModelGenerator : CyrusGeneratorBase
             Guids = GetGuids(cyrusGenerationContext.GuidValues),
             Strings = GetStrings(cyrusGenerationContext.StringValues)
         };
-        var modelJson = JsonSerializer.Serialize(model, options);
+        var modelJson = JsonSerializer.Serialize(model, ModelSerializerOptions.Default);
         var modelAttribute = new
         {
             Key = "cyrus-model",
