@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "NForza.Cyrus.TypescriptGenerate": {
+    "NForza.Cyrus.MSBuild": {
       "commandName": "Project",
       "commandLineArgs": "--path \"C:\\dev\\Cyrus\\examples\\SignalR\\CyrusSignalR\\CyrusDotNet\\bin\\Debug\\net10.0\\CyrusSignalR.dll\" --output \"C:\\dev\\Cyrus\\src\\NForza.Cyrus.Angular\\src\\app\\generated\""
     }

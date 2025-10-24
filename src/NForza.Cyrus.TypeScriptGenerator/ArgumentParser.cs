@@ -1,7 +1,8 @@
 ﻿public class ArgumentParser
 {
-    public string? Output { get; private set; }
-    public string? Path { get; private set; }
+    public string Output { get; private set; } = ".";
+    public string Path { get; private set; } = "";
+    public bool Clean { get; set; } = false;
 
     public ArgumentParser(string[] args)
     {

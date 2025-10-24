@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
-  <UsingTask TaskName="Cyrus.GenerateTypeScript"
-             AssemblyFile="$(MSBuildThisFileDirectory)tasks\netstandard2.0\NForza.Cyrus.MSBuild.dll" />
-
-  <Target Name="GenerateTypeScript" AfterTargets="CopyFilesToOutputDirectory">
+  <Target Name="CyrusGenerateTypeScript" AfterTargets="Build" Condition="'$(Cyrus-GenerateTypeScript)'=='true' and '$(DesignTimeBuild)'!='true'">
+		<PropertyGroup>
+			<_ThisDir>$(MSBuildThisFileDirectory)</_ThisDir>
+			<_ToolDll>$([System.IO.Path]::GetFullPath('$(_ThisDir)..\tools\net10.0\typescript-generator\NForza.Cyrus.TypeScriptGenerator.dll'))</_ToolDll>
+			<_DotNet>$(DOTNET_HOST_PATH)</_DotNet>
+			<_DotNet Condition="'$(_DotNet)' == ''">dotnet</_DotNet>
+		</PropertyGroup>
     <Message Importance="High" Text="Invoking Cyrus TypeScript generator... " />
-    <Cyrus.GenerateTypeScript
-      ToolPath="$(MSBuildThisFileDirectory)..\tools\net10.0\typescript-generator\NForza.Cyrus.TypeScriptGenerator.dll"
-      AssemblyPath="$(TargetPath)"
-      OutputFolder="$(Cyrus-TypeScriptFolder)"
-      CleanOutputFolder="$(Cyrus-CleanTypeScriptFolder)" />
+		<Exec Command='"$(_DotNet)" "$(_ToolDll)" --output "$(Cyrus-TypeScriptFolder)" --model "$(Cyrus-ModelFile)" --path "$(TargetPath)" --clean' />
   </Target>
-
 
 </Project>
