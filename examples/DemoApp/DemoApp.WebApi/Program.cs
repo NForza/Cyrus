@@ -1,14 +1,14 @@
 using System.Reflection;
+using DemoApp.WebApi;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NForza.Cyrus;
-using NForza.Cyrus.WebApi;
-using DemoApp.WebApi;
-using Microsoft.EntityFrameworkCore;
-using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.Abstractions;
+using NForza.Cyrus.Cqrs;
+using NForza.Cyrus.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 

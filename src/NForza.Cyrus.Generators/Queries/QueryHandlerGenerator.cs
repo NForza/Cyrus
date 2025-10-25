@@ -51,7 +51,7 @@ public class QueryHandlerGenerator : CyrusGeneratorBase
             Queries = handlers.Select(q => new
             {
                 ReturnTypeOriginal = q.ReturnType,
-                ReturnType = q.ReturnType.IsTaskType() ? ((INamedTypeSymbol) q.ReturnType).TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
+                ReturnType = q.ReturnType.IsTaskType() ? ((INamedTypeSymbol)q.ReturnType).TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
                 Invocation = q.GetQueryInvocation(serviceProviderVariable: "queryProcessor.ServiceProvider"),
                 q.Name,
                 QueryType = q.Parameters[0].Type.ToFullName(),

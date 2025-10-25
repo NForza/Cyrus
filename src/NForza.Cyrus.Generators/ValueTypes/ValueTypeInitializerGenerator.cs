@@ -37,7 +37,7 @@ public class ValueTypeInitializerGenerator : CyrusGeneratorBase
             .Select(t => t.ContainingNamespace.GetNameOrEmpty())
             .Where(s => !string.IsNullOrEmpty(s))
             .Concat([
-                "System", 
+                "System",
                 "System.Collections.Generic",
                 "System.Text.Json.Serialization",
                 "Microsoft.Extensions.DependencyInjection",

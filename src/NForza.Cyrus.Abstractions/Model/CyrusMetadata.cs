@@ -2,7 +2,7 @@
 
 namespace NForza.Cyrus.Abstractions.Model;
 
-public class CyrusMetadata: ICyrusModel
+public class CyrusMetadata : ICyrusModel
 {
     public IEnumerable<string> Guids { get; set; } = [];
     public IEnumerable<string> Integers { get; set; } = [];

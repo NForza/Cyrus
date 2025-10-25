@@ -10,15 +10,15 @@ using NForza.Cyrus.Generators.Analyzers;
 using NForza.Cyrus.Generators.Commands;
 using NForza.Cyrus.Generators.Events;
 using NForza.Cyrus.Generators.Queries;
+using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Generators.SignalR;
 using NForza.Cyrus.Generators.Validators;
-using NForza.Cyrus.Generators.WebApi;
-using NForza.Cyrus.Generators.Roslyn;
-using NForza.Cyrus.Templating;
-using NForza.Cyrus.Generators.ValueTypes.Ints;
 using NForza.Cyrus.Generators.ValueTypes.Doubles;
 using NForza.Cyrus.Generators.ValueTypes.Guids;
+using NForza.Cyrus.Generators.ValueTypes.Ints;
 using NForza.Cyrus.Generators.ValueTypes.Strings;
+using NForza.Cyrus.Generators.WebApi;
+using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators;
 

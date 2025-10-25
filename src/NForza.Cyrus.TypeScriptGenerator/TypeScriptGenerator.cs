@@ -1,9 +1,9 @@
-﻿using NForza.Cyrus.Templating;
-using NForza.Cyrus.Abstractions.Model;
-using Fluid.Values;
-using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using Fluid.Values;
+using NForza.Cyrus.Abstractions.Model;
+using NForza.Cyrus.Templating;
 
 namespace Cyrus;
 
@@ -186,8 +186,8 @@ internal static class TypeScriptGenerator
             IEnumerable<ModelTypeDefinition> queryTypeDefinitions = queries.Cast<ModelTypeDefinition>();
             IEnumerable<ModelTypeDefinition> commands = hub.Commands.Select(c => metadata.Commands.First(m => m.Name == c));
             IEnumerable<ModelTypeDefinition> events = hub.Events.Select(c => metadata.Events.First(m => m.Name == c));
-            IEnumerable<ModelTypeDefinition> queryReturnTypes =queries.Select(q => q.ReturnType);
-            IEnumerable<ModelTypeDefinition> allTypes = 
+            IEnumerable<ModelTypeDefinition> queryReturnTypes = queries.Select(q => q.ReturnType);
+            IEnumerable<ModelTypeDefinition> allTypes =
                 queryTypeDefinitions
                     .Concat(queryReturnTypes)
                     .Concat(commands)

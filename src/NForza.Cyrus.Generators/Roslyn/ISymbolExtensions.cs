@@ -34,7 +34,7 @@ public static class ISymbolExtensions
 
     public static string Description(this ISymbol methodSymbol)
     {
-        var descriptionAttribute =  methodSymbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "DescriptionAttribute");
+        var descriptionAttribute = methodSymbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.Name == "DescriptionAttribute");
         if (descriptionAttribute != null && descriptionAttribute.ConstructorArguments.Length > 0)
         {
             return descriptionAttribute?.ConstructorArguments[0].Value?.ToString() ?? string.Empty;
@@ -70,7 +70,7 @@ public static class ISymbolExtensions
         {
             if (attr.NamedArguments.Length > 0)
             {
-                return attr.NamedArguments.FirstOrDefault( kvp => kvp.Key == "Route").Value.Value?.ToString() ?? null;
+                return attr.NamedArguments.FirstOrDefault(kvp => kvp.Key == "Route").Value.Value?.ToString() ?? null;
             }
         }
         return null;

@@ -10,17 +10,18 @@ public class IntValueGenerator : CyrusGeneratorBase
     public override void GenerateSource(SourceProductionContext context, CyrusGenerationContext cyrusGenerationContext)
     {
         var recordSymbols = cyrusGenerationContext.IntValues;
-            foreach (var recordSymbol in recordSymbols)
-            {
-                var sourceText = GenerateIntValue(recordSymbol, cyrusGenerationContext.LiquidEngine);
-                context.AddSource($"{recordSymbol.Name}.g.cs", sourceText);
-            };
+        foreach (var recordSymbol in recordSymbols)
+        {
+            var sourceText = GenerateIntValue(recordSymbol, cyrusGenerationContext.LiquidEngine);
+            context.AddSource($"{recordSymbol.Name}.g.cs", sourceText);
+        }
+        ;
 
-            if (recordSymbols.Any())
-            {
-                var intModels = GetPartialModelClass(recordSymbols.First().ContainingAssembly.Name, "TypedIds", "Integers", "string", recordSymbols.Select(im => $"\"{im.Name}\""), cyrusGenerationContext.LiquidEngine);
-                context.AddSource($"model-ints.g.cs", intModels);
-            }
+        if (recordSymbols.Any())
+        {
+            var intModels = GetPartialModelClass(recordSymbols.First().ContainingAssembly.Name, "TypedIds", "Integers", "string", recordSymbols.Select(im => $"\"{im.Name}\""), cyrusGenerationContext.LiquidEngine);
+            context.AddSource($"model-ints.g.cs", intModels);
+        }
     }
 
     private string GenerateIntValue(INamedTypeSymbol item, LiquidEngine liquidEngine)

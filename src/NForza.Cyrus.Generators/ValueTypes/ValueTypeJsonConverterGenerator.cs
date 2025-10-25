@@ -14,7 +14,8 @@ public class ValueTypeJsonConverterGenerator : CyrusGeneratorBase
         {
             var sourceText = GenerateJsonConverterForTypedId(typedId, cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"{typedId.Name}JsonConverter.g.cs", sourceText);
-        };
+        }
+        ;
     }
 
     private string GenerateJsonConverterForTypedId(INamedTypeSymbol item, LiquidEngine liquidEngine)

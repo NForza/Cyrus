@@ -5,7 +5,7 @@ using Microsoft.Extensions.FileProviders;
 
 namespace NForza.Cyrus.Templating;
 
-internal class TemplateOverrideFileInfo: IFileInfo
+internal class TemplateOverrideFileInfo : IFileInfo
 {
     private readonly string path;
     private readonly string template;

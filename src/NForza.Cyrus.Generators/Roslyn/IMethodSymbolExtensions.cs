@@ -79,7 +79,7 @@ internal static class IMethodSymbolExtensions
             tupleType.TypeArguments[0].ToDisplayString() == "System.IO.Stream" &&
             tupleType.TypeArguments[1].SpecialType == SpecialType.System_String)
         {
-            return tupleType.TypeArguments[0]; 
+            return tupleType.TypeArguments[0];
         }
 
         return returnType;
