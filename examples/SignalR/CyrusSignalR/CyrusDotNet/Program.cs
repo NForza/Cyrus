@@ -10,9 +10,7 @@ using NForza.Cyrus.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCyrus();
-
-builder.Services.AddMassTransit(x =>
+builder.Services.AddCyrus(x =>
 {
     x.UsingInMemory((context, cfg) =>
     {

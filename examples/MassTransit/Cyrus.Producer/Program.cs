@@ -5,13 +5,11 @@ using NForza.Cyrus;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMassTransit(cfg =>
+builder.Services.AddCyrus(cfg =>
 {
     cfg.AddConsumers(Assembly.GetExecutingAssembly());
     cfg.UsingRabbitMq();
 });
-
-builder.Services.AddCyrus();
 
 var app = builder.Build();
 
