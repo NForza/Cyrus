@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using MassTransit;
-using Microsoft.AspNetCore.Mvc.TagHelpers;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace NForza.Cyrus.Cqrs;
 

@@ -1,10 +1,9 @@
 ﻿using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
-using Cyrus;
 
 namespace NForza.Cyrus.TypeScriptGenerator;
 
-internal class ModelGenerator(string modelAssemblyFile)
+internal class ModelReader(string modelAssemblyFile)
 {
     internal (bool succeeded, string? model) GetModel()
     {
@@ -56,8 +55,8 @@ internal class ModelGenerator(string modelAssemblyFile)
             ushort prolog = br.ReadUInt16(); // must be 0x0001
             if (prolog != 0x0001) continue;
 
-            string key = br.ReadSerializedString();
-            string value = br.ReadSerializedString();
+            string key = br.ReadSerializedString() ?? string.Empty;
+            string value = br.ReadSerializedString() ?? string.Empty;
 
             if (key == keyValue)
             {

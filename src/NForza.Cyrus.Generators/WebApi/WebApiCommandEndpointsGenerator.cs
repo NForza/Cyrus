@@ -17,11 +17,11 @@ public class WebApiCommandEndpointsGenerator : CyrusGeneratorBase
         {
             IEnumerable<IMethodSymbol> handlers =
                 cyrusGenerationContext
-                    .AllCommandsAndHandlers
+                    .All.CommandHandlers
                     .OfType<IMethodSymbol>()
                     .ToList();
 
-            IEnumerable<INamedTypeSymbol> commands = cyrusGenerationContext.AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToList();
+            IEnumerable<INamedTypeSymbol> commands = cyrusGenerationContext.All.Commands.OfType<INamedTypeSymbol>().ToList();
             IEnumerable<IMethodSymbol> validators = cyrusGenerationContext.Validators;
 
             var contents = AddCommandHandlerMappings(spc, handlers.Where(h => h.HasCommandRoute()), validators, cyrusGenerationContext.Compilation, cyrusGenerationContext.LiquidEngine);

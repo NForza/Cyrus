@@ -1,8 +1,8 @@
 ﻿using System.Collections.Immutable;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Aggregates;
 using NForza.Cyrus.Generators.Config;
+using NForza.Cyrus.Generators.Events;
 using NForza.Cyrus.Generators.SignalR;
 using NForza.Cyrus.Templating;
 
@@ -16,6 +16,7 @@ public class CyrusGenerationContext
         ImmutableArray<INamedTypeSymbol> intValues,
         ImmutableArray<INamedTypeSymbol> doubleValues,
         ImmutableArray<INamedTypeSymbol> stringValues,
+        ImmutableArray<INamedTypeSymbol> allValueTypes,
         ImmutableArray<INamedTypeSymbol> commands,
         ImmutableArray<IMethodSymbol> commandHandlers,
         ImmutableArray<ISymbol> allCommandsAndHandlers,
@@ -37,15 +38,16 @@ public class CyrusGenerationContext
         IntValues = intValues;
         DoubleValues = doubleValues;
         StringValues = stringValues;
+        this.allValueTypes = allValueTypes;
         Commands = commands;
         CommandHandlers = commandHandlers;
-        AllCommandsAndHandlers = allCommandsAndHandlers;
+        this.allCommandsAndHandlers = allCommandsAndHandlers;
         Queries = queries;
         QueryHandlers = queryHandlers;
         EventHandlers = eventHandlers;
         Events = events;
         AllEvents = allEvents;
-        AllQueriesAndHandlers = allQueriesAndHandlers;
+        this.allQueriesAndHandlers = allQueriesAndHandlers;
         Validators = validators;
         AggregateRoots = aggregateRoots;
         SignalRHubs = signalRHubs;
@@ -59,25 +61,25 @@ public class CyrusGenerationContext
     public ImmutableArray<INamedTypeSymbol> IntValues { get; }
     public ImmutableArray<INamedTypeSymbol> DoubleValues { get; }
     public ImmutableArray<INamedTypeSymbol> StringValues { get; }
+
+    private ImmutableArray<INamedTypeSymbol> allValueTypes;
+
     public ImmutableArray<INamedTypeSymbol> Commands { get; }
     public ImmutableArray<IMethodSymbol> CommandHandlers { get; }
-    public ImmutableArray<ISymbol> AllCommandsAndHandlers { get; }
+    private ImmutableArray<ISymbol> allCommandsAndHandlers;
     public ImmutableArray<INamedTypeSymbol> Queries { get; }
     public ImmutableArray<IMethodSymbol> QueryHandlers { get; }
-    public ImmutableArray<ISymbol> AllQueriesAndHandlers { get;  }
+    private ImmutableArray<ISymbol> allQueriesAndHandlers;
     public ImmutableArray<IMethodSymbol> Validators { get; }
     public ImmutableArray<AggregateRootDefinition> AggregateRoots { get; }
     public ImmutableArray<INamedTypeSymbol> Events { get; }
     public ImmutableArray<INamedTypeSymbol> AllEvents { get; }
     public ImmutableArray<IMethodSymbol> EventHandlers { get; }
+    public ImmutableArray<INamedTypeSymbol> ValueTypes => GuidValues.AddRange(IntValues).AddRange(StringValues).AddRange(DoubleValues);
     public ImmutableArray<SignalRHubClassDefinition> SignalRHubs { get; }
     public GenerationConfig GenerationConfig { get; }
     public LiquidEngine LiquidEngine { get; }
     public bool IsTestProject { get; }
 
-    public ImmutableArray<INamedTypeSymbol> ValueTypes => GuidValues.AddRange(IntValues).AddRange(StringValues).AddRange(DoubleValues);
-    public ImmutableArray<INamedTypeSymbol> AllCommands => AllCommandsAndHandlers.OfType<INamedTypeSymbol>().ToImmutableArray();
-    public ImmutableArray<IMethodSymbol> AllCommandHandlers => AllCommandsAndHandlers.OfType<IMethodSymbol>().ToImmutableArray();
-    public ImmutableArray<IMethodSymbol> AllQueryHandlers => AllQueriesAndHandlers.OfType<IMethodSymbol>().ToImmutableArray();
-    public ImmutableArray<IMethodSymbol> AllHandlers => AllCommandsAndHandlers.Concat(AllQueriesAndHandlers).OfType<IMethodSymbol>().ToImmutableArray();
+    public SolutionContext All { get => new SolutionContext(this, allCommandsAndHandlers, allQueriesAndHandlers, allValueTypes); }
 }

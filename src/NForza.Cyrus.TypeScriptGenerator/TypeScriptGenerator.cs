@@ -251,7 +251,7 @@ internal static class TypeScriptGenerator
     {
         foreach (var integerType in metadata.Integers)
         {
-            var result = liquidEngine.Render(new { Name = integerType }, "integer");
+            var result = liquidEngine.Render(new { Name = integerType }, "number");
             string fileName = Path.ChangeExtension(Path.Combine(outputFolder, integerType), ".ts");
             File.WriteAllText(fileName, result);
         }

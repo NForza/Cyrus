@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Microsoft.CodeAnalysis;
-using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Generators.Events;
 

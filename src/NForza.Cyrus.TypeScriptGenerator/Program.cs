@@ -17,7 +17,7 @@ if (argumentParser.Clean)
     dirInfo.GetFiles("*.ts").ToList().ForEach(file => file.Delete());
 }
 
-(var succeeded, var model) = new ModelGenerator(argumentParser.Path!).GetModel();
+(var succeeded, var model) = new ModelReader(argumentParser.Path!).GetModel();
 
 if (!succeeded)
 {

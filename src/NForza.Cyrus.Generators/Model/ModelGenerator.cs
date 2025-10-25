@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text.Json;
@@ -19,10 +18,10 @@ public class ModelGenerator : CyrusGeneratorBase
         var model = new CyrusMetadata
         {
             Commands = GetCommands(cyrusGenerationContext),
-            Integers = GetInts(cyrusGenerationContext.IntValues),
-            Doubles = GetDoubles(cyrusGenerationContext.DoubleValues),
-            Guids = GetGuids(cyrusGenerationContext.GuidValues),
-            Strings = GetStrings(cyrusGenerationContext.StringValues)
+            Integers = GetInts(cyrusGenerationContext.All.IntValues),
+            Doubles = GetDoubles(cyrusGenerationContext.All.DoubleValues),
+            Guids = GetGuids(cyrusGenerationContext.All.GuidValues),
+            Strings = GetStrings(cyrusGenerationContext.All.StringValues)
         };
         var modelJson = JsonSerializer.Serialize(model, ModelSerializerOptions.Default);
         var modelAttribute = new
@@ -44,7 +43,7 @@ public class ModelGenerator : CyrusGeneratorBase
 
     private static System.Collections.Generic.IEnumerable<ModelTypeDefinition> GetCommands(CyrusGenerationContext cyrusGenerationContext)
     {
-        return cyrusGenerationContext.AllCommands.Select(c =>
+        return cyrusGenerationContext.All.Commands.Select(c =>
             new ModelTypeDefinition(
                 c.Name,
                 c.ToFullName(),
