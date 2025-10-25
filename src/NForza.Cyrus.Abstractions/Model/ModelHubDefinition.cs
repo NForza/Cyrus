@@ -2,7 +2,7 @@
 
 namespace NForza.Cyrus.Abstractions.Model;
 
-public class ModelHubDefinition 
+public class ModelHubDefinition
 {
     public ModelHubDefinition(string name, string path, IEnumerable<string> commands, IEnumerable<string> queries, IEnumerable<string> events)
     {

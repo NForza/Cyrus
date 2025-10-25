@@ -1,9 +1,9 @@
-﻿using NForza.Cyrus.Templating;
-using NForza.Cyrus.Abstractions.Model;
-using Fluid.Values;
-using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using Fluid.Values;
+using NForza.Cyrus.Abstractions.Model;
+using NForza.Cyrus.Templating;
 
 namespace Cyrus;
 
@@ -29,9 +29,9 @@ internal static class TypeScriptGenerator
                 if (p.IsNullable) return "null";
                 if (p.IsCollection) return "[]";
                 var tsType = CSharpToTypeScriptType(p.Name, metadata);
-                if (metadata.Guids.Contains(tsType)) return "''";
-                if (metadata.Integers.Contains(tsType)) return "0";
-                if (metadata.Strings.Contains(tsType)) return "''";
+                if (metadata?.Guids.Contains(tsType) ?? false) return "''";
+                if (metadata?.Integers.Contains(tsType) ?? false) return "0";
+                if (metadata?.Strings.Contains(tsType) ?? false) return "''";
                 if (tsType == "string") return "''";
                 if (tsType == "number") return "0";
                 var model = new { p.Properties };
@@ -69,13 +69,14 @@ internal static class TypeScriptGenerator
         });
     });
 
-    private static CyrusMetadata metadata;
+    private static CyrusMetadata? metadata;
 
-    private static string CSharpToTypeScriptType(string input, CyrusMetadata metadata)
+    private static string CSharpToTypeScriptType(string input, CyrusMetadata? metadata)
     {
-        static bool TypeFoundIn(IEnumerable<ModelTypeDefinition> models, string input, [NotNullWhen(true)] out string? value)
+        static bool TypeFoundIn(IEnumerable<ModelTypeDefinition>? models, string input, [NotNullWhen(true)] out string? value)
         {
-            var model = models.FirstOrDefault(m => m.Name == input);
+
+            var model = models?.FirstOrDefault(m => m.Name == input);
             if (model != null)
             {
                 value = model.Name + (model.IsNullable ? "?" : "") + (model.IsCollection ? "[]" : "");
@@ -108,14 +109,14 @@ internal static class TypeScriptGenerator
         string typeScriptType = input switch
         {
             _ when typeMapping.TryGetValue(input, out string? tsType) => tsType,
-            _ when metadata.Guids.Contains(input) => input,
-            _ when metadata.Strings.Contains(input) => input,
-            _ when metadata.Integers.Contains(input) => input,
-            _ when TypeFoundIn(metadata.Commands, input, out var value) => value,
-            _ when TypeFoundIn(metadata.Queries, input, out var value) => value,
-            _ when TypeFoundIn(metadata.Events, input, out var value) => value,
-            _ when TypeFoundIn(metadata.Models, input, out var value) => value,
-            _ when TypeFoundIn(metadata.Queries.Select(q => q.ReturnType), input, out var value) => value,
+            _ when metadata?.Guids.Contains(input) ?? false => input,
+            _ when metadata?.Strings.Contains(input) ?? false => input,
+            _ when metadata?.Integers.Contains(input) ?? false => input,
+            _ when TypeFoundIn(metadata?.Commands, input, out var value) => value,
+            _ when TypeFoundIn(metadata?.Queries, input, out var value) => value,
+            _ when TypeFoundIn(metadata?.Events, input, out var value) => value,
+            _ when TypeFoundIn(metadata?.Models, input, out var value) => value,
+            _ when TypeFoundIn(metadata?.Queries.Select(q => q.ReturnType), input, out var value) => value,
             _ => "any"
         };
         return typeScriptType;
@@ -185,8 +186,8 @@ internal static class TypeScriptGenerator
             IEnumerable<ModelTypeDefinition> queryTypeDefinitions = queries.Cast<ModelTypeDefinition>();
             IEnumerable<ModelTypeDefinition> commands = hub.Commands.Select(c => metadata.Commands.First(m => m.Name == c));
             IEnumerable<ModelTypeDefinition> events = hub.Events.Select(c => metadata.Events.First(m => m.Name == c));
-            IEnumerable<ModelTypeDefinition> queryReturnTypes =queries.Select(q => q.ReturnType);
-            IEnumerable<ModelTypeDefinition> allTypes = 
+            IEnumerable<ModelTypeDefinition> queryReturnTypes = queries.Select(q => q.ReturnType);
+            IEnumerable<ModelTypeDefinition> allTypes =
                 queryTypeDefinitions
                     .Concat(queryReturnTypes)
                     .Concat(commands)

@@ -1,6 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Templating;
-using System.Collections.Generic;
 
 namespace NForza.Cyrus.Generators;
 

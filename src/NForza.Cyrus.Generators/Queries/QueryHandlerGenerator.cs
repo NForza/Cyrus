@@ -21,7 +21,7 @@ public class QueryHandlerGenerator : CyrusGeneratorBase
                 .Where(x => x != null)
                 .Where(x => !x.IsStatic)
                 .Distinct(SymbolEqualityComparer.Default)
-                .Select(qht => $" services.AddTransient<{qht.ToFullName()}>();"));
+                .Select(qht => $" services.AddTransient<{qht!.ToFullName()}>();"));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
             var ctx = new
             {
@@ -51,7 +51,7 @@ public class QueryHandlerGenerator : CyrusGeneratorBase
             Queries = handlers.Select(q => new
             {
                 ReturnTypeOriginal = q.ReturnType,
-                ReturnType = q.ReturnType.IsTaskType() ? ((INamedTypeSymbol) q.ReturnType).TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
+                ReturnType = q.ReturnType.IsTaskType() ? ((INamedTypeSymbol)q.ReturnType).TypeArguments[0].ToFullName() : q.ReturnType.ToFullName(),
                 Invocation = q.GetQueryInvocation(serviceProviderVariable: "queryProcessor.ServiceProvider"),
                 q.Name,
                 QueryType = q.Parameters[0].Type.ToFullName(),

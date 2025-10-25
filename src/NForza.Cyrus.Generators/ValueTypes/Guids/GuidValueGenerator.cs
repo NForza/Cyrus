@@ -14,7 +14,8 @@ public class GuidValueGenerator : CyrusGeneratorBase
         {
             var sourceText = GenerateGuidValue(recordSymbol, cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"{recordSymbol.Name}.g.cs", sourceText);
-        };
+        }
+        ;
 
         if (guidValues.Any())
         {

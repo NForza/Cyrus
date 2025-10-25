@@ -14,7 +14,8 @@ public class StringValueGenerator : CyrusGeneratorBase
         {
             var sourceText = GenerateCodeForRecordStruct(recordSymbol, cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"{recordSymbol.Name}.g.cs", sourceText);
-        };
+        }
+        ;
         if (StringValues.Any())
         {
             var stringModels = GetPartialModelClass(StringValues.First().ContainingAssembly.Name, "TypedIds", "Strings", "string", StringValues.Select(s => $"\"{s.Name}\""), cyrusGenerationContext.LiquidEngine);

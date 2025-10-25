@@ -5,7 +5,7 @@ using NForza.Cyrus.Generators.Roslyn;
 
 namespace NForza.Cyrus.Generators;
 
-public class SolutionContext(CyrusGenerationContext cyrusGenerationContext, ImmutableArray<ISymbol> allCommandsAndHandlers, ImmutableArray<ISymbol> allQueriesAndHandlers, ImmutableArray<INamedTypeSymbol> allValueTypes)
+public class SolutionContext(ImmutableArray<ISymbol> allCommandsAndHandlers, ImmutableArray<ISymbol> allQueriesAndHandlers, ImmutableArray<INamedTypeSymbol> allValueTypes)
 {
     public ImmutableArray<INamedTypeSymbol> ValueTypes => allValueTypes;
     public ImmutableArray<INamedTypeSymbol> GuidValues => allValueTypes.Where(v => v.IsGuidValue()).ToImmutableArray();

@@ -5,7 +5,7 @@ namespace NForza.Cyrus.Abstractions;
 [AttributeUsage(AttributeTargets.Struct)]
 public class StringValueAttribute : Attribute
 {
-    public StringValueAttribute(int minimumLength, int maximumLength, string validationRegex): this(minimumLength, maximumLength)
+    public StringValueAttribute(int minimumLength, int maximumLength, string validationRegex) : this(minimumLength, maximumLength)
     {
         ValidationRegex = validationRegex;
     }

@@ -29,4 +29,4 @@ internal class CommandHandlerProvider : CyrusProviderBase<ImmutableArray<IMethod
 
         return commandHandlerProvider;
     }
-}                                                                                                                   
+}

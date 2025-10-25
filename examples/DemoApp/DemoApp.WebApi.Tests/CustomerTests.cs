@@ -11,7 +11,7 @@ using Xunit.Abstractions;
 
 namespace DemoApp.WebApi.Tests;
 
-public class CustomerTests( ITestOutputHelper outputHelper)
+public class CustomerTests(ITestOutputHelper outputHelper)
 {
     [Theory]
     [InlineData("/customers/1/10")]
@@ -58,8 +58,8 @@ public class CustomerTests( ITestOutputHelper outputHelper)
     public async Task Posting_Add_Customer_Command_Without_A_Name_Should_Return_Bad_Request(string url)
     {
         var command = new AddCustomerCommand(
-            new CustomerId(), 
-            new Name(""), 
+            new CustomerId(),
+            new Name(""),
             new Address
             {
                 Street = new Street("The Netherlands"),
@@ -104,7 +104,7 @@ public class CustomerTests( ITestOutputHelper outputHelper)
 
         var host = await DemoAppTestClient.GetHostAsync(outputHelper);
 
-        var response = await host.Scenario( _ => 
+        var response = await host.Scenario(_ =>
         {
             _.JsonBody(command);
             _.Put.Url(url.Replace("{Id}", customerId.ToString()));

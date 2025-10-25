@@ -16,7 +16,7 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
         if (config != null && config.GenerationTarget.Contains(GenerationTarget.WebApi))
         {
             IEnumerable<IMethodSymbol> validators = cyrusGenerationContext.Validators;
-            IEnumerable<IMethodSymbol> queryHandlers = 
+            IEnumerable<IMethodSymbol> queryHandlers =
                 cyrusGenerationContext
                     .All.QueryHandlers
                     .Where(h => h.HasQueryRoute());
@@ -65,11 +65,12 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
         };
         var httpContextObjectFactoryInitialization = liquidEngine.Render(model, "HttpContextObjectFactoryQuery");
 
-        var initModel = new { 
-            Namespace = "WebApi", 
+        var initModel = new
+        {
+            Namespace = "WebApi",
             Name = "HttpContextObjectFactoryQueryInitializer",
             Usings = new string[] { "System.Linq", "NForza.Cyrus.Abstractions" },
-            Initializer = httpContextObjectFactoryInitialization 
+            Initializer = httpContextObjectFactoryInitialization
         };
         var source = liquidEngine.Render(initModel, "CyrusInitializer");
         sourceProductionContext.AddSource($"HttpContextObjectFactoryQueries.g.cs", source);

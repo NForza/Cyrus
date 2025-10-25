@@ -19,7 +19,7 @@ public class ValueTypeTests(ITestOutputHelper outputWindow)
                 public partial record struct CustomerId; 
             ";
 
-        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) = 
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
             await new CyrusGeneratorTestBuilder()
             .WithSource(source)
             .LogGeneratedSource(outputWindow.WriteLine)

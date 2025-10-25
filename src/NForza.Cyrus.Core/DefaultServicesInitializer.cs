@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Http.Json;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyModel;
+using Microsoft.Extensions.Options;
+using NForza.Cyrus.Abstractions;
+using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.WebApi;
-using Microsoft.Extensions.DependencyModel;
-using NForza.Cyrus.Abstractions.Model;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Http.Json;
-using NForza.Cyrus.Abstractions;
 
 public class DefaultCyrusServices : ICyrusInitializer
 {

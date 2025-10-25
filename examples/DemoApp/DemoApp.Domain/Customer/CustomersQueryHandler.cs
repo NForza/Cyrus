@@ -30,6 +30,6 @@ public class CustomersQueryHandler
     public static (Stream, string) QueryPdfByCustomerId(CustomerTemplateQuery query)
     {
         string path = Path.Combine("Content", "sample.pdf");
-        return (new FileStream(path, FileMode.Open, FileAccess.Read), "application/pdf");    
+        return (new FileStream(path, FileMode.Open, FileAccess.Read), "application/pdf");
     }
 }

@@ -213,7 +213,7 @@ public static class DiagnosticDescriptors
         description: "Command for CommandHandler '{0}' can't have multiple parameters  of type CancellationToken."
     );
 
-    public static DiagnosticDescriptor UnrecognizedParameterForCommandHandler= new DiagnosticDescriptor(
+    public static DiagnosticDescriptor UnrecognizedParameterForCommandHandler = new DiagnosticDescriptor(
         id: "CYRUS018",
         title: "Invalid parameter type for CommandHandler",
         messageFormat: "CommandHandler '{0}' has additional parameters that are not an [AggregateRoot] or a CancellationToken",

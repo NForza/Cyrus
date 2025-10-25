@@ -5,7 +5,7 @@ using NForza.Cyrus.Abstractions;
 
 namespace DemoApp.Domain.Customer;
 
-public class AddCustomerCommandValidator 
+public class AddCustomerCommandValidator
 {
     [Validator]
     public IEnumerable<string> Validate(AddCustomerCommand command)

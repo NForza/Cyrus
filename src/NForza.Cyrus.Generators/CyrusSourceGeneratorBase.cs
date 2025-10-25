@@ -11,7 +11,7 @@ using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators;
 
-public abstract class CyrusSourceGeneratorBase 
+public abstract class CyrusSourceGeneratorBase
 {
     protected IncrementalValueProvider<GenerationConfig> ConfigProvider(IncrementalGeneratorInitializationContext context)
     {
@@ -26,9 +26,9 @@ public abstract class CyrusSourceGeneratorBase
 
     private GenerationConfig CreateDefaultGenerationConfig()
     {
-        return 
-            new GenerationConfig 
-            { 
+        return
+            new GenerationConfig
+            {
                 GenerationTarget = [GenerationTarget.Domain, GenerationTarget.WebApi, GenerationTarget.Contracts]
             };
     }
@@ -37,7 +37,7 @@ public abstract class CyrusSourceGeneratorBase
 
     public string GetPartialModelClass(string assemblyName, string subNamespace, string propertyName, string propertyType, IEnumerable<string> propertyValues, LiquidEngine liquidEngine)
     {
-        var model = new 
+        var model = new
         {
             AssemblyName = assemblyName + "." + subNamespace,
             PropertyName = propertyName,

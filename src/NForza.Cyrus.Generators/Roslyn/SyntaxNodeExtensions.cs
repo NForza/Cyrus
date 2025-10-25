@@ -1,5 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace NForza.Cyrus.Generators.Roslyn;
 
@@ -33,7 +33,8 @@ public static class SyntaxNodeExtensions
         {
             bool isEvent = classDeclaration.HasEventAttribute();
             return isEvent;
-        };
+        }
+        ;
         return false;
     }
 
@@ -43,7 +44,8 @@ public static class SyntaxNodeExtensions
         {
             bool isQuery = classDeclaration.HasQueryAttribute();
             return isQuery;
-        };
+        }
+        ;
         return false;
     }
 
@@ -53,7 +55,8 @@ public static class SyntaxNodeExtensions
         {
             bool isCommand = classDeclaration.HasCommandAttribute();
             return isCommand;
-        };
+        }
+        ;
         return false;
     }
 

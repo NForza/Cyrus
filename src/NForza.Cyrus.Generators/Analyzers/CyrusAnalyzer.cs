@@ -41,7 +41,7 @@ public class CyrusAnalyzer : DiagnosticAnalyzer
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
         context.RegisterSymbolAction(AnalyzeMethodSymbol, SymbolKind.Method);
-        context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.StructDeclaration, SyntaxKind.RecordStructDeclaration, SyntaxKind.RecordDeclaration, SyntaxKind.ClassDeclaration );
+        context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.StructDeclaration, SyntaxKind.RecordStructDeclaration, SyntaxKind.RecordDeclaration, SyntaxKind.ClassDeclaration);
     }
 
     private static void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext context)

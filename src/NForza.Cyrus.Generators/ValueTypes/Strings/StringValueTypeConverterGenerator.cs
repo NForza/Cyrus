@@ -13,7 +13,8 @@ public class StringValueTypeConverterGenerator : CyrusGeneratorBase
         {
             var sourceText = GenerateStringValueTypeConverter(recordSymbol, cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"{recordSymbol}TypeConverter.g.cs", sourceText);
-        };
+        }
+        ;
     }
 
     private string GenerateStringValueTypeConverter(INamedTypeSymbol item, LiquidEngine liquidEngine)

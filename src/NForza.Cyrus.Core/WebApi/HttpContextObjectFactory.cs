@@ -10,10 +10,10 @@ public class HttpContextObjectFactory : IHttpContextObjectFactory
     private MethodInfo registerMethod = typeof(HttpContextObjectFactory).GetMethod(nameof(Register), BindingFlags.NonPublic | BindingFlags.Instance)!;
     public HttpContextObjectFactory(IEnumerable<ObjectFactoryRegistration> objectFactoryRegistrations)
     {
-        foreach(var registration in objectFactoryRegistrations)
+        foreach (var registration in objectFactoryRegistrations)
         {
             registerMethod.MakeGenericMethod(registration.Type).Invoke(this, [registration.FactoryMethod]);
-        }   
+        }
     }
 
     Dictionary<Type, Func<HttpContext, object?, (object, IEnumerable<string>)>> objectFactories = new();

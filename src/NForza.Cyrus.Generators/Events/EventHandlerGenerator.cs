@@ -18,7 +18,7 @@ public class EventHandlerGenerator : CyrusGeneratorBase
                 .Where(x => x != null)
                 .Where(x => !x.IsStatic)
                 .Distinct(SymbolEqualityComparer.Default)
-                .Select(eht => $" services.AddTransient<{eht.ToFullName()}>();"));
+                .Select(eht => $" services.AddTransient<{eht!.ToFullName()}>();"));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
             var ctx = new
             {

@@ -2,7 +2,7 @@
 
 namespace NForza.Cyrus.Aggregates;
 
-public interface IAggregateRootPersistence<TAggregateRoot, TAggregateRootId> 
+public interface IAggregateRootPersistence<TAggregateRoot, TAggregateRootId>
     where TAggregateRoot : class
     where TAggregateRootId : struct
 {

@@ -16,8 +16,8 @@ internal class CommandAnalyzer
 
         var isStruct =
             (
-                typeDecl is StructDeclarationSyntax 
-                || 
+                typeDecl is StructDeclarationSyntax
+                ||
                 (typeDecl is RecordDeclarationSyntax recDecl && recDecl.ClassOrStructKeyword.IsKind(SyntaxKind.StructKeyword))
                 ||
                 typeDecl is ClassDeclarationSyntax classDecl && classDecl.Modifiers.Any(m => m.IsKind(SyntaxKind.StructKeyword))
@@ -44,8 +44,8 @@ internal class CommandAnalyzer
     private static bool HasCommandAttribute(ISymbol symbol) =>
         symbol.GetAttributes().Any(a =>
         {
-            var attrName = a.AttributeClass?.Name;                 
-            var fullName = a.AttributeClass?.ToDisplayString();    
+            var attrName = a.AttributeClass?.Name;
+            var fullName = a.AttributeClass?.ToDisplayString();
             return attrName is "CommandAttribute" or "Command" || (fullName?.EndsWith(".CommandAttribute") ?? false);
         });
 }

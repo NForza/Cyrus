@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace NForza.Cyrus.Generators.Analyzers;
@@ -15,12 +14,6 @@ internal class MassTransitAnalyzer : CyrusAnalyzerBase
 
             return baseType != null &&
                    baseType.ToDisplayString() == expectedBaseClassName;
-        }
-
-        bool ReferencesAssembly(Compilation compilation, string assemblyName)
-        {
-            return compilation.ReferencedAssemblyNames
-                .Any(r => r.Name == assemblyName);
         }
 
         if (methodSymbol.Name != ".ctor")

@@ -13,7 +13,8 @@ public class IntValueTypeConverterGenerator : CyrusGeneratorBase
         {
             var sourceText = GenerateGuidValueTypeConverter(recordSymbol, cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"{recordSymbol}TypeConverter.g.cs", sourceText);
-        };
+        }
+        ;
     }
 
     private string GenerateGuidValueTypeConverter(INamedTypeSymbol item, LiquidEngine liquidEngine)

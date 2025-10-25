@@ -8,9 +8,9 @@ public class EntityFrameworkPersistence<TAggregateRoot, TAggregateRootId, TDbCon
     where TAggregateRootId : struct
     where TDbContext : DbContext
 {
-    public ValueTask<TAggregateRoot?> Load(TAggregateRootId? id) 
+    public ValueTask<TAggregateRoot?> Load(TAggregateRootId? id)
         => ctx.Set<TAggregateRoot>().FindAsync(id);
 
-    public Task Save(TAggregateRoot aggregateRoot) 
+    public Task Save(TAggregateRoot aggregateRoot)
         => ctx.SaveChangesAsync();
 }

@@ -23,8 +23,8 @@ internal static class IPropertySymbolExtensions
                         return arrow.Expression.ToFullString().Trim();
                     break;
 
-                case ParameterSyntax param when param.Default is { } def:   
-                    return def.Value.ToFullString().Trim();               
+                case ParameterSyntax param when param.Default is { } def:
+                    return def.Value.ToFullString().Trim();
             }
         }
 

@@ -13,7 +13,7 @@ public static class CyrusModel
         {
             return string.Empty;
         }
-        var attribute = assembly.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault( a => a.Key == "cyrus-model");
+        var attribute = assembly.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault(a => a.Key == "cyrus-model");
         return attribute?.Value?.DecompressFromBase64() ?? string.Empty;
     }
 
