@@ -20,10 +20,10 @@ public class EntityFrameworkPersistenceGenerator : CyrusGeneratorBase
 
     private string GenerateEntityFrameworkPersistenceInitializer(CyrusGenerationContext cyrusGenerationContext)
     {
-#pragma warning disable RS1035 // Do not use APIs banned for analyzers
-        var persistenceRegistrations = string.Join(Environment.NewLine, cyrusGenerationContext.AggregateRoots.Select(v =>
-                $"services.AddScoped<IAggregateRootPersistence<{v.Symbol.ToFullName()}, {v.AggregateRootProperty.Type.ToFullName()}>, EntityFrameworkPersistence<{v.Symbol.ToFullName()}, {v.AggregateRootProperty.Type.ToFullName()}, {cyrusGenerationContext.GenerationConfig.PersistenceContextType}>>();"));
-#pragma warning restore RS1035 // Do not use APIs banned for analyzers
+        var persistenceRegistrations = string.Join("\n", 
+            cyrusGenerationContext.AggregateRoots
+                .Where(v => v.Symbol != null && v.AggregateRootProperty != null)
+                .Select(v => $"services.AddScoped<IAggregateRootPersistence<{v.Symbol!.ToFullName()}, {v.AggregateRootProperty!.Type.ToFullName()}>, EntityFrameworkPersistence<{v.Symbol!.ToFullName()}, {v.AggregateRootProperty.Type.ToFullName()}, {cyrusGenerationContext.GenerationConfig.PersistenceContextType}>>();"));
         var ctx = new
         {
             Usings = new string[] { "NForza.Cyrus.EntityFramework", "NForza.Cyrus.Aggregates", "NForza.Cyrus.Abstractions"},

@@ -14,9 +14,9 @@ public sealed class Error
     public string Message { get; private set; } = string.Empty;
     public string Field { get; private set; } = string.Empty;
     public string Source { get; private set; } = string.Empty;
-    public Error[]? InnerErrors { get; private set; }
-    public Exception? InnerException { get; private set; }
-    public string? Tag { get; private set; }
+    public Error[] InnerErrors { get; private set; } = Array.Empty<Error>();
+    public Exception InnerException { get; private set; }
+    public string Tag { get; private set; }
 
     public Error WithException(Exception exception)
     {
@@ -26,7 +26,7 @@ public sealed class Error
 
     public Error WithErrors(IEnumerable<Error> errors)
     {
-        InnerErrors = errors?.ToArray();
+        InnerErrors = errors.ToArray();
         return this;
     }
 

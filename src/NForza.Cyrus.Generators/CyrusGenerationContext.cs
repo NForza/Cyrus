@@ -81,5 +81,5 @@ public class CyrusGenerationContext
     public LiquidEngine LiquidEngine { get; }
     public bool IsTestProject { get; }
 
-    public SolutionContext All { get => new SolutionContext(this, allCommandsAndHandlers, allQueriesAndHandlers, allValueTypes); }
+    public SolutionContext All { get => new SolutionContext(allCommandsAndHandlers, allQueriesAndHandlers, allValueTypes); }
 }

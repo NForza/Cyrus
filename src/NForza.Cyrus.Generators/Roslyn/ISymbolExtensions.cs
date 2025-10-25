@@ -57,11 +57,11 @@ public static class ISymbolExtensions
         return false;
     }
 
-    public static string? GetCommandRoute(this ISymbol methodSymbol)
-        => GetRouteFromAttribute(methodSymbol, "CommandHandlerAttribute");
+    public static string GetCommandRoute(this ISymbol methodSymbol)
+        => GetRouteFromAttribute(methodSymbol, "CommandHandlerAttribute") ?? string.Empty;
 
-    public static string? GetQueryRoute(this ISymbol methodSymbol)
-    => GetRouteFromAttribute(methodSymbol, "QueryHandlerAttribute");
+    public static string GetQueryRoute(this ISymbol methodSymbol)
+    => GetRouteFromAttribute(methodSymbol, "QueryHandlerAttribute") ?? string.Empty;
 
     public static string? GetRouteFromAttribute(this ISymbol methodSymbol, string attributeName)
     {

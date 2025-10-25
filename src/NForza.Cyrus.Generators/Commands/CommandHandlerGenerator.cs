@@ -26,7 +26,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                         .Select(ch => ch.ContainingType)
                         .Where(x => x != null && !x.IsStatic)
                         .Distinct(SymbolEqualityComparer.Default)
-                        .Select(cht => $" services.AddTransient<{cht.ToFullName()}>();"));
+                        .Select(cht => $" services.AddTransient<{cht!.ToFullName()}>();"));
             if (!string.IsNullOrEmpty(commandHandlerRegistrations))
             {
                 var ctx = new

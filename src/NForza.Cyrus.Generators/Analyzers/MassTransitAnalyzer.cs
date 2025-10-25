@@ -17,12 +17,6 @@ internal class MassTransitAnalyzer : CyrusAnalyzerBase
                    baseType.ToDisplayString() == expectedBaseClassName;
         }
 
-        bool ReferencesAssembly(Compilation compilation, string assemblyName)
-        {
-            return compilation.ReferencedAssemblyNames
-                .Any(r => r.Name == assemblyName);
-        }
-
         if (methodSymbol.Name != ".ctor")
             return;
 

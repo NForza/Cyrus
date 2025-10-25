@@ -13,15 +13,13 @@ public class ValidatorGenerator : CyrusGeneratorBase
         {
             var validators = cyrusGenerationContext.Validators;
 
-#pragma warning disable RS1035 // Do not use APIs banned for analyzers
-            var validatorRegistrations = string.Join(Environment.NewLine,
+            var validatorRegistrations = string.Join("\n",
                     cyrusGenerationContext.Validators
                         .Select(ch => ch.ContainingType)
                         .Where(x => x != null)
                         .Where(x => !x.IsStatic)
                         .Distinct(SymbolEqualityComparer.Default)
-                        .Select(cht => $" services.AddTransient<{cht.ToFullName()}>();"));
-#pragma warning restore RS1035 // Do not use APIs banned for analyzers
+                        .Select(cht => $" services.AddTransient<{cht!.ToFullName()}>();"));
             if (!string.IsNullOrEmpty(validatorRegistrations))
             {
                 var ctx = new

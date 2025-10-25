@@ -21,7 +21,7 @@ public class QueryHandlerGenerator : CyrusGeneratorBase
                 .Where(x => x != null)
                 .Where(x => !x.IsStatic)
                 .Distinct(SymbolEqualityComparer.Default)
-                .Select(qht => $" services.AddTransient<{qht.ToFullName()}>();"));
+                .Select(qht => $" services.AddTransient<{qht!.ToFullName()}>();"));
 #pragma warning restore RS1035 // Do not use APIs banned for analyzers
             var ctx = new
             {

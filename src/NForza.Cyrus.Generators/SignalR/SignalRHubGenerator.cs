@@ -102,7 +102,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase
                 {
                     c.MethodName,
                     c.ClrTypeName,
-                    c.Handler.ReturnType,
+                    c.Handler!.ReturnType,
                     ReturnsVoid = c.Handler.ReturnType.IsVoid(),
                     Invocation = c.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "services"),
                     ReturnsTask = c.Handler.ReturnType.IsTaskType(),
