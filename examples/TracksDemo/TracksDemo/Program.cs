@@ -10,13 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<DemoContext>(o =>
     o.UseInMemoryDatabase("DemoDb"));
 
-builder.Services.AddMassTransit(x =>
+builder.Services.AddCyrus(x =>
 {
     x.AddConsumers(Assembly.GetExecutingAssembly());
     x.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
 });
-
-builder.Services.AddCyrus();
 
 var app = builder.Build();
 
