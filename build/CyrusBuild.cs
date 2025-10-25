@@ -10,6 +10,7 @@ class CyrusBuild : NukeBuild
 
     private static string cyrusSolutionFileName = "NForza.Cyrus.sln";
     private static AbsolutePath cyrusSolutionPath = RootDirectory / cyrusSolutionFileName;
+    private static AbsolutePath examplesPath = RootDirectory / "examples";
     private static AbsolutePath massTransitExamplePath = examplesPath / "MassTransit" / "MassTransit.sln";
     private static AbsolutePath signalRExamplePath = examplesPath / "SignalR" / "CyrusSignalR" / "CyrusSignalR.sln";
     private static AbsolutePath tracksDemoExamplePath = examplesPath / "TracksDemo" / "TracksDemo.sln";
@@ -38,11 +39,11 @@ class CyrusBuild : NukeBuild
         {
             var projects = new[]
             {
-            cyrusSolutionPath,
-            massTransitExamplePath,
-            signalRExamplePath,
-            tracksDemoExamplePath
-        };
+                cyrusSolutionPath,
+                massTransitExamplePath,
+                signalRExamplePath,
+                tracksDemoExamplePath
+            };
 
             foreach (var project in projects)
             {
@@ -91,5 +92,4 @@ class CyrusBuild : NukeBuild
         Log.Information(line);
         Log.Information("");
     }
-
 }
