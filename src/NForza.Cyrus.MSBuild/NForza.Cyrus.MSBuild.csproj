@@ -8,7 +8,7 @@
     <MSBuildRuntime>CurrentRuntime</MSBuildRuntime>
     <OutputType>Library</OutputType>
     <IsPackable>true</IsPackable>
-    <Version>1.0.22</Version>
+    <Version>1.0.23</Version>
     <Title>Cyrus Typescript Generator</Title>
     <Authors>NForza</Authors>
     <Description>Generates Typescript types based on a Cyrus Model</Description>
@@ -55,7 +55,7 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <None Include="..\NForza.Cyrus.TypeScriptGenerator\bin\$(Configuration)\net10.0\publish\**\*.*" Pack="true" PackagePath="tools/net10.0/typescript-generator/" Visible="false" PrivateAssets="all" CopyToOutputDirectory="Never" />
+    <None Include="..\NForza.Cyrus.TypeScriptGenerator\bin\Release\net10.0\publish\**\*.*" Pack="true" PackagePath="tools/net10.0/typescript-generator/" Visible="false" PrivateAssets="all" CopyToOutputDirectory="Never" />
   </ItemGroup> 
 
 </Project>

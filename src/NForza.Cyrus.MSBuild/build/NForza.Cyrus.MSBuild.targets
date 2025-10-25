@@ -8,7 +8,7 @@
 			<_DotNet Condition="'$(_DotNet)' == ''">dotnet</_DotNet>
 		</PropertyGroup>
     <Message Importance="High" Text="Invoking Cyrus TypeScript generator... " />
-		<Exec Command='"$(_DotNet)" "$(_ToolDll)" --output "$(Cyrus-TypeScriptFolder)" --model "$(Cyrus-ModelFile)" --path "$(TargetPath)" --clean' />
+		<Exec Command='"$(_DotNet)" "$(_ToolDll)" --output "$(Cyrus-TypeScriptFolder)" --path "$(TargetPath)" --clean' />
   </Target>
 
 </Project>
