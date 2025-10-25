@@ -4,7 +4,7 @@ using NForza.Cyrus;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddMassTransit(cfg =>
+builder.Services.AddCyrus(cfg =>
 {
     cfg.AddConsumers(Assembly.GetExecutingAssembly());
     cfg.UsingRabbitMq((context, x) =>
@@ -12,8 +12,6 @@ builder.Services.AddMassTransit(cfg =>
         x.ConfigureEndpoints(context);
     });
 });
-
-builder.Services.AddCyrus();
 
 var app = builder.Build();
 
