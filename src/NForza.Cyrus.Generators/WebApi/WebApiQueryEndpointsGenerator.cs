@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using NForza.Cyrus.Generators.Config;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
@@ -19,8 +18,7 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
             IEnumerable<IMethodSymbol> validators = cyrusGenerationContext.Validators;
             IEnumerable<IMethodSymbol> queryHandlers = 
                 cyrusGenerationContext
-                    .AllQueriesAndHandlers
-                    .OfType<IMethodSymbol>()
+                    .All.QueryHandlers
                     .Where(h => h.HasQueryRoute());
             var contents = AddQueryHandlerMappings(spc, queryHandlers, validators, cyrusGenerationContext.LiquidEngine);
 
@@ -46,9 +44,7 @@ public class WebApiQueryEndpointsGenerator : CyrusGeneratorBase
                 spc.AddSource("QueryHandlerMapping.g.cs", fileContents);
             }
 
-            IEnumerable<INamedTypeSymbol> queries = cyrusGenerationContext.AllQueriesAndHandlers
-                .Where(q => q.IsQuery())
-                .OfType<INamedTypeSymbol>();
+            IEnumerable<INamedTypeSymbol> queries = cyrusGenerationContext.All.Queries;
 
             AddHttpContextObjectFactoryMethodsRegistrations(spc, queries, cyrusGenerationContext.LiquidEngine);
             WebApiContractGenerator.GenerateContracts(queries, spc, cyrusGenerationContext.LiquidEngine);

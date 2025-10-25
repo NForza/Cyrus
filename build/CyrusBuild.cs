@@ -39,11 +39,11 @@ class CyrusBuild : NukeBuild
         {
             var projects = new[]
             {
-            cyrusSolutionPath,
-            massTransitExamplePath,
-            signalRExamplePath,
-            tracksDemoExamplePath
-        };
+                cyrusSolutionPath,
+                massTransitExamplePath,
+                signalRExamplePath,
+                tracksDemoExamplePath
+            };
 
             foreach (var project in projects)
             {
@@ -92,5 +92,4 @@ class CyrusBuild : NukeBuild
         Log.Information(line);
         Log.Information("");
     }
-
 }

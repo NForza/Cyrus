@@ -2,7 +2,7 @@
   "profiles": {
     "NForza.Cyrus.MSBuild.ModelExtractor": {
       "commandName": "Project",
-      "commandLineArgs": "--path \"C:\\dev\\Cyrus\\examples\\DemoApp\\DemoApp.WebApi\\bin\\Debug\\net10.0\\DemoApp.WebApi.dll\" --output \r\n./ts\""
+      "commandLineArgs": "--path \"C:\\dev\\Cyrus\\examples\\SignalR\\CyrusSignalR\\CyrusDotNet\\bin\\Debug\\net10.0\\CyrusSignalR.dll\" --output \r\n./ts\""
     }
   }
 }

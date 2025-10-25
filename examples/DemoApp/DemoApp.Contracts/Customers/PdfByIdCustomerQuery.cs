@@ -1,5 +1,4 @@
-﻿using DemoApp.Contracts;
-using NForza.Cyrus.Abstractions;
+﻿using NForza.Cyrus.Abstractions;
 
 namespace DemoApp.Domain.Customer
 {

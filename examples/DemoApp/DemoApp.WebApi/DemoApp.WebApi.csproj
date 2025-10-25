@@ -6,18 +6,19 @@
     <Configurations>Debug;Release;DebugGenerator</Configurations>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>$(MSBuildProjectDirectory)/obj/$(Configuration)/generated</CompilerGeneratedFilesOutputPath>
+		<Cyrus-TypeScriptFolder>.</Cyrus-TypeScriptFolder>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\NForza.Cyrus.EntityFramework\NForza.Cyrus.EntityFramework.csproj" />
-    <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.2" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.6" />
-    <ProjectReference Include="..\..\..\src\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.4" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.10" />
+		<ProjectReference Include="..\DemoApp.Domain\DemoApp.Domain.csproj" />
+		<ProjectReference Include="..\..\..\src\NForza.Cyrus.EntityFramework\NForza.Cyrus.EntityFramework.csproj" />
+		<ProjectReference Include="..\..\..\src\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\src\NForza.Cyrus.Generators\NForza.Cyrus.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <InternalsVisibleTo Include="DemoApp.WebApi.Tests" />
-    <ProjectReference Include="..\DemoApp.Domain\DemoApp.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

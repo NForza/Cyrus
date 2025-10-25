@@ -1,22 +1,10 @@
-﻿using System;
-using System.IO;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Text;
 
-namespace NForza.Cyrus;
+namespace Cyrus;
 
 public static class StringExtensions
 {
-    public static string ToCamelCase(this string str)
-    {
-        if (string.IsNullOrEmpty(str))
-        {
-            return str;
-        }
-        str = char.ToLowerInvariant(str[0]) + str.Substring(1);
-        return str;
-    }
-
     public static string CompressToBase64(this string input)
     {
         if (string.IsNullOrEmpty(input))

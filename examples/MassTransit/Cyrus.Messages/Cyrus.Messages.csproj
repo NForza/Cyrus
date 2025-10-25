@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NForza.Cyrus.Generators" Version="1.0.311" />
-    <PackageReference Include="NForza.Cyrus.Abstractions" Version="1.0.311" />
+    <PackageReference Include="NForza.Cyrus.Generators" Version="1.0.328-beta-20251022-061434" />
+    <PackageReference Include="NForza.Cyrus.Abstractions" Version="1.0.328-beta-20251022-061434" />
   </ItemGroup>
 
 </Project>

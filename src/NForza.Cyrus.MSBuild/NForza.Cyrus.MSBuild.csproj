@@ -8,7 +8,7 @@
     <MSBuildRuntime>CurrentRuntime</MSBuildRuntime>
     <OutputType>Library</OutputType>
     <IsPackable>true</IsPackable>
-    <Version>1.0.22</Version>
+    <Version>1.0.24</Version>
     <Title>Cyrus Typescript Generator</Title>
     <Authors>NForza</Authors>
     <Description>Generates Typescript types based on a Cyrus Model</Description>
@@ -46,15 +46,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Framework" Version="17.14.8" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.8" PrivateAssets="all" ExcludeAssets="Runtime">
+    <PackageReference Include="Microsoft.Build.Framework" Version="17.14.28" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.28" PrivateAssets="all" ExcludeAssets="Runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-  </ItemGroup>
+		<PackageReference Include="System.Reflection.MetadataLoadContext" Version="9.0.0" />
+	</ItemGroup>
 
   <ItemGroup>
-    <None Include="..\NForza.Cyrus.TypeScriptGenerator\bin\$(Configuration)\net10.0\publish\**\*.*" Pack="true" PackagePath="tools/net10.0/typescript-generator/" Visible="false" PrivateAssets="all" CopyToOutputDirectory="Never" />
+    <None Include="..\NForza.Cyrus.TypeScriptGenerator\bin\Release\net10.0\publish\**\*.*" Pack="true" PackagePath="tools/net10.0/typescript-generator/" Visible="false" PrivateAssets="all" CopyToOutputDirectory="Never" />
   </ItemGroup> 
 
 </Project>

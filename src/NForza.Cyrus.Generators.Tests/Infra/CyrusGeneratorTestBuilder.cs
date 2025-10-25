@@ -26,6 +26,22 @@ internal class CyrusGeneratorTestBuilder
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source);
 
+    //    var referencedAssemblies = ReferenceAssemblies.Net.Net90.WithAssemblies(
+    //[
+    //    typeof(IServiceCollection).Assembly.Location,
+    //            typeof(ICyrusWebStartup).Assembly.Location,
+    //            typeof(DbContext).Assembly.Location,
+    //            typeof(IBus).Assembly.Location,
+    //            typeof(EntityFrameworkPersistence<,,>).Assembly.Location
+    //]);
+
+    //    var compilation = CSharpCompilation.Create(
+    //        "TestAssembly",
+    //        [syntaxTree],
+    //        await referencedAssemblies.ResolveAsync(LanguageNames.CSharp, CancellationToken.None),
+    //        new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+    //    );
+
         var referencedAssemblies = ((string?)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES"))!
             .Split(Path.PathSeparator)
             .Concat([

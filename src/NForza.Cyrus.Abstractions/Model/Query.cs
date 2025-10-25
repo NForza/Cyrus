@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NForza.Cyrus.Abstractions.Model;
+﻿namespace NForza.Cyrus.Abstractions.Model;
 
 public class Query
 {

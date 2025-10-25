@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Roslyn;
 using NForza.Cyrus.Templating;
 

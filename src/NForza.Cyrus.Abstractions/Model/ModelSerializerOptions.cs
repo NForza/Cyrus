@@ -2,9 +2,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using NForza.Cyrus.Abstractions.Model;
 
-namespace NForza.Cyrus.Model;
+namespace NForza.Cyrus.Abstractions.Model;
 
 [JsonSerializable(typeof(ICyrusModel))]
 [JsonSerializable(typeof(ModelHubDefinition))]
@@ -19,7 +18,7 @@ public static class ModelSerializerOptions
 {
     public static readonly JsonSerializerOptions Default = new()
     {
-        WriteIndented = true,
+        WriteIndented = false,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         Converters =
         {
@@ -37,7 +36,7 @@ public static class ModelSerializerOptions
         }
         foreach (var prop in contract.Properties)
         {
-            if (prop.PropertyType.IsAssignableTo(typeof(IEnumerable)))
+            if (typeof(IEnumerable).IsAssignableFrom(prop.PropertyType))
             {
                 prop.ShouldSerialize = static (_, child) => child is IEnumerable enumerable && enumerable.GetEnumerator().MoveNext();
             }

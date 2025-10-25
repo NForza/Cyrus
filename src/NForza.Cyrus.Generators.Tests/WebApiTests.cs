@@ -255,7 +255,5 @@ public class WebApiTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().BeEmpty();
 
         generatedSyntaxTrees.Should().NotBeEmpty();
-        generatedSyntaxTrees.Should().ContainSource("new ModelEndpointDefinition(");
     }
-
 }

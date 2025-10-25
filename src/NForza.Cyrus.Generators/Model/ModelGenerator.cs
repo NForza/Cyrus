@@ -1,73 +1,57 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Text.Json;
+using Cyrus;
 using Microsoft.CodeAnalysis;
+using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Generators.Roslyn;
-using NForza.Cyrus.Generators.SignalR;
-using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.Model;
 
-internal class ModelGenerator
+public class ModelGenerator : CyrusGeneratorBase
 {
-    internal static string ForHub(SignalRHubClassDefinition signalRHub, LiquidEngine liquidEngine)
+    public static JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = false };
+
+    public override void GenerateSource(SourceProductionContext context, CyrusGenerationContext cyrusGenerationContext)
     {
-        var model = new
+        var model = new CyrusMetadata
         {
-            signalRHub.Name,
-            signalRHub.Path,
-            signalRHub.Commands,
-            signalRHub.Queries,
-            signalRHub.Events
+            Commands = GetCommands(cyrusGenerationContext),
+            Integers = GetInts(cyrusGenerationContext.All.IntValues),
+            Doubles = GetDoubles(cyrusGenerationContext.All.DoubleValues),
+            Guids = GetGuids(cyrusGenerationContext.All.GuidValues),
+            Strings = GetStrings(cyrusGenerationContext.All.StringValues)
         };
-
-        return liquidEngine.Render(model, "Model-hub");
-    }
-
-    internal static string ForNamedType(ITypeSymbol typeSymbol, LiquidEngine liquidEngine)
-    {
-        (bool isCollection, ITypeSymbol? elementType) = typeSymbol.IsCollection();
-        if (isCollection)
+        var modelJson = JsonSerializer.Serialize(model, ModelSerializerOptions.Default);
+        var modelAttribute = new
         {
-            typeSymbol = elementType;
-        }
-        string properties = GetPropertiesDeclaration(typeSymbol, liquidEngine);
-        string values = GetValuesDeclaration(typeSymbol);
-        return $"new ModelTypeDefinition(\"{typeSymbol.Name}\", \"{typeSymbol.ToAssemblyQualifiedName()}\", \"{typeSymbol.Description()}\", [{properties}], [{values}], {isCollection.ToString().ToLower()}, {typeSymbol.IsNullable().ToString().ToLower()})";
+            Key = "cyrus-model",
+            Value = modelJson.CompressToBase64()
+        };
+        var source = cyrusGenerationContext.LiquidEngine.Render(modelAttribute, "ModelAttribute");
+        context.AddSource("cyrus-model.g.cs", source);
     }
 
-    internal static string ForQueryHandler(IMethodSymbol queryHandler, LiquidEngine liquidEngine)
+    private IEnumerable<string> GetStrings(ImmutableArray<INamedTypeSymbol> stringValues) => stringValues.Select(s => s.Name);
+
+    private IEnumerable<string> GetGuids(ImmutableArray<INamedTypeSymbol> guidValues) => guidValues.Select(g => g.Name);
+
+    private IEnumerable<string> GetDoubles(ImmutableArray<INamedTypeSymbol> doubleValues) => doubleValues.Select(s => s.Name);
+
+    private IEnumerable<string> GetInts(ImmutableArray<INamedTypeSymbol> intValues) => intValues.Select(i => i.Name);
+
+    private static System.Collections.Generic.IEnumerable<ModelTypeDefinition> GetCommands(CyrusGenerationContext cyrusGenerationContext)
     {
-        var queryModelDefinition = ForNamedType(queryHandler.Parameters[0].Type, liquidEngine);
-        var returnType = queryHandler.GetQueryReturnType();
-        var returnTypeDefinition = returnType.Name == "Stream" ? ForStream(returnType.IsNullable()) : ForNamedType(returnType, liquidEngine);
-        string queryName = queryHandler.Parameters[0].Type.Name;
-        return $"new ModelQueryDefinition({queryModelDefinition}, {returnTypeDefinition})";
+        return cyrusGenerationContext.All.Commands.Select(c =>
+            new ModelTypeDefinition(
+                c.Name,
+                c.ToFullName(),
+                c.Description(),
+                c.GetPropertyModels(),
+                c.Values(),
+                c.IsCollection().IsMatch,
+                c.IsNullable()
+            )).ToArray();
     }
-
-    private static string ForStream(bool isNullable) 
-        => $"new ModelTypeDefinition(\"byte\", \"System.Byte\", string.Empty, [], [], true, {isNullable.ToString().ToLower()})";
-
-    private static string GetValuesDeclaration(ITypeSymbol namedType)
-    {
-        return namedType.TypeKind == TypeKind.Enum ? string.Join(",", namedType.GetMembers()
-                .OfType<IFieldSymbol>()
-                .Where(f => f.HasConstantValue)
-                .Select(f => $"\"{f.Name}\"")) : string.Empty;
-    }
-
-    private static string GetPropertiesDeclaration(ITypeSymbol typeSymbol, LiquidEngine liquidEngine)
-    {
-        var propertyDeclarations = typeSymbol.GetPropertyModels().Select(m => liquidEngine.Render(new { property = m }, "Model-property"));
-        return string.Join(",", propertyDeclarations);
-    }
-
-    internal static string ForCommandEndpoint((INamedTypeSymbol NamedTypeSymbol, string HttpVerb, string Route) em, LiquidEngine liquidEngine)
-    {
-        return $"new ModelEndpointDefinition(HttpVerb.{em.HttpVerb}, \"{em.Route}\", \"{em.NamedTypeSymbol.Name}\", \"\")";
-    }
-
-    internal static string ForQueryEndpoint((INamedTypeSymbol NamedTypeSymbol, string HttpVerb, string Route) em, LiquidEngine liquidEngine)
-    {
-        return $"new ModelEndpointDefinition(HttpVerb.{em.HttpVerb}, \"{em.Route}\", \"\", \"{em.NamedTypeSymbol.Name}\")";
-    }
-
 }

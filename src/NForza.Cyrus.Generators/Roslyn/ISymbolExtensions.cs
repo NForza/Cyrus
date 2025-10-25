@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using NForza.Cyrus.Abstractions;
 
 namespace NForza.Cyrus.Generators.Roslyn;
 
@@ -104,11 +105,31 @@ public static class ISymbolExtensions
 
     public static bool IsCommand(this ISymbol methodSymbol)
     {
-        return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "CommandAttribute");
+        return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == nameof(CommandAttribute));
     }
 
     public static bool IsEvent(this ISymbol methodSymbol)
     {
-        return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "EventAttribute");
+        return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == nameof(EventAttribute));
+    }
+
+    public static bool IsGuidValue(this ISymbol methodSymbol)
+    {
+        return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == nameof(GuidValueAttribute));
+    }
+
+    public static bool IsIntValue(this ISymbol methodSymbol)
+    {
+        return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == nameof(IntValueAttribute));
+    }
+
+    public static bool IsDoubleValue(this ISymbol methodSymbol)
+    {
+        return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == nameof(DoubleValueAttribute));
+    }
+
+    public static bool IsStringValue(this ISymbol methodSymbol)
+    {
+        return methodSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == nameof(StringValueAttribute));
     }
 }

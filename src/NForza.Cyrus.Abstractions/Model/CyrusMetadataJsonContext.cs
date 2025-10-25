@@ -1,7 +1,6 @@
 ﻿using System.Text.Json.Serialization;
-using NForza.Cyrus.Abstractions.Model;
 
-namespace NForza.Cyrus.Model;
+namespace NForza.Cyrus.Abstractions.Model;
 
 [JsonSerializable(typeof(ICyrusModel))]
 [JsonSerializable(typeof(CyrusMetadata))]

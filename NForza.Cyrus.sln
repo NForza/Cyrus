@@ -34,8 +34,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.Generators.Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.MSBuild", "src\NForza.Cyrus.MSBuild\NForza.Cyrus.MSBuild.csproj", "{E16C1252-6481-BBEB-8982-3868DA4F41A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.MSBuild.Tests", "src\NForza.Cyrus.MSBuild.Tests\NForza.Cyrus.MSBuild.Tests.csproj", "{CCB06883-92FD-2F10-C0B3-3EBD629E8B9D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.TypeScriptGenerator", "src\NForza.Cyrus.TypeScriptGenerator\NForza.Cyrus.TypeScriptGenerator.csproj", "{C1F6A4F6-3D42-2775-1A7C-3825515EC12C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.EntityFramework", "src\NForza.Cyrus.EntityFramework\NForza.Cyrus.EntityFramework.csproj", "{C9C2EDAD-6392-4C2A-B021-84A479C22EFF}"
@@ -103,12 +101,6 @@ Global
 		{E16C1252-6481-BBEB-8982-3868DA4F41A9}.DebugGenerator|Any CPU.Build.0 = Debug|Any CPU
 		{E16C1252-6481-BBEB-8982-3868DA4F41A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E16C1252-6481-BBEB-8982-3868DA4F41A9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CCB06883-92FD-2F10-C0B3-3EBD629E8B9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CCB06883-92FD-2F10-C0B3-3EBD629E8B9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CCB06883-92FD-2F10-C0B3-3EBD629E8B9D}.DebugGenerator|Any CPU.ActiveCfg = Debug|Any CPU
-		{CCB06883-92FD-2F10-C0B3-3EBD629E8B9D}.DebugGenerator|Any CPU.Build.0 = Debug|Any CPU
-		{CCB06883-92FD-2F10-C0B3-3EBD629E8B9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CCB06883-92FD-2F10-C0B3-3EBD629E8B9D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C1F6A4F6-3D42-2775-1A7C-3825515EC12C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C1F6A4F6-3D42-2775-1A7C-3825515EC12C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1F6A4F6-3D42-2775-1A7C-3825515EC12C}.DebugGenerator|Any CPU.ActiveCfg = Debug|Any CPU

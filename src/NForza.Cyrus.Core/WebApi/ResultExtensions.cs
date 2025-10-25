@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using NForza.Cyrus.Abstractions;
+﻿using NForza.Cyrus.Abstractions;
 
 namespace NForza.Cyrus.WebApi;
 

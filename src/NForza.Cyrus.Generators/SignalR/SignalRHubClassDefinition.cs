@@ -119,7 +119,7 @@ public record SignalRHubClassDefinition
 
     private ITypeSymbol? GetReturnTypeOfQuery(ITypeSymbol symbol, CyrusGenerationContext cyrusGenerationContext)
     {
-        var queryHandler = cyrusGenerationContext.AllQueryHandlers.FirstOrDefault(handler => SymbolEqualityComparer.Default.Equals(handler.Parameters[0].Type, symbol));
+        var queryHandler = cyrusGenerationContext.All.QueryHandlers.FirstOrDefault(handler => SymbolEqualityComparer.Default.Equals(handler.Parameters[0].Type, symbol));
         if (queryHandler != null)
         {
             return queryHandler.GetQueryReturnType();
@@ -129,7 +129,7 @@ public record SignalRHubClassDefinition
     }
 
     private IMethodSymbol? GetCommandHandler(ITypeSymbol symbol, CyrusGenerationContext cyrusGenerationContext)
-        => cyrusGenerationContext.AllCommandHandlers.FirstOrDefault(handler => SymbolEqualityComparer.Default.Equals(handler.Parameters[0].Type, symbol));
+        => cyrusGenerationContext.All.CommandHandlers.FirstOrDefault(handler => SymbolEqualityComparer.Default.Equals(handler.Parameters[0].Type, symbol));
 
     private void SetEvents(INamedTypeSymbol symbol, BlockSyntax constructorBody)
     {

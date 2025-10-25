@@ -1,5 +1,4 @@
 using System.Reflection;
-using DemoApp.Domain.Customer;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,19 +8,26 @@ using NForza.Cyrus.WebApi;
 using DemoApp.WebApi;
 using Microsoft.EntityFrameworkCore;
 using NForza.Cyrus.Cqrs;
-using DemoApp.Contracts.Customers;
-using DemoApp.Contracts;
 using NForza.Cyrus.Abstractions;
-using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.SetMinimumLevel(LogLevel.Debug).AddConsole();
 
-builder.Services.AddMassTransit(cfg =>
+builder.Services.AddDbContext<DemoDbContext>(o => o.UseInMemoryDatabase("Demo.Webapi"));
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularApp", builder =>
+    {
+        builder.WithOrigins("http://localhost:4200")
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials();
+    });
+});
+
+builder.Services.AddCyrus(cfg =>
 {
     cfg.AddConsumers(Assembly.GetExecutingAssembly(), typeof(DemoApp.Domain.CyrusConfiguration).Assembly);
     cfg.SetSnakeCaseEndpointNameFormatter();
@@ -39,21 +45,6 @@ builder.Services.AddMassTransit(cfg =>
     //    cfg.ConfigureEndpoints(context);
     //});
 });
-
-builder.Services.AddDbContext<DemoDbContext>(o => o.UseInMemoryDatabase("Demo.Webapi"));
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAngularApp", builder =>
-    {
-        builder.WithOrigins("http://localhost:4200")
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .AllowCredentials();
-    });
-});
-
-builder.Services.AddCyrus();
 
 var app = builder.Build();
 
