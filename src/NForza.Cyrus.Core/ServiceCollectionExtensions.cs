@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddCyrus(this IServiceCollection services, Action<IBusRegistrationConfigurator>? massTransitConfigurator = null)
     {
-        var assemblyNames = Assembly.GetEntryAssembly()!.GetReferencedAssemblies().Where(a => !a.IsFrameworkAssembly());
+        var assemblyNames = AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsFrameworkOrCyrusAssembly()).SelectMany(a => a.GetReferencedAssemblies().Where(a => !a.IsFrameworkAssembly()));
         EnsureAssembliesAreLoaded(assemblyNames);
 
         var assembliesToScan = AppDomain.CurrentDomain.GetAssemblies()
