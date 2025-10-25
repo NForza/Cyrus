@@ -8,7 +8,7 @@ public static class CyrusModel
 {
     public static string AsJson()
     {
-        Assembly assembly = Assembly.GetEntryAssembly();
+        Assembly? assembly = Assembly.GetEntryAssembly();
         if (assembly == null)
         {
             return string.Empty;

@@ -44,7 +44,7 @@ public class ModelGenerator : CyrusGeneratorBase
 
     private static System.Collections.Generic.IEnumerable<ModelTypeDefinition> GetCommands(CyrusGenerationContext cyrusGenerationContext)
     {
-        return cyrusGenerationContext.Commands.Select(c =>
+        return cyrusGenerationContext.AllCommands.Select(c =>
             new ModelTypeDefinition(
                 c.Name,
                 c.ToFullName(),
