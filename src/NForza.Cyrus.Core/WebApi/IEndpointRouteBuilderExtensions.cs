@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
-using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Model;
 
 namespace NForza.Cyrus.WebApi;
@@ -45,8 +44,7 @@ public static class IEndpointRouteBuilderExtensions
         endpoints
             .MapGet("/model", () =>
             {
-                ICyrusModel model = CyrusModel.Aggregate(endpoints.ServiceProvider);
-                string json = model.AsJson();
+                string json = CyrusModel.AsJson();
                 return Results.Content(json, "application/json");
             })
             .ExcludeFromDescription();

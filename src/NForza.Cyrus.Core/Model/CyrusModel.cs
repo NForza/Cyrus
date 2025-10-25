@@ -1,25 +1,24 @@
-﻿using System;
-using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
-using NForza.Cyrus.Abstractions.Model;
+﻿using System.Linq;
+using System.Reflection;
+using MassTransit;
 
 namespace NForza.Cyrus.Model;
 
 public static class CyrusModel
 {
-    public static ICyrusModel Aggregate(IServiceProvider serviceProvider)
+    public static string AsJson()
     {
-        var models = serviceProvider.GetServices<ICyrusModel>();
-        return new CyrusModelAggregator(models);
+        Assembly assembly = Assembly.GetEntryAssembly();
+        if (assembly == null)
+        {
+            return string.Empty;
+        }
+        var attribute = assembly.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault( a => a.Key == "cyrus-model");
+        return attribute?.Value?.DecompressFromBase64() ?? string.Empty;
     }
 
-    public static string GetAsJson()
+    public static string AsAsyncApiYaml(IBus bus)
     {
-        var models = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(assembly => assembly.GetTypes())
-            .Where(type => type.IsAssignableTo(typeof(ICyrusModel)) && !type.IsAbstract)
-            .Where(type => type.Name != "CyrusModelAggregator")
-            .Select(type => (ICyrusModel)Activator.CreateInstance(type)!);
-        return new CyrusModelAggregator(models).AsJson();
+        return string.Empty;
     }
 }

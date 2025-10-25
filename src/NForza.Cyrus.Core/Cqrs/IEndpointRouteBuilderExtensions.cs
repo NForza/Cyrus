@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Model;
 
 namespace NForza.Cyrus.Cqrs;
@@ -16,8 +15,7 @@ public static class IEndpointRouteBuilderExtensions
         endpoints
             .MapGet("/asyncapi", () =>
             {
-                ICyrusModel model = CyrusModel.Aggregate(endpoints.ServiceProvider);
-                string yaml = model.AsAsyncApiYaml(bus);
+                string yaml = CyrusModel.AsAsyncApiYaml(bus);
                 return Results.Content(yaml, "text/yaml");
             })
             .ExcludeFromDescription();
