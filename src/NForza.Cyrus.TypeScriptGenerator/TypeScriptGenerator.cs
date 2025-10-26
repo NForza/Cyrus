@@ -191,7 +191,6 @@ internal static class TypeScriptGenerator
                 queryTypeDefinitions
                     .Concat(queryReturnTypes)
                     .Concat(commands)
-                    .Concat(queryReturnTypes)
                     .Concat(events)
                     .Distinct(TypeWithPropertiesEqualityComparer.Instance);
 

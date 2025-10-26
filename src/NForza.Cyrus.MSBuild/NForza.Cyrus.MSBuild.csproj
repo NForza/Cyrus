@@ -51,7 +51,7 @@
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-		<PackageReference Include="System.Reflection.MetadataLoadContext" Version="9.0.0" />
+		<PackageReference Include="System.Reflection.MetadataLoadContext" Version="9.0.10" />
 	</ItemGroup>
 
   <ItemGroup>

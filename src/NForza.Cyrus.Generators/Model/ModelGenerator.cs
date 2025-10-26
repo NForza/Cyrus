@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text.Json;
@@ -17,11 +18,13 @@ public class ModelGenerator : CyrusGeneratorBase
     {
         var model = new CyrusMetadata
         {
-            Commands = GetCommands(cyrusGenerationContext),
+            Commands = GetModelTypeDefinitions(cyrusGenerationContext.All.CommandHandlers),
             Integers = GetInts(cyrusGenerationContext.All.IntValues),
             Doubles = GetDoubles(cyrusGenerationContext.All.DoubleValues),
             Guids = GetGuids(cyrusGenerationContext.All.GuidValues),
-            Strings = GetStrings(cyrusGenerationContext.All.StringValues)
+            Strings = GetStrings(cyrusGenerationContext.All.StringValues),
+            Events = cyrusGenerationContext.All.Events.Select(e => e.GetModelTypeDefinition()),
+            Queries = GetModelQueryDefinitions(cyrusGenerationContext.All.QueryHandlers),
         };
         var modelJson = JsonSerializer.Serialize(model, ModelSerializerOptions.Default);
         var modelAttribute = new
@@ -33,6 +36,11 @@ public class ModelGenerator : CyrusGeneratorBase
         context.AddSource("cyrus-model.g.cs", source);
     }
 
+    private IEnumerable<ModelQueryDefinition> GetModelQueryDefinitions(ImmutableArray<IMethodSymbol> queryHandlers)
+    {
+        return [.. queryHandlers.Select(c => new ModelQueryDefinition(c.GetQueryType().GetModelTypeDefinition(), c.GetQueryReturnType().GetModelTypeDefinition()))];
+    }
+
     private IEnumerable<string> GetStrings(ImmutableArray<INamedTypeSymbol> stringValues) => stringValues.Select(s => s.Name);
 
     private IEnumerable<string> GetGuids(ImmutableArray<INamedTypeSymbol> guidValues) => guidValues.Select(g => g.Name);
@@ -41,17 +49,8 @@ public class ModelGenerator : CyrusGeneratorBase
 
     private IEnumerable<string> GetInts(ImmutableArray<INamedTypeSymbol> intValues) => intValues.Select(i => i.Name);
 
-    private static System.Collections.Generic.IEnumerable<ModelTypeDefinition> GetCommands(CyrusGenerationContext cyrusGenerationContext)
+    private static IEnumerable<ModelTypeDefinition> GetModelTypeDefinitions(ImmutableArray<IMethodSymbol> methodSymbols)
     {
-        return cyrusGenerationContext.All.Commands.Select(c =>
-            new ModelTypeDefinition(
-                c.Name,
-                c.ToFullName(),
-                c.Description(),
-                c.GetPropertyModels(),
-                c.Values(),
-                c.IsCollection().IsMatch,
-                c.IsNullable()
-            )).ToArray();
+        return [.. methodSymbols.Select(c => c.GetCommandType().GetModelTypeDefinition())];
     }
 }
