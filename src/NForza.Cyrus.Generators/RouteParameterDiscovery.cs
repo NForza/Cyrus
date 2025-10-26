@@ -15,7 +15,7 @@ public static partial class RouteParameterDiscovery
         return matches.Cast<Match>().Select(m => m.Groups["parameter"].Value);
     }
 
-    private static readonly Regex ParameterRegexInstance = new Regex(@"\{(?<parameter>[a-zA-Z_][a-zA-Z0-9_]*)(:(?<type>[^}]+))?\}", RegexOptions.Compiled);
+    private static readonly Regex ParameterRegexInstance = new(@"\{(?<parameter>[a-zA-Z_][a-zA-Z0-9_]*)(:(?<type>[^}]+))?\}", RegexOptions.Compiled);
 
     public static Regex ParameterRegex() => ParameterRegexInstance;
 }

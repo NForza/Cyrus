@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Aggregates;
 using NForza.Cyrus.Generators.Config;
-using NForza.Cyrus.Generators.Events;
 using NForza.Cyrus.Generators.SignalR;
 using NForza.Cyrus.Templating;
 
@@ -29,7 +28,7 @@ public class CyrusGenerationContext
         ImmutableArray<IMethodSymbol> validators,
         ImmutableArray<AggregateRootDefinition> aggregateRoots,
         ImmutableArray<SignalRHubClassDefinition> signalRHubs,
-        GenerationConfig generationConfig, 
+        GenerationConfig generationConfig,
         LiquidEngine liquidEngine,
         bool isTestProject)
     {
@@ -81,5 +80,5 @@ public class CyrusGenerationContext
     public LiquidEngine LiquidEngine { get; }
     public bool IsTestProject { get; }
 
-    public SolutionContext All { get => new SolutionContext(this, allCommandsAndHandlers, allQueriesAndHandlers, allValueTypes); }
+    public SolutionContext All { get => new SolutionContext(allCommandsAndHandlers, allQueriesAndHandlers, allValueTypes); }
 }

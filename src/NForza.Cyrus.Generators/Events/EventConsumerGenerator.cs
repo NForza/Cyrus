@@ -22,7 +22,7 @@ public class EventConsumerGenerator : CyrusGeneratorBase
         {
             Name = eventHandler.Parameters[0].Type.Name,
             FullName = eventHandler.Parameters[0].Type.ToFullName(),
-            InvocationLambda = eventHandler.GetEventLambda("services") 
+            InvocationLambda = eventHandler.GetEventLambda("services")
         };
 
         var resolvedSource = liquidEngine.Render(model, "EventConsumer");

@@ -36,7 +36,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase
 
     private void ReportMissingHandlers(IEnumerable<SignalRHubClassDefinition> signalRHubs, SourceProductionContext spc)
     {
-        foreach(var hub in signalRHubs)
+        foreach (var hub in signalRHubs)
         {
             foreach (var command in hub.Commands)
             {
@@ -65,7 +65,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase
             .Distinct(SymbolEqualityComparer.Default)
             .Select(u => u?.ToFullName())
             .Where(u => !string.IsNullOrWhiteSpace(u))
-            .Concat(["Microsoft.Extensions.DependencyInjection", "NForza.Cyrus.Abstractions" ]);
+            .Concat(["Microsoft.Extensions.DependencyInjection", "NForza.Cyrus.Abstractions"]);
 
         var hubs = signalRDefinitions
             .Select(s => new
@@ -102,7 +102,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase
                 {
                     c.MethodName,
                     c.ClrTypeName,
-                    c.Handler.ReturnType,
+                    c.Handler!.ReturnType,
                     ReturnsVoid = c.Handler.ReturnType.IsVoid(),
                     Invocation = c.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "services"),
                     ReturnsTask = c.Handler.ReturnType.IsTaskType(),

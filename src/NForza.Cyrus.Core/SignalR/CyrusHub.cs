@@ -27,9 +27,9 @@ public class CyrusHub : Hub
         foreach (var evt in eventsToSend)
         {
             if (!eventConfig.TryGetValue(evt.GetType(), out var broadcast))
-                continue;                            
+                continue;
 
-            var methodName = evt.GetType().Name.ToCamelCase();  
+            var methodName = evt.GetType().Name.ToCamelCase();
 
             var sendTask = (broadcast ? Clients.All : Clients.Caller).SendAsync(methodName, evt);
 

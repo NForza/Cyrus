@@ -46,7 +46,7 @@ public static class INamedTypeSymbolExtensions
             .FirstOrDefault();
 
         if (constructor == null)
-            return []; 
+            return [];
 
         return constructor.Parameters
             .Select(p => (p.Name, p.Type))
@@ -55,7 +55,7 @@ public static class INamedTypeSymbolExtensions
 
     public static bool IsRecordType(this INamedTypeSymbol typeSymbol)
     {
-        if (typeSymbol.IsRecord) return true; 
+        if (typeSymbol.IsRecord) return true;
 
         bool hasEqualityOperators = typeSymbol.GetMembers()
             .OfType<IMethodSymbol>()
@@ -79,17 +79,17 @@ public static class INamedTypeSymbolExtensions
         };
     }
 
-    public static bool HasAttribute(this ISymbol typeSymbol, string attributeName) 
+    public static bool HasAttribute(this ISymbol typeSymbol, string attributeName)
         => typeSymbol
                 .GetAttributes()
                 .Select(a => a.AttributeClass?.Name ?? "")
                 .Any(name => name == attributeName || name == attributeName + "Attribute");
 
     public static bool IsCancellationToken(this INamedTypeSymbol typeSymbol)
-        => typeSymbol.Name == "CancellationToken" 
+        => typeSymbol.Name == "CancellationToken"
            && typeSymbol.ContainingNamespace.ToDisplayString() == "System.Threading";
 
-    public static bool IsAggregateRoot(this ISymbol typeSymbol) 
+    public static bool IsAggregateRoot(this ISymbol typeSymbol)
         => typeSymbol.HasAttribute("AggregateRoot");
 
     public static IPropertySymbol? GetAggregateRootIdProperty(this INamedTypeSymbol typeSymbol)
@@ -100,6 +100,6 @@ public static class INamedTypeSymbolExtensions
             var attributes = p.GetAttributes();
             return attributes.Any(a => a.AttributeClass?.Name.StartsWith("AggregateRootId") ?? false);
         });
-        return rootIdProperty ;
+        return rootIdProperty;
     }
 }

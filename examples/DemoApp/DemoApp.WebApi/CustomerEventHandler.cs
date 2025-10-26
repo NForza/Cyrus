@@ -10,7 +10,7 @@ public class CustomerEventHandler
     [EventHandler]
     public async Task Handle(CustomerAddedEvent @event)
     {
-        await Task.Delay(10); 
+        await Task.Delay(10);
         Console.WriteLine($"Customer Added: {@event.Id}");
     }
 }

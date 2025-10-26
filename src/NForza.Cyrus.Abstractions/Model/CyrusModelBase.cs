@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace NForza.Cyrus.Abstractions.Model;
 
-public class CyrusModelBase: ICyrusModel
+public class CyrusModelBase : ICyrusModel
 {
     public virtual IEnumerable<string> Guids { get; set; } = Enumerable.Empty<string>();
     public virtual IEnumerable<string> Integers { get; set; } = Enumerable.Empty<string>();

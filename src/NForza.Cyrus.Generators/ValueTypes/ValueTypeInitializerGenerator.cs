@@ -36,7 +36,14 @@ public class ValueTypeInitializerGenerator : CyrusGeneratorBase
         var imports = typedIds
             .Select(t => t.ContainingNamespace.GetNameOrEmpty())
             .Where(s => !string.IsNullOrEmpty(s))
-            .Concat(["System", "System.Collections.Generic", "NForza.Cyrus.Abstractions" ])
+            .Concat([
+                "System",
+                "System.Collections.Generic",
+                "System.Text.Json.Serialization",
+                "Microsoft.Extensions.DependencyInjection",
+                "NForza.Cyrus.Abstractions",
+                "NForza.Cyrus.Cqrs",
+                ])
             .Distinct();
 
         var types = typedIds.Select(t => new { Name = t.ToFullName(), UnderlyingType = t.GetUnderlyingTypeOfValueType() }).ToList();

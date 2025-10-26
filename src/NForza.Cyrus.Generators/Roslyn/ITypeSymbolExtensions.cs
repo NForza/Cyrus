@@ -139,7 +139,7 @@ internal static class ITypeSymbolExtensions
     {
         if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
         {
-            return (false, null); 
+            return (false, null);
         }
         if (!namedTypeSymbol.IsTaskType())
             return (false, null);

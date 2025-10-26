@@ -35,7 +35,7 @@ public static class AttributeDataExtensions
                 SpecialType.System_Char => $"'{constant.Value}'",
                 SpecialType.System_Boolean => constant.Value?.ToString()!.ToLower(),
                 _ => constant.Value?.ToString() ?? "null"
-            };
+            } ?? string.Empty;
         }
 
         var typeName = attribute.AttributeClass!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);

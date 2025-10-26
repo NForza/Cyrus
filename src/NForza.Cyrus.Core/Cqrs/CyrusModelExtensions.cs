@@ -135,7 +135,7 @@ public static class AsyncApiWriter
         {
             if (_schemas.ContainsKey(t)) return;
 
-            if (TryWriteInline(t, out _)) 
+            if (TryWriteInline(t, out _))
             {
                 _schemas[t] = SchemaNode.ForInline(NameFor(t), t);
                 return;
@@ -265,7 +265,7 @@ public static class AsyncApiWriter
             if (t == typeof(DateTime) || t == typeof(DateTimeOffset)) return ("string", "date-time");
             if (t == typeof(TimeSpan)) return ("string", "duration"); // RFC 3339 duration-ish
             if (t == typeof(Uri)) return ("string", "uri");
-            return ("string", null); 
+            return ("string", null);
         }
 
         private static bool TryWriteInline(Type t, out InlineSchema inline)

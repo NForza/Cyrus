@@ -210,7 +210,7 @@ public class QueryHandlerTests(ITestOutputHelper outputWindow)
             generatedSyntaxTrees.Should().NotBeEmpty();
         }
     }
-    
+
     [Fact]
     public async Task Generating_Instance_QueryHandler_Should_Generate_DI_Registration()
     {

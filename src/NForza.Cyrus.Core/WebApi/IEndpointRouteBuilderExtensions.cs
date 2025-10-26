@@ -14,7 +14,7 @@ public static class IEndpointRouteBuilderExtensions
 {
     public static IEndpointRouteBuilder MapCyrus(this WebApplication endpoints, ILogger? logger = null)
     {
-        endpoints = (WebApplication) endpoints.UseJsonExceptionHandler();
+        endpoints = (WebApplication)endpoints.UseJsonExceptionHandler();
         IEnumerable<Assembly> assembliesToScan = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => !a.IsFrameworkAssembly())
             .ToList();
