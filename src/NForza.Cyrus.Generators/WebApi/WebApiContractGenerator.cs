@@ -25,11 +25,11 @@ public static class WebApiContractGenerator
         });
     }
 
-    private static IEnumerable<string> GetRouteProperties(string route, INamedTypeSymbol command)
+    private static IEnumerable<string> GetRouteProperties(string? route, INamedTypeSymbol command)
     {
         var routeProperties = RouteParameterDiscovery.FindAllParametersInRoute(route);
         var publicPropertiesOfCommand = command.GetPublicProperties().Select(p => p.Name).ToList();
-        return routeProperties.Where(p => publicPropertiesOfCommand.Contains(p)).ToList();
+        return [.. routeProperties.Where(publicPropertiesOfCommand.Contains)];
     }
 
     public static void GenerateContract(INamedTypeSymbol contract, IEnumerable<string> propertiesFromRoute, SourceProductionContext sourceProductionContext, LiquidEngine liquidEngine)

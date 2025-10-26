@@ -57,11 +57,11 @@ public static class ISymbolExtensions
         return false;
     }
 
-    public static string GetCommandRoute(this ISymbol methodSymbol)
-        => GetRouteFromAttribute(methodSymbol, "CommandHandlerAttribute") ?? string.Empty;
+    public static string? GetCommandRoute(this ISymbol methodSymbol)
+        => GetRouteFromAttribute(methodSymbol, "CommandHandlerAttribute");
 
-    public static string GetQueryRoute(this ISymbol methodSymbol)
-    => GetRouteFromAttribute(methodSymbol, "QueryHandlerAttribute") ?? string.Empty;
+    public static string? GetQueryRoute(this ISymbol methodSymbol)
+        => GetRouteFromAttribute(methodSymbol, "QueryHandlerAttribute");
 
     public static string? GetRouteFromAttribute(this ISymbol methodSymbol, string attributeName)
     {
@@ -70,7 +70,7 @@ public static class ISymbolExtensions
         {
             if (attr.NamedArguments.Length > 0)
             {
-                return attr.NamedArguments.FirstOrDefault(kvp => kvp.Key == "Route").Value.Value?.ToString() ?? null;
+                return attr.NamedArguments.FirstOrDefault(kvp => kvp.Key == "Route").Value.Value?.ToString();
             }
         }
         return null;
