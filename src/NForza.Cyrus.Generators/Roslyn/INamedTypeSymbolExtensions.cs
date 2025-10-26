@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using NForza.Cyrus.Abstractions.Model;
 
 namespace NForza.Cyrus.Generators.Roslyn;
 
@@ -102,4 +103,15 @@ public static class INamedTypeSymbolExtensions
         });
         return rootIdProperty;
     }
+
+    public static ModelTypeDefinition GetModelTypeDefinition(this ITypeSymbol typeSymbol) 
+        => new(
+                typeSymbol.Name,
+                typeSymbol.ToFullName(),
+                typeSymbol.Description(),
+                typeSymbol.GetPropertyModels(),
+                typeSymbol.Values(),
+                typeSymbol.IsCollection().IsMatch,
+                typeSymbol.IsNullable()
+            );
 }

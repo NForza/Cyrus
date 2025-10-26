@@ -45,7 +45,7 @@ public class CyrusGenerationContext
         QueryHandlers = queryHandlers;
         EventHandlers = eventHandlers;
         Events = events;
-        AllEvents = allEvents;
+        this.allEvents = allEvents;
         this.allQueriesAndHandlers = allQueriesAndHandlers;
         Validators = validators;
         AggregateRoots = aggregateRoots;
@@ -56,23 +56,22 @@ public class CyrusGenerationContext
     }
 
     public Compilation Compilation { get; }
+    private ImmutableArray<INamedTypeSymbol> allEvents;
+    private ImmutableArray<INamedTypeSymbol> allValueTypes;
+    private ImmutableArray<ISymbol> allCommandsAndHandlers;
+    private ImmutableArray<ISymbol> allQueriesAndHandlers;
+
     public ImmutableArray<INamedTypeSymbol> GuidValues { get; }
     public ImmutableArray<INamedTypeSymbol> IntValues { get; }
     public ImmutableArray<INamedTypeSymbol> DoubleValues { get; }
     public ImmutableArray<INamedTypeSymbol> StringValues { get; }
-
-    private ImmutableArray<INamedTypeSymbol> allValueTypes;
-
     public ImmutableArray<INamedTypeSymbol> Commands { get; }
     public ImmutableArray<IMethodSymbol> CommandHandlers { get; }
-    private ImmutableArray<ISymbol> allCommandsAndHandlers;
     public ImmutableArray<INamedTypeSymbol> Queries { get; }
     public ImmutableArray<IMethodSymbol> QueryHandlers { get; }
-    private ImmutableArray<ISymbol> allQueriesAndHandlers;
     public ImmutableArray<IMethodSymbol> Validators { get; }
     public ImmutableArray<AggregateRootDefinition> AggregateRoots { get; }
     public ImmutableArray<INamedTypeSymbol> Events { get; }
-    public ImmutableArray<INamedTypeSymbol> AllEvents { get; }
     public ImmutableArray<IMethodSymbol> EventHandlers { get; }
     public ImmutableArray<INamedTypeSymbol> ValueTypes => GuidValues.AddRange(IntValues).AddRange(StringValues).AddRange(DoubleValues);
     public ImmutableArray<SignalRHubClassDefinition> SignalRHubs { get; }
@@ -80,5 +79,5 @@ public class CyrusGenerationContext
     public LiquidEngine LiquidEngine { get; }
     public bool IsTestProject { get; }
 
-    public SolutionContext All { get => new SolutionContext(allCommandsAndHandlers, allQueriesAndHandlers, allValueTypes); }
+    public SolutionContext All { get => new SolutionContext(this, allCommandsAndHandlers, allQueriesAndHandlers, allEvents, allValueTypes); }
 }

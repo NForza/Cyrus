@@ -163,6 +163,11 @@ internal static class IMethodSymbolExtensions
         return (INamedTypeSymbol)firstParam;
     }
 
+    public static INamedTypeSymbol GetQueryType(this IMethodSymbol methodSymbol)
+    {
+        var firstParam = methodSymbol.Parameters[0].Type;
+        return (INamedTypeSymbol)firstParam;
+    }
     public static bool HasParametersInBody(this IMethodSymbol methodSymbol)
     {
         var command = methodSymbol.GetCommandType();
