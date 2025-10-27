@@ -1,4 +1,6 @@
-﻿namespace NForza.Cyrus.Abstractions.Model;
+﻿using System.Text.Json.Serialization;
+
+namespace NForza.Cyrus.Abstractions.Model;
 
 public class ModelQueryDefinition : ModelTypeDefinition
 {
@@ -7,6 +9,7 @@ public class ModelQueryDefinition : ModelTypeDefinition
     {
     }
 
+    [JsonConstructor]
     public ModelQueryDefinition(string name, string clrTypeName, string description, ModelPropertyDefinition[] properties, string[] values, bool isCollection, bool isNullable, ModelTypeDefinition returnType)
         : base(name, clrTypeName, description, properties, values, isCollection, isNullable)
     {

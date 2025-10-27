@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text.Json;
 using Cyrus;
 using Microsoft.CodeAnalysis;
+using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Generators.Roslyn;
 
@@ -25,6 +27,7 @@ public class ModelGenerator : CyrusGeneratorBase
             Strings = GetStrings(cyrusGenerationContext.All.StringValues),
             Events = cyrusGenerationContext.All.Events.Select(e => e.GetModelTypeDefinition()),
             Queries = GetModelQueryDefinitions(cyrusGenerationContext.All.QueryHandlers),
+            Endpoints = GetEndpoints(cyrusGenerationContext.All.QueryHandlers, cyrusGenerationContext.All.CommandHandlers),
         };
         var modelJson = JsonSerializer.Serialize(model, ModelSerializerOptions.Default);
         var modelAttribute = new
@@ -34,6 +37,19 @@ public class ModelGenerator : CyrusGeneratorBase
         };
         var source = cyrusGenerationContext.LiquidEngine.Render(modelAttribute, "ModelAttribute");
         context.AddSource("cyrus-model.g.cs", source);
+    }
+
+    private IEnumerable<ModelEndpointDefinition> GetEndpoints(ImmutableArray<IMethodSymbol> queryHandlers, ImmutableArray<IMethodSymbol> commandHandlers)
+    {
+        var queryEndpoints = queryHandlers
+            .Select(nts => (Type: (INamedTypeSymbol)nts.Parameters[0].Type, Verb: HttpVerb.Get, Route: nts.GetQueryRoute()))
+            .Select(em => new ModelEndpointDefinition(em.Verb, em.Route, string.Empty, em.Type.Name));
+
+        var commandEndpoints = commandHandlers
+            .Select(nts => (Type: (INamedTypeSymbol)nts.Parameters[0].Type, Verb: (HttpVerb) Enum.Parse(typeof(HttpVerb), nts.GetCommandVerb()), Route: nts.GetCommandRoute()))
+            .Select(em => new ModelEndpointDefinition(em.Verb, em.Route, em.Type.Name, ""));
+
+        return queryEndpoints.Concat(commandEndpoints);
     }
 
     private IEnumerable<ModelQueryDefinition> GetModelQueryDefinitions(ImmutableArray<IMethodSymbol> queryHandlers)
