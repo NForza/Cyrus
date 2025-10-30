@@ -198,4 +198,61 @@ public class SignalRHubTests(ITestOutputHelper outputWindow)
         generatedSyntaxTrees.Should().ContainSource("app.MapHub<global::Test.CustomerHub_Generated>(\"/customers\")");
         generatedSyntaxTrees.Should().ContainSource("(typeof(global::Test.CustomerCreatedEvent), true)");
     }
+
+    [Fact]
+    public async Task Generating_Hub_Should_Generate_Model_With_Hub_Definition()
+    {
+        var source = @"
+                using System;       
+                using NForza.Cyrus.Abstractions;
+                using NForza.Cyrus.SignalR;         
+
+                namespace Test;
+
+                [Command] 
+                public record NewCustomerCommand(Guid Id);
+
+                [Event]
+                public record CustomerCreatedEvent(Guid Id);
+
+                public static class CustomerCommandHandler
+                {
+                    [CommandHandler]
+                    public static void Handle(NewCustomerCommand cmd)
+                    {
+                    }
+                }
+
+                public class CustomerHub : CyrusSignalRHub
+                {
+                    public CustomerHub()
+                    {
+                        UsePath(""/customers"");
+                        Expose<NewCustomerCommand>();
+                        Emit<CustomerCreatedEvent>();
+                    }
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        compilerOutput.Should().NotHaveErrors();
+        analyzerOutput.Should().BeEmpty();
+
+        var model = generatedSyntaxTrees.GetGeneratedModel();
+        model.Models.Should().Contain(m => m.Name == "NewCustomerCommand");
+        model.Models.Should().Contain(m => m.Name == "CustomerCreatedEvent");
+
+        model.Hubs.Should().ContainSingle();
+        var hub = model.Hubs.Single();
+        hub.Name.Should().Be("CustomerHub");
+        hub.Path.Should().Be("/customers");
+        hub.Commands.Should().ContainSingle().Which.Should().Be("NewCustomerCommand");
+        hub.Queries.Should().BeEmpty();
+        hub.Events.Should().ContainSingle().Which.Should().Be("CustomerCreatedEvent");     
+    }
 }
