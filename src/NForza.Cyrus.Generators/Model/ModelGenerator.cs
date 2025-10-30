@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.ComponentModel.Design;
 using System.Linq;
 using System.Text.Json;
 using Cyrus;
@@ -9,6 +8,7 @@ using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Generators.Roslyn;
+using NForza.Cyrus.Generators.SignalR;
 
 namespace NForza.Cyrus.Generators.Model;
 
@@ -28,6 +28,8 @@ public class ModelGenerator : CyrusGeneratorBase
             Events = cyrusGenerationContext.All.Events.Select(e => e.GetModelTypeDefinition()),
             Queries = GetModelQueryDefinitions(cyrusGenerationContext.All.QueryHandlers),
             Endpoints = GetEndpoints(cyrusGenerationContext.All.QueryHandlers, cyrusGenerationContext.All.CommandHandlers),
+            Hubs = GetHubs(cyrusGenerationContext.SignalRHubs),
+            Models = GetModelTypeDefinitions(cyrusGenerationContext.All)
         };
         var modelJson = JsonSerializer.Serialize(model, ModelSerializerOptions.Default);
         var modelAttribute = new
@@ -39,6 +41,35 @@ public class ModelGenerator : CyrusGeneratorBase
         context.AddSource("cyrus-model.g.cs", source);
     }
 
+    private IEnumerable<ModelTypeDefinition> GetModelTypeDefinitions(SolutionContext all)
+    {
+        var allModels = all.Commands
+            .Concat(all.Events)
+            .Concat(all.Queries)
+            .Concat(all.ValueTypes);
+        return allModels.Select(m => m.GetModelTypeDefinition());
+    }
+
+    private IEnumerable<ModelHubDefinition> GetHubs(ImmutableArray<SignalRHubClassDefinition> signalRHubs)
+    {
+        foreach (var signalRHub in signalRHubs)
+        {
+            var model = new
+            {
+                signalRHub.Name,
+                signalRHub.Path,
+                signalRHub.Commands,
+                signalRHub.Queries,
+                signalRHub.Events
+            };
+
+            yield return new ModelHubDefinition(model.Name, model.Path,
+              model.Commands.Select(c => c.MethodName),
+              model.Queries.Select(c => c.MethodName),
+              model.Events.Select(e => e.Name));
+        }
+    }
+
     private IEnumerable<ModelEndpointDefinition> GetEndpoints(ImmutableArray<IMethodSymbol> queryHandlers, ImmutableArray<IMethodSymbol> commandHandlers)
     {
         var queryEndpoints = queryHandlers
@@ -46,7 +77,7 @@ public class ModelGenerator : CyrusGeneratorBase
             .Select(em => new ModelEndpointDefinition(em.Verb, em.Route, string.Empty, em.Type.Name));
 
         var commandEndpoints = commandHandlers
-            .Select(nts => (Type: (INamedTypeSymbol)nts.Parameters[0].Type, Verb: (HttpVerb) Enum.Parse(typeof(HttpVerb), nts.GetCommandVerb()), Route: nts.GetCommandRoute()))
+            .Select(nts => (Type: (INamedTypeSymbol)nts.Parameters[0].Type, Verb: (HttpVerb)Enum.Parse(typeof(HttpVerb), nts.GetCommandVerb()), Route: nts.GetCommandRoute()))
             .Select(em => new ModelEndpointDefinition(em.Verb, em.Route, em.Type.Name, ""));
 
         return queryEndpoints.Concat(commandEndpoints);
