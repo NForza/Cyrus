@@ -269,28 +269,33 @@ internal static class TypeScriptGenerator
 
     private static IEnumerable<Import> GetImportsFor(ModelTypeDefinition type, bool includeTypeItself, CyrusMetadata metadata)
     {
-        if (includeTypeItself)
+        IEnumerable<Import> GetAllImports()
         {
-            yield return new Import { Name = type.Name };
+            if (includeTypeItself)
+            {
+                yield return new Import { Name = type.Name };
+            }
+            foreach (var p in type.Properties ?? [])
+            {
+                if (metadata.Guids.Contains(p.Type))
+                {
+                    yield return new Import { Name = p.Type };
+                }
+                if (metadata.Strings.Contains(p.Type))
+                {
+                    yield return new Import { Name = p.Type };
+                }
+                if (metadata.Integers.Contains(p.Type))
+                {
+                    yield return new Import { Name = p.Type };
+                }
+                if (metadata.Models.Any(m => m.Name == p.Type))
+                {
+                    yield return new Import { Name = p.Type };
+                }
+            }
         }
-        foreach (var p in type.Properties ?? [])
-        {
-            if (metadata.Guids.Contains(p.Type))
-            {
-                yield return new Import { Name = p.Type };
-            }
-            if (metadata.Strings.Contains(p.Type))
-            {
-                yield return new Import { Name = p.Type };
-            }
-            if (metadata.Integers.Contains(p.Type))
-            {
-                yield return new Import { Name = p.Type };
-            }
-            if (metadata.Models.Any(m => m.Name == p.Type))
-            {
-                yield return new Import { Name = p.Type };
-            }
-        }
+
+        return GetAllImports().GroupBy(i => i.Name).Select(g => g.First());
     }
 }
