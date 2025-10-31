@@ -1,1 +1,2 @@
-export type CustomerId = string;
+export interface CustomerId {
+}
