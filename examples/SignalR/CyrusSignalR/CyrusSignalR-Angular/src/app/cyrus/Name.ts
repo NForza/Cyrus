@@ -1,1 +1,2 @@
-export type Name = string;
+export interface Name {
+}
