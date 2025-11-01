@@ -15,13 +15,6 @@ public class DoubleValueGenerator : CyrusGeneratorBase
             var sourceText = GenerateDoubleValueTypes(recordSymbol, cyrusGenerationContext.LiquidEngine);
             context.AddSource($"{recordSymbol.Name}.g.cs", sourceText);
         }
-        ;
-
-        if (recordSymbols.Any())
-        {
-            var intModels = GetPartialModelClass(recordSymbols.First().ContainingAssembly.Name, "TypedIds", "Doubles", "string", recordSymbols.Select(im => $"\"{im.Name}\""), cyrusGenerationContext.LiquidEngine);
-            context.AddSource($"model-double.g.cs", intModels);
-        }
     }
 
     private string GenerateDoubleValueTypes(INamedTypeSymbol item, LiquidEngine liquidEngine)
