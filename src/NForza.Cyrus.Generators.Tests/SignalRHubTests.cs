@@ -255,4 +255,42 @@ public class SignalRHubTests(ITestOutputHelper outputWindow)
         hub.Queries.Should().BeEmpty();
         hub.Events.Should().ContainSingle().Which.Should().Be("CustomerCreatedEvent");     
     }
+
+    [Fact]
+    public async Task Generating_No_Hubs_Should_Not_Generate_SignalR_Registration()
+    {
+        var source = @"
+                using System;       
+                using NForza.Cyrus.Abstractions;
+                using NForza.Cyrus.SignalR;         
+
+                namespace Test;
+
+                [Command] 
+                public record NewCustomerCommand(Guid Id);
+
+                [Event]
+                public record CustomerCreatedEvent(Guid Id);
+
+                public static class CustomerCommandHandler
+                {
+                    [CommandHandler]
+                    public static void Handle(NewCustomerCommand cmd)
+                    {
+                    }
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        compilerOutput.Should().NotHaveErrors();
+        analyzerOutput.Should().BeEmpty();
+
+        generatedSyntaxTrees.Should().NotContainSource(".AddSignalR");
+    }
+
 }

@@ -7,13 +7,7 @@
     <PackAsTool>true</PackAsTool>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Templates\enum.liquid" />
-    <EmbeddedResource Include="Templates\guid.liquid" />
-    <EmbeddedResource Include="Templates\hub.liquid" />
-    <EmbeddedResource Include="Templates\number.liquid" />
-    <EmbeddedResource Include="Templates\interface.liquid" />
-    <EmbeddedResource Include="Templates\string.liquid" />
-    <EmbeddedResource Include="Templates\type-defaults.liquid" />
+    <EmbeddedResource Include="Templates\*.liquid" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj" />
