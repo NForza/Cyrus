@@ -1,6 +1,6 @@
 ﻿using NForza.Cyrus.Abstractions;
 
-namespace SimpleCyrusWebApi;
+namespace SimpleCyrusWebApi.Model;
 
 [StringValue]
 public partial record struct Address;

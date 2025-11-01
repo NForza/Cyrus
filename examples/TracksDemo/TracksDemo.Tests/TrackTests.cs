@@ -11,7 +11,7 @@ public class TrackTests(ITestOutputHelper outputWindow)
         TracksDemoApplicationFactory webApplicationFactory = new(outputWindow);
         var client = webApplicationFactory.CreateClient();
 
-        var result = await  client.GetAsync("/tracks");
+        var result = await client.GetAsync("/tracks");
         result.Should().NotBeNull();
         result.EnsureSuccessStatusCode();
     }

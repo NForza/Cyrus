@@ -10,6 +10,6 @@ public class NewCustomerCommandHandler
     public (Result Result, object Messages) Execute(NewCustomerCommand command)
     {
         Console.WriteLine("Executing handler for NewCustomerCommand");
-        return (new AcceptedResult(),  new CustomerCreatedEvent(command.Id));
+        return (Result.Accepted(), new CustomerCreatedEvent(command.Id));
     }
 }

@@ -2,7 +2,7 @@
 
 namespace CyrusSignalR
 {
-    public class CustomerHub: CyrusSignalRHub
+    public class CustomerHub : CyrusSignalRHub
     {
         public CustomerHub()
         {

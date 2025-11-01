@@ -1,7 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-
+using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
 namespace TracksDemo.Tests;

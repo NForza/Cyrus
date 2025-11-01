@@ -1,6 +1,6 @@
 ﻿using NForza.Cyrus.Abstractions;
 
-namespace SimpleCyrusWebApi;
+namespace SimpleCyrusWebApi.Model;
 
 [GuidValue]
 public partial record struct CustomerId;

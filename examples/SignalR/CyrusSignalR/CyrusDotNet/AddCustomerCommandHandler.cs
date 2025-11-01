@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
 using NForza.Cyrus.Abstractions;
 
 namespace CyrusSignalR;

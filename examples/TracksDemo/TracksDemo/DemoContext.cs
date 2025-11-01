@@ -3,7 +3,7 @@ using TracksDemo.Tracks;
 
 namespace TracksDemo;
 
-public class DemoContext: DbContext
+public class DemoContext : DbContext
 {
     public DemoContext(DbContextOptions<DemoContext> options) : base(options)
     {

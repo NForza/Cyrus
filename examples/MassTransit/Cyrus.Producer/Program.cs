@@ -1,7 +1,7 @@
-using NForza.Cyrus.WebApi;
-using MassTransit;
 using System.Reflection;
+using MassTransit;
 using NForza.Cyrus;
+using NForza.Cyrus.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 

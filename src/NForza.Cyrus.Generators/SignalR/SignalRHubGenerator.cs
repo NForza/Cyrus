@@ -21,7 +21,7 @@ public class SignalRHubGenerator : CyrusGeneratorBase
 
         var isWebApi = configuration.GenerationTarget.Contains(GenerationTarget.WebApi);
 
-        if (isWebApi)
+        if (isWebApi && signalRHubs.Any())
         {
             var registration = GenerateSignalRHubRegistration(signalRHubs, cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"RegisterSignalRHubs.g.cs", registration);

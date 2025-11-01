@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NForza.Cyrus.Abstractions;
-using TracksDemo.Tracks;
 
 namespace TracksDemo.Tracks.Query;
 
@@ -44,8 +43,8 @@ public class TracksQueryHandler(DemoContext context)
         Console.WriteLine("Searching tracks: " + query.SearchTerms);
         var searchTerms = query.SearchTerms.ToLower().Split(' ');
         return [.. context.Tracks
-            .Where(c => searchTerms.Any(term => 
-                c.Title.ToString().Contains(term, StringComparison.CurrentCultureIgnoreCase) 
+            .Where(c => searchTerms.Any(term =>
+                c.Title.ToString().Contains(term, StringComparison.CurrentCultureIgnoreCase)
                 ||
                 c.Artist.ToString().Contains(term, StringComparison.CurrentCultureIgnoreCase)))
             .Skip((query.Page - 1) * query.PageSize)
