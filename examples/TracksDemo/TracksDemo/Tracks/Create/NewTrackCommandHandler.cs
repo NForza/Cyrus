@@ -29,8 +29,8 @@ public class NewTrackCommandHandler(DemoContext context)
         }
         catch (ArgumentException ae) when (ae.Message.Contains("same key"))
         {
-           //return (new ConflictResult.Conflict<Track>($"Track with Id {command.TrackId} already exists."), []);
+           return (Result.Conflict($"Track with Id {command.TrackId} already exists."), []);
         }
-        return (new AcceptedResult(), [new TrackCreatedEvent(command.TrackId, command.Title, command.FileName)]);
+        return (Result.Accepted(), [new TrackCreatedEvent(command.TrackId, command.Title, command.FileName)]);
     }
 }
