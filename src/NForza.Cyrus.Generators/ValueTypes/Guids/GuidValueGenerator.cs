@@ -14,20 +14,7 @@ public class GuidValueGenerator : CyrusGeneratorBase
         {
             var sourceText = GenerateGuidValue(recordSymbol, cyrusGenerationContext.LiquidEngine);
             spc.AddSource($"{recordSymbol.Name}.g.cs", sourceText);
-        }
-        ;
-
-        if (guidValues.Any())
-        {
-            var guidModels = GetPartialModelClass(
-                guidValues.First().ContainingAssembly.Name,
-                "ValueTypes",
-                "Guids",
-                "string",
-                guidValues.Select(guid => $"\"{guid.Name}\""),
-                cyrusGenerationContext.LiquidEngine);
-            spc.AddSource($"model-guids.g.cs", guidModels);
-        }
+        }       
     }
 
     private string GenerateGuidValue(INamedTypeSymbol item, LiquidEngine liquidEngine)
