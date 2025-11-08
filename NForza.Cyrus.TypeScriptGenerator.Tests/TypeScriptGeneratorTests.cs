@@ -1,12 +1,9 @@
-﻿using System.IO.Abstractions.TestingHelpers;
-using System.Text.Json;
-using FluentAssertions;
-using NForza.Cyrus.Abstractions.Model;
-using NForza.Cyrus.TypeScriptGenerator;
+﻿using NForza.Cyrus.Abstractions.Model;
+using NForza.Cyrus.TypeScriptGenerator.Tests.Infra;
 
 namespace NForza.Cyrus.TypeScriptGenerator.Tests;
 
-public class UnitTest1
+public class TypeScriptGeneratorTests
 {
     [Fact]
     public void Command_In_Model_Should_Generate_TS_Code()

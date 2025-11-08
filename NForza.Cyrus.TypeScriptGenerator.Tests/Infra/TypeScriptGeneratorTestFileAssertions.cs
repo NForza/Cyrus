@@ -1,7 +1,7 @@
 ﻿
 using FluentAssertions;
 
-namespace NForza.Cyrus.TypeScriptGenerator.Tests
+namespace NForza.Cyrus.TypeScriptGenerator.Tests.Infra
 {
     internal class TypeScriptGeneratorTestFileAssertions(string textContents)
     {

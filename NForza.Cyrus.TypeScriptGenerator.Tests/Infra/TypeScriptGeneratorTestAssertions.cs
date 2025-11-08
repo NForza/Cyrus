@@ -1,7 +1,7 @@
 ﻿using System.IO.Abstractions.TestingHelpers;
 using FluentAssertions;
 
-namespace NForza.Cyrus.TypeScriptGenerator.Tests
+namespace NForza.Cyrus.TypeScriptGenerator.Tests.Infra
 {
     public class TypeScriptGeneratorTestAssertions(MockFileSystem mockFileSystem)
     {

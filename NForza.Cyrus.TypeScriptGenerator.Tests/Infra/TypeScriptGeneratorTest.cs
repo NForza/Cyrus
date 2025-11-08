@@ -2,7 +2,7 @@
 using System.Text.Json;
 using NForza.Cyrus.Abstractions.Model;
 
-namespace NForza.Cyrus.TypeScriptGenerator.Tests
+namespace NForza.Cyrus.TypeScriptGenerator.Tests.Infra
 {
     internal class TypeScriptGeneratorTest
     {
