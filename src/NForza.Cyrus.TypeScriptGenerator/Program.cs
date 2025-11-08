@@ -1,4 +1,4 @@
-﻿using Cyrus;
+﻿using System.IO.Abstractions;
 using NForza.Cyrus.TypeScriptGenerator;
 
 var argumentParser = new ArgumentParser(args);
@@ -25,5 +25,5 @@ if (!succeeded)
     return 1;
 }
 
-TypeScriptGenerator.Generate(model!, argumentParser.Output);
+TypeScriptGenerator.Generate(new FileSystem(), model!, argumentParser.Output);
 return 0;

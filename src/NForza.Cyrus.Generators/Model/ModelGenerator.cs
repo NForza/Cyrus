@@ -46,7 +46,9 @@ public class ModelGenerator : CyrusGeneratorBase
         var allModels = all.Commands
             .Concat(all.Events)
             .Concat(all.Queries)
-            .Concat(all.ValueTypes);
+            .Concat(all.QueryHandlers.Select( q => q.GetQueryReturnType()))
+            .Where(m => !all.ValueTypes.Contains(m, SymbolEqualityComparer.Default));
+
         return allModels.Select(m => m.GetModelTypeDefinition());
     }
 

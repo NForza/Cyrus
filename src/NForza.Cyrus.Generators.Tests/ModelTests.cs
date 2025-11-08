@@ -81,4 +81,89 @@ public class ModelTests(ITestOutputHelper outputWindow)
         model.Queries.Should().ContainSingle(cd => cd.Name == "CustomerQuery");
         model.Endpoints.Should().ContainSingle(ed => ed.Route == "/query" && ed.QueryName == "CustomerQuery" && ed.HttpVerb == HttpVerb.Get);
     }
+
+    [Fact]
+    public async Task Generating_GuidValue_Should_Not_Generate_GuidValue_In_Models()
+    {
+        var source = @"
+                using System;       
+                using NForza.Cyrus.Abstractions;
+                using NForza.Cyrus.SignalR;         
+
+                namespace Test;
+
+                [GuidValue] 
+                public partial record struct CustomerId;
+
+                [Query] 
+                public record CustomerQuery(CustomerId Id);
+
+                public static class CustomerQueryHandler
+                {
+                    [QueryHandler(Route = ""/query"")]
+                    public static CustomerId Handle(CustomerQuery qry)
+                    {
+                        return qry.Id;      
+                    }
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        compilerOutput.Should().NotHaveErrors();
+        analyzerOutput.Should().BeEmpty();
+
+        var model = generatedSyntaxTrees.GetGeneratedModel();
+        model.Should().NotBeNull();
+        model.Guids.Should().ContainSingle(g => g == "CustomerId");
+        model.Models.Should().NotContain(md => md.Name == "CustomerId");
+    }
+
+    [Fact]
+    public async Task Generating_Query_Should_Generate_Query_ReturnType_In_Model()
+    {
+        var source = @"
+                using System;       
+                using NForza.Cyrus.Abstractions;
+                using NForza.Cyrus.SignalR;         
+
+                namespace Test;
+
+                [GuidValue] 
+                public partial record struct CustomerId;
+
+                public record Customer(CustomerId Id, string Name);
+
+                [Query] 
+                public record CustomerQuery(CustomerId Id);
+
+                public static class CustomerQueryHandler
+                {
+                    [QueryHandler(Route = ""/query"")]
+                    public static Customer Handle(CustomerQuery qry)
+                    {
+                        return new Customer(qry.Id, """");      
+                    }
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        compilerOutput.Should().NotHaveErrors();
+        analyzerOutput.Should().BeEmpty();
+
+        var model = generatedSyntaxTrees.GetGeneratedModel();
+        model.Should().NotBeNull();
+        model.Guids.Should().ContainSingle(g => g == "CustomerId");
+        model.Models.Should().Contain(md => md.Name == "Customer");
+        model.Models.Should().NotContain(md => md.Name == "CustomerId");
+    }
 }
