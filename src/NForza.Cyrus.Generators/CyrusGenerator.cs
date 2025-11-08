@@ -114,8 +114,11 @@ public class CyrusGenerator : CyrusSourceGeneratorBase, IIncrementalGenerator
                     .ToList()
                     .ForEach(t =>
                     {
-                        var generator = (CyrusGeneratorBase)Activator.CreateInstance(t);
-                        generator.GenerateSource(sourceProductionContext, cyrusGenerationContext);
+                        if (!sourceProductionContext.CancellationToken.IsCancellationRequested)
+                        {
+                            var generator = (CyrusGeneratorBase)Activator.CreateInstance(t);
+                            generator.GenerateSource(sourceProductionContext, cyrusGenerationContext);
+                        }
                     });
             }
             catch (Exception ex)
