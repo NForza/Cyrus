@@ -100,7 +100,15 @@ internal class CyrusGeneratorTestBuilder
 
         generatedSyntaxTrees.ToList().ForEach(tree =>
         {
-            var text = $"{tree.FilePath}{Environment.NewLine}----{Environment.NewLine}{tree}{Environment.NewLine}{Environment.NewLine}";
+            var text = @$"
+----------------
+{tree.FilePath}
+----------------
+{tree}
+
+
+
+";
             logAction.Invoke(text);
         });
 

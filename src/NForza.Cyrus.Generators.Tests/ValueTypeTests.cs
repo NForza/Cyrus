@@ -135,4 +135,50 @@ public class ValueTypeTests(ITestOutputHelper outputWindow)
         analyzerOutput.Should().NotHaveErrors();
         compilerOutput.Should().NotHaveErrors();
     }
+
+    [Fact]
+    public async Task Generating_IntValue_With_Named_Min_And_Max_Values_Should_Generate_Correct_Code()
+    {
+        var source = @"
+                using NForza.Cyrus.Abstractions;
+
+                [IntValue(minimum: 27, maximum: 34)]
+                public partial record struct Amount;
+        ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        analyzerOutput.Should().NotHaveErrors();
+        compilerOutput.Should().NotHaveErrors();
+        generatedSyntaxTrees.Should().ContainSource("public partial record struct Amount(int Value)");
+        generatedSyntaxTrees.Should().ContainSource("Value >= 27");
+        generatedSyntaxTrees.Should().ContainSource("Value <= 34");
+    }
+
+    [Fact]
+    public async Task Generating_IntValue_With_Named_Min_And_Max_Values_Out_Of_Order_Should_Generate_Correct_Code()
+    {
+        var source = @"
+                using NForza.Cyrus.Abstractions;
+
+                [IntValue(maximum: 34, minimum: 27)]
+                public partial record struct Amount;
+        ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        analyzerOutput.Should().NotHaveErrors();
+        compilerOutput.Should().NotHaveErrors();
+        generatedSyntaxTrees.Should().ContainSource("public partial record struct Amount(int Value)");
+        generatedSyntaxTrees.Should().ContainSource("Value >= 27");
+        generatedSyntaxTrees.Should().ContainSource("Value <= 34");
+    }
 }

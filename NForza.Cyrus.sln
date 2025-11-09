@@ -38,7 +38,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.TypeScriptGene
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.EntityFramework", "src\NForza.Cyrus.EntityFramework\NForza.Cyrus.EntityFramework.csproj", "{C9C2EDAD-6392-4C2A-B021-84A479C22EFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.TypeScriptGenerator.Tests", "NForza.Cyrus.TypeScriptGenerator.Tests\NForza.Cyrus.TypeScriptGenerator.Tests.csproj", "{037FC812-66C5-471A-9761-E6EFC461C8DB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NForza.Cyrus.TypeScriptGenerator.Tests", "src\NForza.Cyrus.TypeScriptGenerator.Tests\NForza.Cyrus.TypeScriptGenerator.Tests.csproj", "{037FC812-66C5-471A-9761-E6EFC461C8DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
