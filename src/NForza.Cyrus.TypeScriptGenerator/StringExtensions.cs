@@ -1,7 +1,7 @@
 ﻿using System.IO.Compression;
 using System.Text;
 
-namespace Cyrus;
+namespace NForza.Cyrus.TypeScriptGenerator;
 
 public static class StringExtensions
 {

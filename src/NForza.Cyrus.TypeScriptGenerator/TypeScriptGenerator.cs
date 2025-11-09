@@ -1,13 +1,14 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.IO.Abstractions;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
 using Fluid.Values;
 using NForza.Cyrus.Abstractions.Model;
 using NForza.Cyrus.Templating;
 
-namespace Cyrus;
+namespace NForza.Cyrus.TypeScriptGenerator;
 
-internal static class TypeScriptGenerator
+public static class TypeScriptGenerator
 {
     private static LiquidEngine? _liquidEngine = null;
     private static LiquidEngine liquidEngine => _liquidEngine ??= new LiquidEngine(Assembly.GetExecutingAssembly(), [], options =>
@@ -122,42 +123,42 @@ internal static class TypeScriptGenerator
         return typeScriptType;
     }
 
-    public static bool Generate(string json, string outputFolder)
+    public static bool Generate(IFileSystem fileSystem, string json, string outputFolder)
     {
         metadata = JsonSerializer.Deserialize<CyrusMetadata>(json, ModelSerializerOptions.Default) ?? throw new InvalidOperationException("Can't read metadata");
 
-        var path = Path.GetFullPath(outputFolder);
+        var path = fileSystem.Path.GetFullPath(outputFolder);
         Console.WriteLine("model: " + JsonSerializer.Serialize(metadata));
 
         Console.WriteLine("Writing output to: " + path);
 
         Console.WriteLine("Writing Guids.");
-        GenerateGuids(path, metadata);
+        GenerateGuids(fileSystem, path, metadata);
 
         Console.WriteLine("Writing Strings.");
-        GenerateStrings(path, metadata);
+        GenerateStrings(fileSystem, path, metadata);
 
         Console.WriteLine("Writing Integers.");
-        GenerateIntegers(path, metadata);
+        GenerateIntegers(fileSystem, path, metadata);
 
         Console.WriteLine("Writing Commands.");
-        GenerateCommands(path, metadata);
+        GenerateCommands(fileSystem, path, metadata);
 
         Console.WriteLine("Writing Queries.");
-        GenerateQueries(path, metadata);
+        GenerateQueries(fileSystem, path, metadata);
 
         Console.WriteLine("Writing Events.");
-        GenerateEvents(path, metadata);
+        GenerateEvents(fileSystem, path, metadata);
 
         Console.WriteLine("Writing Hubs.");
-        GenerateHubs(path, metadata);
+        GenerateHubs(fileSystem, path, metadata);
 
         Console.WriteLine("Writing Models.");
-        GenerateModels(path, metadata);
+        GenerateModels(fileSystem, path, metadata);
         return true;
     }
 
-    private static void GenerateModels(string outputFolder, CyrusMetadata metadata)
+    private static void GenerateModels(IFileSystem fileSystem, string outputFolder, CyrusMetadata metadata)
     {
         foreach (var type in metadata.Models)
         {
@@ -177,9 +178,9 @@ internal static class TypeScriptGenerator
         }
     }
 
-    private static void GenerateHubs(string outputFolder, CyrusMetadata metadata)
+    private static void GenerateHubs(IFileSystem fileSystem, string outputFolder, CyrusMetadata metadata)
     {
-        GenerateHubQueryReturnTypes(outputFolder, metadata);
+        GenerateHubQueryReturnTypes(fileSystem, outputFolder, metadata);
         foreach (var hub in metadata.Hubs)
         {
             IEnumerable<ModelQueryDefinition> queries = hub.Queries.Select(queryName => metadata.Queries.First(q => q.Name == queryName));
@@ -202,68 +203,72 @@ internal static class TypeScriptGenerator
         }
     }
 
-    private static void GenerateHubQueryReturnTypes(string outputFolder, CyrusMetadata metadata)
+    private static void GenerateHubQueryReturnTypes(IFileSystem fileSystem, string outputFolder, CyrusMetadata metadata)
     {
         var returnTypes = metadata.Hubs.SelectMany(h => h.Queries).Select(queryName => metadata.Queries.First(q => q.Name == queryName).ReturnType).Distinct(TypeWithPropertiesEqualityComparer.Instance);
-        GenerateTypesWithProperties(returnTypes, outputFolder, metadata);
+        GenerateTypesWithProperties(fileSystem, returnTypes, outputFolder, metadata);
     }
 
-    private static void GenerateGuids(string outputFolder, CyrusMetadata metadata)
+
+    private static void GenerateGuids(IFileSystem fileSystem, string outputFolder, CyrusMetadata metadata)
     {
         foreach (var guid in metadata.Guids)
         {
             var result = liquidEngine.Render(new { Name = guid }, "guid");
-            string fileName = Path.ChangeExtension(Path.Combine(outputFolder, guid), ".ts");
-            File.WriteAllText(fileName, result);
+
+            string fileName = fileSystem.Path.ChangeExtension(fileSystem.Path.Combine(outputFolder, guid), ".ts");
+
+            fileSystem.File.WriteAllText(fileName, result);
         }
     }
 
-    private static void GenerateStrings(string outputFolder, CyrusMetadata metadata)
+
+    private static void GenerateStrings(IFileSystem fileSystem, string outputFolder, CyrusMetadata metadata)
     {
         foreach (var stringType in metadata.Strings)
         {
             var result = liquidEngine.Render(new { Name = stringType }, "string");
-            string fileName = Path.ChangeExtension(Path.Combine(outputFolder, stringType), ".ts");
-            File.WriteAllText(fileName, result);
+            string fileName = fileSystem.Path.ChangeExtension(Path.Combine(outputFolder, stringType), ".ts");
+            fileSystem.File.WriteAllText(fileName, result);
         }
     }
 
-    private static void GenerateCommands(string outputFolder, CyrusMetadata metadata) => GenerateTypesWithProperties(metadata.Commands, outputFolder, metadata);
+    private static void GenerateCommands(IFileSystem fileSystem, string outputFolder, CyrusMetadata metadata) => GenerateTypesWithProperties(fileSystem, metadata.Commands, outputFolder, metadata);
 
-    private static void GenerateTypesWithProperties(IEnumerable<ModelTypeDefinition> typesWithProperties, string outputFolder, CyrusMetadata metadata)
+    private static void GenerateTypesWithProperties(IFileSystem fileSystem, IEnumerable<ModelTypeDefinition> typesWithProperties, string outputFolder, CyrusMetadata metadata)
     {
         foreach (var type in typesWithProperties)
         {
             var model = new { Imports = GetImportsFor(type, false, metadata).ToList(), type.Name, type.Properties };
             var result = liquidEngine.Render(model, "interface");
-            string fileName = Path.ChangeExtension(Path.Combine(outputFolder, type.Name), ".ts");
-            File.WriteAllText(fileName, result);
+            string fileName = fileSystem.Path.ChangeExtension(Path.Combine(outputFolder, type.Name), ".ts");
+            fileSystem.File.WriteAllText(fileName, result);
         }
     }
 
-    private static void GenerateQueries(string outputFolder, CyrusMetadata metadata)
+    private static void GenerateQueries(IFileSystem fileSystem, string outputFolder, CyrusMetadata metadata)
     {
-        GenerateTypesWithProperties(metadata.Queries, outputFolder, metadata);
-        GenerateTypesWithProperties(metadata.Queries.Select(q => q.ReturnType), outputFolder, metadata);
+        GenerateTypesWithProperties(fileSystem, metadata.Queries, outputFolder, metadata);
+        GenerateTypesWithProperties(fileSystem, metadata.Queries.Select(q => q.ReturnType), outputFolder, metadata);
     }
 
-    private static void GenerateIntegers(string outputFolder, CyrusMetadata metadata)
+    private static void GenerateIntegers(IFileSystem fileSystem, string outputFolder, CyrusMetadata metadata)
     {
         foreach (var integerType in metadata.Integers)
         {
             var result = liquidEngine.Render(new { Name = integerType }, "number");
-            string fileName = Path.ChangeExtension(Path.Combine(outputFolder, integerType), ".ts");
-            File.WriteAllText(fileName, result);
+            string fileName = fileSystem.Path.ChangeExtension(Path.Combine(outputFolder, integerType), ".ts");
+            fileSystem.File.WriteAllText(fileName, result);
         }
     }
-    private static void GenerateEvents(string outputFolder, CyrusMetadata metadata)
+    private static void GenerateEvents(IFileSystem fileSystem, string outputFolder, CyrusMetadata metadata)
     {
         foreach (var @event in metadata.Events)
         {
             var model = new { Imports = GetImportsFor(@event, false, metadata).ToList(), @event.Name, @event.Properties };
             var result = liquidEngine.Render(model, "interface");
-            string fileName = Path.ChangeExtension(Path.Combine(outputFolder, @event.Name), ".ts");
-            File.WriteAllText(fileName, result);
+            string fileName = fileSystem.Path.ChangeExtension(Path.Combine(outputFolder, @event.Name), ".ts");
+            fileSystem.File.WriteAllText(fileName, result);
         }
     }
 
