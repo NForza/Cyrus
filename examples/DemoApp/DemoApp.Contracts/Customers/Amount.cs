@@ -2,5 +2,5 @@
 
 namespace DemoApp.Contracts.Customers;
 
-[IntValue(0, 100)]
+[IntValue(minimum: 0, maximum: 100)]
 public partial record struct Amount;

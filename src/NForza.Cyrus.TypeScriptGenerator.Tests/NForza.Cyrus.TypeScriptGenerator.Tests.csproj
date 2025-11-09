@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\NForza.Cyrus.TypeScriptGenerator\NForza.Cyrus.TypeScriptGenerator.csproj" />
+    <ProjectReference Include="..\NForza.Cyrus.TypeScriptGenerator\NForza.Cyrus.TypeScriptGenerator.csproj" />
   </ItemGroup>
 
   <ItemGroup>

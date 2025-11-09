@@ -26,14 +26,9 @@ public partial record struct {{ Name }}(int Value): IIntValueType, IComparable, 
     public bool IsValid() => {% if HasMaximumOrMinumum == false -%}
             true
         {%- else -%}
-            {% if HasMinimum -%}
-                Value >= {{ Minimum }}
-            {%- endif -%}
-            {% if HasMaximumAndMinumum -%}
-                && 
-            {%- endif %}
-            {%- if HasMaximum -%}
-            Value < {{ Maximum }}
+            {% if HasMinimum -%}Value >= {{ Minimum }}{% endif -%}
+            {% if HasMaximumAndMinumum %} && {%- endif %}
+            {%- if HasMaximum %} Value <= {{ Maximum }}
             {%- endif -%}
         {% endif %};
     public override string ToString() => Value.ToString();
