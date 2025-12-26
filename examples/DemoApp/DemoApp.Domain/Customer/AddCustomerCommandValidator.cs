@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using DemoApp.Contracts;
 using DemoApp.Contracts.Customers;
+using NForza.Cyrus;
 using NForza.Cyrus.Abstractions;
 
 namespace DemoApp.Domain.Customer;
