@@ -11,7 +11,7 @@ namespace NForza.Cyrus.WebApi;
 
 public static class CommandDispatch
 {
-    public static async Task<IResult?> ExecuteAsync<TCommandContract, TCommand>(
+    public static async Task<IResult?> ExecuteWithValidationAsync<TCommandContract, TCommand>(
             WebApplication app,
             TCommandContract commandContract,
             Func<CommandExecutionContext, IEnumerable<string>> validationFunc,
@@ -29,6 +29,24 @@ public static class CommandDispatch
 
         CreateCommandPipelineAction<TCommandContract, TCommand> createCommand = new CreateCommandPipelineAction<TCommandContract, TCommand>(
             next: validateCommand);
+
+        IResult? result = await createCommand.ExecuteAsync(commandExecutionContext);
+        return result;
+    }
+
+    public static async Task<IResult?> ExecuteAsync<TCommandContract, TCommand>(
+            WebApplication app,
+            TCommandContract commandContract,
+            Func<ICommandDispatcher, IMessageBus, TCommand, Task<IResult>> dispatchFunction)
+        where TCommandContract : class
+        where TCommand : class
+    {
+        var commandExecutionContext = new CommandExecutionContext(commandContract, app.Services.CreateScope());
+
+        var dispatchPipelineAction = new DispatchCommandPipelineAction<TCommandContract, TCommand>(dispatchFunction);
+
+        CreateCommandPipelineAction<TCommandContract, TCommand> createCommand = new CreateCommandPipelineAction<TCommandContract, TCommand>(
+            next: dispatchPipelineAction);
 
         return await createCommand.ExecuteAsync(commandExecutionContext);
     }
