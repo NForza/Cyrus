@@ -1,31 +1,20 @@
-﻿    app.Map{{ Verb }}("{{ Path }}", async ({% if HasBody %}[FromBody] {{ CommandType | as-contract }} command, {% endif -%} [FromServices] IMessageBus messageBus, [FromServices] IHttpContextObjectFactory objectFactory, [FromServices] IHttpContextAccessor ctx) =>    {
-        {% if HasBody == false %}{{ CommandType | as-contract }} command = new();{% endif %}
-        using var scope = app.Services.CreateScope();
-        var services = scope.ServiceProvider;
-        var (cmd, validationErrors) = objectFactory
-            .CreateFromHttpContextWithBodyAndRouteParameters<{{ CommandType | as-contract }}, {{ CommandType }}>(ctx.HttpContext, command);
-        if (validationErrors.Any())
-            return Results.BadRequest(validationErrors);
+﻿
+app.Map{{ Verb }}("{{ Path }}", async ({% if HasBody %}[FromBody] {{ CommandType | as-contract }} command{% endif -%}) =>
+    await CommandDispatch.Execute{%- if ValidatorMethod != nil %}WithValidation{%- endif %}Async<{{ CommandType | as-contract }}, {{ CommandType }}>(
+        app,
+        command,
         {%- if ValidatorMethod != nil %}
-        {%- if ValidatorMethodIsStatic %}
-        validationErrors = {{ ValidatorClass }}.{{ ValidatorMethodName }}(cmd);
-        {% else %}
-        var validator = services.GetRequiredService<{{ ValidatorClass }}>();
-        validationErrors = validator.{{ ValidatorMethodName }}(cmd);
+        ctx => {% if ValidatorMethodIsStatic -%}
+              {{ ValidatorClass }}.{{ ValidatorMethodName }}(cmd);
+            {%- else -%}
+              app.Services.GetRequiredService<{{ ValidatorClass }}>().{{ ValidatorMethodName }}(({{ CommandType }})ctx.Command)
+            {%- endif %},
         {%- endif %}
-        if (validationErrors.Any())
-        {
-            return Results.BadRequest(validationErrors);
-        }
-        {% endif -%}
-        ICommandDispatcher dispatcher = services.GetRequiredService<ICommandDispatcher>();
-        {% if HasReturnType %}var commandResult = {% endif %} await dispatcher.Handle(cmd);
-        return new CommandResultAdapter(messageBus).{{ AdapterMethod }}({% if HasReturnType %}commandResult{% endif %});
-    })
+        async (dispatcher, messageBus, cmd) => new CommandResultAdapter(messageBus).{{ AdapterMethod }}({% if HasReturnType %}await dispatcher.Handle(cmd){% endif %})))
     .WithOpenApi()
     {%- if Attributes.size > 0 -%}
     .WithMetadata([
     {%- for attr in Attributes %}
         {{ attr }}{% unless forloop.last %},{% endunless %}
     {% endfor %}])
-    {% endif -%};
+    {%- endif -%};

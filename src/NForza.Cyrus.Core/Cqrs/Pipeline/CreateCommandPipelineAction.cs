@@ -20,6 +20,7 @@ public class CreateCommandPipelineAction<TCommandContract, TCommand>(ICommandExe
         if (validationErrors.Any())
             return Results.BadRequest(validationErrors);
         context.Command = cmd;
-        return next == null ? Results.Problem() : await next!.ExecuteAsync(context);
+        IResult? result = next == null ? Results.Problem() : await next!.ExecuteAsync(context);
+        return result;
     }
 }
