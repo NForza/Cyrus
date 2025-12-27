@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Transactions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,6 +16,11 @@ public class DispatchCommandPipelineAction<TCommandContract, TCommand>(Func<ICom
         ArgumentNullException.ThrowIfNull(context.Command);
         ICommandDispatcher dispatcher = context.Services.GetRequiredService<ICommandDispatcher>();
         IMessageBus messageBus = context.Services.GetRequiredService<IMessageBus>();
-        return await dispatchFunction(dispatcher, messageBus, (TCommand) context.Command);
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            var result = await dispatchFunction(dispatcher, messageBus, (TCommand)context.Command);
+            scope.Complete();
+            return result;
+        }
     }
 }
