@@ -90,7 +90,21 @@ internal class CyrusGeneratorTestBuilder
 
         compileDiagnostics.ToList().ForEach(d =>
         {
-            logAction.Invoke($"Compilation Diagnostic: {d.Id} - {d.GetMessage()}");
+            string? path = Path.GetFileName(d.Location.SourceTree?.FilePath);
+            if (!String.IsNullOrEmpty(path))
+            {
+                path += " - ";
+            }
+            int line = d.Location.GetLineSpan().Span.Start.Line;
+            int column = d.Location.GetLineSpan().Span.Start.Character;
+            if (line == 0 && column == 0)
+            {
+                logAction.Invoke($"{path}{d.Id} - {d.GetMessage()}");
+            }
+            else
+            {
+                logAction.Invoke($"{path}({line},{column}) - {d.Id}: {d.GetMessage()}");
+            }
         });
 
         analyzerDiagnostics.ToList().ForEach(d =>

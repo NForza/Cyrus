@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Aggregates;
 using NForza.Cyrus.Generators.Roslyn;
-using NForza.Cyrus.Templating;
 
 namespace NForza.Cyrus.Generators.Commands;
 
@@ -15,35 +15,63 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
         {
             var commandHandlers = cyrusGenerationContext.CommandHandlers;
 
-            var sourceText = GenerateCommandDispatcherExtensionMethods(cyrusGenerationContext, cyrusGenerationContext.LiquidEngine);
-            if (!string.IsNullOrEmpty(sourceText))
-            {
-                spc.AddSource($"CommandDispatcher.g.cs", sourceText);
-            }
+            GenerateCommandDispatcherExtensionMethods(cyrusGenerationContext, spc);
 
-            var commandHandlerRegistrations = string.Join("\n",
-                    cyrusGenerationContext.CommandHandlers
-                        .Select(ch => ch.ContainingType)
-                        .Where(x => x != null && !x.IsStatic)
-                        .Distinct(SymbolEqualityComparer.Default)
-                        .Select(cht => $" services.AddTransient<{cht!.ToFullName()}>();"));
-            if (!string.IsNullOrEmpty(commandHandlerRegistrations))
-            {
-                var ctx = new
-                {
-                    Usings = new string[] { "NForza.Cyrus.Cqrs", "NForza.Cyrus.Abstractions" },
-                    Namespace = "CommandHandlers",
-                    Name = "CommandHandlersRegistration",
-                    Initializer = commandHandlerRegistrations
-                };
+            GenerateImplementedCommandHandlers(cyrusGenerationContext, spc);
 
-                var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
-                spc.AddSource("CommandHandlerRegistration.g.cs", fileContents);
-            }
+            GenerateStepCommandHandlers(cyrusGenerationContext, spc);
         }
     }
 
-    private static string GenerateCommandDispatcherExtensionMethods(CyrusGenerationContext cyrusGenerationContext, LiquidEngine liquidEngine)
+    private void GenerateStepCommandHandlers(CyrusGenerationContext cyrusGenerationContext, SourceProductionContext spc)
+    {
+        var stepHandlers = cyrusGenerationContext.CommandHandlers
+             .Where(ch => ch.IsPartialDefinition);
+
+        foreach(var stepHandler in stepHandlers) 
+        {
+                var model = new
+                {
+                    Namespace = stepHandler.ContainingType.ContainingNamespace.ToDisplayString(),
+                    ClassName = stepHandler.ContainingType.Name,
+                    ResultType = stepHandler.ReturnsVoid ? "void" : stepHandler.ReturnType.ToFullName(),
+                    Arguments = stepHandler.Parameters.Select(p => new
+                    {
+                        Type = p.Type.ToFullName(),
+                        Name = p.Name
+                    }).ToList(),
+                    MethodName = stepHandler.Name,
+                };
+                var source = cyrusGenerationContext.LiquidEngine.Render(model, "StepCommand");
+                spc.AddSource($"{stepHandler.ContainingType.Name}.g.cs", source);
+        }
+    }
+
+    private static void GenerateImplementedCommandHandlers(CyrusGenerationContext cyrusGenerationContext, SourceProductionContext spc)
+    {
+        var implementedCommandHandlerRegistrations = string.Join("\n",
+                cyrusGenerationContext.CommandHandlers
+                    .Where(ch => !ch.IsPartialDefinition)
+                    .Select(ch => ch.ContainingType)
+                    .Where(x => x != null && !x.IsStatic)
+                    .Distinct(SymbolEqualityComparer.Default)
+                    .Select(cht => $" services.AddTransient<{cht!.ToFullName()}>();"));
+        if (!string.IsNullOrEmpty(implementedCommandHandlerRegistrations))
+        {
+            var ctx = new
+            {
+                Usings = new string[] { "NForza.Cyrus.Cqrs", "NForza.Cyrus.Abstractions" },
+                Namespace = "CommandHandlers",
+                Name = "CommandHandlersRegistration",
+                Initializer = implementedCommandHandlerRegistrations
+            };
+
+            var fileContents = cyrusGenerationContext.LiquidEngine.Render(ctx, "CyrusInitializer");
+            spc.AddSource("CommandHandlerRegistration.g.cs", fileContents);
+        }
+    }
+
+    private static void GenerateCommandDispatcherExtensionMethods(CyrusGenerationContext cyrusGenerationContext, SourceProductionContext spc)
     {
         var commands = cyrusGenerationContext.CommandHandlers.Select(h =>
         {
@@ -80,9 +108,12 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
             }).ToList()
         };
 
-        var resolvedSource = liquidEngine.Render(model, "CommandDispatcher");
+        var resolvedSource = cyrusGenerationContext.LiquidEngine.Render(model, "CommandDispatcher");
 
-        return resolvedSource;
+        if (!string.IsNullOrEmpty(resolvedSource))
+        {
+            spc.AddSource($"CommandDispatcher.g.cs", resolvedSource);
+        }
     }
 
     private static AggregateRootDefinition? FindAggregateRoot(IEnumerable<AggregateRootDefinition> aggregateRoots, ITypeSymbol? type)

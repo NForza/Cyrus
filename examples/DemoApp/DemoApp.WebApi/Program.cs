@@ -1,16 +1,12 @@
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using DemoApp.WebApi;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NForza.Cyrus;
-using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Cqrs;
 using NForza.Cyrus.WebApi;
 
@@ -51,15 +47,6 @@ builder.Services.AddCyrus(cfg =>
 });
 
 var app = builder.Build();
-
-app.MapPost("customers2", async ([FromBody] global::DemoApp.Contracts.Customers.AddCustomerCommandContract command) =>
-    CommandDispatch.ExecuteWithValidationAsync<global::DemoApp.Contracts.Customers.AddCustomerCommandContract, global::DemoApp.Contracts.Customers.AddCustomerCommand>(
-        app,
-        command,
-        ctx => ctx.Services.GetRequiredService<global::DemoApp.Domain.Customer.AddCustomerCommandValidator>().Validate((global::DemoApp.Contracts.Customers.AddCustomerCommand)ctx.Command!),
-        async (dispatcher, messageBus, cmd) => new CommandResultAdapter(messageBus).FromResultAndMessages(await dispatcher.Handle(cmd))))
-.WithOpenApi()
-.WithMetadata([new global::Microsoft.AspNetCore.Mvc.ProducesResponseTypeAttribute(202)]);
 
 app.UseCors("AllowAngularApp");
 
