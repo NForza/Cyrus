@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Generators.Aggregates;
 using NForza.Cyrus.Generators.Roslyn;
 
@@ -40,11 +41,34 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                         Type = p.Type.ToFullName(),
                         Name = p.Name
                     }).ToList(),
+                    Steps = GetCommandHandlerSteps(stepHandler, cyrusGenerationContext),
                     MethodName = stepHandler.Name,
                 };
                 var source = cyrusGenerationContext.LiquidEngine.Render(model, "StepCommand");
                 spc.AddSource($"{stepHandler.ContainingType.Name}.g.cs", source);
         }
+    }
+
+    private IEnumerable<string> GetCommandHandlerSteps(IMethodSymbol stepHandler, CyrusGenerationContext cyrusGenerationContext)
+    {
+        var stepAttributes = stepHandler.GetAttributes()
+            .Where(attr => attr.AttributeClass != null && attr.AttributeClass.Name == "HandlerStepAttribute");
+        
+        var steps = new List<string>();
+        
+        foreach (var stepAttribute in stepAttributes)
+        {
+            if (stepAttribute.ConstructorArguments.Length > 0)
+            {
+                var methodNameArgument = stepAttribute.ConstructorArguments[0];
+                if (methodNameArgument.Value is string methodName)
+                {
+                    steps.Add(methodName);
+                }
+            }
+        }
+        
+        return steps;
     }
 
     private static void GenerateImplementedCommandHandlers(CyrusGenerationContext cyrusGenerationContext, SourceProductionContext spc)
