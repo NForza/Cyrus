@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using NForza.Cyrus.Aggregates;
 
 {% if Namespace != "" %}
 namespace {{ Namespace }};
@@ -12,5 +10,15 @@ public partial class {{ ClassName }}
 {
     public partial {{ ResultType }} {{ MethodName }}(
         {%- for arg in Arguments %}{{ arg.Type }} {{ arg.Name }}{% if forloop.last == false %}, {% endif %}{% endfor -%}
-    ) { }
+    ) 
+    {
+        {%- for step in Steps %}
+            {% if step.IsVoid == false %} var step{{ step.Index }}Result = {%- endif %} {{ step.Name -}}
+            (
+                {%- for param in step.Parameters -%}
+                        {{ param.Name }}{% if forloop.last == false %}, {% endif %}
+                {%- endfor -%}
+            );
+        {%- endfor %}
+    }
 }

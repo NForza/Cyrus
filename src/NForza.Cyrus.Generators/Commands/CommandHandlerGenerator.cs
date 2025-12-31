@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.Generators.Aggregates;
@@ -49,13 +50,14 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
         }
     }
 
-    private IEnumerable<string> GetCommandHandlerSteps(IMethodSymbol stepHandler, CyrusGenerationContext cyrusGenerationContext)
+    private IEnumerable<CommandStep> GetCommandHandlerSteps(IMethodSymbol stepHandler, CyrusGenerationContext cyrusGenerationContext)
     {
         var stepAttributes = stepHandler.GetAttributes()
             .Where(attr => attr.AttributeClass != null && attr.AttributeClass.Name == "HandlerStepAttribute");
         
-        var steps = new List<string>();
+        var stepHandlerType = stepHandler.ContainingType;
         
+        int stepIndex = 0;
         foreach (var stepAttribute in stepAttributes)
         {
             if (stepAttribute.ConstructorArguments.Length > 0)
@@ -63,12 +65,23 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                 var methodNameArgument = stepAttribute.ConstructorArguments[0];
                 if (methodNameArgument.Value is string methodName)
                 {
-                    steps.Add(methodName);
+                    var methods = stepHandlerType.GetMembers(methodName)
+                        .OfType<IMethodSymbol>()
+                        .ToList();
+                    if (methods.Count == 1)
+                    {
+                      yield return new() { 
+                          Index = stepIndex++,
+                          Name = methodName, 
+                          ReturnType = methods[0].ReturnType.ToFullName(),
+                          IsVoid = methods[0].ReturnType.IsVoid(),
+                          HasArgs = methods[0].Parameters.Length > 0,
+                          Args = methods[0].Parameters.ToList()
+                      };
+                    }
                 }
             }
         }
-        
-        return steps;
     }
 
     private static void GenerateImplementedCommandHandlers(CyrusGenerationContext cyrusGenerationContext, SourceProductionContext spc)
@@ -142,4 +155,14 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
 
     private static AggregateRootDefinition? FindAggregateRoot(IEnumerable<AggregateRootDefinition> aggregateRoots, ITypeSymbol? type)
         => aggregateRoots.FirstOrDefault(ard => SymbolEqualityComparer.Default.Equals(ard.Symbol, type));
+
+    public class CommandStep
+    {
+        public string Name { get; set; } = string.Empty;
+        public string ReturnType { get; internal set; } = string.Empty;
+        public bool IsVoid { get; internal set; }
+        public int Index { get; internal set; }
+        public bool HasArgs { get; internal set; }
+        public List<IParameterSymbol> Args { get; internal set; }
+    }
 }
