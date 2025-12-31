@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using Microsoft.CodeAnalysis;
@@ -30,34 +31,53 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
         var stepHandlers = cyrusGenerationContext.CommandHandlers
              .Where(ch => ch.IsPartialDefinition);
 
-        foreach(var stepHandler in stepHandlers) 
+        foreach (var stepHandler in stepHandlers)
         {
-                var model = new
+            IEnumerable<CommandStep> steps = GetCommandHandlerSteps(stepHandler, cyrusGenerationContext).ToList();
+            var model = new
+            {
+                Namespace = stepHandler.ContainingType.ContainingNamespace.ToDisplayString(),
+                ClassName = stepHandler.ContainingType.Name,
+                ResultType = stepHandler.ReturnsVoid ? "void" : stepHandler.ReturnType.ToFullName(),
+                Arguments = stepHandler.Parameters.Select(p => new
                 {
-                    Namespace = stepHandler.ContainingType.ContainingNamespace.ToDisplayString(),
-                    ClassName = stepHandler.ContainingType.Name,
-                    ResultType = stepHandler.ReturnsVoid ? "void" : stepHandler.ReturnType.ToFullName(),
-                    Arguments = stepHandler.Parameters.Select(p => new
-                    {
-                        Type = p.Type.ToFullName(),
-                        Name = p.Name
-                    }).ToList(),
-                    Steps = GetCommandHandlerSteps(stepHandler, cyrusGenerationContext),
-                    MethodName = stepHandler.Name,
-                };
-                var source = cyrusGenerationContext.LiquidEngine.Render(model, "StepCommand");
-                spc.AddSource($"{stepHandler.ContainingType.Name}.g.cs", source);
+                    Type = p.Type.ToFullName(),
+                    Name = p.Name
+                }).ToList(),
+                Steps = steps,
+                ReturnVariable = GetLastStepToReturnResultOrDefault(stepHandler, steps),
+                MethodName = stepHandler.Name,
+            };
+            var source = cyrusGenerationContext.LiquidEngine.Render(model, "StepCommand");
+            spc.AddSource($"{stepHandler.ContainingType.Name}.g.cs", source);
         }
+    }
+
+    private string GetLastStepToReturnResultOrDefault(IMethodSymbol methodSymbol, IEnumerable<CommandStep> steps)
+    {
+        if (methodSymbol.ReturnsVoid)
+            return string.Empty;
+        foreach (var stepAttribute in steps.Reverse())
+        {
+            if (SymbolEqualityComparer.Default.Equals(stepAttribute.ReturnTypeSymbol, methodSymbol.ReturnType))
+            {
+                return stepAttribute.VariableName;
+            }
+        }
+        throw new InvalidOperationException($"Cannot find a step that returns the method return type {methodSymbol.ReturnType.ToFullName()}");
     }
 
     private IEnumerable<CommandStep> GetCommandHandlerSteps(IMethodSymbol stepHandler, CyrusGenerationContext cyrusGenerationContext)
     {
-        var stepAttributes = stepHandler.GetAttributes()
-            .Where(attr => attr.AttributeClass != null && attr.AttributeClass.Name == "HandlerStepAttribute");
-        
+        IEnumerable<AttributeData> stepAttributes = GetStepAttributes(stepHandler);
+
         var stepHandlerType = stepHandler.ContainingType;
-        
+
         int stepIndex = 0;
+        Dictionary<ITypeSymbol, string> availableArguments = new Dictionary<ITypeSymbol, string>(SymbolEqualityComparer.Default)
+        {
+            { stepHandler.Parameters[0].Type, stepHandler.Parameters[0].Name }
+        };
         foreach (var stepAttribute in stepAttributes)
         {
             if (stepAttribute.ConstructorArguments.Length > 0)
@@ -70,16 +90,46 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                         .ToList();
                     if (methods.Count == 1)
                     {
-                      yield return new() { 
-                          Index = stepIndex++,
-                          Name = methodName, 
-                          ReturnType = methods[0].ReturnType.ToFullName(),
-                          IsVoid = methods[0].ReturnType.IsVoid(),
-                          HasArgs = methods[0].Parameters.Length > 0,
-                          Args = methods[0].Parameters.ToList()
-                      };
+                        string variableName = $"step{stepIndex++}Result";
+                        IMethodSymbol methodSymbol = methods[0];
+                        yield return new()
+                        {
+                            VariableName = variableName,
+                            Name = methodName,
+                            ReturnType = methodSymbol.ReturnType.ToFullName(),
+                            ReturnTypeSymbol = methodSymbol.ReturnType,
+                            IsVoid = methodSymbol.ReturnType.IsVoid(),
+                            HasArgs = methodSymbol.Parameters.Length > 0,
+                            Args = ResolveParameterArguments(methodSymbol.Parameters, availableArguments).ToList(),
+                        };
+                        if (!methodSymbol.ReturnType.IsVoid())
+                        {
+                            availableArguments.Remove(methodSymbol.ReturnType);
+                            availableArguments.Add(methodSymbol.ReturnType, variableName);
+                        }
                     }
                 }
+            }
+        }
+    }
+
+    private static IEnumerable<AttributeData> GetStepAttributes(IMethodSymbol stepHandler)
+    {
+        return stepHandler.GetAttributes()
+            .Where(attr => attr.AttributeClass != null && attr.AttributeClass.Name == "HandlerStepAttribute");
+    }
+
+    private IEnumerable<string> ResolveParameterArguments(ImmutableArray<IParameterSymbol> parameters, Dictionary<ITypeSymbol, string> availableArguments)
+    {
+        foreach (var param in parameters)
+        {
+            if (availableArguments.TryGetValue(param.Type, out var argName))
+            {
+                yield return argName;
+            }
+            else
+            {
+                throw new InvalidOperationException($"Cannot resolve argument of type {param.Type.ToFullName()} for parameter {param.Name}");
             }
         }
     }
@@ -160,9 +210,10 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
     {
         public string Name { get; set; } = string.Empty;
         public string ReturnType { get; internal set; } = string.Empty;
+        public ITypeSymbol ReturnTypeSymbol { get; internal set; } = null!;
         public bool IsVoid { get; internal set; }
-        public int Index { get; internal set; }
+        public string VariableName { get; internal set; } = string.Empty;
         public bool HasArgs { get; internal set; }
-        public List<IParameterSymbol> Args { get; internal set; }
+        public List<string> Args { get; internal set; } = [];
     }
 }
