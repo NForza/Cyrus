@@ -97,6 +97,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                             VariableName = variableName,
                             Name = methodName,
                             ReturnType = methodSymbol.ReturnType.ToFullName(),
+                            ReturnsResult = GetReturnsResultFor(stepHandler) && GetReturnsResultFor(methodSymbol),
                             ReturnTypeSymbol = methodSymbol.ReturnType,
                             IsVoid = methodSymbol.ReturnType.IsVoid(),
                             HasArgs = methodSymbol.Parameters.Length > 0,
@@ -111,6 +112,32 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                 }
             }
         }
+    }
+
+    private bool GetReturnsResultFor(IMethodSymbol methodSymbol)
+    {
+        var returnType = methodSymbol.ReturnType;
+        
+        // Check if returns Result directly
+        if (returnType is INamedTypeSymbol namedType)
+        {
+            if (namedType.Name == nameof(NForza.Cyrus.Abstractions.Result))
+            {
+                return true;
+            }
+            
+            // Check if returns Task<Result>
+            if (returnType.IsTaskType() && namedType.TypeArguments.Length > 0)
+            {
+                var taskArgument = namedType.TypeArguments[0];
+                if (taskArgument.Name == nameof(NForza.Cyrus.Abstractions.Result))
+                {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
 
     private static IEnumerable<AttributeData> GetStepAttributes(IMethodSymbol stepHandler)
@@ -208,12 +235,13 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
 
     public class CommandStep
     {
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; internal set; } = string.Empty;
         public string ReturnType { get; internal set; } = string.Empty;
         public ITypeSymbol ReturnTypeSymbol { get; internal set; } = null!;
         public bool IsVoid { get; internal set; }
         public string VariableName { get; internal set; } = string.Empty;
         public bool HasArgs { get; internal set; }
         public List<string> Args { get; internal set; } = [];
+        public bool ReturnsResult { get; internal set; }
     }
 }

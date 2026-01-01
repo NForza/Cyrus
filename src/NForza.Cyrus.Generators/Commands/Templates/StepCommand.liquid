@@ -13,12 +13,16 @@ public partial class {{ ClassName }}
     ) 
     {
         {%- for step in Steps %}
-            {% if step.IsVoid == false %} var {{ step.VariableName }} = {%- endif %} {{ step.Name -}}
+            {% if step.IsVoid == false -%} var {{ step.VariableName }} = {%- endif %} {{ step.Name -}}
             (
                 {%- for arg in step.Args -%}
-                        {{ arg }}{% if forloop.last == false %}, {% endif %}
-                {%- endfor -%}
+                        {{ arg }}{% if forloop.last == false %}, {% endif -%}
             );
+            {% if step.ReturnsResult == true -%}
+            if ({{ step.VariableName }} != null)
+                return {{ step.VariableName }};
+            {%- endif %} 
+            {%- endfor -%}
         {%- endfor %}
         {% if ReturnVariable != "" -%}
         return {{ ReturnVariable }};
