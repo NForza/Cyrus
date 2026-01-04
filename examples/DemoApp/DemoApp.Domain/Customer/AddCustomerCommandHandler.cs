@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using DemoApp.Contracts;
 using DemoApp.Contracts.Customers;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ public partial class AddCustomerCommandHandler
     [HandlerStep(nameof(CreateCustomerContext))]
     [HandlerStep(nameof(CreateCustomer))]
     [HandlerStep(nameof(ReturnStatus))]
-    public partial Result Handle(AddCustomerCommand command);
+    public partial Task<Result> Handle(AddCustomerCommand command);
 
     private Result? ValidateCommand(AddCustomerCommand command)
     {
@@ -25,9 +26,10 @@ public partial class AddCustomerCommandHandler
         return null;
     }
 
-    private AddCustomerCommandContext CreateCustomerContext(AddCustomerCommand command)
+    private async Task<AddCustomerCommandContext> CreateCustomerContext(AddCustomerCommand command)
     {
-        CustomerId id = new CustomerId();
+        await Task.CompletedTask;
+        CustomerId id = new();
         return new AddCustomerCommandContext
         {
             Id = id,

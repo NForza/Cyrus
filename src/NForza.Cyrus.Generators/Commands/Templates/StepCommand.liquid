@@ -8,7 +8,7 @@ namespace {{ Namespace }};
 
 public partial class {{ ClassName }}
 {
-    public partial {{ ResultType }} {{ MethodName }}(
+    public partial {% if IsAsync %}async Task{% if ResultType != "void" %}<{{ ResultType }}>{% endif %}{% else %}{{ ResultType }}{% endif %} {{ MethodName }}(
         {%- for arg in Arguments %}{{ arg.Type }} {{ arg.Name }}{% if forloop.last == false %}, {% endif %}{% endfor -%}
     ) 
     {
