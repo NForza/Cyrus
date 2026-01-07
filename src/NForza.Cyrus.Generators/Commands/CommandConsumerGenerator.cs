@@ -22,7 +22,7 @@ public class CommandConsumerGenerator : CyrusGeneratorBase
         {
             Command = commandHandler.Parameters[0].Type.Name,
             Namespace = commandHandler.Parameters[0].Type.ContainingNamespace.GetNameOrEmpty(),
-            HasResult = !commandHandler.ReturnsVoid
+            HasResult = commandHandler.ReturnType.HasReturnValue(),
         };
 
         var resolvedSource = liquidEngine.Render(model, "CommandConsumer");

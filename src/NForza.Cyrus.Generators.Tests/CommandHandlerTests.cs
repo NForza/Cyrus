@@ -128,6 +128,49 @@ public class CommandHandlerTests(ITestOutputHelper outputWindow)
     }
 
     [Fact]
+    public async Task Generating_Step_CommandHandler_For_Async_Result_Method_Should_Compile_And_Generate_Sources()
+    {
+        var source = @"
+                using System;       
+                using NForza.Cyrus.Abstractions;
+                using System.Net;
+                using System.Threading.Tasks;
+
+                namespace Test;
+            
+                [Command]
+                public record CreateCustomerCommand(Guid Id);
+
+                public partial class Customer
+                {
+                    [CommandHandler]
+                    [HandlerStep(nameof(RunThisStep))]
+                    public partial Task<Result> Handle(CreateCustomerCommand command);
+
+                    private async Task<Result> RunThisStep(CreateCustomerCommand command)
+                    {
+                        return new Result(HttpStatusCode.OK);
+                    }   
+                }
+            ";
+
+        (var compilerOutput, var analyzerOutput, var generatedSyntaxTrees) =
+            await new CyrusGeneratorTestBuilder()
+            .WithSource(source)
+            .LogGeneratedSource(outputWindow.WriteLine)
+            .RunAsync();
+
+        using (new AssertionScope())
+        {
+            compilerOutput.Should().NotHaveErrors();
+            analyzerOutput.Should().BeEmpty();
+
+            generatedSyntaxTrees.Should().NotBeEmpty();
+        }
+    }
+
+
+    [Fact]
     public async Task Generating_Step_CommandHandler_For_Void_Method_Should_Compile_And_Generate_Sources()
     {
         var source = @"

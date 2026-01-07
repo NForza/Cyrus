@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Aggregates;
 using NForza.Cyrus.Generators.Roslyn;
@@ -32,20 +33,30 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
         foreach (var stepHandler in stepHandlers)
         {
             IEnumerable<CommandStep> steps = GetCommandHandlerSteps(stepHandler, cyrusGenerationContext).ToList();
+            var returnType = stepHandler.ReturnType;
+            if (returnType is INamedTypeSymbol namedTypeSymbol)
+            {
+                returnType = (namedTypeSymbol.IsTaskType(), namedTypeSymbol.TypeArguments.Length) switch
+                {
+                    (true, 1) => namedTypeSymbol.TypeArguments[0],
+                    (true, 0) => null,
+                    _ => namedTypeSymbol,
+                };
+            }
             var model = new
             {
                 Namespace = stepHandler.ContainingType.ContainingNamespace.ToDisplayString(),
                 ClassName = stepHandler.ContainingType.Name,
-                ResultType = stepHandler.ReturnsVoid ? "void" : stepHandler.ReturnType.ToFullName(),
-                ReturnsVoid = stepHandler.ReturnsVoid,
+                ResultType = returnType?.ToFullName() ?? "",
+                HasReturnValue = stepHandler.ReturnType.HasReturnValue(),
                 Arguments = stepHandler.Parameters.Select(p => new
                 {
                     Type = p.Type.ToFullName(),
                     Name = p.Name
                 }).ToList(),
                 Steps = steps,
-                IsAsync = steps.Any(s => s.IsTaskMethod),
-                ReturnVariable = GetLastStepToReturnResultOrDefault(stepHandler, steps),
+                IsAsync = steps.Any(s => s.ReturnsTask),
+                ReturnVariable = GetLastStepToReturnResultOrDefault(returnType!, steps),
                 MethodName = stepHandler.Name,
             };
             var source = cyrusGenerationContext.LiquidEngine.Render(model, "StepCommand");
@@ -53,18 +64,19 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
         }
     }
 
-    private string GetLastStepToReturnResultOrDefault(IMethodSymbol methodSymbol, IEnumerable<CommandStep> steps)
+    private string GetLastStepToReturnResultOrDefault(ITypeSymbol typeSymbol, IEnumerable<CommandStep> steps)
     {
-        var returnType = methodSymbol.ReturnType as INamedTypeSymbol;
-        if (returnType == null)
+        var returnType = typeSymbol as INamedTypeSymbol;
+        if (returnType == null || !returnType.HasReturnValue())
         {
             return string.Empty;
         }
+
         var parameterType = (returnType.IsTaskType(), returnType.TypeArguments.Length) switch
         {
             (true, 1) => returnType.TypeArguments[0],
             (true, 0) => null,
-            (false, _) => methodSymbol.ReturnType,
+            (false, _) => returnType,
         };
         if (parameterType == null)
             return string.Empty;
@@ -76,7 +88,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                 return stepAttribute.VariableName;
             }
         }
-        throw new InvalidOperationException($"Cannot find a step that returns the method return type {methodSymbol.ReturnType.ToFullName()}");
+        throw new InvalidOperationException($"Cannot find a step that returns the method return type {returnType.ToFullName()}");
     }
 
     private IEnumerable<CommandStep> GetCommandHandlerSteps(IMethodSymbol stepHandler, CyrusGenerationContext cyrusGenerationContext)
@@ -105,28 +117,36 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                         string variableName = $"step{stepIndex++}Result";
                         IMethodSymbol methodSymbol = methods[0];
                         var returnType = methodSymbol.ReturnType;
-                        var isTaskMethod = false;
+                        var returnsTask = false;
+                        bool hasReturnValue = !returnType.IsVoid();
+
                         if (returnType is INamedTypeSymbol namedType && returnType.IsTaskType())
                         {
-                            isTaskMethod = true;
+                            returnsTask = true;
                             if (namedType.TypeArguments.Length == 1)
+                            {
                                 returnType = namedType.TypeArguments[0];
+                                hasReturnValue = true;
+                            }
                             else
+                            {
                                 returnType = cyrusGenerationContext.Compilation.GetSpecialType(SpecialType.System_Void);
+                                hasReturnValue = false;
+                            }
                         }
                         yield return new()
                         {
                             VariableName = variableName,
                             Name = methodName,
                             ReturnType = returnType.ToFullName(),
-                            IsTaskMethod = isTaskMethod,
+                            ReturnsTask = returnsTask,
                             ReturnsResult = GetReturnsResultFor(stepHandler) && GetReturnsResultFor(methodSymbol),
                             ReturnTypeSymbol = returnType,
-                            IsVoid = returnType.IsVoid(),
+                            HasReturnValue = hasReturnValue,
                             HasArgs = methodSymbol.Parameters.Length > 0,
                             Args = ResolveParameterArguments(methodSymbol.Parameters, availableArguments).ToList(),
                         };
-                        if (!returnType.IsVoid())
+                        if (returnType.HasReturnValue())
                         {
                             availableArguments.Remove(returnType);
                             availableArguments.Add(returnType, variableName);
@@ -239,7 +259,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
                 },
                 Invocation = cmd.Handler.GetCommandInvocation(variableName: "command", serviceProviderVariable: "commandDispatcher.Services", aggregateRootVariableName: cmd.AggregateRoot != null ? "aggregateRoot" : null),
                 cmd.Name,
-                cmd.ReturnsVoid,
+                ReturnsVoid = cmd.ReturnsVoid || (cmd.ReturnsTask && cmd.ReturnType.TypeArguments.Length == 0),
                 cmd.CommandType,
                 cmd.ReturnsTask,
                 cmd.AggregateRoot,
@@ -266,11 +286,11 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
         public string Name { get; internal set; } = string.Empty;
         public string ReturnType { get; internal set; } = string.Empty;
         public ITypeSymbol ReturnTypeSymbol { get; internal set; } = null!;
-        public bool IsVoid { get; internal set; }
+        public bool HasReturnValue { get; internal set; }
         public string VariableName { get; internal set; } = string.Empty;
         public bool HasArgs { get; internal set; }
         public List<string> Args { get; internal set; } = [];
         public bool ReturnsResult { get; internal set; }
-        public bool IsTaskMethod { get; internal set; }
+        public bool ReturnsTask { get; internal set; }
     }
 }

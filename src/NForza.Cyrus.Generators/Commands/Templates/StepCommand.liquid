@@ -8,12 +8,14 @@ namespace {{ Namespace }};
 
 public partial class {{ ClassName }}
 {
-    public partial {% if IsAsync %}async Task{% if ResultType != "void" %}<{{ ResultType }}>{% endif %}{% else %}{{ ResultType }}{% endif %} {{ MethodName }}(
+    public partial {% if IsAsync %}async Task{% if HasReturnValue == true %}<{{ ResultType }}>{% endif %}{% else %}{{ ResultType }}{% endif %} {{ MethodName }}(
         {%- for arg in Arguments %}{{ arg.Type }} {{ arg.Name }}{% if forloop.last == false %}, {% endif %}{% endfor -%}
     ) 
     {
         {%- for step in Steps %}
-            {% if step.IsVoid == false -%} var {{ step.VariableName }} = {%- endif %} {{ step.Name -}}
+            {% if step.HasReturnValue == true -%} var {{ step.VariableName }} = {%- endif %}
+            {%- if step.ReturnsTask == true %} await {% endif -%}
+            {{ step.Name -}}
             (
                 {%- for arg in step.Args -%}
                         {{ arg }}{% if forloop.last == false %}, {% endif -%}
@@ -24,7 +26,7 @@ public partial class {{ ClassName }}
             {%- endif %} 
             {%- endfor -%}
         {%- endfor %}
-        {% if ReturnVariable != "" -%}
+        {% if HasReturnValue == true -%}
         return {{ ReturnVariable }};
         {%- endif -%}
     }

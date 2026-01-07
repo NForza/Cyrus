@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Threading.Tasks;
+using DemoApp.Contracts.Customers;
 using DemoApp.WebApi;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
@@ -55,3 +57,8 @@ ILogger logger = app.Services.GetRequiredService<ILogger<Program>>();
 app.MapCyrus(logger).MapAsyncApi();
 
 await app.RunAsync();
+
+public class CreateCustomerCommandConsumer(ICommandDispatcher commandDispatcher, IMessageBus bus) : CommandConsumer<AddCustomerCommand>(bus)
+{
+    public override async Task Consume(ConsumeContext<AddCustomerCommand> context) => HandleCommandResult(context, await commandDispatcher.Handle(context.Message));
+}
