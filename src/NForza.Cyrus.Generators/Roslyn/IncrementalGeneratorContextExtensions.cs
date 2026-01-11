@@ -18,10 +18,9 @@ namespace NForza.Cyrus.Generators.Roslyn
                 {
                     var (compilation, options) = tuple;
 
-                    if (options.GlobalOptions.TryGetValue("build_property.EnableCyrusGeneration", out var isEnabled) &&
-                        isEnabled.Equals("true", StringComparison.OrdinalIgnoreCase))
+                    if (options.GlobalOptions.TryGetValue("build_property.EnableCyrusGeneration", out var isEnabled))
                     {
-                        return false;
+                        return !isEnabled.Equals("true", StringComparison.OrdinalIgnoreCase);
                     }
 
                     if (options.GlobalOptions.TryGetValue("build_property.IsTestProject", out var isTest) &&

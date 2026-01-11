@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-    <LangVersion>13</LangVersion>
+    <LangVersion>14</LangVersion>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;DebugGenerator</Configurations>
     <IsPackable>true</IsPackable>
@@ -39,6 +39,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Commands\Templates\CommandConsumer.liquid" />
+    <EmbeddedResource Include="Commands\Templates\StepCommand.liquid" />
     <EmbeddedResource Include="Commands\Templates\CommandDispatcher.liquid" />
     <EmbeddedResource Include="Commands\Templates\CyrusInitializer.liquid" />
     <EmbeddedResource Include="Model\Templates\ModelAttribute.liquid" />
@@ -72,9 +73,9 @@
   <ItemGroup>
     <PackageReference Include="Costura.Fody" Version="6.0.0" PrivateAssets="All" />
     <PackageReference Include="Fody" Version="6.9.3" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.14.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
-    <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.10" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="5.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="10.0.1" />
   </ItemGroup>
 
   <ItemGroup>

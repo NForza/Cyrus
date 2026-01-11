@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OpenApi;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 namespace NForza.Cyrus.WebApi;
 
@@ -30,9 +30,10 @@ internal class CyrusOpenApiSchemaTransformer : IOpenApiSchemaTransformer
 
                 var camelCasedName = char.ToLowerInvariant(jsonName[0]) + jsonName[1..];
 
-                if (schema.Properties.TryGetValue(camelCasedName, out var propSchema))
+                if (schema.Properties?.TryGetValue(camelCasedName, out var propSchema) == true && propSchema != null)
                 {
-                    propSchema.Nullable = !isRequired;
+                    //propSchema.Type.a = !isRequired;
+
                 }
             }
 

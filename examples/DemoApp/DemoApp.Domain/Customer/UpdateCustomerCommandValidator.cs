@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using DemoApp.Contracts;
-using DemoApp.Contracts.Customers;
 using NForza.Cyrus.Abstractions;
 
 namespace DemoApp.Domain.Customer;
 
-public class AddCustomerCommandValidator
+public class UpdateCustomerCommandValidator
 {
     [Validator]
-    public IEnumerable<string> Validate(AddCustomerCommand command)
+    public IEnumerable<string> Validate(UpdateCustomerCommand command)
     {
         if (command.Id == CustomerId.Empty) yield return "Id can't be empty.";
         if (command.Name.IsEmpty()) yield return "Name can't be empty.";

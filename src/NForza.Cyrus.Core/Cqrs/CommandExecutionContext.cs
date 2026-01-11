@@ -1,7 +1,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace NForza.Cyrus
+namespace NForza.Cyrus.Cqrs
 {
     /// <summary>
     /// Provides context for command execution including the command and service provider.

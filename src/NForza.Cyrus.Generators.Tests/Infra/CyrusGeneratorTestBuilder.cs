@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using NForza.Cyrus.Abstractions;
 using NForza.Cyrus.EntityFramework;
 using NForza.Cyrus.Generators.Analyzers;
 
@@ -26,31 +27,30 @@ internal class CyrusGeneratorTestBuilder
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source);
 
-        //    var referencedAssemblies = ReferenceAssemblies.Net.Net90.WithAssemblies(
-        //[
-        //    typeof(IServiceCollection).Assembly.Location,
-        //            typeof(ICyrusWebStartup).Assembly.Location,
-        //            typeof(DbContext).Assembly.Location,
-        //            typeof(IBus).Assembly.Location,
-        //            typeof(EntityFrameworkPersistence<,,>).Assembly.Location
-        //]);
-
-        //    var compilation = CSharpCompilation.Create(
-        //        "TestAssembly",
-        //        [syntaxTree],
-        //        await referencedAssemblies.ResolveAsync(LanguageNames.CSharp, CancellationToken.None),
-        //        new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-        //    );
-
-        var referencedAssemblies = ((string?)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES"))!
+        var trustedAssemblies = ((string?)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES"))!
             .Split(Path.PathSeparator)
-            .Concat([
+            .Where(path =>
+            {
+                var fileName = Path.GetFileName(path);
+                return (fileName.StartsWith("System.") ||
+                       fileName.StartsWith("Microsoft.") ||
+                       fileName.StartsWith("netstandard")) &&
+                       !fileName.Contains("xunit", StringComparison.OrdinalIgnoreCase) &&
+                       !fileName.Contains("nunit", StringComparison.OrdinalIgnoreCase);
+            });
+
+        string[] additionalAssemblies = [
                 typeof(IServiceCollection).Assembly.Location,
+                typeof(ServiceCollectionServiceExtensions).Assembly.Location,
                 typeof(ICyrusWebStartup).Assembly.Location,
+                typeof(Result).Assembly.Location,
                 typeof(DbContext).Assembly.Location,
                 typeof(IBus).Assembly.Location,
-                typeof(EntityFrameworkPersistence<,,>).Assembly.Location
-                ])
+                typeof(EntityFrameworkPersistence<,,>).Assembly.Location,
+            ];
+
+        var referencedAssemblies = trustedAssemblies
+            .Concat(additionalAssemblies)
             .Distinct()
             .Select(path => MetadataReference.CreateFromFile(path))
             .ToList();
@@ -90,7 +90,21 @@ internal class CyrusGeneratorTestBuilder
 
         compileDiagnostics.ToList().ForEach(d =>
         {
-            logAction.Invoke($"Compilation Diagnostic: {d.Id} - {d.GetMessage()}");
+            string? path = Path.GetFileName(d.Location.SourceTree?.FilePath);
+            if (!String.IsNullOrEmpty(path))
+            {
+                path += " - ";
+            }
+            int line = d.Location.GetLineSpan().Span.Start.Line;
+            int column = d.Location.GetLineSpan().Span.Start.Character;
+            if (line == 0 && column == 0)
+            {
+                logAction.Invoke($"{path}{d.Id} - {d.GetMessage()}");
+            }
+            else
+            {
+                logAction.Invoke($"{path}({line},{column}) - {d.Id}: {d.GetMessage()}");
+            }
         });
 
         analyzerDiagnostics.ToList().ForEach(d =>
@@ -117,7 +131,7 @@ internal class CyrusGeneratorTestBuilder
 
     internal CyrusGeneratorTestBuilder InTestProject()
     {
-        globalOptions.Remove(enableCyrusBuildPropertyKey);
+        globalOptions[enableCyrusBuildPropertyKey] = false.ToString();
         return this;
     }
 

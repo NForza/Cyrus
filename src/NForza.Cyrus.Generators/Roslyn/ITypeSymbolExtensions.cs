@@ -170,4 +170,15 @@ internal static class ITypeSymbolExtensions
                         return true;
         return false;
     }
+
+    public static bool HasReturnValue(this ITypeSymbol typeSymbol)
+    {
+        if (typeSymbol.IsVoid())
+            return false;
+
+        if (typeSymbol is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.IsTaskType() && namedTypeSymbol.TypeArguments.Length == 0)
+            return false;
+
+        return true;
+    }
 }
