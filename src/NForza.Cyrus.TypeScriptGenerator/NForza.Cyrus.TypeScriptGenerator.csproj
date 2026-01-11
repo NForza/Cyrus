@@ -12,8 +12,8 @@
   <ItemGroup>
     <ProjectReference Include="..\NForza.Cyrus.Abstractions\NForza.Cyrus.Abstractions.csproj" />
     <ProjectReference Include="..\NForza.Cyrus.Templating\NForza.Cyrus.Templating.csproj" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="9.0.10" />
-    <PackageReference Include="System.IO.Abstractions" Version="22.0.16" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="10.0.1" />
+    <PackageReference Include="System.IO.Abstractions" Version="22.1.0" />
     <ProjectReference Include="..\NForza.Cyrus.Core\NForza.Cyrus.Core.csproj" />
   </ItemGroup>
 </Project>

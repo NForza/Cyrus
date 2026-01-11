@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using Microsoft.CodeAnalysis;
 using NForza.Cyrus.Generators.Aggregates;
 using NForza.Cyrus.Generators.Roslyn;
@@ -33,16 +32,7 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
         foreach (var stepHandler in stepHandlers)
         {
             IEnumerable<CommandStep> steps = GetCommandHandlerSteps(stepHandler, cyrusGenerationContext).ToList();
-            var returnType = stepHandler.ReturnType;
-            if (returnType is INamedTypeSymbol namedTypeSymbol)
-            {
-                returnType = (namedTypeSymbol.IsTaskType(), namedTypeSymbol.TypeArguments.Length) switch
-                {
-                    (true, 1) => namedTypeSymbol.TypeArguments[0],
-                    (true, 0) => null,
-                    _ => namedTypeSymbol,
-                };
-            }
+            ITypeSymbol? returnType = GetCommandHandlerReturnType(stepHandler);
             var model = new
             {
                 Namespace = stepHandler.ContainingType.ContainingNamespace.ToDisplayString(),
@@ -62,6 +52,22 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
             var source = cyrusGenerationContext.LiquidEngine.Render(model, "StepCommand");
             spc.AddSource($"{stepHandler.ContainingType.Name}.g.cs", source);
         }
+    }
+
+    private static ITypeSymbol? GetCommandHandlerReturnType(IMethodSymbol stepHandler)
+    {
+        var returnType = stepHandler.ReturnType;
+        if (returnType is INamedTypeSymbol namedTypeSymbol)
+        {
+            returnType = (namedTypeSymbol.IsTaskType(), namedTypeSymbol.TypeArguments.Length) switch
+            {
+                (true, 1) => namedTypeSymbol.TypeArguments[0],
+                (true, 0) => null,
+                _ => namedTypeSymbol,
+            };
+        }
+
+        return returnType;
     }
 
     private string GetLastStepToReturnResultOrDefault(ITypeSymbol typeSymbol, IEnumerable<CommandStep> steps)
@@ -161,19 +167,17 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
     {
         var returnType = methodSymbol.ReturnType;
 
-        // Check if returns Result directly
         if (returnType is INamedTypeSymbol namedType)
         {
-            if (namedType.Name == nameof(NForza.Cyrus.Abstractions.Result))
+            if (namedType.Name == nameof(Abstractions.Result))
             {
                 return true;
             }
 
-            // Check if returns Task<Result>
             if (returnType.IsTaskType() && namedType.TypeArguments.Length > 0)
             {
                 var taskArgument = namedType.TypeArguments[0];
-                if (taskArgument.Name == nameof(NForza.Cyrus.Abstractions.Result))
+                if (taskArgument.Name == nameof(Abstractions.Result))
                 {
                     return true;
                 }
