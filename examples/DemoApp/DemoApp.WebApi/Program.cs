@@ -33,19 +33,19 @@ builder.Services.AddCyrus(cfg =>
 {
     cfg.AddConsumers(Assembly.GetExecutingAssembly(), typeof(DemoApp.Domain.CyrusConfiguration).Assembly);
     cfg.SetSnakeCaseEndpointNameFormatter();
-    cfg.UsingRabbitMq((ctx, cfg) =>
-    {
-        cfg.Host("rabbitmq://localhost", h =>
-        {
-            h.Username("guest");
-            h.Password("guest");
-        });
-        cfg.ConfigureEndpoints(ctx);
-    });
-    //cfg.UsingInMemory((context, cfg) =>
+    //cfg.UsingRabbitMq((ctx, cfg) =>
     //{
-    //    cfg.ConfigureEndpoints(context);
+    //    cfg.Host("rabbitmq://localhost", h =>
+    //    {
+    //        h.Username("guest");
+    //        h.Password("guest");
+    //    });
+    //    cfg.ConfigureEndpoints(ctx);
     //});
+    cfg.UsingInMemory((context, cfg) =>
+    {
+        cfg.ConfigureEndpoints(context);
+    });
 });
 
 var app = builder.Build();

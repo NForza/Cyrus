@@ -212,7 +212,6 @@ public class CommandHandlerGenerator : CyrusGeneratorBase
     {
         var implementedCommandHandlerRegistrations = string.Join("\n",
                 cyrusGenerationContext.CommandHandlers
-                    .Where(ch => !ch.IsPartialDefinition)
                     .Select(ch => ch.ContainingType)
                     .Where(x => x != null && !x.IsStatic)
                     .Distinct(SymbolEqualityComparer.Default)
